@@ -1753,7 +1753,7 @@ footer a {
 }
 @media (max-width: 760px) {
   .window-search-section {
-  position: relative;
+    position: relative;
     padding: 60px 20px;
   }
   .window-search-section .section-heading {
@@ -1790,5 +1790,245 @@ footer a {
   }
   .brand-sub {
     font-size: 6px;
+  }
+}
+
+/* R1: exports, teaching and portable scenarios reuse the observation panels. */
+.export-panel {
+  margin: 20px 0;
+}
+.export-options,
+.scenario-transfer,
+.closest-results {
+  padding: 24px;
+  margin: 20px 0;
+}
+.export-options h3,
+.closest-results h3 {
+  margin-bottom: 16px;
+}
+.export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px 0;
+}
+.export-actions button,
+.lesson-player button,
+.lesson-details button,
+.import-verdict button {
+  border: 1px solid #4b5e6a;
+  padding: 12px 18px;
+  background: #17232c;
+  color: #e8edf1;
+  cursor: pointer;
+}
+.export-options label {
+  display: block;
+}
+.export-options input {
+  width: 100%;
+  margin: 8px 0;
+}
+.chart-export-source {
+  position: absolute;
+  left: -100000px;
+  top: 0;
+  pointer-events: none;
+}
+.scenario-transfer {
+  margin: 0 0 40px;
+}
+.scenario-transfer summary,
+.lesson-details summary {
+  cursor: pointer;
+  padding: 8px 0;
+  font-weight: 600;
+}
+.scenario-transfer p,
+.closest-results p {
+  color: #acbac5;
+  line-height: 1.7;
+  margin: 15px 0;
+}
+.import-scenarios {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+.import-scenarios div {
+  border-left: 2px solid #edbb66;
+  padding-left: 18px;
+  overflow-wrap: anywhere;
+}
+.import-verdict {
+  margin: 20px 0;
+  padding: 20px;
+  border: 1px solid #607a6a;
+}
+.closest-results li {
+  margin: 12px 0;
+  line-height: 1.7;
+}
+.closest-results > ol {
+  padding-left: 22px;
+}
+.closest-results ul {
+  padding-left: 18px;
+  color: #a7bac6;
+}
+.classroom-section {
+  position: relative;
+  padding: 100px 5%;
+  background: #0b1117;
+  scroll-margin-top: 85px;
+}
+.classroom-section .muted {
+  margin: 20px 0;
+  font-size: 15px;
+}
+.lesson-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 36px;
+}
+.lesson-card {
+  padding: 30px;
+}
+.lesson-card h3 {
+  font-size: 24px;
+  line-height: 1.3;
+}
+.lesson-card p {
+  margin: 20px 0;
+  color: #a7bac6;
+}
+.lesson-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(240px, 1fr);
+  gap: 24px;
+}
+.lesson-sky {
+  overflow: hidden;
+}
+.lesson-player {
+  padding: 24px;
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.lesson-player label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+}
+.lesson-player input[type="range"] {
+  width: 100%;
+}
+.lesson-player strong {
+  font: 14px var(--mono);
+}
+.lesson-player select {
+  padding: 9px;
+}
+.lesson-explanation {
+  padding: 30px;
+}
+.lesson-explanation h3 {
+  margin: 18px 0;
+  font-size: 24px;
+}
+.lesson-explanation p {
+  color: #b4c4ce;
+  line-height: 1.8;
+}
+.lesson-cards {
+  grid-column: 1/-1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.lesson-cards article {
+  padding: 24px;
+}
+.lesson-cards h3 {
+  margin-bottom: 14px;
+}
+.lesson-cards p {
+  color: #a7bac6;
+  line-height: 1.8;
+}
+.lesson-details,
+.lesson-stage > .export-panel,
+.lesson-stage > .search-limitation {
+  grid-column: 1/-1;
+}
+.lesson-details {
+  padding: 24px;
+  overflow-wrap: anywhere;
+}
+.lesson-details p {
+  margin: 18px 0;
+  line-height: 1.7;
+}
+@media (max-width: 760px) {
+  .lesson-options,
+  .lesson-stage,
+  .lesson-cards {
+    grid-template-columns: 1fr;
+  }
+  .classroom-section {
+    padding: 65px 5%;
+  }
+  .classroom-section .section-heading {
+    align-items: start;
+    gap: 15px;
+  }
+  .classroom-section h2 {
+    font-size: 36px;
+  }
+  .lesson-player {
+    gap: 14px;
+    padding: 18px;
+  }
+  .lesson-explanation {
+    padding: 24px;
+  }
+  .export-options,
+  .scenario-transfer,
+  .closest-results {
+    padding: 18px;
+  }
+  .export-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+  .scenario-transfer input[type="file"] {
+    max-width: 100%;
+  }
+  .navigation {
+    height: 106px;
+    padding-top: 12px;
+    padding-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 0;
+  }
+  .navigation nav {
+    width: 100%;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .navigation nav button {
+    font-size: 11px;
+    padding: 12px 0;
+  }
+  .classroom-section,
+  .window-search-section,
+  .comparison-section {
+    scroll-margin-top: 110px;
   }
 }

@@ -1,0 +1,104 @@
+{
+  "base_job": "8910a78d-6cbf-5693-9663-0bea28d29e67",
+  "comparison_job": "46cfdfd8-4e34-58b2-ba98-337e0e782e19",
+  "checks": {
+    "single": {
+      "csv_rows": 39,
+      "exact_frame_values": true,
+      "manifest_roundtrip": true,
+      "fingerprint_matches": true,
+      "report_contains_sources": true
+    },
+    "comparison": {
+      "csv_rows": 63,
+      "exact_frame_values": true,
+      "manifest_roundtrip": true,
+      "fingerprint_matches": true,
+      "report_contains_sources": true
+    },
+    "changing-light": {
+      "job_id": "d2fca08e-345c-586f-9f6a-5ae4c93debc9",
+      "reuse": true
+    },
+    "later-start": {
+      "job_id": "fbdf5315-4175-5df1-8879-de7f5dfbe74c",
+      "reuse": true
+    },
+    "ranking": {
+      "search_id": "ae16bccf-9ad5-400b-b20c-2c344fcb7997",
+      "nearest": {
+        "job_id": "fbdf5315-4175-5df1-8879-de7f5dfbe74c",
+        "start_utc": "2026-11-06T00:00:00+00:00",
+        "state": "not_met",
+        "score": 0.05555555555555555,
+        "deficits": [
+          {
+            "name": "sunlight_percent",
+            "shortfall": 0,
+            "unit": "percentage points",
+            "normalized": 0.0
+          },
+          {
+            "name": "longest_darkness_hours",
+            "shortfall": 0,
+            "unit": "hours",
+            "normalized": 0.0
+          },
+          {
+            "name": "earth_visible_hours",
+            "shortfall": 4.0,
+            "unit": "hours",
+            "normalized": 0.16666666666666666
+          }
+        ]
+      },
+      "unknown_excluded": true
+    }
+  },
+  "verified_utc": "2026-11-14T15:17:33Z",
+  "branch": "feature/r1-exports-sharing-classroom",
+  "base_commit": "28554ff",
+  "skeleton_commit": "0b18549",
+  "frozen_test_commit": "f534817",
+  "tests": {
+    "backend": 169,
+    "ingestion": 75,
+    "frontend": 19,
+    "total": 263
+  },
+  "quality": {
+    "ruff": "passed",
+    "pip_check": "passed",
+    "typescript_build": "passed",
+    "npm_audit_vulnerabilities": 0,
+    "frozen_backend_tests_unchanged": true
+  },
+  "browser": {
+    "desktop": "1440x1000",
+    "mobile": "390x844",
+    "checks": [
+      "shared single-result link restores frame index 2",
+      "shared A/B link restores comparison cursor 3",
+      "single and comparison PNG downloads inspected",
+      "CSV download preserves all real sample values",
+      "downloaded HTML report opens without external dependencies",
+      "scenario file validates without queuing then explicitly recalculates A/B",
+      "recalculated A/B fingerprints match",
+      "classroom opens in two clicks, has speed/play/pause and collapsed technical details",
+      "mobile layout has no horizontal overflow",
+      "no-match search displays nearest candidates and per-condition deficits"
+    ],
+    "portable_recalculation_job_ids": [
+      "3c92c415-95f6-436f-8366-9ce085c8a894",
+      "eae9736a-b546-4638-af34-8c966c46cbd1"
+    ],
+    "portable_recalculation_fingerprints_match": true
+  },
+  "limitations": [
+    "No public deployment or merge",
+    "Saved links require the same accessible server and retained state volume",
+    "Portable JSON does not bundle source datasets; exact recalculation is checked, not promised",
+    "Classroom demonstrates observer horizon/visibility; terrain-wide shadow visualization from the broader S15 design is not implemented",
+    "Human teammate MVP acceptance remains pending"
+  ]
+}

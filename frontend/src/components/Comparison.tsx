@@ -1,3 +1,4 @@
+import ExportPanel from "./ExportPanel";
 import { useEffect, useState } from "react";
 import HorizonPlot from "./HorizonPlot";
 import type { Result, Preset, Frame } from "../types";
@@ -205,8 +206,12 @@ export default function Comparison({
   a,
   sites,
   onClose,
+  initialBId,
+  initialCursor = 0,
 }: {
   aId: string;
+  initialBId?: string;
+  initialCursor?: number;
   a: Result;
   sites: Preset[];
   onClose: () => void;
@@ -243,13 +248,26 @@ export default function Comparison({
         }
         setDraft(saved?.draft || { ...job.submission });
         setMode(saved?.mode || "dates");
-        setBId(saved?.bId || null);
+        setBId(initialBId || saved?.bId || null);
+        if (initialBId)
+          api(`/analyses/${initialBId}`)
+            .then((other) => {
+              if (active) {
+                setDraft(other.submission);
+                setMode(
+                  other.submission.start_utc === job.submission.start_utc
+                    ? "sites"
+                    : "dates",
+                );
+              }
+            })
+            .catch((e) => active && setError(e.message));
       })
       .catch((e) => active && setError(e.message));
     return () => {
       active = false;
     };
-  }, [aId, key, retry]);
+  }, [aId, key, retry, initialBId]);
   useEffect(() => {
     if (draft) localStorage.setItem(key, JSON.stringify({ draft, mode, bId }));
   }, [key, draft, mode, bId]);
@@ -277,7 +295,11 @@ export default function Comparison({
           if (active) {
             setB(view);
             setComparison(match);
-            setCursor(0);
+            setCursor(
+              Number.isInteger(initialCursor)
+                ? Math.max(0, Math.min(initialCursor, match.cursor.length - 1))
+                : 0,
+            );
             setBusy(false);
             setPhase(match.status);
             setError("");
@@ -578,6 +600,17 @@ export default function Comparison({
       )}
       {comparison && b && point ? (
         <>
+          {bId && (
+            <ExportPanel
+              jobId={aId}
+              result={a}
+              frameIndex={point.a_index ?? 0}
+              bId={bId}
+              b={b}
+              bFrameIndex={point.b_index ?? 0}
+              cursor={cursor}
+            />
+          )}
           <div className="compare-deltas">
             {metrics.map(([target, metric, label, unit]) => {
               const raw = comparison.deltas[target][metric];

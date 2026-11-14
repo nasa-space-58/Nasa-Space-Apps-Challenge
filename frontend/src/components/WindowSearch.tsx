@@ -89,6 +89,32 @@ export default function WindowSearch({
   const [opening, setOpening] = useState(false);
   const [retry, setRetry] = useState(0);
   const [onlyMatches, setOnlyMatches] = useState(false);
+  const [ranking, setRanking] = useState<{
+    method: string;
+    ranked: {
+      job_id: string;
+      score: number;
+      state: string;
+      deficits: { name: string; shortfall: number; unit: string }[];
+    }[];
+    excluded: { job_id: string; reason: string }[];
+  } | null>(null);
+  const [rankError, setRankError] = useState("");
+  useEffect(() => {
+    if (!id || !view?.completed) return;
+    let active = true;
+    api("/searches/" + id + "/ranking")
+      .then((data) => {
+        if (active && Array.isArray(data.ranked)) {
+          setRanking(data);
+          setRankError("");
+        }
+      })
+      .catch((e) => active && setRankError(e.message));
+    return () => {
+      active = false;
+    };
+  }, [id, view?.completed, retry]);
   const busy =
     sending || (!!view && ["pending", "running"].includes(view.status));
   useEffect(() => {
@@ -170,6 +196,8 @@ export default function WindowSearch({
       };
       const next = await api("/searches", body);
       setView(next);
+      setRanking(null);
+      setRankError("");
       setId(next.id);
       localStorage.setItem(
         "lunar-window-search",
@@ -477,6 +505,73 @@ export default function WindowSearch({
                   thresholds.
                 </div>
               )}
+              {rankError && (
+                <p className="alert">
+                  Closest-results ranking unavailable: {rankError}{" "}
+                  <button onClick={() => setRetry((n) => n + 1)}>
+                    Retry ranking
+                  </button>
+                </p>
+              )}
+              {ranking &&
+                view.completed === view.total &&
+                view.matches === 0 && (
+                  <div className="panel closest-results">
+                    <h3>Closest evaluated starts</h3>
+                    <p>{ranking.method}</p>
+                    {ranking.ranked.length ? (
+                      <ol>
+                        {ranking.ranked.slice(0, 3).map((row) => (
+                          <li key={row.job_id}>
+                            <strong>
+                              {stamp(
+                                view.candidates.find(
+                                  (c) => c.job_id === row.job_id,
+                                )!.start_utc,
+                              )}{" "}
+                              · deficit {row.score.toFixed(4)}
+                            </strong>
+                            <ul>
+                              {row.deficits
+                                .filter((d) => d.shortfall > 0)
+                                .map((d) => (
+                                  <li key={d.name}>
+                                    {conditionLabels[d.name]}:{" "}
+                                    {d.shortfall.toFixed(2)} {d.unit}{" "}
+                                    {d.name === "longest_darkness_hours"
+                                      ? "over your maximum"
+                                      : "below your minimum"}
+                                  </li>
+                                ))}
+                            </ul>
+                            <button
+                              className="text-button"
+                              disabled={opening}
+                              onClick={() =>
+                                choose(
+                                  view.candidates.find(
+                                    (c) => c.job_id === row.job_id,
+                                  )!,
+                                  false,
+                                )
+                              }
+                            >
+                              Review this candidate ↗
+                            </button>
+                          </li>
+                        ))}
+                      </ol>
+                    ) : (
+                      <p>No fully evaluated candidate can be ranked.</p>
+                    )}
+                    {ranking.excluded.length > 0 && (
+                      <p>
+                        {ranking.excluded.length} unknown, failed or unfinished
+                        candidate(s) excluded.
+                      </p>
+                    )}
+                  </div>
+                )}
               <label className="checkbox-label search-filter">
                 <input
                   type="checkbox"

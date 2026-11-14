@@ -11,6 +11,9 @@ import HorizonPlot from "./components/HorizonPlot";
 import PolarMap from "./components/PolarMap";
 import Comparison from "./components/Comparison";
 import WindowSearch from "./components/WindowSearch";
+import ExportPanel from "./components/ExportPanel";
+import ScenarioTransfer from "./components/ScenarioTransfer";
+import Classroom from "./components/Classroom";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
 
 const MoonScene = lazy(() => import("./components/MoonScene"));
@@ -188,6 +191,9 @@ export default function App() {
   const [submitting, setSubmitting] = useState(false);
   const [sources, setSources] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [classroomOpen, setClassroomOpen] = useState(false);
+  const [sharedB, setSharedB] = useState<string | undefined>(undefined);
+  const shared = useRef(new URLSearchParams(location.search));
   const [resolved, setResolved] = useState("");
   const busy = submitting || (!!job && activeStates.includes(job.status));
   const frame = result?.frames[frameIndex];
@@ -232,7 +238,9 @@ export default function App() {
   };
   useEffect(() => {
     loadSites();
-    const saved = localStorage.getItem("lunar-analysis-id");
+    const saved =
+      shared.current.get("analysis") ||
+      localStorage.getItem("lunar-analysis-id");
     if (saved)
       api(`/analyses/${saved}`)
         .then((savedJob) => {
@@ -254,7 +262,13 @@ export default function App() {
             setRefine(submitted.refine);
           }
         })
-        .catch(() => localStorage.removeItem("lunar-analysis-id"));
+        .catch(() => {
+          if (shared.current.has("analysis"))
+            setError(
+              "Shared analysis is unavailable on this server. Ask for a scenario JSON file or the original server URL.",
+            );
+          else localStorage.removeItem("lunar-analysis-id");
+        });
   }, []);
   useEffect(() => {
     if (!job) return;
@@ -269,7 +283,23 @@ export default function App() {
           const view: Result = await api(`/analyses/${job.id}/result`);
           if (!canceled) {
             setResult(view);
-            setFrameIndex(0);
+            const requested =
+              shared.current.get("analysis") === job.id
+                ? Number(shared.current.get("frame") || 0)
+                : 0;
+            setFrameIndex(
+              Number.isInteger(requested)
+                ? Math.max(0, Math.min(requested, view.frames.length - 1))
+                : 0,
+            );
+            if (shared.current.get("analysis") === job.id) {
+              const other = shared.current.get("compare");
+              if (other) {
+                setSharedB(other);
+                setComparisonBase({ id: job.id, result: view });
+              }
+              setTimeout(() => jump(other ? "comparison" : "mission"), 0);
+            }
             setError("");
           }
         } else if (next.status === "failed")
@@ -365,6 +395,7 @@ export default function App() {
     refine,
   });
   const launch = async (example = false) => {
+    clearSharedLink();
     setError("");
     setSubmitting(true);
     setPlaying(false);
@@ -407,11 +438,20 @@ export default function App() {
       setSubmitting(false);
     }
   };
-  const openSearchResult = async (id: string, compare: boolean) => {
+  const clearSharedLink = () => {
+    shared.current = new URLSearchParams();
+    window.history.replaceState({}, "", window.location.pathname);
+  };
+  const openSearchResult = async (
+    id: string,
+    compare: boolean,
+    otherId?: string,
+  ) => {
     const [selected, view] = await Promise.all([
       api(`/analyses/${id}`),
       api(`/analyses/${id}/result`),
     ]);
+    clearSharedLink();
     const submitted = selected.submission;
     setSiteId(submitted.site_id);
     setLat(String(submitted.latitude_deg));
@@ -426,6 +466,8 @@ export default function App() {
     );
     setRefine(submitted.refine);
     setSearchOpen(false);
+    setClassroomOpen(false);
+    setSharedB(otherId);
     setPlaying(false);
     setJob(selected);
     setResult(view);
@@ -471,9 +513,10 @@ export default function App() {
         </button>
         <nav aria-label="Main navigation">
           <button
-            aria-pressed={!searchOpen}
+            aria-pressed={!searchOpen && !classroomOpen}
             onClick={() => {
               setSearchOpen(false);
+              setClassroomOpen(false);
               setTimeout(() => jump("mission"), 0);
             }}
           >
@@ -482,11 +525,23 @@ export default function App() {
           <button
             aria-pressed={searchOpen}
             onClick={() => {
+              setClassroomOpen(false);
               setSearchOpen(true);
               setTimeout(() => jump("window-search"), 0);
             }}
           >
             Time search
+          </button>
+          <button
+            aria-pressed={classroomOpen}
+            onClick={() => {
+              setSearchOpen(false);
+              setClassroomOpen(true);
+              setPlaying(false);
+              setTimeout(() => jump("classroom"), 0);
+            }}
+          >
+            Classroom
           </button>
           <button onClick={openSources}>
             Sources <span>↗</span>
@@ -561,6 +616,7 @@ export default function App() {
                 className="primary"
                 onClick={() => {
                   setSearchOpen(false);
+                  setClassroomOpen(false);
                   setTimeout(() => jump("mission"), 0);
                 }}
               >
@@ -624,6 +680,7 @@ export default function App() {
               className="primary"
               onClick={() => {
                 setSearchOpen(false);
+                setClassroomOpen(false);
                 setTimeout(() => jump("mission"), 0);
               }}
             >
@@ -636,7 +693,12 @@ export default function App() {
         </section>
       </section>
 
-      <section id="mission" className="mission-section" hidden={searchOpen}>
+      <section
+        id="mission"
+        className="mission-section"
+        hidden={searchOpen || classroomOpen}
+      >
+        <ScenarioTransfer onOpen={openSearchResult} />
         <div className="section-heading">
           <div>
             <p className="eyebrow">03 / YOUR OBSERVATION WINDOW</p>
@@ -1099,10 +1161,18 @@ export default function App() {
               </div>
             )}
             {result && job && (
+              <ExportPanel
+                jobId={job.id}
+                result={result}
+                frameIndex={frameIndex}
+              />
+            )}
+            {result && job && (
               <button
                 className="primary add-comparison"
                 onClick={() => {
                   setPlaying(false);
+                  setSharedB(undefined);
                   setComparisonBase({ id: job.id, result });
                   setTimeout(() => jump("comparison"), 0);
                 }}
@@ -1117,16 +1187,19 @@ export default function App() {
           </div>
         </div>
       </section>
-      {comparisonBase && !searchOpen && (
+      {comparisonBase && !searchOpen && !classroomOpen && (
         <Comparison
           key={comparisonBase.id}
           aId={comparisonBase.id}
+          initialBId={sharedB}
+          initialCursor={Number(shared.current.get("cursor") || 0)}
           a={comparisonBase.result}
           sites={sites}
           onClose={() => setComparisonBase(null)}
         />
       )}
       {searchOpen && <WindowSearch sites={sites} onChoose={openSearchResult} />}
+      {classroomOpen && <Classroom onOpen={openSearchResult} />}
       <footer>
         <span>
           2GBRAM <i> / </i> LUNAR LANDING NAVIGATOR
