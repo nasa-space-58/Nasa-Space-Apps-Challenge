@@ -4,7 +4,7 @@ H9 turns the H8 solver arena into an illustrative Artemis-style campaign: one cr
 
 ## Delivery and history
 
-Branch: `codex/h9-shared-antenna`, based on completed H8 `74bcfba`, which contains current main `cb17bdd`. H8 had not been merged into main when work started. Only the new branch is delivered; main and tahakrcc are not merged or pushed. The user's existing H6 notebook edits remain local and excluded.
+Branch: `codex/h9-shared-antenna`, based on completed H8 `74bcfba`, which contains the starting main revision `cb17bdd`. H8 had not been merged into main when work started. Before delivery, collaborator NOAA space-weather changes from main `a5171d4` were integrated into this H9 branch, preserving both features. Only the new branch is delivered; neither main nor tahakrcc receives H9 commits. The user's existing H6 notebook edits remain local and excluded.
 
 - Campaign skeleton: `071e1fa`.
 - Frozen campaign acceptance tests: `945a718` (40 tests).
@@ -109,4 +109,12 @@ The selected ideal circuit had feasible probability 67.8607% and optimal probabi
 
 Raw counts and sanitized metadata are retained in `shared/examples/campaign/hardware.json`. Both the notebook and API independently decode every count against the original H9 constraints without repair. The best observed plan is crew-1 / robot-a-2 / robot-b-4. The stored hardware record is not applied to modified scenarios.
 
-Final checks: **1050 backend tests, 112 ingestion tests and 69 optional quantum tests passed**, with Ruff checks and the TypeScript/Vite build passing. All **11 notebook code cells executed without error**. The recorded hardware fixture was additionally exercised by the targeted H8/H9 suite and the running API. No frontend tests or screenshots were run.
+### Reading the outputs
+
+A shot is one measurement of the circuit, producing one proposed three-mission assignment. It is not a separately optimized mission or a successful physical landing. Of the 256 observations, 17 satisfy the modeled scheduling constraints: three are optimal and 14 are feasible but lower-scoring. The remaining 239 violate one or more constraints, such as simultaneous antenna demand or selecting a geometrically unavailable interval. Repeated bitstrings count as repeated observations, not distinct plans.
+
+The optimal measured string is `110100`, observed three times. Read its two-bit fields from right to left in mission order: crew `00` selects alternative 1, robot A `01` selects alternative 2, and robot B `11` selects alternative 4. Alternative codes are zero-based. Their preference contributions are respectively `3 * 4 / 4 = 3`, `2 * 3 / 4 = 1.5`, and `1 * 1 / 4 = 0.25`; the total is 4.75, with no solar contribution in these dark intervals.
+
+The best observed gap of zero compares the best valid sample with the exact classical optimum. It does not mean all samples are correct, nor that the hardware beats the classical solver. The exact solver exhaustively checks 64 possible assignments and provides the reference optimum; the hardware circuit samples assignments after local parameter tuning. The measured 93.796-second interval includes queueing, networking and polling, not just QPU execution, so it is not a standalone quantum computation time.
+
+Final checks after integrating main `a5171d4`: **1121 backend tests, 185 ingestion tests and 69 optional quantum tests passed**, with Ruff checks and the TypeScript/Vite build passing. All **11 notebook code cells executed without error**. The recorded hardware fixture was additionally exercised by the targeted H8/H9 suite and the running API. After integration, the running API retained H8, H9 and NOAA route groups; catalog and archived hardware endpoints returned HTTP 200, preserving the 17/256 feasible and 3/256 optimal measurements without submitting new jobs. No frontend tests or screenshots were run.
