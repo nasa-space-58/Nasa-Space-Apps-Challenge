@@ -5,7 +5,7 @@ import logging
 import os
 from pathlib import Path
 
-from app.consumer import serve
+from app.consumer import serve, serve_dsn
 
 import aio_pika
 
@@ -18,10 +18,11 @@ async def main() -> None:
     """
     connection = await aio_pika.connect_robust(os.environ["RABBITMQ_URL"])
     try:
-        consumer = asyncio.create_task(
-            serve(connection, Path(os.environ.get("DATA_DIR", "/data")))
+        data_dir = Path(os.environ.get("DATA_DIR", "/data"))
+        # Analysis ingestion and DSN station requests use separate queues/channels.
+        await asyncio.gather(
+            serve(connection, data_dir), serve_dsn(connection, data_dir)
         )
-        await consumer
     finally:
         await connection.close()
 

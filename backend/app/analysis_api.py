@@ -333,15 +333,31 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     from app.window_search import SearchStore, register_search_routes
 
     searches = SearchStore(store)
+    from app.communication import (
+        CommunicationStore,
+        execute_communication,
+        register_communication_routes,
+    )
+
+    communications = CommunicationStore(store)
 
     async def worker():
         while True:
             searches.tick()
             jobs = store.pending()
+            links = [] if jobs else communications.pending()
             if jobs:
                 await asyncio.to_thread(
                     lambda: asyncio.run(
                         execute_job(store, jobs[0], data_dir, broker_url)
+                    )
+                )
+            elif links:
+                await asyncio.to_thread(
+                    lambda: asyncio.run(
+                        execute_communication(
+                            communications, store, links[0], data_dir, broker_url
+                        )
                     )
                 )
             else:
@@ -350,6 +366,7 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     @asynccontextmanager
     async def lifespan(app):
         store.recover()
+        communications.recover()
         task = asyncio.create_task(worker()) if start_worker else None
         yield
         if task:
@@ -362,7 +379,9 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     app = FastAPI(title="Lunar Landing Navigator", lifespan=lifespan)
     app.state.store = store
     app.state.searches = searches
+    app.state.communications = communications
     register_search_routes(app, searches)
+    register_communication_routes(app, store, communications)
 
     @app.get("/health")
     def health():

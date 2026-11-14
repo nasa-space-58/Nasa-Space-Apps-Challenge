@@ -203,3 +203,13 @@ Task 7 yalnızca `feature/task7-window-search` dalına gönderilir; tahakrcc/mai
 
 **263 test** ve derleme kontrolleri geçti. [R1 kullanım, API ve kapsam](docs/release-r1.md).
 Yalnızca `feature/r1-exports-sharing-classroom` dalına gönderilir; tahakrcc/main ile birleştirme kullanıcıya aittir. Takım arkadaşı MVP kabulü hâlâ bekliyor.
+
+## R2: DSN yer istasyonlarıyla Dünya'ya doğrudan iletişim
+
+Görev kontrolündeki **Direct-to-Earth communication** paneli, kaydedilmiş bir analiz için Dünya ile doğrudan iletişimin geometrik olarak mümkün olduğu zamanları gösterir. Bir pencere için iki koşulun aynı anda sağlanması gerekir:
+
+- Dünya'nın merkezi iniş noktasındaki arazi ufkunun üstünde olmalı.
+- Ay, NASA DSN istasyonlarından en az birinde (Goldstone DSS-14, Canberra DSS-43, Madrid DSS-63) yükseklik sınırının üstünde olmalı.
+
+Varsayılan sınır 6° (alma), alternatifi 10° (düşük güçlü gönderme). İstasyon koordinatları NASA DSN 810-005 modül 301 Rev. P'den, Ay konumları JPL Horizons'tan gelir. İstasyon ufuk maskeleri, takvim ve link-budget modellenmez; sonuç bir bağlantı garantisi değildir. [Kaynaklar, yöntem ve API](docs/ground-station-communication.md).
+

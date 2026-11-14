@@ -2032,3 +2032,104 @@ footer a {
     scroll-margin-top: 110px;
   }
 }
+
+/* R2: direct-to-Earth communication through DSN stations. */
+.communication-panel {
+  margin-top: 16px;
+}
+.communication-body {
+  padding: 20px;
+}
+.communication-intro,
+.communication-empty {
+  color: #acbac5;
+  line-height: 1.6;
+  margin: 0 0 16px;
+}
+.communication-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+.communication-controls label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  color: #b1bcc5;
+}
+.communication-controls select {
+  background: #17232c;
+  color: #e8edf1;
+  border: 1px solid #4b5e6a;
+  padding: 10px 12px;
+}
+.communication-status {
+  font-size: 13px;
+  color: #b1bcc5;
+}
+.communication-status.failed {
+  color: #f0a39a;
+}
+.communication-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+.communication-metrics > div {
+  display: grid;
+  gap: 4px;
+  border: 1px solid var(--line);
+  padding: 12px;
+}
+.communication-metrics strong {
+  font-size: 22px;
+  font-weight: 500;
+}
+.communication-metrics small {
+  color: #8c9ba6;
+  font-size: 11px;
+}
+.communication-bands .timeline-row > span {
+  width: 52px;
+}
+.time-segment.link-available {
+  background: #8fb3c7;
+}
+.time-segment.link-unavailable {
+  background: #263541;
+}
+.time-segment.link-unknown {
+  background: repeating-linear-gradient(
+    45deg,
+    #554e60,
+    #554e60 3px,
+    #8f8798 3px,
+    #8f8798 4px
+  );
+}
+.station-key,
+.window-list,
+.communication-limits ul {
+  margin: 14px 0;
+  padding-left: 18px;
+  color: #c4ced5;
+  font-size: 13px;
+  line-height: 1.7;
+}
+.communication-limits summary {
+  cursor: pointer;
+  font-weight: 600;
+  padding: 8px 0;
+}
+.communication-limits a {
+  color: var(--blue);
+  font-size: 13px;
+}
+@media (max-width: 700px) {
+  .communication-metrics {
+    grid-template-columns: 1fr;
+  }
+}

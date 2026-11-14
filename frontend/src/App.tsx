@@ -14,6 +14,7 @@ import WindowSearch from "./components/WindowSearch";
 import ExportPanel from "./components/ExportPanel";
 import ScenarioTransfer from "./components/ScenarioTransfer";
 import Classroom from "./components/Classroom";
+import Communication from "./components/Communication";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
 
 const MoonScene = lazy(() => import("./components/MoonScene"));
@@ -1105,6 +1106,9 @@ export default function App() {
                 </strong>
               </div>
             </div>
+            {result && job && (
+              <Communication key={job.id} jobId={job.id} current={frame?.utc} />
+            )}
             {result && (
               <div className="panel trace-panel">
                 <details>

@@ -57,3 +57,17 @@ async def serve(connection, data_dir: Path) -> None:
     async with queue.iterator() as messages:
         async for message in messages:
             await handle_message(message, exchange, data_dir)
+
+
+async def serve_dsn(connection, data_dir: Path) -> None:
+    """Consume DSN station requests on a separate channel, one at a time."""
+    from shared.dsn import declare_dsn_topology
+    from app.dsn import handle_dsn_message
+
+    channel = await connection.channel(publisher_confirms=True, on_return_raises=True)
+    await channel.set_qos(prefetch_count=1)
+    queue, exchange = await declare_dsn_topology(channel)
+    logging.info("Broker connected; DSN station consumer ready")
+    async with queue.iterator() as messages:
+        async for message in messages:
+            await handle_dsn_message(message, exchange, data_dir)

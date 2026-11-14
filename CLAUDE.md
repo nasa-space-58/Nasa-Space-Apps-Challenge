@@ -99,3 +99,8 @@ Start from Task 6 on `feature/task7-window-search`. Push only this new branch; d
 
 Complete remaining R1 work from Task 7 (`28554ff`) on `feature/r1-exports-sharing-classroom`.
 Push only this new branch. Do not merge into or push to tahakrcc/main. The user merges manually.
+
+### R2 delivery override (user, 2026-11-14)
+
+R2 (DSN ground-station communication) starts from tahakrcc `a37e83c` on `feature/r2-ground-station-communication`. Push that branch and, at the user's explicit request, the same commits to `temel`. Do not merge into or push to tahakrcc or main.
+
