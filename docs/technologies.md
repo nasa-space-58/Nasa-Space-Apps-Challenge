@@ -185,3 +185,8 @@ The backend activates the previously selected Rasterio/GDAL and NumPy stack, pin
 ## Optional H0 notebook environment
 
 H0 adds no service runtime dependency. Local Jupyter execution uses a separate Python 3.12 environment with `notebooks/requirements.txt`: Pydantic 2.12.5 (matching services), ipykernel 6.30.1, nbformat 5.10.4 and nbclient 0.10.2. The latter three are optional notebook development/execution tools. They are not installed in backend or ingestion images. Qiskit and quantum-provider SDKs are not required by H0.
+
+
+### H2 local quantum simulation
+
+H2 reuses backend NumPy 2.5.4 for bounded noiseless statevectors (at most eight qubits); no service runtime dependency changes. Optional `notebooks/requirements.txt` now includes that same NumPy version for the existing Jupyter kernel. No provider SDK or hardware connection is used by H2. See `docs/quantum-mapping.md` for execution budgets, encoding limits and gate estimates.

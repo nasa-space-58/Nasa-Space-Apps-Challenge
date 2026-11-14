@@ -129,3 +129,8 @@ H0 starts from current tahakrcc `d67a32f` on `codex/h0-hybrid-contracts`. Push o
 ### H1 and continuing hybrid delivery override (user, 2026-11-14)
 
 H1 starts from H0 `ac14ec8`. The user requested one continuing quantum-development branch: `codex/quantum-hybrid`. Push only that branch; do not merge into or push to tahakrcc/main. The user merges manually. H1 is the tested classical reference, with no quantum calls. See `docs/classical-planning.md`; skeleton `33901c3`, frozen tests `1bc2ce8`. For later quantum experiments, start with a small circuit and bounded execution budget; keep unsuccessful experimental implementations uncommitted and preserve their evidence locally. Agree on measurable success criteria before quantum experiments; do not equate a successful hardware invocation with a useful optimization result.
+
+
+### H2 continuation (user, 2026-11-14)
+
+The user authorized continuing later H stages on `codex/quantum-hybrid`. H2 uses a bounded local simulator only; no paid/provider job is authorized by a local simulation run. Skeleton `00c6801`, frozen tests `7c26cfc`; see `docs/quantum-mapping.md`. Low-qubit encoding must report its gate/locality tradeoff. Do not label simulator expectations as hardware observations or per-sample gains as end-to-end advantage.

@@ -247,3 +247,10 @@ Jupyter notebook: [`notebooks/H0_shared_contracts.ipynb`](notebooks/H0_shared_co
 [`notebooks/H1_classical_planning.ipynb`](notebooks/H1_classical_planning.ipynb), aynı Jupyter çekirdeğiyle bağımsız seçimleri ortak planlamayla karşılaştırır. Üç görev ve dört seçenek için 64 birleşimi değerlendirir; kapasite, zaman ve enerji ihlallerini açıklar. Tek kanallı örnekte 24 geçerli plan arasından 26 ham bilim puanlı planı seçer. Eksik bilgi, çözümsüzlük ve yarıda kalan arama ayrı gösterilir.
 
 [Yöntem, sınırlar ve testler](docs/classical-planning.md). Bu aşama statik klasik referanstır; kuantum devresi veya gerçek iniş güvenliği değerlendirmesi çalıştırmaz. Hibrit geliştirme `codex/quantum-hybrid` branch'inde sürdürülür.
+
+
+## H2: Küçük kuantum simülatörü deneyi
+
+[`notebooks/H2_quantum_mapping.ipynb`](notebooks/H2_quantum_mapping.ipynb), 12 seçim değişkenli QUBO modelini klasik referansla doğrular ve aynı üç görevli problemi 6 kubitlik QAOA simülatöründe dener. Tek katman düşük kapı sayılı varsayılandır; iki katmanla sonuç ve kapı ihtiyacını karşılaştırır. Ham geçersiz örnekler gizlenmez, klasik onarım yapılmaz.
+
+[Yöntem, ölçümler ve sınırlar](docs/quantum-mapping.md). Gerçek kuantum servisine iş göndermez; bu küçük örnek klasik yöntemle zaten kolayca çözülür. Simülatörde örnek başına olasılığın artması, klasik çözücüye göre hız veya maliyet üstünlüğü anlamına gelmez.
