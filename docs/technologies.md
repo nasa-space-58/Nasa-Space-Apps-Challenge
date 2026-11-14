@@ -38,7 +38,7 @@ flowchart LR
 | Language | TypeScript |
 | Build tool / dev server | Vite |
 | 3D Moon map and trajectory view | Three.js via React Three Fiber |
-| Charts (visibility timelines, fuel, landing time) | Recharts |
+| Charts | SVG for the Task 4 horizon/timelines; Recharts remains planned for comparison charts |
 | Testing | Vitest + React Testing Library |
 | Package manager | npm |
 
@@ -48,12 +48,15 @@ Responsibilities:
 - Collecting user input (site, date, spacecraft parameters, mission priorities).
 - **No scientific calculation is done in the frontend.** All calculations come from the backend API.
 
+Task 4 activates the planned Three.js / React Three Fiber stack (locked versions 0.187.0 / 9.8.2). Small NASA display models are local assets with recorded credits; Draco decoding is served locally. The introductory descent is illustrative. This branch documents changes for team review before manual integration.
+
 ## Backend
 
 | Area | Technology |
 |---|---|
 | Language | Python 3.12 |
 | API framework | FastAPI |
+| Local analysis job persistence | Python standard-library SQLite, separate writable state volume |
 | ASGI server | Uvicorn |
 | Data validation / schemas | Pydantic |
 | Message queue client | aio-pika |

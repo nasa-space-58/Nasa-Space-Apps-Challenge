@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "verified_on": "2026-11-14",
+  "sites": [
+    {
+      "site_id": "mons-mouton-feature-center",
+      "display_name": "Mons Mouton \u2014 feature center",
+      "purpose": "Source-backed demonstration/comparison observer; not a certified landing site",
+      "latitude_deg": -84.6,
+      "longitude_deg_east": 31.0,
+      "source_longitude_deg_east": 31.0,
+      "coordinate_source_url": "https://planetarynames.wr.usgs.gov/Feature/16070",
+      "coordinate_source_locator": "Feature 16070, center coordinates, LOLA 2011",
+      "reference_frame": "MOON_ME",
+      "frame_realization": "DE421 mean Earth",
+      "coordinate_precision_note": "Published feature center rounded to 0.01 degree; not a precise touchdown point",
+      "terrain_product": "LDEM_80S_80MPP_ADJ.TIF",
+      "terrain_surface_height_m": 5039.1572265625,
+      "height_sampling": "Containing 80 m pixel; no interpolation or local ground survey",
+      "reference_sphere_radius_m": 1737400,
+      "proposed_observer_height_above_terrain_m": 2.0,
+      "provisional_horizons_altitude_km": 5.0411572265625,
+      "terrain_verified_window_bounds_m": [
+        64320.0,
+        120400.0,
+        104400.0,
+        160480.0
+      ],
+      "terrain_evidence": "verification/terrain-2026-11-14.json",
+      "runtime_preset_enabled": true
+    },
+    {
+      "site_id": "malapert-massif-r23",
+      "display_name": "Malapert Massif \u2014 R23",
+      "purpose": "Source-backed demonstration/comparison observer; not a certified landing site",
+      "latitude_deg": -85.9948,
+      "longitude_deg_east": 359.76422,
+      "source_longitude_deg_east": -0.23578,
+      "coordinate_source_url": "https://ntrs.nasa.gov/api/citations/20250002845/downloads/M2M-30044%20Lunar%20Surface%20Data%20Book%20Baseline_Final.pdf#page=75",
+      "coordinate_source_locator": "Table A2.1-1, page 75, R23 / Site23",
+      "reference_frame": "MOON_ME",
+      "frame_realization": "DE421 mean Earth",
+      "coordinate_precision_note": "Published DEM-derived polygon center; preserve source precision",
+      "terrain_product": "LDEM_80S_80MPP_ADJ.TIF",
+      "terrain_surface_height_m": 4784.62451171875,
+      "height_sampling": "Containing 80 m pixel; no interpolation or local ground survey",
+      "reference_sphere_radius_m": 1737400,
+      "proposed_observer_height_above_terrain_m": 2.0,
+      "provisional_horizons_altitude_km": 4.78662451171875,
+      "terrain_verified_window_bounds_m": [
+        -20560.0,
+        101440.0,
+        19520.0,
+        141520.0
+      ],
+      "terrain_evidence": "verification/terrain-2026-11-14.json",
+      "runtime_preset_enabled": true
+    }
+  ]
+}

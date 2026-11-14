@@ -1,0 +1,412 @@
+{
+  "verified_on": "2026-11-14",
+  "request": {
+    "site": {
+      "site_id": "malapert-massif-r23",
+      "longitude_deg_east": 359.76422,
+      "latitude_deg": -85.9948,
+      "altitude_km": 4.78662451171875,
+      "reference_frame": "MOON_ME"
+    },
+    "start_utc": "2026-11-01T00:00:00Z",
+    "end_utc": "2026-12-01T00:00:00Z",
+    "step_s": 3600
+  },
+  "coarse_analysis_id": "f2a813ea65a383b10c3fd81762173116fc363814d87fb14bfa372928db53d74f",
+  "refined_analysis_id": "a86b2376ee5b8be71138bb1d44d05bf12bbbaf06898d8016d259584486d8a87f",
+  "horizon_profile_id": "0db8b71d945ebd7601746a3b4501ef843c17df2ba4cccdd4f7776f52e23ae5c2",
+  "coarse_samples": 721,
+  "refined_samples": 1006,
+  "coarse_event_count": 19,
+  "refined_event_count": 19,
+  "max_refined_bracket_s": 60.0,
+  "max_matched_event_shift_s": 602.00634,
+  "refinement": {
+    "status": "completed",
+    "passes": [
+      {
+        "step_s": 300,
+        "windows": 18
+      },
+      {
+        "step_s": 60,
+        "windows": 19
+      }
+    ],
+    "scope": "detected transition brackets only; not a full fine-grid search"
+  },
+  "metrics": {
+    "sun": {
+      "visible_duration_s": 961687.4952700001,
+      "full_duration_s": 545871.232209,
+      "partial_duration_s": 415816.263061,
+      "blocked_duration_s": 1630312.50473,
+      "unknown_duration_s": 0,
+      "visible_percent_of_interval": 37.10214102121914,
+      "longest_visible_s": 479946.963766,
+      "longest_blocked_s": 633627.59087
+    },
+    "earth": {
+      "visible_duration_s": 1141201.326871,
+      "full_duration_s": 0,
+      "partial_duration_s": 0,
+      "blocked_duration_s": 1450798.673129,
+      "unknown_duration_s": 0,
+      "visible_percent_of_interval": 44.027828968788576,
+      "longest_visible_s": 997283.164509,
+      "longest_blocked_s": 1341658.438833
+    }
+  },
+  "next_setting": {
+    "sun": {
+      "kind": "sunset",
+      "estimated_at_utc": "2026-11-04T04:55:38.157360Z",
+      "bracket_start_utc": "2026-11-04T04:55:00Z",
+      "bracket_end_utc": "2026-11-04T04:56:00Z",
+      "bracket_width_s": 60.0,
+      "status": "found",
+      "time_until_estimate_s": 276938.15736,
+      "time_until_bracket_s": [
+        276900.0,
+        276960.0
+      ]
+    },
+    "earth": {
+      "kind": "earthset",
+      "estimated_at_utc": "2026-11-02T15:58:38.162362Z",
+      "bracket_start_utc": "2026-11-02T15:58:00Z",
+      "bracket_end_utc": "2026-11-02T15:59:00Z",
+      "bracket_width_s": 60.0,
+      "status": "found",
+      "time_until_estimate_s": 143918.162362,
+      "time_until_bracket_s": [
+        143880.0,
+        143940.0
+      ]
+    }
+  },
+  "spatial_sensitivity": {
+    "offset_deg": 0.75,
+    "is_error_bound": false,
+    "horizon_raised": {
+      "sun_visible_duration_s": 378289.29572399997,
+      "earth_visible_duration_s": 1012656.89692
+    },
+    "horizon_lowered": {
+      "sun_visible_duration_s": 1710151.517101,
+      "earth_visible_duration_s": 1270063.0492979998
+    }
+  },
+  "provenance": {
+    "terrain_reference": "terrain/processed/2d16e4a91f72903dc821c84342efe7350bb308b479b41e2b7a6ae62669ecbd29",
+    "ephemerides": [
+      {
+        "reference": "horizons/13b1b86c91711a75b6bb1989fb25c012e4b9df83c20bb4a57aabe0531690ece8",
+        "sha256": {
+          "raw/10.json": "aa312409cbad62aaf02805f4bd3c73cca2c8a7b0dff1e3e2038b5c9692d6fc0e",
+          "raw/399.json": "4b1b8de0c509538da58cf87f4c2036a62ac3ab25e6d1c280047eb19b3e1179b9",
+          "samples.json": "069c39cca4177f4a7f3eeca5223a8630fce2a08c0e6a3165b723ab94f163fd2f"
+        }
+      },
+      {
+        "reference": "horizons/af9f707ab452676c0e6b44d42dacdc63891799270cf92a2b30242cfd6c54eb69",
+        "sha256": {
+          "raw/10.json": "14d02243374dcee7e555b588db062b5460ab4046a899140be42758a6d06fe1a8",
+          "raw/399.json": "54ebe87ca46587411c6bb162016a3e6fd7ddedde5dc36fad5670672d5c713930",
+          "samples.json": "fd03db0d9419c289d4f193d4d81346daf6e3d9718f944b3481e4079a61d625c2"
+        }
+      },
+      {
+        "reference": "horizons/7a66afae564c7b7fb0460684db0807fa526b3c6d75035b66ed0de0bb58092d76",
+        "sha256": {
+          "raw/10.json": "af62458350c1b3d9075ea3e22f6870387eba560f3f224affaf885b2fdcfa9759",
+          "raw/399.json": "5b3d41fd96a6310274c0876a857db9c1af7ef7a7e3d28c4fd7d5a88d6a29fff5",
+          "samples.json": "56c741d4c1ba9bc557db0200b0dd4235970d160df44ff47b99f78c35c0563b4e"
+        }
+      },
+      {
+        "reference": "horizons/4fbbef189d82c738bb719fe8587605e5150de4a9ba6e7f85b486c3a362e1284d",
+        "sha256": {
+          "raw/10.json": "23349a12aa78717ceb9e3a2c868203d55fa3cc9529ccd4f39b64e477e1169fb1",
+          "raw/399.json": "8937af671254dc5df6ae5037a6758fbb3400a82bf0b5e97e52c0d65b694c92a7",
+          "samples.json": "8283990bdd37829b8ed5b27e3bea2c4a0369a192c1b4225cfeaba6811409af8a"
+        }
+      },
+      {
+        "reference": "horizons/2451885d7af53de949939c107e06b1ce9aa6afb3e2c5d550721fb84f0badbb31",
+        "sha256": {
+          "raw/10.json": "a51552eec2b7b8d41a9de0bd7da3c9a28a1b933f38e08347ed592a5b5c33c648",
+          "raw/399.json": "9b281be9fc6e58815aa9d1cd5bdee6b812e99e8d7434302f0fbb70e3930376cf",
+          "samples.json": "7d3089415dfc632f8b622f725f0732c3b2f800c5544fe6183f7c868f08a3bb0c"
+        }
+      },
+      {
+        "reference": "horizons/f63559670a969e8b6d0d52cdaf749b9dcd94817e1b3a9fea678ec404944bc51b",
+        "sha256": {
+          "raw/10.json": "8b7347f2d250341940a6a6858a6c182189a9a63276a1c42a2b3b4c4b204b8f07",
+          "raw/399.json": "580b87305dbc9d89ab36b1038dc6d817448b1e97cd26cc550a51792535c90ab2",
+          "samples.json": "508f58d85da0cc13ccdc82e6207f9b83a53845c724e221204a72816c78ebcb06"
+        }
+      },
+      {
+        "reference": "horizons/cd0214db764678f23cedff8f85bf821bf9f956a4ad0b93f4e7a121da1ccd8803",
+        "sha256": {
+          "raw/10.json": "1c461c7912bec567009deebb65298a9378051152e5ec082e00139a307175e82e",
+          "raw/399.json": "ac5f9e4ab0ea73ee5b5979e0d9552bd869f060470fb5a4d9b3267fe9cbe70512",
+          "samples.json": "693db9ecd2c255ae1ca1bf650a602bfbd37fea75e70228fdec74530ec6d101a0"
+        }
+      },
+      {
+        "reference": "horizons/9406f8c890959662cc4319ff4d45a4ed725d81806b98e50f6a2e7670495e6607",
+        "sha256": {
+          "raw/10.json": "66c1d0f5dfad10ad27a8086db231c1b92921938a263e6cde11d3cdb816aaaf79",
+          "raw/399.json": "2cbf0b8a218195ac33caa3da9662f69f1640f2b363de7b79152806eee4330d38",
+          "samples.json": "07a7ee6e1b15f459ee2978dd5ceef2c6ce5d799fdef2ab694436ffbe66f275fa"
+        }
+      },
+      {
+        "reference": "horizons/2097236662c1c871e7abfcf56797626cfbb5fa85bf01c200233b83f85bd4b019",
+        "sha256": {
+          "raw/10.json": "1fc0208c68036ae117665e704a6b79d80539c0ca73d2a5739f3022e2899b8137",
+          "raw/399.json": "53c549e8618ec5640fc4a60686ac22bbf0a333137a98e929b9fcf411db665665",
+          "samples.json": "c4f65d0cc2445d7861265577bb166093f48ef6f99d2a469e30afc0744acf0e5e"
+        }
+      },
+      {
+        "reference": "horizons/3cfd7979aa7af04ee318bb5452ff9afe7042e501d77feb7088aea04bfcf39146",
+        "sha256": {
+          "raw/10.json": "660e304b9faedc281b412c6639dfa842a9c6c1c9c7d78566d3e59ba820b9f2f0",
+          "raw/399.json": "18e2e031dda67b7367c1e629a0d43d5a3dfd3dfe4bd4687bad1a1ef144d19773",
+          "samples.json": "9f33a0dd624a2d2f058b2735a848f72a930aac6a068e1690c89b45330829c7c1"
+        }
+      },
+      {
+        "reference": "horizons/073419dddbbc011fb007c39cf2ed47438f91a4e276a0c5766c3cff75f01f4449",
+        "sha256": {
+          "raw/10.json": "0652c8bb025187d5c1fbc6efa0e1ee8e3c88092926cd7275cf23892a719fac19",
+          "raw/399.json": "ec2352128bc0ada9c1d610429a72cab3be03793f07dafa2c30d1a8a44a1bf443",
+          "samples.json": "d724a33c1a1006bfab01ee0afdda637237e3491211db42c875bd3c4ba4ea5b97"
+        }
+      },
+      {
+        "reference": "horizons/88ddc448a3dc6e6dc950d5b80d2e2a0c0d9bb21dc52e4de7fc7c7a067d4de8a0",
+        "sha256": {
+          "raw/10.json": "1a58b20780065b84a88e768474305b5d5a4cd65935e0a99b6c3694a6c4e454b8",
+          "raw/399.json": "e6d8d8e1b6247acd09278bce5c22ad03e9ed2c23a0422a53fedaa2b5e66086ac",
+          "samples.json": "1c6d8b96a279c03288ec1d56c0e224d43af13f7fdfdec249a917709d4e21ed48"
+        }
+      },
+      {
+        "reference": "horizons/037336eaa3b6a2782473b537e42a6ce527133de180c457efc5f68cac9d3548e8",
+        "sha256": {
+          "raw/10.json": "64a05053420c120ca52a0e88884bc1b276a968e49364aac523a9def09afeae87",
+          "raw/399.json": "2ce5a95ceed56d72ab58d9674f25fca15bbc567c7576de07a31ff471c8cc76da",
+          "samples.json": "1cb2c6649bb0893ba0edbe6ff05e02e6d4ab56b9873fa89103c15fbec7b8b1d1"
+        }
+      },
+      {
+        "reference": "horizons/ada475de2d3c8c0e25aeae31b6a7fe3dfd4016726e022d071d5a367a6a62b079",
+        "sha256": {
+          "raw/10.json": "c14cd4e5dbc7d101de9dd6dd4e8ddfa0254bd178957a6ac84212874b945e0ad9",
+          "raw/399.json": "92a644b62f2f61c15b0387505a85f914dc2f59db5ce34bce6262976b6d2f812d",
+          "samples.json": "37c99c2a9eb0566b546b40af7e74d388fc5b3f72721e25e9c6e579d3f1f83827"
+        }
+      },
+      {
+        "reference": "horizons/82cd2d900d6e645b942234ffe55c9dcd26055b2bb2da65a85e01fac2d1c3e246",
+        "sha256": {
+          "raw/10.json": "892799f4b830055fc77c00bc70e4e0a3c994278d35f309b9313245472f437b97",
+          "raw/399.json": "43ab168e63f7abe6213ea5b39390bcc71d85b3a8f00d860a41c43fcb1808bb07",
+          "samples.json": "b3650dbe25b0c343ef90c9c2820aea5747e30b9547aed453f14ea7e53f04e2d7"
+        }
+      },
+      {
+        "reference": "horizons/c011c741b2ee9a66269de8ff6e21d93334eba0bc94a02a360fcabcfafc6e6614",
+        "sha256": {
+          "raw/10.json": "b47f17ef6031689649c40b6f3d208ce175dba9641a166faa6c58881d143d3de2",
+          "raw/399.json": "9f7da4f131bec2e19ab9984fc1290c8c137769fa0a3c14196a96262c1b4789cb",
+          "samples.json": "6745a86dcc55993d105a0583c4f81a540eb481cb2fc16cd0c24cd7e03302b9b5"
+        }
+      },
+      {
+        "reference": "horizons/7af00b7bbd5173dd46eb484381f4514293397da4787acdab7048c5c1780fce40",
+        "sha256": {
+          "raw/10.json": "ba2238c1c0b470ba81cf656cf02631b00efbc4ca59408b484548c5bcdcc51e33",
+          "raw/399.json": "ba2b85c85c2b455ce7964280ab06f887fb87c1450f2e42e87c38a60e4b0288b7",
+          "samples.json": "0cb77ac876e228cd2b397d1af7063c995bc786b371d9d5b3db0f3ac1570a9b2c"
+        }
+      },
+      {
+        "reference": "horizons/6c1745031804e04fc5d3794d86b77f04620cbb92e56f7837b128f106a0b22eef",
+        "sha256": {
+          "raw/10.json": "bfecb0ad307f6b30417e628c5a9fa892cfc4f73b8b7947c6a8fdd78d0ba61bbe",
+          "raw/399.json": "0277c88b86d81b0f81e93116f4e5f133feb047451472df14ace74b8c2e68d504",
+          "samples.json": "49a2b1265fedc24d665a70e17c7677101ae476c99d4a03461547cff76152676a"
+        }
+      },
+      {
+        "reference": "horizons/074e3396fc7a49a85f8f5d518abcdc123ea352bf5abd9b136d070afef665bf6b",
+        "sha256": {
+          "raw/10.json": "6c89a877ff03c0b9599720ce4d3624a5cecbbf1135e048c3afa1cdd5eb0940ac",
+          "raw/399.json": "6638b832cea6715bada2f363cf522fa10a3f716b27ebf0293d463acbc459617d",
+          "samples.json": "d1a75609aa585d6d32b0e52d95768f52702f41df9fc06586f7e48d71cafc0e9b"
+        }
+      },
+      {
+        "reference": "horizons/3f1de947921b3a3543e0668c6eeb548f0e51894eb6a69a52e1ee8674e9a446f4",
+        "sha256": {
+          "raw/10.json": "1965291cc036261641b911929851fd5de185b1576ee46b803bb5722aff113220",
+          "raw/399.json": "5a2518345acfe178e0344b4584c02ebe1c8d8573be769fb580210f5d9839ba0f",
+          "samples.json": "69fdf7546640f4994d56ea1536b0b6d0a867fea074e553b481a4b7bf02c6d910"
+        }
+      },
+      {
+        "reference": "horizons/15eb7b1f485c2c0831fc1bb998c2ffb8d50844629555503aca44086c16c5f9e9",
+        "sha256": {
+          "raw/10.json": "d0e6ee566ab691f317ee7508ed36fcff63f058f81baed304b36f1752ab1356d5",
+          "raw/399.json": "1cacfe928a79f18fbcae700dfc36b290f2e89417f75039179ba88b9fc82aec43",
+          "samples.json": "22ecb338761547ecc07dd920e9feca03c3ad228eb117311b65eb1b948dd5377a"
+        }
+      },
+      {
+        "reference": "horizons/6d563377db1a9e72b94e9a7629b6683bd1b82a11d129a664b67435498efe6d6f",
+        "sha256": {
+          "raw/10.json": "7c2c22c16ea98fb50055e669d7e93e54f2a70d69e5e494ebb148c77ff25afcfc",
+          "raw/399.json": "8fb4291c6b29538de87fdbe9404a4016a32a1cc7cf4eff73a7ee3faf77369544",
+          "samples.json": "2bd4d9b9fd2e149558c73fe83ff93c77f7bfab5d8d22afa6ddbedf5e20a88f48"
+        }
+      },
+      {
+        "reference": "horizons/3d193cd91a5ded571648e636de933a4208324fdedfbe97ec824caf0d7da9904f",
+        "sha256": {
+          "raw/10.json": "8d5709117a46cd12ee7211a63c01f3848fd1d8a82fd3bb77459869b4a16e9183",
+          "raw/399.json": "d87f360f48199c812b64c9e256f99aa44e92dac728eca2507e14b1917cca0ef7",
+          "samples.json": "020cf6b885f4dbeeb9e46b5a418a4ef600ff044b9425e386f2a6069decdc0eec"
+        }
+      },
+      {
+        "reference": "horizons/450b6452bee0b25f53cca829d96bad53770351c23c70677e97bc71aae5dee586",
+        "sha256": {
+          "raw/10.json": "b559c6f2674ce485d495fb9ecc230693558df415d9751f068fc2a7fe181d4ffc",
+          "raw/399.json": "180c0df0183deed07c0171448f70f620026990634deeb8fd788f1f2cdd67c14c",
+          "samples.json": "9c0ff974caba27bfa6a7b95a5106164d005a92773658e3c9d076d246a1f40604"
+        }
+      },
+      {
+        "reference": "horizons/7be9a03c2290547345bceef68445ec1a8f90319e9f1a702f056621223ceba84e",
+        "sha256": {
+          "raw/10.json": "abbd3a5b34a0618e578c34841b711e0a6fc54c4bba6ebd5327de3d7a0faf48e8",
+          "raw/399.json": "ebe8561498f784c4b1b2fb6ceba60acbe2e327fc9357ae6c86df0437cb5071bd",
+          "samples.json": "a0f55c76cd823158ffee40597dc2bbf02b264ade22b85b24921a973bb7696f00"
+        }
+      },
+      {
+        "reference": "horizons/e1bbac0a811815f15d029d30301d34ad1843075397b9bfb7c09972d2e09ba913",
+        "sha256": {
+          "raw/10.json": "4eb55230439d8f142645f5181adb22acf9cfe4962758f5f934899525d0566b6c",
+          "raw/399.json": "b31940ed2b085a83b92d1382d2fc39a90c73e0df47867986eea3424a1586b1cf",
+          "samples.json": "53eb3d382282bfc93ba007ec2c34841a0c73d94d44a39bd3e29bee70340df783"
+        }
+      },
+      {
+        "reference": "horizons/c94b5742d9080d289409c3886b60035f5755dd0de195703a39ada97f606e336e",
+        "sha256": {
+          "raw/10.json": "c485f56ecd1650d8e8c68b85f8ff7eb255752461c1d71f7afffc74001a1ccd19",
+          "raw/399.json": "458d5a14a75b6d902cd9dee0c404627c45633c67813d9de36b7ede1aa23f01a2",
+          "samples.json": "58ca48a4eaeed7aeedde54869c319533b44afea623c9177dd1b0028cec506d2f"
+        }
+      },
+      {
+        "reference": "horizons/de6395e0b824c79a8371fad1e3fe3f35df7b58e1b4e73cc2338dee6d49934868",
+        "sha256": {
+          "raw/10.json": "e83da3c73f309497a8bf12ac70003c5362dfd92e334db0b64ff120ad2bbf0649",
+          "raw/399.json": "6547ed554006222d1cec3795218ab69d1aa73d68be8a7ecb87689c4a9cae08fa",
+          "samples.json": "69699e689015a76a74c66036d19e174aa71e60c06993ff243bb744eb49e226a5"
+        }
+      },
+      {
+        "reference": "horizons/73fb78294777d008bf08de92072f0812c735cc9503f2410ecbb5d7e6549794d2",
+        "sha256": {
+          "raw/10.json": "b70a452cac56ca4ebc57047bc50d9a147f819eb6b26f17461529b67cc75d4f0c",
+          "raw/399.json": "770a533e90df7dfdfbb060a5383edc30c83fc89fc4f7cf51cae4ec96242fd044",
+          "samples.json": "0a7f190682d8703eec754eabd574b79967a1367c9ab92ccb1d5cc5612d489deb"
+        }
+      },
+      {
+        "reference": "horizons/e49412992ba2edaf1ae358a8be78ebc6459e224d6662fed9459f9a3ab4c93547",
+        "sha256": {
+          "raw/10.json": "51ccbf27f9ab1b76d048d1004af8d4df26354bd13dba855ce3c17a3888f18c71",
+          "raw/399.json": "9c35f1380eab225e5980152818d26066f3ff17c1ca6a44552e6a7e06ed2422c6",
+          "samples.json": "f23be51aa1334b81908c3a58b6c4477cf855df0f6c30112af896aee199b5ad3c"
+        }
+      },
+      {
+        "reference": "horizons/fc35fa7d414bfd6941bf7d8cb2cfac0c62bca3c77056e9508717c77f9e8b06ac",
+        "sha256": {
+          "raw/10.json": "7c85252c49d8f62905baaa5373b412fc25e42d499dc46a75c1dcc95137442331",
+          "raw/399.json": "142c496621e91514525af88b14b10d421985ef935e30aa4a30351ec1cb319060",
+          "samples.json": "88e954f519f06d350f53c30541bca068f649a8d1bdcdc6ce22c3dc521b305935"
+        }
+      },
+      {
+        "reference": "horizons/ba09585ae216f539baa58049af5f6645b43dd638e5b2def6f2568f18e3e45a45",
+        "sha256": {
+          "raw/10.json": "0ba223102c3afbca1158f204dbfce9d3fb7be6e663aef4b68c9ba6c65f7e74cb",
+          "raw/399.json": "eeb9d8c5c869c96d1e20958ce8c35cebd4fc80084cfc21a96a3c176fd3d4047c",
+          "samples.json": "fa42170ec3411695b22c1f8bd412ba4069547ef0d4eaf191348f89eb1c14bdde"
+        }
+      },
+      {
+        "reference": "horizons/5a1911e16f7d8dffc170b230801ca915a7479f5d722beba265428b8460811207",
+        "sha256": {
+          "raw/10.json": "c457ce5d1de2c78973d09b30ecbf99b1bcac11e651c0685c2f1977c62880f6ff",
+          "raw/399.json": "5b4a482990cbcfe6dc0f9933d296e70ce2cf41a359fc721bb9cd83acad0f17de",
+          "samples.json": "884a4eb049f841fe7e8c739521ca5c0ddbb5028d3dfb965aa0bb89200cdee5ac"
+        }
+      },
+      {
+        "reference": "horizons/21fe7d2593e14c98fbed9a8d5d55ff11fa26ab16060a458ac0dee3eded4f9d51",
+        "sha256": {
+          "raw/10.json": "bcabf282216aba47d08293e986a19a0a43ea2b2f05ec7bb037656cafca0a9131",
+          "raw/399.json": "e6ab60e83af19634ca9ca797399f55fadf04d9ad3575080e665c0f8a4049b7d9",
+          "samples.json": "0104dbbf88dd27ab73da48d80b0c2a7bb785a9e7853484fc4ac82a54549591fb"
+        }
+      },
+      {
+        "reference": "horizons/3e564c582ccf7549eb75270936a83dd775f34cfa2b15c4e51246b8f6d21b5c4c",
+        "sha256": {
+          "raw/10.json": "683746b7ae8c20939ee5cdfba32fe052a3407b45110931b5fbc33dda480b968c",
+          "raw/399.json": "0b472301e67fd6226f59e7c178919f34268d9a292b7bed0476edd44dc65f8f6e",
+          "samples.json": "ddef3bf1058eb738cfc0f57c776e9f862127ec9e473fe1761d64484c10b17423"
+        }
+      },
+      {
+        "reference": "horizons/4ccb2bfcbe55db397a1c585213a77023e0fc39cf3c6c27b58b1e0e6498c360f2",
+        "sha256": {
+          "raw/10.json": "8b3ed05beb93edf165a44fa51537b2b074be08d580a30cbae5875a0d6c1d5785",
+          "raw/399.json": "67a500207cdfaf0a20cdfe9ee59f32405e333bfb0ecfc0b4c2815d01aba9c65f",
+          "samples.json": "1bb72a7e31643071a58d394427a7a9759da664d1289f2b00db6f960e82046a07"
+        }
+      },
+      {
+        "reference": "horizons/e2286c9bf1f9ad4676aeb4dae9d613d7646313d39bfca359c7d6a92c875522ac",
+        "sha256": {
+          "raw/10.json": "9d247a5bba3fdc721311a5b13cea6b388c691cdb1e0995b0563c488d4d756532",
+          "raw/399.json": "15df40a58a75b2df2e02d992d8007597fb4b0a727d50efe1ce515fc13d7a097e",
+          "samples.json": "6b29bd7e01538c3771ee7d56d67206814152c97b66d1bfeca449e372fc077544"
+        }
+      },
+      {
+        "reference": "horizons/1c59f366ecd260c1031feda63d7a828f1c5ba3b37b62a16ce29324cf9e082dbb",
+        "sha256": {
+          "raw/10.json": "1201c43d17df1910838170ad0dd11da9762487446512d0b604565a0fd2e4ed23",
+          "raw/399.json": "a087d0ad9f47934e26f30e12a32c1faf83958a082c65a77f9559010c5ab336f4",
+          "samples.json": "ed435dbd6b3523ead9bed1200141c194513ef2c3d587a8749990ec77b937331e"
+        }
+      }
+    ]
+  },
+  "cached_replay_identical": true,
+  "duration_conservation": "passed within 1e-5 seconds",
+  "limitations": "Linear temporal model; finite sampled terrain; only detected transitions refined; no eclipse or radio link model."
+}

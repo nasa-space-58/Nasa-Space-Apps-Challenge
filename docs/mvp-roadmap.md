@@ -95,30 +95,34 @@ Step 2 implementation and local verification completed on 2026-11-14 in `feature
 
 Depends on Step 2.
 
-- [ ] Compare Horizons Sun/Earth angles with the terrain horizon at each timestamp.
-- [ ] Calculate the documented partial/full solar disk conditions.
-- [ ] Refine transition intervals and retain known sampling limitations.
-- [ ] Produce sunlight, darkness and Earth-center visibility intervals.
-- [ ] Calculate total visible duration, percentage, longest gap and longest continuous window.
-- [ ] Calculate the next sunset and Earthset relative to the selected instant.
-- [ ] Preserve unknown durations and distinguish no event in range from a confirmed setting event.
-- [ ] Validate time windows, clipped analysis boundaries and polar cases against documented references.
+- [x] Compare Horizons Sun/Earth angles with the terrain horizon at each timestamp.
+- [x] Calculate the documented partial/full solar disk conditions.
+- [x] Refine transition intervals and retain known sampling limitations.
+- [x] Produce sunlight, darkness and Earth-center visibility intervals.
+- [x] Calculate total visible duration, percentage, longest gap and longest continuous window.
+- [x] Calculate the next sunset and Earthset relative to the selected instant.
+- [x] Preserve unknown durations and distinguish no event in range from a confirmed setting event.
+- [x] Validate time windows, clipped analysis boundaries and polar cases against documented references.
 
 **Completion evidence** — One site's analysis can be reproduced from cached data and exposes its uncertainty and coverage.
+
+Step 3 implementation and local verification completed on 2026-11-14 in `feature/task3-visibility-metrics`. The November Malapert case has real queue-driven transition refinement and explicit temporal/spatial limitations. See [visibility metrics](visibility-metrics.md) and its reproducible verification report. Teammate review and manual merge remain separate.
 
 ### Step 4 — Deliver the analysis API and single-site experience
 
 Depends on Step 3.
 
-- [ ] Define endpoints/contracts for presets, analysis requests, processing status and result retrieval.
-- [ ] Provide pending, ready, failed and insufficient-data responses.
-- [ ] Add site selection, coordinate input and UTC date/duration controls.
-- [ ] Render the lunar map, terrain horizon and Sun/Earth sky positions.
-- [ ] Add synchronized playback, pause and time scrubbing.
-- [ ] Show summary metrics, next setting events and source/model information.
-- [ ] Add loading/error/empty states, readable units, keyboard controls and text equivalents for color states.
+- [x] Define endpoints/contracts for presets, analysis requests, processing status and result retrieval.
+- [x] Provide pending, ready, failed and insufficient-data responses.
+- [x] Add site selection, coordinate input and UTC date/duration controls.
+- [x] Render the lunar map, terrain horizon and Sun/Earth sky positions.
+- [x] Add synchronized playback, pause and time scrubbing.
+- [x] Show summary metrics, next setting events and source/model information.
+- [x] Add loading/error/empty states, readable units, keyboard controls and text equivalents for color states.
 
 **Completion evidence** — A user completes the first five steps of the MVP journey using real data through the normal interface.
+
+Step 4 implementation and local verification completed on 2026-11-14 in `feature/task4-mission-interface`. Persistent API jobs, real-data playback, sourced presets and a NASA-model scroll introduction are available. See [API and interface details](analysis-api-and-interface.md) and [verification evidence](verification/task4-interface-2026-11-14.json). Site/date comparison remains Task 5; teammate review and manual integration remain separate.
 
 ### Step 5 — Compare locations and dates
 

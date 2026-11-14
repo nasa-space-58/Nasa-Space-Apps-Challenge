@@ -4,14 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo contains the completed Step 0 foundation and Task 1 RabbitMQ ingestion, persistent terrain/Horizons caches, Task 2 bounded terrain horizon computation and tests. Local Docker runtime verification and frontend lock generation passed on 2026-11-14; Python transitive locks and a clean-clone Docker test also passed; terrain/site input definitions were also verified against NASA/USGS sources; Step 0 is complete; see docs/mvp-roadmap.md. The README is in Turkish; everything else (code, comments, commits, docs) must be in English.
+**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo contains the completed Step 0 foundation and Task 1 RabbitMQ ingestion, persistent terrain/Horizons caches, Task 2 bounded terrain horizon computation, Task 3 sampled visibility metrics/refinement, and Task 4 persistent analysis API plus NASA-model scroll interface and tests. Local Docker runtime verification and frontend lock generation passed on 2026-11-14; Python transitive locks and a clean-clone Docker test also passed; terrain/site input definitions were also verified against NASA/USGS sources; Step 0 is complete; see docs/mvp-roadmap.md. The README is in Turkish; everything else (code, comments, commits, docs) must be in English.
 
 `docs/` is the source of truth. Read the relevant file before working:
 - `docs/mvp-roadmap.md`: first-release scope, release order, task checklist and acceptance criteria.
 - `docs/technologies.md`: stack, service architecture, Docker Compose, planned repo layout. Changes need whole-team agreement.
 - `docs/coding-conventions.md`: git, test-first workflow, code style.
 - `docs/user-scenarios.md`: personas, modules, scenarios S1–S16, build order, acceptance criteria. Numeric thresholds there are example defaults.
-- `docs/terrain-and-sites.md`, `docs/initial-sites.json`: verified initial terrain and observer inputs; runtime presets remain pending.
+- `docs/terrain-and-sites.md`, `docs/initial-sites.json`: verified initial terrain and observer inputs; runtime sourced presets are in shared/presets.json.
 - `docs/data-sources.md`, `docs/2gbram_horizons_veri_notlari.md`: NASA data source catalog and JPL Horizons notes.
 
 The first release focuses on site/date comparison, terrain-relative Sun/Earth visibility and understandable energy/communication metrics. Extended mission planning follows the phased roadmap.
@@ -19,7 +19,7 @@ The first release focuses on site/date comparison, terrain-relative Sun/Earth vi
 ## Planned architecture (see docs/technologies.md)
 
 Four Docker Compose services; the only host requirement is Docker:
-- `frontend`: React + TypeScript + Vite (port 5173), React Three Fiber for 3D, Recharts. **No scientific calculation in the frontend**; no business logic in UI code.
+- `frontend`: React + TypeScript + Vite (port 5173), React Three Fiber for 3D, SVG horizon/timelines (Recharts planned for comparisons). **No scientific calculation in the frontend**; no business logic in UI code.
 - `backend`: Python 3.12, FastAPI (port 8000), NumPy/SciPy, cached JPL Horizons ephemerides, Rasterio. Does all computation. **Never downloads external data**; mounts the data volume read-only.
 - `data-ingestion`: separate Python worker that downloads and preprocesses NASA LRO/LOLA DEM and JPL Horizons observer data into the shared data volume (read-write). It never runs inside the backend process.
 - `rabbitmq`: backend and ingestion communicate **only** through it (aio-pika). Messages are JSON Pydantic models shared by both services, carry references/metadata only (never large data), are durable, acked after full processing, and ingestion requests must be idempotent.
@@ -70,3 +70,11 @@ Rules:
 ### Task 2 delivery override (user, 2026-11-14)
 
 Task 2 starts from Task 1 on `feature/task2-terrain-horizon`. Push only this new branch. Do not merge into or push to `tahakrcc` or `main`; the user performs merges manually.
+
+### Task 3 delivery override (user, 2026-11-14)
+
+Task 3 starts from Task 2 on `feature/task3-visibility-metrics`. Push only this new branch. Do not merge into or push to `tahakrcc` or `main`; the user performs merges manually.
+
+### Task 4 delivery override (user, 2026-11-14)
+
+Task 4 starts from Task 3 on `feature/task4-mission-interface`. Push only this new branch; the user manually merges. Do not merge into or push to tahakrcc or main.

@@ -1,0 +1,30 @@
+{
+  "retrieved_utc": "2026-11-14",
+  "purpose": "Illustrative introductory scene only; not terrain analysis or trajectory simulation",
+  "assets": [
+    {
+      "file": "lro.glb",
+      "name": "Lunar Reconnaissance Orbiter (A)",
+      "credit": "NASA / Christopher R. Meaney",
+      "source_page": "https://science.nasa.gov/3d-resources/lunar-reconnaissance-orbiter-a/",
+      "bytes": 654500,
+      "sha256": "b9547bc7c8c37c44675a80c3c3e27b647a9ff1293cf40030ef36f806b9c616b1"
+    },
+    {
+      "file": "apollo.glb",
+      "name": "Apollo Lunar Module",
+      "credit": "NASA / Michael D. Carbajal",
+      "source_page": "https://science.nasa.gov/3d-resources/apollo-lunar-module/",
+      "bytes": 716840,
+      "sha256": "379101dfcee399267addf771709107c35e826b0b9e5233272f123e4c8a585c4e"
+    },
+    {
+      "file": "moon.jpg",
+      "name": "CGI Moon Kit, 2K color map",
+      "credit": "NASA / Goddard / Scientific Visualization Studio / Ernie Wright",
+      "source_page": "https://svs.gsfc.nasa.gov/4720/",
+      "bytes": 457942,
+      "sha256": "f7130a1822681fa7512d7dcfd40db8c10b9ba4f06777910348698260ed7a2170"
+    }
+  ]
+}
