@@ -166,3 +166,7 @@ The user explicitly authorized merging `codex/quantum-hybrid` into current `taha
 ### Main push exception (user, 2026-11-14)
 
 At the user's explicit request, tahakrcc (`28f8380`) was fast-forwarded directly onto `main` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### Space weather main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/space-weather-noaa` (NOAA SWPC solar activity; frozen tests `be593c9`, see docs/space-weather.md) was fast-forwarded directly onto `main` and `temel` from `cb17bdd` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
