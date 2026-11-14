@@ -340,10 +340,17 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     )
 
     communications = CommunicationStore(store)
+    from app.recommendation import (
+        RecommendationStore,
+        register_recommendation_routes,
+    )
+
+    recommendations = RecommendationStore(store, communications)
 
     async def worker():
         while True:
             searches.tick()
+            await asyncio.to_thread(recommendations.tick, data_dir)
             jobs = store.pending()
             links = [] if jobs else communications.pending()
             if jobs:
@@ -380,8 +387,10 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     app.state.store = store
     app.state.searches = searches
     app.state.communications = communications
+    app.state.recommendations = recommendations
     register_search_routes(app, searches)
     register_communication_routes(app, store, communications)
+    register_recommendation_routes(app, recommendations)
 
     @app.get("/health")
     def health():
