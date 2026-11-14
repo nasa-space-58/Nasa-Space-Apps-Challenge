@@ -28,7 +28,7 @@ from app.terrain_safety import (
 
 CRITERIA = ("energy", "darkness", "communication", "terrain_safety")
 NOT_MODELED = {
-    "fuel": "Fuel and reachability are added after R4/R5 descent trajectories.",
+    "fuel": "Enable 'include descent' to add R4/R5 reachability and fuel.",
     "science": "No validated science-value dataset is integrated yet.",
 }
 MAX_ACTIVE_RECOMMENDATIONS = 2
@@ -54,7 +54,7 @@ class Weights(BaseModel):
 
     @model_validator(mode="after")
     def require_positive_total(self) -> "Weights":
-        if sum(getattr(self, c) for c in CRITERIA) <= 0:
+        if sum(getattr(self, c) for c in CRITERIA) + self.fuel <= 0:
             raise ValueError("At least one criterion weight must be positive")
         return self
 
@@ -187,8 +187,38 @@ def criterion_scores(
 
 
 def descent_summary(plan: dict) -> dict:
-    """Reachability and fuel metrics of an R4 plan for the recommendation."""
-    raise NotImplementedError
+    """Reachability and fuel metrics of an R4 plan for the recommendation.
+
+    fuel_score = propellant margin / propellant available at PDI, clamped 0..1.
+    """
+    available = plan["profile"]["usable_propellant_kg"]
+    used = plan["totals"]["propellant_used_kg"]
+    margin = available - used
+    return {
+        "feasible": bool(plan["feasible"]),
+        "limiting_factors": plan.get("limiting_factors", []),
+        "detail": "; ".join(f["detail"] for f in plan.get("limiting_factors", [])),
+        "propellant_used_kg": used,
+        "usable_propellant_kg": available,
+        "propellant_margin_kg": margin,
+        "powered_delta_v_mps": plan["totals"]["powered_delta_v_mps"],
+        "fuel_score": _clamp(margin / available) if available > 0 else 0.0,
+    }
+
+
+def descent_plan(data_dir, latitude_deg, longitude_deg_east, profile_id) -> dict:
+    """R4 plan for one candidate using the cached terrain height (read-only)."""
+    from app.descent import DescentRequest, plan_descent, terrain_height_m
+
+    height = terrain_height_m(data_dir, latitude_deg, longitude_deg_east)
+    return plan_descent(
+        DescentRequest(
+            latitude_deg=latitude_deg,
+            longitude_deg_east=longitude_deg_east,
+            profile_id=profile_id,
+        ),
+        height,
+    )
 
 
 def _failure(constraint, actual, limit, unit) -> dict:
@@ -250,12 +280,24 @@ def evaluate(
         elif available_h < limit:
             unknown("communication")
 
+    if descent is not None and not descent["feasible"]:
+        failures.append(
+            {**_failure("descent", None, None, None), "detail": descent["detail"]}
+        )
+
     status = "rejected" if failures else "insufficient_data" if unknowns else "ranked"
     criteria = (
         criterion_scores(analysis, communication, safety, constraints)
         if safety.get("covered", False)
         else {}
     )
+    if criteria and descent is not None:
+        criteria["fuel"] = {
+            "score": descent["fuel_score"],
+            "value": descent["propellant_margin_kg"],
+            "unit": "kg propellant margin at touchdown (R4 descent)",
+            "rule": "propellant margin / propellant available at PDI",
+        }
     return {
         "candidate_id": candidate_id,
         "status": status,
@@ -265,9 +307,19 @@ def evaluate(
     }
 
 
+def _active_criteria(evaluations: list[dict]) -> tuple[str, ...]:
+    """R3 criteria, plus fuel when any evaluation carries an R5 descent score."""
+    with_fuel = any("fuel" in e.get("criteria", {}) for e in evaluations)
+    return CRITERIA + (("fuel",) if with_fuel else ())
+
+
 def _describe_failure(failure: dict) -> str:
     if failure["constraint"] == "terrain_coverage":
         return "no verified terrain coverage for the landing and search area"
+    if failure["constraint"] == "descent":
+        return (
+            f"descent is not feasible ({failure.get('detail') or 'see descent plan'})"
+        )
     comparison = "exceeds" if failure["constraint"] == "slope" else "is below"
     return (
         f"{failure['constraint']} {failure['actual']:.1f} {failure['unit']} "
@@ -280,18 +332,23 @@ def rank(evaluations: list[dict], weights: Weights) -> dict:
 
     total = sum(w_c * s_c) / sum(w_c); ties break by candidate ID.
     """
-    raw = {c: getattr(weights, c) for c in CRITERIA}
+    active = _active_criteria(evaluations)
+    raw = {c: getattr(weights, c) for c in active}
     total_weight = sum(raw.values())
-    norm = {c: raw[c] / total_weight for c in CRITERIA}
+    if total_weight <= 0:
+        raise ValueError(
+            "At least one weight of the evaluated criteria must be positive"
+        )
+    norm = {c: raw[c] / total_weight for c in active}
     rows = []
     for evaluation in evaluations:
         if evaluation["status"] != "ranked":
             continue
         scores = evaluation["criteria"]
-        contributions = {c: norm[c] * scores[c]["score"] for c in CRITERIA}
-        weighted = [c for c in CRITERIA if norm[c] > 0]
-        strongest = max(weighted, key=lambda c: (contributions[c], -CRITERIA.index(c)))
-        weakest = min(weighted, key=lambda c: (scores[c]["score"], CRITERIA.index(c)))
+        contributions = {c: norm[c] * scores[c]["score"] for c in active}
+        weighted = [c for c in active if norm[c] > 0]
+        strongest = max(weighted, key=lambda c: (contributions[c], -active.index(c)))
+        weakest = min(weighted, key=lambda c: (scores[c]["score"], active.index(c)))
         rows.append(
             {
                 "candidate_id": evaluation["candidate_id"],
@@ -338,7 +395,7 @@ def rank(evaluations: list[dict], weights: Weights) -> dict:
         "ranked": rows,
         "rejected": rejected,
         "insufficient_data": insufficient,
-        "not_modeled": NOT_MODELED,
+        "not_modeled": {k: v for k, v in NOT_MODELED.items() if k not in active},
     }
 
 
@@ -356,7 +413,7 @@ def rescore(evaluations: list[dict], previous: Weights, current: Weights) -> dic
         reason = None
         if a and b and a["rank"] != b["rank"]:
             reason = max(
-                CRITERIA,
+                list(b["contributions"]),
                 key=lambda c: abs(b["contributions"][c] - a["contributions"][c]),
             )
         changes.append(
@@ -453,6 +510,7 @@ class RecommendationStore:
                     "error": None,
                     "safety": None,
                     "evaluation": None,
+                    "descent": None,
                 }
                 for cid, candidate in zip(candidate_ids(request), request.candidates)
             ],
@@ -595,8 +653,37 @@ class RecommendationStore:
             cand.update(state="failed", error=f"Terrain unavailable: {exc}")
             return
         cand["safety"] = safety
+        descent = None
+        if request.include_descent:
+            from app.descent import DescentError
+
+            try:
+                plan = descent_plan(
+                    data_dir,
+                    site["latitude_deg"],
+                    site["longitude_deg_east"],
+                    request.descent_profile_id,
+                )
+                descent = descent_summary(plan)
+            except DescentError as exc:
+                descent = {
+                    "feasible": False,
+                    "limiting_factors": [],
+                    "detail": str(exc),
+                    "fuel_score": 0.0,
+                    "propellant_margin_kg": None,
+                }
+            except FileNotFoundError as exc:
+                cand.update(state="failed", error=f"Terrain unavailable: {exc}")
+                return
+            cand["descent"] = descent
         cand["evaluation"] = evaluate(
-            cand["candidate_id"], analysis, comm_result, safety, request.constraints
+            cand["candidate_id"],
+            analysis,
+            comm_result,
+            safety,
+            request.constraints,
+            descent=descent,
         )
         cand["state"] = "evaluated"
 

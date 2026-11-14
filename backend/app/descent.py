@@ -37,7 +37,8 @@ from shared.constants import (
 PROFILES_FILE = Path(__file__).resolve().parents[2] / "shared/vehicle_profiles.json"
 DEFAULT_ORBIT_ALTITUDE_KM = 111.12  # 60 nautical miles (TN D-6846, Figure 1)
 PDI_ALTITUDE_M = 50000 * FOOT_M  # TN D-6846: PDI near 50 000 ft above the site
-GUIDANCE_HOLD_S = 2.0  # hold the last command as t_go -> 0 (singular gains)
+GUIDANCE_HOLD_S = 2.0
+MIN_PHASE_DURATION_S = 10.0  # well above the guidance hold window  # hold the last command as t_go -> 0 (singular gains)
 PDI_RANGE_BOUNDS_M = (300e3, 700e3)
 SEARCH_STEP_S = 0.5
 FINAL_STEP_S = 0.1
@@ -222,8 +223,13 @@ def gate_states(
     R5 may override the approach and terminal-descent durations (s); the gate
     states themselves stay at the Apollo 11 values.
     """
-    if approach_s is not None or terminal_s is not None:
-        raise NotImplementedError
+    for value in (approach_s, terminal_s):
+        if value is not None and not (
+            math.isfinite(value) and value >= MIN_PHASE_DURATION_S
+        ):
+            raise ValueError(
+                f"Phase durations must be at least {MIN_PHASE_DURATION_S:g} s"
+            )
     ref = apollo11_reference()
     high, low, touch = ref["high_gate"], ref["low_gate"], ref["touchdown"]
     high_horizontal = math.sqrt(
@@ -246,7 +252,7 @@ def gate_states(
         ),
         (
             "approach",
-            low["time_s"] - high["time_s"],
+            approach_s if approach_s is not None else low["time_s"] - high["time_s"],
             _state(
                 site_radius_m,
                 -low_range,
@@ -257,7 +263,7 @@ def gate_states(
         ),
         (
             "terminal",
-            touch["time_s"] - low["time_s"],
+            terminal_s if terminal_s is not None else touch["time_s"] - low["time_s"],
             _state(site_radius_m, 0.0, 0.0, 0.0, touch["altitude_rate_fps"] * FOOT_M),
         ),
     ]
@@ -329,7 +335,7 @@ def simulate_powered_descent(
             }
         )
 
-    for gate in gate_states(site_radius_m):
+    for gate in gate_states(site_radius_m, approach_s, terminal_s):
         start, elapsed = clock, 0.0
         phase_dv = 0.0
         phase_mass = mass
