@@ -3,6 +3,10 @@
 This document defines which technology is used in which part of **Lunar Landing Navigator**.
 Any change to this file must be agreed on by the whole team before it is merged.
 
+## Release scope
+
+The first release follows [the MVP roadmap](mvp-roadmap.md). JPL Horizons is the selected source for Sun and Earth positions. The ingestion worker retrieves and caches responses, and the backend computes terrain visibility from those cached results. Trajectory, fuel, risk and rover capabilities belong to later releases.
+
 ## Core Rules
 
 1. **Frontend (user interface) is written in React.**
@@ -21,7 +25,7 @@ flowchart LR
     Queue -->|ingestion requests| Ingestion[data-ingestion<br/>Python worker]
     Ingestion -->|dataset events| Queue
     Queue -->|dataset events| Backend
-    Ingestion -->|downloads| NASA[(NASA PDS / NAIF)]
+    Ingestion -->|downloads| NASA[(NASA LOLA / JPL Horizons)]
     Ingestion -->|writes| Data[(data volume)]
     Backend -->|reads only| Data
 ```
@@ -54,7 +58,7 @@ Responsibilities:
 | Data validation / schemas | Pydantic |
 | Message queue client | aio-pika |
 | Numerical computation | NumPy, SciPy |
-| Sun and Earth positions | SpiceyPy (NASA NAIF SPICE toolkit) |
+| Sun and Earth positions | JPL Horizons observer ephemerides, fetched by data-ingestion |
 | Lunar terrain data (DEM) reading | Rasterio (GDAL) |
 | Testing | pytest |
 | Linting / formatting | Ruff |
@@ -62,7 +66,7 @@ Responsibilities:
 
 Responsibilities:
 - Reading processed terrain and ephemeris data from the shared data volume.
-- Computing Sun and Earth positions, horizon visibility and shadows.
+- Reading cached Horizons Sun/Earth positions and computing terrain visibility and time windows.
 - Trajectory, fuel, risk (Monte Carlo) and landing site recommendation calculations.
 - Exposing all results through a REST API.
 - Publishing ingestion requests and consuming dataset events from the message queue.
@@ -82,7 +86,8 @@ Responsibilities:
 | Dependency management | `requirements.txt` with pinned versions |
 
 Responsibilities:
-- Downloading LRO/LOLA terrain data and NAIF SPICE kernels from NASA sources.
+- Downloading LRO/LOLA terrain data and querying JPL Horizons for requested sites and UTC intervals.
+- Caching raw Horizons responses and normalized time series, with query parameters, provenance and explicit pending/ready/failed states.
 - Verifying downloaded files (size / checksum when available).
 - Preprocessing raw data into the formats the backend uses (e.g. cropping, reprojecting, deriving slope maps).
 - Writing processed data to the shared data volume.
@@ -107,7 +112,7 @@ Rules:
 | Data | Source |
 |---|---|
 | Lunar elevation and slope (DEM) | NASA LRO LOLA (PDS) |
-| Planetary ephemerides and lunar frames | NASA NAIF SPICE kernels |
+| Sun/Earth observer positions and frame metadata | NASA/JPL Horizons observer ephemerides |
 
 Data files are **not committed to Git**. They are downloaded by the data-ingestion service and stored in a shared Docker volume.
 

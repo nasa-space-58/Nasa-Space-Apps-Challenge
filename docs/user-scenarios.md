@@ -49,6 +49,8 @@ flowchart LR
 
 ---
 
+The scenarios below describe the full product roadmap. Release assignments in section 4 determine which portions belong to the first MVP.
+
 ## 2. Modules
 
 | ID | Module |
@@ -91,39 +93,37 @@ flowchart LR
 
 ## 4. Build Order
 
-Modules are built sequentially. Each step must leave the application in a working, demonstrable state.
+The implementation checklist and release acceptance criteria live in [mvp-roadmap.md](mvp-roadmap.md). Complete and demonstrate the MVP before proceeding through the later releases.
 
-```mermaid
-flowchart LR
-    B1["1. M1 Map and terrain"] --> B2["2. M2 Visibility"]
-    B2 --> B3["3. M10 Dashboard base"]
-    B3 --> B4["4. M5 Recommendation"]
-    B4 --> B5["5. M3 Trajectory"]
-    B5 --> B6["6. M4 Fuel"]
-    B6 --> B7["7. M6 Risk"]
-    B7 --> B8["8. M7 Alternatives"]
-    B8 --> B9["9. M8 Post-landing"]
-    B9 --> B10["10. M9 What-if"]
-```
+| Release | Scenarios | Delivered scope |
+|---|---|---|
+| MVP | S1, S2, S5, S13, S15, S16 (scoped below) | Site selection, UTC date changes, terrain horizon, Sun/Earth paths, timelines, metrics and accessible comparison |
+| R1 | S3, S14; full S15 | Window search, CSV/PNG/report export, reproducible sharing and guided teaching presets |
+| R2 | S4 | Ground-station visibility and documented communication assumptions |
+| R3 | S8, S9 (terrain and visibility criteria) | Explained ranking and adjustable priorities |
+| R4 | S6 | Descent trajectories and vehicle limits |
+| R5 | S7; extend S8/S9 | Fuel optimization and fuel-aware ranking |
+| R6 | S10 | Risk and uncertainty analysis |
+| R7 | S11 | Reachable backup landing plans |
+| R8 | S12 | Post-landing exploration routes |
+| R9 | Full S13 | Vehicle and mission parameter simulation |
+| R10 | Optional experiment | Hybrid quantum optimization evaluated against a classical baseline |
 
-| Step | Scenarios unlocked |
-|------|--------------------|
-| 1 | S1 |
-| 2 | S2, S3, S4, S15, S16 |
-| 3 | S5, S14 |
-| 4 | S8, S9 |
-| 5 | S6 |
-| 6 | S7 |
-| 7 | S10 |
-| 8 | S11 |
-| 9 | S12 |
-| 10 | S13 |
+The MVP portions have the following boundaries. Their detailed release criteria are in the roadmap.
+
+- S1 delivers a sourced site list, coordinate entry, map selection, elevation and coverage feedback. Hazard classification and hazard distance follow with R3.
+- S2 delivers terrain-relative positions, partial solar disk handling and visibility windows using cached Horizons data.
+- S5 compares at least two site/date scenarios with aligned settings and explicit differences.
+- S13 supports a baseline and a changed site or date, including a launch-delay example. Vehicle parameters follow with R9.
+- S15/S16 deliver one accessible preset, a horizon/sky view, time playback and plain-language explanations. Dedicated classroom narratives follow with R1.
 
 ---
 
 ## 5. Scenarios
 
 ### S1 — Explore Terrain and Inspect a Location
+
+**Release assignment — MVP subset; hazard analysis in R3**
 
 - **Actor:** P1, P2, P4
 - **Goal:** Inspect the lunar south pole terrain and evaluate the safety of a specific location.
@@ -165,9 +165,11 @@ sequenceDiagram
 
 ### S2 — Analyze Sun and Earth Visibility at a Point
 
+**Release assignment — MVP**
+
 - **Actor:** P1, P2, P3
 - **Goal:** See when the Sun and Earth are above the local terrain horizon during a date range.
-- **Preconditions:** A location is selected. SPICE ephemeris kernels are available.
+- **Preconditions:** A location is selected. Cached JPL Horizons observer ephemerides are available.
 
 **Main flow**
 1. The user selects a location and a date range.
@@ -206,6 +208,8 @@ sequenceDiagram
 
 ### S3 — Find the Best Landing Window
 
+**Release assignment — R1**
+
 - **Actor:** P1
 - **Goal:** Find landing dates that satisfy power and communication constraints for a fixed location.
 - **Preconditions:** A location is selected.
@@ -240,6 +244,8 @@ flowchart TD
 
 ### S4 — Verify Real Direct-to-Earth Communication
 
+**Release assignment — R2**
+
 - **Actor:** P1
 - **Goal:** Find when direct-to-Earth communication is actually possible. This requires Earth to be above the local horizon and at least one ground station to see the Moon.
 - **Preconditions:** Earth visibility is computed (S2). Ground station locations (DSN Goldstone, Madrid, Canberra) are configured.
@@ -266,6 +272,8 @@ flowchart LR
 ---
 
 ### S5 — Compare Candidate Landing Sites
+
+**Release assignment — MVP**
 
 - **Actor:** P1
 - **Goal:** Decide which of several candidate sites is the most suitable.
@@ -306,6 +314,8 @@ sequenceDiagram
 
 ### S6 — Compute a Descent Trajectory
 
+**Release assignment — R4**
+
 - **Actor:** P1
 - **Goal:** Compute a descent route from lunar orbit to the selected landing site.
 - **Preconditions:** A landing site is selected. A spacecraft profile is defined (mass, thrust, specific impulse, initial orbit).
@@ -342,6 +352,8 @@ stateDiagram-v2
 
 ### S7 — Optimize Fuel Consumption Across Routes
 
+**Release assignment — R5**
+
 - **Actor:** P1
 - **Goal:** Find feasible routes that use less fuel while keeping safety margins.
 - **Preconditions:** A spacecraft profile with fuel capacity and a reserve requirement is defined.
@@ -375,6 +387,8 @@ flowchart TD
 
 ### S8 — Get a Ranked, Explained Recommendation
 
+**Release assignment — R3; fuel and trajectory criteria added after R5**
+
 - **Actor:** P1, P2
 - **Goal:** Get a ranked list of landing sites with a clear explanation for each ranking.
 - **Preconditions:** A search area, a date range, and mission goals are defined.
@@ -406,6 +420,8 @@ flowchart TD
 
 ### S9 — Adjust Mission Priorities
 
+**Release assignment — R3; fuel criterion added after R5**
+
 - **Actor:** P1, P2
 - **Goal:** See how changing the importance of each criterion changes the recommendation.
 - **Preconditions:** A ranked recommendation exists (S8).
@@ -434,6 +450,8 @@ sequenceDiagram
 ---
 
 ### S10 — Run Risk and Monte Carlo Analysis
+
+**Release assignment — R6**
 
 - **Actor:** P1
 - **Goal:** Test how robust a landing plan is under uncertainty.
@@ -466,6 +484,8 @@ flowchart TD
 ---
 
 ### S11 — Prepare Alternative Landing Plans
+
+**Release assignment — R7**
 
 - **Actor:** P1
 - **Goal:** Have backup sites and routes ready in case the primary plan fails.
@@ -503,6 +523,8 @@ sequenceDiagram
 
 ### S12 — Plan Post-Landing Exploration
 
+**Release assignment — R8**
+
 - **Actor:** P2
 - **Goal:** Evaluate a landing site by how well it supports science operations after landing.
 - **Preconditions:** A landing site and at least one science target are defined.
@@ -533,6 +555,8 @@ flowchart TD
 ---
 
 ### S13 — Run a What-If Scenario
+
+**Release assignment — MVP site/date subset; full scope in R9**
 
 - **Actor:** P1
 - **Goal:** See how changing mission parameters affects the plan.
@@ -566,6 +590,8 @@ stateDiagram-v2
 
 ### S14 — Export and Share Results
 
+**Release assignment — R1**
+
 - **Actor:** P1, P3
 - **Goal:** Use the analysis in reports or presentations.
 - **Preconditions:** At least one analysis view is open.
@@ -593,6 +619,8 @@ flowchart LR
 ---
 
 ### S15 — Classroom Demonstration Mode
+
+**Release assignment — MVP basic preset; full scope in R1**
 
 - **Actor:** P3
 - **Goal:** Explain why the lunar south pole has both near-permanent light and permanent shadow.
@@ -627,6 +655,8 @@ sequenceDiagram
 
 ### S16 — Public Explore Mode
 
+**Release assignment — MVP**
+
 - **Actor:** P4
 - **Goal:** Get simple answers about well-known candidate landing regions.
 - **Preconditions:** Known candidate regions are preloaded.
@@ -653,7 +683,9 @@ flowchart TD
 
 ---
 
-## 6. End-to-End Mission Planning Flow
+## 6. Extended Mission Planning Flow
+
+This flow applies as R4–R9 are implemented. The MVP flow is select site/date → inspect visibility → compare a changed site/date.
 
 ```mermaid
 flowchart TD
@@ -678,7 +710,7 @@ flowchart TD
 | Area | Source or assumption |
 |------|----------------------|
 | Terrain | NASA LRO LOLA digital elevation models for the south polar region |
-| Sun and Earth positions | NAIF SPICE ephemeris and lunar orientation kernels |
+| Sun and Earth positions | NASA/JPL Horizons observer ephemerides |
 | Ground stations | Deep Space Network station coordinates |
 | Spacecraft parameters | Documented reference models. Every assumption is shown to the user |
 | Sensor and engine uncertainty | Assumed ranges, stated explicitly in the risk module |

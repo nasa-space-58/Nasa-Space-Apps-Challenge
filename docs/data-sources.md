@@ -7,6 +7,10 @@
 >
 > Horizons query details, the data schema and the visibility-window algorithm are summarized here from [2gbram_horizons_veri_notlari.md](2gbram_horizons_veri_notlari.md); see that file for the full details.
 
+## Implementation decision
+
+JPL Horizons is selected for the MVP. The ingestion worker fetches and caches ephemerides and LOLA terrain data. The backend reads the shared volume and computes visibility. React displays API results. The catalog below preserves researched alternatives for future evaluation. Release priorities and tasks are tracked in [mvp-roadmap.md](mvp-roadmap.md).
+
 ## ⚠️ Competition rule (use of resources)
 
 According to the [NASA Space Apps GO Team announcement](https://github.com/nasa/spaceapps/discussions/1827), to be eligible for **Global Awards** a team **must use at least one NASA data source from the challenge's Resources list and name it in the submission**. For us this is **JPL Horizons** (on the official list). The announcement also states that development started at **09:00 local time on 14 November**; only research was allowed before that.
@@ -87,9 +91,9 @@ This requires three kinds of data:
   - **An HTTP 200 response can still contain a Horizons error.** Verify the target, center, time scale and expected row count; mark `n.a.` values as unknown.
   - Store the full request URL, the raw response, the fetch time, the API version and the ephemeris/orientation headers (reproducibility).
 - **Caveats:**
-  - Cannot be called directly from the browser (blocked by CORS — we tested this). → **Fetch the data ahead of time with Python and ship it as JSON**, or use a small server/proxy.
+  - Cannot be called directly from the browser (blocked by CORS — we tested this). → The ingestion worker fetches and caches responses; the frontend reads results through FastAPI.
   - Horizons elevation is relative to a **flat horizon**; mountains and craters are not taken into account. Sources 2 and 3 are needed for the real horizon.
-- **Role in the project:** The core of the application. All power/communication metrics are derived from it.
+- **Role in the project:** The core of the application. Visibility metrics combine these positions with the LOLA terrain horizon.
 
 ## 2. PGDA – LOLA South Pole Digital Elevation Models (DEM) ⭐⭐⭐⭐⭐ ✅
 
@@ -112,13 +116,13 @@ This requires three kinds of data:
 - **Resolution:** 240 m/pixel and 60 m/pixel (south + north pole).
 - **Role in the project:** A heat-map layer on the map: **"how much sunlight does this area usually get / how often does it see Earth"**. Shows good vs. bad regions from NASA's own precomputed results without running our own computation. Also an excellent reference for **validating** our own calculations.
 
-## 4. Skyfield + NAIF SPICE kernels ⭐⭐⭐⭐ ✅
+## 4. Future alternative — Skyfield + NAIF SPICE kernels ⭐⭐⭐⭐ ✅
 
 - **What:** A Python astronomy library. Computes Sun/Earth altitude and azimuth **offline**, "relative to the astronaut's horizon" for an observer standing on the lunar surface (`altaz()`).
 - **Links:**
   - Skyfield planetary reference frames (includes a view-from-the-Moon example): https://rhodesmill.org/skyfield/planetary.html
   - NAIF generic kernels (lunar orientation files under `pck/`): https://naif.jpl.nasa.gov/pub/naif/generic_kernels/pck/
-- **Why in addition to Horizons:** No network or rate-limit concerns; computes thousands of site × date combinations in seconds. A fallback if Horizons is slow during the hackathon.
+- **Why in addition to Horizons:** No network or rate-limit concerns; computes thousands of site × date combinations in seconds. A future alternative to evaluate if needed; the MVP uses cached Horizons responses.
 - **Alternative:** `spiceypy` (Python wrapper for SPICE) — more powerful but harder to learn.
 
 ## 5. Moon Trek WMTS API ⭐⭐⭐⭐ ✅
@@ -201,22 +205,15 @@ For looking very closely at a single landing site. Files are large — only wort
 
 ---
 
-## Recommended data flow (safest path for the hackathon)
+## MVP data flow
 
-```
-                PRECOMPUTED (Python, at the start of the hackathon)                 APPLICATION (Web)
- ┌──────────────┐   ┌─────────────────────────┐   ┌──────────────────┐   ┌────────────────────────┐
- │ Site list    │──▶│ Horizons / Skyfield      │──▶│                  │   │ Moon Trek / Cesium      │
- │ (source 8)   │   │ Sun & Earth AZ/EL        │   │  sites.json      │──▶│ map + 3D view           │
- └──────────────┘   │ (hourly, a few months)   │   │  (per site:      │   │ Time slider             │
-                    └─────────────────────────┘   │   horizon mask + │   │ Power / comms charts    │
- ┌──────────────┐   ┌─────────────────────────┐   │   time series)   │   │ Site comparison         │
- │ LOLA DEM     │──▶│ Horizon mask             │──▶│                  │   └────────────────────────┘
- │ (source 2)   │   │ (360 azimuths × angle)   │   └──────────────────┘
- └──────────────┘   └─────────────────────────┘          ▲
-                                                         │ validation / heat map
-                                             PGDA Illumination (source 3)
-```
+1. Frontend submits a site and UTC analysis interval to FastAPI.
+2. Backend checks cached data and publishes any missing-data request through RabbitMQ.
+3. The ingestion worker retrieves Horizons responses and LOLA data, validates them, stores raw and processed files, and publishes ready/failed events.
+4. Backend reads the data volume and computes the horizon, visibility windows and summary metrics.
+5. Frontend displays the map, sky view, timeline and comparison. It exposes pending, failed and insufficient-coverage states.
+
+The selected rendering libraries are React Three Fiber and Recharts, as specified in technologies.md.
 
 ### How to compute the horizon mask (summary)
 1. For each azimuth direction around the landing site (e.g. 360 directions at 1° steps), march outward across the DEM (e.g. up to 50–150 km).
@@ -280,7 +277,7 @@ Unique row key: `(site_id, sampled_at_utc)`. Sun and Earth tables are joined on 
 ## Open checks (to do in the first hours)
 
 - [x] Run the Horizons example query and confirm the `coord@301` + `SITE_COORD` syntax. (🧪 done by the team)
-- [ ] Pick one engine for Sun/Earth positions: Horizons (official resource) or SPICE/Skyfield? (user-scenarios.md assumes SPICE)
+- [x] Select JPL Horizons for Sun/Earth positions. Fetch through data-ingestion and cache results.
 - [ ] Download a 60–120 m/pixel DEM from PGDA 90 and compute a horizon mask for one site.
 - [ ] Compare our computed sunlight fraction with the PGDA 69 map.
 - [ ] Get the coordinates of the 9 Artemis III regions from NASA's official page.
