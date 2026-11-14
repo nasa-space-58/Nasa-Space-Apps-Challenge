@@ -236,20 +236,91 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 **Completion evidence** — Generated routes satisfy documented slope and mobility constraints.
 
-### R9 — Full mission what-if simulation
+### R9 — Mission simulation and digital-twin prototype
 
-- [ ] Extend S13 to spacecraft mass, fuel, sensor/engine parameters and mission duration.
-- [ ] Track dependencies and recompute affected outputs.
+- [ ] Extend S13 with position, velocity, mass, remaining propellant, available thrust, battery state and mission duration, with explicit units and coordinate frames.
+- [ ] Define versioned contracts for vehicle state, mission requirements, resource availability, uncertainty, events and plans.
+- [ ] Separate simulated ground truth from sensor observations and the planner's estimated state.
+- [ ] Model sensor health, measurement uncertainty and state-estimation updates.
+- [ ] Implement a simulation clock, deterministic event log and replay with fixed seeds.
+- [ ] Track input dependencies and invalidate affected plans/results when state, observations or resources change.
 - [ ] Compare modified plans against a preserved baseline with numerical differences.
+- [ ] Label simulated telemetry and synthetic hazards separately from sourced observations.
+- [ ] Display predicted versus observed state and explain why a plan was invalidated.
 
-**Completion evidence** — Parameter changes invalidate the appropriate cached results and preserve the baseline.
+### R10 — Hybrid quantum-classical optimization
 
-### R10 — Optional hybrid quantum experiment
+- [ ] Define a common solver interface receiving the same candidate options, objectives, constraints and state/version identifiers.
+- [ ] Keep physical modeling, candidate generation, state estimation and final feasibility validation classical.
+- [ ] Implement a classical exact reference for small problems and select a CP-SAT or MILP baseline for larger problems.
+- [ ] Define binary mission-option variables and encode selection, incompatibility and resource constraints as a QUBO.
+- [ ] Verify that the QUBO corresponds to the original constrained problem; document penalty scales, coefficient normalization and any auxiliary variables.
+- [ ] Implement an initial QAOA experiment using three missions with four options each; verify all feasible assignments against classical enumeration.
+- [ ] Add a classical outer loop for quantum circuit parameters and record circuit depth, shots, seeds and optimization settings.
+- [ ] Scale experiments across problem size, constraint density and resource contention; measure logical-variable and circuit resource growth.
+- [ ] Add bounded subproblem selection so larger mission plans can use a small quantum optimization step inside a classical search.
+- [ ] Validate every solver result against the original constraints independently of the QUBO objective value.
+- [ ] Record raw quantum feasibility separately from any classical repair, including repair cost and changes.
+- [ ] Compare quantum-generated candidates with classical and random candidates using the same repair/local-improvement procedure.
+- [ ] Run noiseless simulation, noise-model experiments and a bounded hardware experiment when access is available; label each execution mode explicitly.
+- [ ] Benchmark feasible-solution rate, objective quality, optimum gap where known, variability and end-to-end runtime, including preparation, tuning, queueing and validation.
+- [ ] Use multiple reproducible instances and held-out evaluation cases with documented compute budgets.
+- [ ] Define go/no-go criteria for each quantum application and retain the classical solver when measured benefit is absent.
+- [ ] Publish reproducible classical-versus-hybrid results without assuming or claiming an unmeasured quantum advantage.
 
-- [ ] Decide whether a concrete coupled planning problem warrants this experiment.
-- [ ] Define its variables, objective and constraints from validated classical inputs.
-- [ ] Establish a classical baseline and test datasets.
-- [ ] Implement a hybrid solver and measure feasibility, solution quality and total runtime on the same inputs.
-- [ ] Document hardware/simulator settings and the measured outcome.
+### R11 — Multi-mission planning and shared resources
 
-**Completion evidence** — A reproducible comparison establishes what the experiment achieves. Starting this phase requires a separate team decision.
+- [ ] Define mission types, priorities, deadlines, dependencies and required energy/communication/science resources.
+- [ ] Build an initial three-mission scenario with multiple site/start-time options and shared communication capacity.
+- [ ] Generate candidate options from validated terrain, illumination, communication and vehicle constraints.
+- [ ] Separate mandatory feasibility constraints from weighted preferences such as science value, fuel use, waiting time and reserve margins.
+- [ ] Implement classical joint site/time selection and compare it with independently planned missions.
+- [ ] Schedule communication demand within visibility windows while modeling station availability, capacity, data rates and exclusivity as separate inputs.
+- [ ] Implement energy and science-activity scheduling with battery limits, task durations, precedence and deadlines.
+- [ ] Add explicit defer/cancel alternatives where mission policy permits, and explain infeasible mission sets.
+- [ ] Model inter-vehicle relay links and their equipment/geometry constraints before crediting one mission with communication support for another.
+- [ ] Evaluate the downstream value of an early mission's location and schedule for subsequent missions.
+- [ ] Connect the same candidate problem to the R10 hybrid solver and independent classical validator.
+- [ ] Show a shared mission timeline, resource conflicts, dependencies and the reasons for selected/rejected options.
+- [ ] Verify cases where the best individual choices conflict but a joint feasible plan exists, and cases where no joint plan is feasible.
+
+### R12 — Self-healing landing and event-driven replanning
+
+- [ ] Define a bounded terminal-descent scenario with an explicit initial position/velocity, vehicle model and touchdown tolerances, building on R4/R5.
+- [ ] Validate classical gravity, thrust, mass-flow and propellant calculations with reference cases, limiting cases and time-step convergence checks.
+- [ ] Generate reachable alternative landing targets and trajectories under current thrust, fuel reserve and maneuver constraints.
+- [ ] Independently validate candidate trajectories at finer time resolution, including touchdown speed, terrain clearance and reserve limits.
+- [ ] Inject timestamped sensor degradation, thrust loss, newly observed obstacles, communication outages and propellant shortfalls.
+- [ ] Make each event alter the relevant physical/state-estimation/resource model rather than only the visualization.
+- [ ] Propagate sensor uncertainty into landing dispersion and candidate acceptance margins.
+- [ ] Implement event-triggered classical replanning with an explicit deadline and updated state/version identifiers.
+- [ ] Define policies for continuing, retargeting, deferring or aborting where the vehicle and mission model permit those actions.
+- [ ] Revalidate fallback plans against the current state; reject stale solver outputs and report when no feasible continuation exists.
+- [ ] Evaluate preservation of reachable backup targets during descent, alongside fuel and primary-goal performance.
+- [ ] Use hybrid optimization for discrete candidate-plan selection and downstream mission rescheduling, while keeping immediate flight control classical.
+- [ ] Run the quantum path asynchronously with a time budget; use a currently validated classical plan when no valid quantum result arrives in time.
+- [ ] Propagate changed landing time/location and lost resources into the R11 multi-mission schedule.
+- [ ] Replay identical events under the original plan, classical replanning and hybrid replanning, comparing feasibility, reserves, delays and mission value.
+- [ ] Add a visual event panel, original/replanned trajectories, uncertainty display, decision explanations and solver timing.
+- [ ] Validate both recoverable and unrecoverable scenarios, including combinations of faults, without assuming every event has a safe solution.
+
+### R13 — Additional quantum application benchmarks
+
+- [ ] Benchmark communication-slot allocation using shared-station conflicts, unmet demand, delivered data and latency.
+- [ ] Benchmark science-activity selection and ordering under energy/time constraints using completed science value and missed deadlines.
+- [ ] Benchmark relay-location selection after validating relay geometry/capacity, measuring coverage and resilience to one relay failure.
+- [ ] Benchmark rover target/route selection after R8, measuring science return, energy use and communication gaps.
+- [ ] Benchmark robust plan selection across reproducible uncertainty/fault scenarios after R6, measuring success rates and worst-case costs.
+- [ ] For each application, define the concrete decision variables, classical baseline, quantum subproblem, validation rules and measurable benefit before implementation.
+- [ ] Record negative as well as positive results and enable quantum execution only where its role and observed contribution are demonstrated.
+
+## Hybrid development sequence
+
+- [ ] **H0 — Shared contracts:** define the R9 state/event/plan model, constraint semantics, data provenance and benchmark scenario formats.
+- [ ] **H1 — Classical multi-mission baseline:** deliver R11 candidate generation, joint planning, small exact solutions and an independent validator.
+- [ ] **H2 — Quantum mapping:** deliver the small R10 QUBO/QAOA experiment and prove mapping consistency against enumeration.
+- [ ] **H3 — Resource integration:** connect communication windows and energy/activity models, then benchmark classical and hybrid scheduling on identical inputs.
+- [ ] **H4 — Descent foundation:** deliver the validated R4/R5 terminal-descent, fuel and reachability model; this can progress alongside H1–H3.
+- [ ] **H5 — Classical self-healing:** add R6/R9 uncertainty, event replay and R12 classical replanning with feasible and infeasible recovery cases.
+- [ ] **H6 — Hybrid recovery:** connect candidate-plan selection to downstream multi-mission scheduling, with deadlines, stale-result rejection and validated fallback behavior.
+- [ ] **H7 — Evidence and demonstration:** run hardware experiments where available, publish reproducible benchmarks, and demonstrate a fault changing both one vehicle's landing plan and subsequent mission schedules.
