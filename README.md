@@ -34,11 +34,13 @@ docker compose run --rm backend ruff check app tests /workspace/shared
 docker compose run --rm data-ingestion ruff check app tests
 ```
 
-Doğrudan bağımlılıklar sabitlendi. Frontend Vite 7.3.8 ve Vitest 4.1.12 kullanır; kilit dosyası güncellendi ve `npm ci` ile doğrulandı. 14 Kasım 2026 kontrolünde `npm audit` sıfır açık bildirdi; 33 test, Python lint kontrolleri ve frontend derlemesi geçti. Python geçişli bağımlılıklarının kilitlenmesi bekliyor.
+Doğrudan bağımlılıklar sabitlendi. Frontend Vite 7.3.8 ve Vitest 4.1.12 kullanır; kilit dosyası güncellendi ve `npm ci` ile doğrulandı. 14 Kasım 2026 kontrolünde `npm audit` sıfır açık bildirdi; 33 test, Python lint kontrolleri ve frontend derlemesi geçti. Python geçişli bağımlılıkları `requirements.lock` dosyalarında sürüm ve SHA-256 hash ile kilitlendi; Docker kurulumu `--require-hashes` ve `pip check` kullanır. [Kilitleri güncelleme](docs/python-dependencies.md).
 
 ```bash
 docker compose run --rm --no-deps frontend npm ci
 ```
+
+14 Kasım 2026 tarihinde ayrı ve temiz bir Git klonunda önbelleksiz Docker derlemesi, yeni veri diskleriyle başlangıç ve 70 test doğrulandı. [Temiz kurulum raporu](docs/clean-install-verification.md).
 
 ## Horizons verilerini indirme
 

@@ -13,7 +13,7 @@ This plan derives the first release from the NASA challenge description supplied
 - React/TypeScript displays results. Python performs scientific processing.
 - The ingestion worker retrieves external data through HTTPX, communicates with the backend through RabbitMQ, and writes the shared data volume. The backend reads it.
 - Taha leads implementation. Teammates review feature PRs according to coding-conventions.md.
-- Step 0 service skeletons and contracts are implemented locally. Local container execution was verified on 2026-11-14; the frontend lockfile is verified, while Python transitive dependency locking remains pending. See assumptions.md for selected defaults and remaining data checks.
+- Step 0 service skeletons and contracts are implemented locally. Local container execution was verified on 2026-11-14; frontend and Python transitive dependency locks are verified, including a fresh-clone Docker run. See assumptions.md for selected defaults and remaining data checks.
 - The full product scenarios remain in user-scenarios.md with release assignments. This document defines delivery order and MVP acceptance.
 
 ## First-release user journey
@@ -55,9 +55,9 @@ Follow the non-UI skeleton → frozen test commit → implementation workflow in
 - [x] Define the meaning of partial/full sunlight and the handling of boundary and unknown states.
 - [x] Set up Graphify and generate the initial graph according to CLAUDE.md.
 - [x] Create the four-service Docker Compose setup, health checks and .env.example.
-- [ ] Pin documented dependencies and provide container-based run, lint and test commands.
+- [x] Pin documented dependencies and provide container-based run, lint and test commands.
 
-**Verification evidence (2026-11-14)** — In the current local checkout, all four Compose services start; backend and frontend respond successfully over HTTP and the ingestion worker connects to RabbitMQ. Backend: 30 tests; ingestion: 2 tests; frontend: 1 test. Both Python Ruff checks, frontend npm ci, npm audit (zero vulnerabilities) and production build pass. Skeleton commit `14a83e2`; frozen test baseline `51bdcc3`. A fresh-checkout run, Python transitive locks and terrain/site inputs remain pending; Step 0 is not fully complete.
+**Verification evidence (2026-11-14)** — A fresh local Git clone of `2707be2` passed no-cache Docker builds, startup with new volumes, 30 backend tests, 39 ingestion tests and 1 frontend test. Both Python Ruff checks and pip check, frontend npm ci, production build and npm audit (zero findings) passed. Python locks pin 22 backend and 23 ingestion packages with SHA-256 hashes; regeneration produced no diff. Backend/frontend returned HTTP 200 and the worker connected to RabbitMQ. See [clean-install evidence](clean-install-verification.md). Terrain coverage, initial preset sites and their coordinate sources remain open; Step 0 is not fully complete.
 
 ### Step 1 — Obtain and cache real data
 

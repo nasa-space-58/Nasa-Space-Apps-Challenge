@@ -38,4 +38,4 @@ References are recorded in [data-sources.md](data-sources.md) and [2gbram_horizo
 
 ## Current verification status
 
-Local Docker services and the full test suite passed on 2026-11-14. Horizons CLI acquisition returned 25 samples per target and cache reuse passed; see horizons-ingestion.md. Terrain coverage, curated site coordinates and Python transitive dependency locks remain open. The CLI accepts only whole-second UTC timestamps.
+Local Docker services and the full test suite passed on 2026-11-14. Horizons CLI acquisition returned 25 samples per target and cache reuse passed; see horizons-ingestion.md. Python transitive dependency locks and a fresh-clone Docker installation were verified; see clean-install-verification.md. Terrain coverage and curated site coordinates remain open. The CLI accepts only whole-second UTC timestamps.

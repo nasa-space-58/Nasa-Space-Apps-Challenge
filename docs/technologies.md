@@ -165,7 +165,7 @@ Rules:
 ```
 ## Step 0 implementation status
 
-Shared Pydantic input contracts live in `shared/contracts.py`, mounted into both Python services. The backend exposes process liveness and the worker opens a broker connection. Message schemas and ingestion consumers follow in Step 1. Scientific libraries, React Three Fiber and Recharts will be installed with the features that use them. Direct dependency versions are pinned. The frontend lockfile and container checks were verified locally on 2026-11-14; Python transitive dependency locks remain pending. Vitest uses jsdom for DOM rendering tests.
+Shared Pydantic input contracts live in `shared/contracts.py`, mounted into both Python services. The backend exposes process liveness and the worker opens a broker connection. Message schemas and ingestion consumers follow in Step 1. Scientific libraries, React Three Fiber and Recharts will be installed with the features that use them. Direct dependency versions are pinned. The frontend lockfile and container checks were verified locally on 2026-11-14; Python transitive dependency locks and clean-clone installation also passed; see python-dependencies.md and clean-install-verification.md. Vitest uses jsdom for DOM rendering tests.
 
 ### Frontend audit remediation
 
