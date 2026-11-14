@@ -230,9 +230,11 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 ### R7 — Alternative landing plans
 
-- [ ] Implement S11 backup-site selection from the current approach state.
-- [ ] Check remaining fuel and maneuver limits for every backup.
-- [ ] Compare primary and backup plans using common metrics.
+- [x] Implement S11 backup-site selection from the current approach state.
+- [x] Check remaining fuel and maneuver limits for every backup.
+- [x] Compare primary and backup plans using common metrics.
+
+**R7 delivery** — See [alternative landing plans](alternative-landing.md). Backups are DEM cells within a search radius that pass the R3 hard constraints, kept a minimum distance apart. Each is evaluated from the R4 state at high or low gate: downrange is flown exactly with the R4 guidance (state rotation), and crossrange uses the analytic minimum-energy lateral divert (Δv = 3|c|/T) once the engine leaves the fixed-throttle position. A backup is reachable only if it avoids propellant exhaustion, keeps the R5 reserve, meets the R4 touchdown tolerances and stays within maximum thrust. The primary and backups share one comparison table, and backups can be marked. On Malapert, 6 of 6 backups are reachable from high gate and all are safer than the primary. Frozen tests: `946618c`.
 
 **Completion evidence** — Each offered backup is reachable under the stated state and limits.
 
