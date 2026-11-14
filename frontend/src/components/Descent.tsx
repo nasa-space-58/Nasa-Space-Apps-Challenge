@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Preset } from "../types";
 import RouteOptimizer, { type RouteResult } from "./RouteOptimizer";
+import RiskPanel from "./RiskPanel";
 
 // R4 (S6): renders backend descent plans; all physics runs in the API.
 type Sample = {
@@ -608,6 +609,17 @@ export default function Descent({ sites }: { sites: Preset[] }) {
             </>
           )}
           {routes && <RouteOptimizer result={routes} />}
+          <RiskPanel
+            base={{
+              site_id: siteId,
+              latitude_deg: Number(lat),
+              longitude_deg_east: Number(lon),
+              orbit: { altitude_km: Number(altitude), inclination_deg: Number(inclination) },
+              allow_plane_change: allowTurn,
+              reserve_delta_v_mps: Number(reserveFps) * FT,
+              ...vehicle(),
+            }}
+          />
         </div>
       </div>
     </section>
