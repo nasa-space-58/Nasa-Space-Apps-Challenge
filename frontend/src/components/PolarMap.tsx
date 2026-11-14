@@ -1,4 +1,5 @@
 import type { Preset } from "../types";
+import { useTranslate } from "../i18n";
 export default function PolarMap({
   lat,
   lon,
@@ -12,6 +13,7 @@ export default function PolarMap({
   onSelect: (lat: number, lon: number) => void;
   onPreset: (site: Preset) => void;
 }) {
+  const { t } = useTranslate();
   const point = (latitude: number, longitude: number) => {
     const r = ((90 + latitude) / 10) * 130,
       angle = (longitude * Math.PI) / 180;
@@ -23,7 +25,7 @@ export default function PolarMap({
       className="polar-map"
       viewBox="0 0 320 300"
       role="img"
-      aria-label="South pole coordinate selector. Use the latitude and longitude fields for keyboard input."
+      aria-label={t("polarMap.label")}
       onClick={(event) => {
         const box = event.currentTarget.getBoundingClientRect();
         const x = ((event.clientX - box.left) / box.width) * 320 - 160;

@@ -1,17 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import type { Preset } from "../types";
+import { errorText, useTranslate, type Translate } from "../i18n";
 
 // R3 (S8/S9): renders backend rankings; scores and rescoring come from the API.
 // "fuel" is the opt-in R5 descent criterion; it appears only when the API returns it.
 const CRITERIA = ["energy", "darkness", "communication", "terrain_safety", "fuel"] as const;
 type Criterion = (typeof CRITERIA)[number];
-const CRITERION_LABEL: Record<Criterion, string> = {
-  energy: "Energy (sunlight)",
-  darkness: "Short darkness",
-  communication: "DSN communication",
-  terrain_safety: "Terrain safety",
-  fuel: "Descent fuel margin",
-};
+const criterionLabel = (t: Translate, c: Criterion) =>
+  t(`recommendations.criterion.${c}`);
 type Weights = Record<Criterion, number>;
 type Score = { score: number | null; value: number | null; unit: string; rule: string };
 type Ranked = {
@@ -84,20 +80,8 @@ type Rescore = {
 type Custom = { lat: string; lon: string };
 
 const ACTIVE = ["pending", "running"];
-const STATUS: Record<string, string> = {
-  pending: "Queued",
-  running: "Analyzing candidates",
-  ready: "Recommendation ready",
-  partial: "Partial recommendation · some candidates incomplete",
-  failed: "Recommendation could not complete",
-};
-const STATE: Record<string, string> = {
-  waiting: "Queued",
-  analyzing: "Sun & Earth analysis",
-  communicating: "DSN communication",
-  evaluated: "Evaluated",
-  failed: "Failed",
-};
+const STATUSES = ["pending", "running", "ready", "partial", "failed"];
+const STATES = ["waiting", "analyzing", "communicating", "evaluated", "failed"];
 const KEY = "lln.recommendation.id";
 const defaults: Weights = { energy: 1, darkness: 1, communication: 1, terrain_safety: 1, fuel: 0 };
 
@@ -111,7 +95,7 @@ async function call(path: string, init?: RequestInit) {
         ? detail
         : Array.isArray(detail)
           ? detail.map((d: { msg: string }) => d.msg).join("; ")
-          : "Request failed",
+          : "",
     );
   }
   return body;
@@ -141,6 +125,8 @@ function RankingTable({
   names: Record<string, string>;
   caption: string;
 }) {
+  const { t } = useTranslate();
+  const CRITERION_LABEL = (c: Criterion) => criterionLabel(t, c);
   const active = CRITERIA.filter((c) => c in ranking.weights);
   return (
     <table className="ranking-table">
@@ -149,17 +135,17 @@ function RankingTable({
         <span className="contribution-legend" aria-hidden="true">
           {active.map((c) => (
             <span key={c}>
-              <i className={`contribution ${c}`} /> {CRITERION_LABEL[c]}
+              <i className={`contribution ${c}`} /> {CRITERION_LABEL(c)}
             </span>
           ))}
         </span>
       </caption>
       <thead>
         <tr>
-          <th scope="col">Rank</th>
-          <th scope="col">Site</th>
-          <th scope="col">Score</th>
-          <th scope="col">Contribution by criterion</th>
+          <th scope="col">{t("recommendations.col.rank")}</th>
+          <th scope="col">{t("recommendations.col.site")}</th>
+          <th scope="col">{t("recommendations.col.score")}</th>
+          <th scope="col">{t("recommendations.col.contribution")}</th>
         </tr>
       </thead>
       <tbody>
@@ -173,7 +159,7 @@ function RankingTable({
                 className="contribution-bar"
                 role="img"
                 aria-label={active
-                  .map((c) => `${CRITERION_LABEL[c]} ${(row.contributions[c] ?? 0).toFixed(2)}`)
+                  .map((c) => `${CRITERION_LABEL(c)} ${(row.contributions[c] ?? 0).toFixed(2)}`)
                   .join(", ")}
               >
                 {active.map((c) => (
@@ -181,9 +167,11 @@ function RankingTable({
                     key={c}
                     className={`contribution ${c}`}
                     style={{ width: `${(row.contributions[c] ?? 0) * 100}%` }}
-                    title={`${CRITERION_LABEL[c]}: score ${
-                      row.criteria[c]?.score?.toFixed(2) ?? "—"
-                    } × weight ${(ranking.weights[c] ?? 0).toFixed(2)}`}
+                    title={t("recommendations.contributionTitle", {
+                      criterion: CRITERION_LABEL(c),
+                      score: row.criteria[c]?.score?.toFixed(2) ?? "—",
+                      weight: (ranking.weights[c] ?? 0).toFixed(2),
+                    })}
                   />
                 ))}
               </div>
@@ -197,6 +185,8 @@ function RankingTable({
 }
 
 export default function Recommendations({ sites }: { sites: Preset[] }) {
+  const { t, tText } = useTranslate();
+  const CRITERION_LABEL = (c: Criterion) => criterionLabel(t, c);
   const [picked, setPicked] = useState<string[]>([]);
   const [custom, setCustom] = useState<Custom[]>([]);
   const [start, setStart] = useState("2026-11-04T00:00");
@@ -231,7 +221,7 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
           setIncludeDescent(Boolean(body.request.include_descent));
         }
       })
-      .catch((e: Error) => setError(e.message));
+      .catch((e: Error) => setError(errorText(e, t, "communication.requestFailed")));
   };
   useEffect(() => {
     const saved = remembered();
@@ -254,7 +244,7 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
       setRec(created);
       poll(created.id);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Request failed");
+      setError(errorText(e, t, "communication.requestFailed"));
     } finally {
       setBusy(false);
     }
@@ -307,7 +297,7 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
         }),
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Rescoring failed");
+      setError(errorText(e, t, "recommendations.rescoreFailed"));
     }
   };
 
@@ -324,20 +314,17 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
     <section
       id="recommendations"
       className="window-search-section recommendation-section"
-      aria-label="Explained site recommendation"
+      aria-label={t("recommendations.label")}
     >
       <div className="section-heading">
         <div>
-          <p className="eyebrow">06 / RECOMMEND A SITE</p>
+          <p className="eyebrow">{t("recommendations.eyebrow")}</p>
           <h2>
-            Where should we land<span>?</span>
+            {t("recommendations.title")}<span>?</span>
           </h2>
-          <p className="muted">
-            Rank 2–6 candidate sites on sunlight, darkness, DSN communication and
-            terrain slope. Every score and every rejection is explained.
-          </p>
+          <p className="muted">{t("recommendations.intro")}</p>
         </div>
-        <span className="outline-tag">EXPLAINED RANKING</span>
+        <span className="outline-tag">{t("recommendations.tag")}</span>
       </div>
       <div className="search-layout">
         <form
@@ -348,7 +335,7 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
           }}
         >
           <fieldset disabled={busy || running}>
-            <h3>Candidates</h3>
+            <h3>{t("recommendations.candidates")}</h3>
             {sites.map((s) => (
               <label className="checkbox-label" key={s.site_id}>
                 <input
@@ -368,7 +355,7 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
             {custom.map((c, i) => (
               <div className="field-pair" key={i}>
                 <label>
-                  Custom {i + 1} latitude · °
+                  {t("recommendations.customLat", { n: i + 1 })} · °
                   <input
                     type="number"
                     step="any"
@@ -381,7 +368,7 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
                   />
                 </label>
                 <label>
-                  Longitude · °E
+                  {t("app.form.longitude")} · °E
                   <input
                     type="number"
                     step="any"
@@ -401,7 +388,7 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
               disabled={count >= 6}
               onClick={() => setCustom([...custom, { lat: "-85.5", lon: "0" }])}
             >
-              + Add custom coordinates
+              + {t("recommendations.addCustom")}
             </button>
             {custom.length > 0 && (
               <button
@@ -409,25 +396,25 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
                 className="text-button"
                 onClick={() => setCustom(custom.slice(0, -1))}
               >
-                − Remove last custom site
+                − {t("recommendations.removeCustom")}
               </button>
             )}
-            <h3>Window</h3>
+            <h3>{t("recommendations.window")}</h3>
             <label>
-              Start · UTC
+              {t("recommendations.start")} · UTC
               <input
-                aria-label="Recommendation start UTC"
+                aria-label={t("recommendations.startLabel")}
                 type="datetime-local"
                 value={start}
                 onChange={(e) => setStart(e.target.value)}
               />
             </label>
             <label>
-              Duration
+              {t("recommendations.duration")}
               <select value={hours} onChange={(e) => setHours(e.target.value)}>
-                <option value="24">24 hours</option>
-                <option value="72">3 days</option>
-                <option value="168">7 days</option>
+                <option value="24">{t("app.form.hours", { n: 24 })}</option>
+                <option value="72">{t("app.form.days", { n: 3 })}</option>
+                <option value="168">{t("app.form.days", { n: 7 })}</option>
               </select>
             </label>
             <label className="checkbox-label">
@@ -436,13 +423,13 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
                 checked={refine}
                 onChange={(e) => setRefine(e.target.checked)}
               />
-              Refine transitions (slower)
+              {t("recommendations.refine")}
             </label>
-            <h3>Hard constraints</h3>
+            <h3>{t("recommendations.hard")}</h3>
             <label>
-              Maximum landing-area slope · °
+              {t("recommendations.slope")} · °
               <input
-                aria-label="Maximum landing slope"
+                aria-label={t("recommendations.slopeLabel")}
                 type="number"
                 min="1"
                 max="45"
@@ -452,7 +439,7 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
               />
             </label>
             <label>
-              Minimum sunlight · % (optional)
+              {t("recommendations.minSun")}
               <input
                 type="number"
                 min="0"
@@ -462,7 +449,7 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
               />
             </label>
             <label>
-              Minimum DSN communication · h (optional)
+              {t("recommendations.minComm")}
               <input
                 type="number"
                 min="0"
@@ -472,21 +459,21 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
               />
             </label>
             <label>
-              DSN station elevation limit
+              {t("recommendations.dsnLimit")}
               <select
                 value={dsnLimit}
                 onChange={(e) => setDsnLimit(Number(e.target.value))}
               >
-                <option value={6}>6° · receive (generic)</option>
-                <option value={10}>10° · low-power transmit</option>
+                <option value={6}>{t("recommendations.limit6")}</option>
+                <option value={10}>{t("recommendations.limit10")}</option>
               </select>
             </label>
           </fieldset>
-          <h3>Priorities</h3>
+          <h3>{t("recommendations.priorities")}</h3>
           <label className="checkbox-label">
             <input
               type="checkbox"
-              aria-label="Include descent fuel"
+              aria-label={t("recommendations.includeDescentLabel")}
               checked={includeDescent}
               disabled={busy || running}
               onChange={(e) => {
@@ -494,13 +481,13 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
                 if (e.target.checked && weights.fuel === 0) setWeights({ ...weights, fuel: 1 });
               }}
             />
-            Include descent reachability and fuel (Apollo 11 LM, R4/R5)
+            {t("recommendations.includeDescent")}
           </label>
           {CRITERIA.filter((c) => c !== "fuel" || includeDescent).map((c) => (
             <label key={c}>
-              {CRITERION_LABEL[c]} · {weights[c]}
+              {CRITERION_LABEL(c)} · {weights[c]}
               <input
-                aria-label={`${CRITERION_LABEL[c]} weight`}
+                aria-label={t("recommendations.weightLabel", { criterion: CRITERION_LABEL(c) })}
                 type="range"
                 min="0"
                 max="10"
@@ -515,18 +502,14 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
             className="primary"
             disabled={busy || running || count < 2 || count > 6}
           >
-            Rank candidate sites ↗
+            {t("recommendations.rank")} ↗
           </button>
           {finished && (
             <button type="button" className="text-button" onClick={applyWeights}>
-              Apply new priorities to this result
+              {t("recommendations.apply")}
             </button>
           )}
-          <p className="field-help">
-            Slope limit 10° is a configurable planning assumption from published lunar
-            lander studies, not a NASA requirement. The 80 m LOLA grid cannot see
-            craters or boulders smaller than about 100 m.
-          </p>
+          <p className="field-help">{t("recommendations.slopeNote")}</p>
         </form>
         <div className="search-results">
           {error && (
@@ -536,13 +519,17 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
           )}
           {!rec && (
             <div className="panel search-empty">
-              Choose at least two sites and rank them.
+              {t("recommendations.empty")}
             </div>
           )}
           {rec && (
             <div className="panel search-progress" role="status">
               <div>
-                <strong>{STATUS[rec.status] ?? rec.status}</strong>
+                <strong>
+                  {STATUSES.includes(rec.status)
+                    ? t(`recommendations.status.${rec.status}`)
+                    : rec.status}
+                </strong>
                 <span>
                   {utc(rec.request.start_utc)} → {utc(rec.request.end_utc)}
                 </span>
@@ -554,25 +541,32 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
             <ul className="candidate-status">
               {rec.candidates.map((c) => (
                 <li key={c.candidate_id}>
-                  <b>{names[c.candidate_id]}</b> · {STATE[c.state] ?? c.state}
+                  <b>{names[c.candidate_id]}</b> ·{" "}
+                  {STATES.includes(c.state) ? t(`recommendations.state.${c.state}`) : c.state}
                   {c.safety?.covered && (
                     <>
                       {" "}
-                      · slope {c.safety.site_slope_deg?.toFixed(1) ?? "—"}° (max{" "}
-                      {c.safety.max_landing_slope_deg?.toFixed(1) ?? "—"}° in landing area) ·
-                      steep terrain{" "}
+                      ·{" "}
+                      {t("recommendations.safety", {
+                        slope: c.safety.site_slope_deg?.toFixed(1) ?? "—",
+                        max: c.safety.max_landing_slope_deg?.toFixed(1) ?? "—",
+                      })}{" "}
                       {c.safety.hazard_distance_m == null
-                        ? "none within search radius"
-                        : `${c.safety.hazard_distance_m.toFixed(0)} m away`}
+                        ? t("recommendations.noHazard")
+                        : t("recommendations.hazardAway", {
+                            m: c.safety.hazard_distance_m.toFixed(0),
+                          })}
                     </>
                   )}
                   {c.descent && (
                     <>
                       {" "}
-                      · descent{" "}
+                      · {t("recommendations.descent")}{" "}
                       {c.descent.feasible
-                        ? `reachable, ${c.descent.propellant_margin_kg?.toFixed(0)} kg propellant margin`
-                        : "not reachable"}
+                        ? t("recommendations.reachable", {
+                            kg: c.descent.propellant_margin_kg?.toFixed(0) ?? "—",
+                          })
+                        : t("recommendations.notReachable")}
                     </>
                   )}
                   {c.error && <span className="alert"> {c.error}</span>}
@@ -583,12 +577,16 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
           {finished && rec.ranking && (
             <>
               {rec.ranking.ranked.length ? (
-                <RankingTable ranking={rec.ranking} names={names} caption="Ranking" />
+                <RankingTable
+                  ranking={rec.ranking}
+                  names={names}
+                  caption={t("recommendations.ranking")}
+                />
               ) : (
-                <div className="panel search-empty">No candidate passed every hard constraint.</div>
+                <div className="panel search-empty">{t("recommendations.nonePassed")}</div>
               )}
               {[...rec.ranking.rejected, ...rec.ranking.insufficient_data].length > 0 && (
-                <ul className="rejections" aria-label="Rejected or unranked candidates">
+                <ul className="rejections" aria-label={t("recommendations.rejected")}>
                   {[...rec.ranking.rejected, ...rec.ranking.insufficient_data].map((r) => (
                     <li key={r.candidate_id}>
                       <b>{names[r.candidate_id]}</b> — {r.explanation}
@@ -604,7 +602,7 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
               <ul className="not-modeled">
                 {Object.entries(rec.ranking.not_modeled).map(([k, v]) => (
                   <li key={k}>
-                    <b>{k}:</b> {v}
+                    <b>{tText(k)}:</b> {tText(v)}
                   </li>
                 ))}
               </ul>
@@ -612,20 +610,33 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
           )}
           {rescored && (
             <div className="rescore-compare">
-              <RankingTable ranking={rescored.previous} names={names} caption="Previous priorities" />
-              <RankingTable ranking={rescored.current} names={names} caption="New priorities" />
-              <ul aria-label="Rank changes">
+              <RankingTable
+                ranking={rescored.previous}
+                names={names}
+                caption={t("recommendations.previous")}
+              />
+              <RankingTable
+                ranking={rescored.current}
+                names={names}
+                caption={t("recommendations.new")}
+              />
+              <ul aria-label={t("recommendations.changes")}>
                 {rescored.changes
                   .filter((c) => c.previous_rank !== c.new_rank)
                   .map((c) => (
                     <li key={c.candidate_id}>
-                      <b>{names[c.candidate_id]}</b> moved from #{c.previous_rank} to #
-                      {c.new_rank}, mainly because of{" "}
-                      {c.reason ? CRITERION_LABEL[c.reason] : "the new weights"}.
+                      <b>{names[c.candidate_id]}</b>{" "}
+                      {t("recommendations.moved", {
+                        from: c.previous_rank ?? "—",
+                        to: c.new_rank ?? "—",
+                        reason: c.reason
+                          ? CRITERION_LABEL(c.reason)
+                          : t("recommendations.newWeights"),
+                      })}
                     </li>
                   ))}
                 {rescored.changes.every((c) => c.previous_rank === c.new_rank) && (
-                  <li>No rank changed with these priorities.</li>
+                  <li>{t("recommendations.noChange")}</li>
                 )}
               </ul>
             </div>
@@ -633,9 +644,9 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
           {finished && (
             <div className="panel reschedule">
               <label>
-                Schedule slip · hours
+                {t("recommendations.slip")}
                 <input
-                  aria-label="Schedule delay hours"
+                  aria-label={t("recommendations.slipLabel")}
                   type="number"
                   min="1"
                   max="720"
@@ -653,7 +664,7 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
                   })
                 }
               >
-                Re-rank after this delay ↗
+                {t("recommendations.rerank")} ↗
               </button>
             </div>
           )}

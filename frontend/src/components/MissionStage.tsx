@@ -4,7 +4,10 @@ import {
   Suspense,
   useEffect,
   useMemo,
+  useRef,
   useState,
+  type CSSProperties,
+  type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
 import PolarMap from "./PolarMap";
@@ -19,28 +22,43 @@ import {
   type SiteSelection,
 } from "../missionPath";
 import type { CameraMode, CameraView, SiteCondition } from "./MissionScene";
+import { useTranslate, type Translate } from "../i18n";
 
 const MissionScene = lazy(() => import("./MissionScene"));
 /** Wall-clock length of one illustrative flight playback. */
 const FLIGHT_PLAYBACK_S = 45;
 const TICK_MS = 50;
-const lockedNotice =
-  "An analysis is running. The landing site is locked until it finishes.";
-
-const cameraModes: { id: CameraMode; label: string }[] = [
-  { id: "auto", label: "Auto" },
-  { id: "system", label: "Earth–Moon" },
-  { id: "moon", label: "Moon orbit" },
-  { id: "pole", label: "South pole" },
-  { id: "spacecraft", label: "Spacecraft" },
-  { id: "launch", label: "Launch" },
-  { id: "landing", label: "Landing" },
+const cameraModes: CameraMode[] = [
+  "auto",
+  "system",
+  "moon",
+  "pole",
+  "spacecraft",
+  "launch",
+  "landing",
 ];
 
-const coordinateLabel = (lat: number, lon: number) =>
+/** Width limits of the resizable mission-control side panel, in CSS pixels. */
+const PANEL_MIN_WIDTH_PX = 300;
+const PANEL_DEFAULT_WIDTH_PX = 420;
+const PANEL_MAX_SHARE = 0.75;
+const PANEL_KEY_STEP_PX = 32;
+const PANEL_WIDTH_STORAGE_KEY = "lunar-panel-width-px";
+
+export type StageModule = { id: string; label: string; content: ReactNode };
+
+const clampPanelWidth = (width_px: number, container_px: number) =>
+  Math.round(
+    Math.max(
+      PANEL_MIN_WIDTH_PX,
+      Math.min(width_px, Math.max(PANEL_MIN_WIDTH_PX, container_px * PANEL_MAX_SHARE)),
+    ),
+  );
+
+const coordinateLabel = (t: Translate, lat: number, lon: number) =>
   Number.isFinite(lat) && Number.isFinite(lon)
-    ? `${Math.abs(lat).toFixed(5)}° ${lat < 0 ? "S" : "N"} · ${lon.toFixed(5)}° E`
-    : "Enter valid coordinates";
+    ? `${Math.abs(lat).toFixed(5)}° ${lat < 0 ? t("missionStage.south") : t("missionStage.north")} · ${lon.toFixed(5)}° ${t("missionStage.east")}`
+    : t("missionStage.invalidCoordinates");
 
 class SceneBoundary extends Component<
   { children: ReactNode; fallback: ReactNode },
@@ -71,6 +89,10 @@ export default function MissionStage({
   onPreset,
   onSceneFailure,
   timeline,
+  status,
+  modules,
+  activeModule,
+  onModuleChange,
   children,
 }: {
   lat: number;
@@ -89,8 +111,52 @@ export default function MissionStage({
   onSceneFailure: () => void;
   /** Rendered directly below the 3D viewport, e.g. the start-date strip. */
   timeline?: ReactNode;
+  /** Short connection/job state shown in the panel header. */
+  status?: ReactNode;
+  /** Extra panel tabs after "Plan", e.g. results and analysis modules. */
+  modules: StageModule[];
+  activeModule: string;
+  onModuleChange: (id: string) => void;
+  /** Content of the "Plan" tab, above the flight simulation controls. */
   children: ReactNode;
 }) {
+  const { t } = useTranslate();
+  const lockedNotice = t("missionStage.locked");
+  const phaseLabel = (id: string) => t(`missionPhases.${id}.label`);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const [panelOpen, setPanelOpen] = useState(true);
+  const [panelWidth, setPanelWidth] = useState(() => {
+    const stored = Number(localStorage.getItem(PANEL_WIDTH_STORAGE_KEY));
+    return Number.isFinite(stored) && stored >= PANEL_MIN_WIDTH_PX
+      ? stored
+      : PANEL_DEFAULT_WIDTH_PX;
+  });
+  const resizePanel = (width_px: number) => {
+    const container = stageRef.current?.clientWidth ?? window.innerWidth;
+    const next = clampPanelWidth(width_px, container);
+    setPanelWidth(next);
+    localStorage.setItem(PANEL_WIDTH_STORAGE_KEY, String(next));
+  };
+  const startResize = (event: ReactPointerEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const handle = event.currentTarget;
+    handle.setPointerCapture(event.pointerId);
+    const move = (e: PointerEvent) => {
+      const right = stageRef.current?.getBoundingClientRect().right ?? window.innerWidth;
+      resizePanel(right - e.clientX);
+    };
+    const stop = () => {
+      handle.removeEventListener("pointermove", move);
+      handle.removeEventListener("pointerup", stop);
+      handle.removeEventListener("pointercancel", stop);
+      document.body.classList.remove("panel-resizing");
+    };
+    document.body.classList.add("panel-resizing");
+    handle.addEventListener("pointermove", move);
+    handle.addEventListener("pointerup", stop);
+    handle.addEventListener("pointercancel", stop);
+  };
+  const tabs = [{ id: "plan", label: t("missionStage.plan") }, ...modules];
   const [progress, setProgress] = useState(0);
   const [flying, setFlying] = useState(false);
   const [cameraMode, setCameraMode] = useState<CameraMode>("auto");
@@ -170,7 +236,10 @@ export default function MissionStage({
     }
     if (!selection.within_coverage) {
       setNotice(
-        `That point is at ${selection.latitude_deg.toFixed(2)}°. Cached terrain covers ${Math.abs(COVERAGE_MAX_LATITUDE_DEG)}–90° S only: click inside the dashed ring.`,
+        t("missionStage.outsideCoverage", {
+          lat: selection.latitude_deg.toFixed(2),
+          max: Math.abs(COVERAGE_MAX_LATITUDE_DEG),
+        }),
       );
       return;
     }
@@ -196,24 +265,26 @@ export default function MissionStage({
         onPreset={(site) => !busy && onPreset(site)}
         onSelect={(latitude, longitude) => !busy && onSelect(latitude, longitude)}
       />
-      <p>
-        The 3D view needs WebGL. Choose the site on this polar grid
-        (80–90° S) or enter coordinates.
-      </p>
+      <p>{t("missionStage.needsWebgl")}</p>
     </div>
   );
 
   return (
-    <div className="mission-stage">
+    <div
+      className="mission-stage"
+      ref={stageRef}
+      data-panel={panelOpen ? "open" : "closed"}
+      style={{ "--panel-width": `${panelWidth}px` } as CSSProperties}
+    >
       <div className="stage-main">
       <div
         className="stage-viewport"
         role="region"
-        aria-label="Earth to Moon flight view"
+        aria-label={t("missionStage.viewLabel")}
       >
         {webgl ? (
           <SceneBoundary fallback={fallback}>
-            <Suspense fallback={<div className="stage-loading">Loading scene…</div>}>
+            <Suspense fallback={<div className="stage-loading">{t("missionStage.loading")}</div>}>
               <MissionScene
                 path={path}
                 lat={lat}
@@ -243,65 +314,65 @@ export default function MissionStage({
         <div className="stage-hud stage-phase" aria-live="polite">
           {progress === 0 && !flying ? (
             <>
-              <span className="eyebrow">PRE-LAUNCH</span>
-              <strong>Choose a landing site</strong>
-              <p>
-                Click the Moon to zoom to its south pole and pick a point inside
-                the dashed ring, then press Simulate flight or Run analysis.
-              </p>
+              <span className="eyebrow">{t("missionStage.preLaunch")}</span>
+              <strong>{t("missionStage.chooseSite")}</strong>
+              <p>{t("missionStage.chooseSiteHelp")}</p>
             </>
           ) : (
             <>
               <span className="eyebrow">
-                PHASE {active.index + 1}/{MISSION_PHASES.length}
+                {t("missionStage.phase", {
+                  n: active.index + 1,
+                  total: MISSION_PHASES.length,
+                })}
               </span>
-              <strong>{active.phase.label}</strong>
-              <p>{active.phase.description}</p>
+              <strong>{phaseLabel(active.phase.id)}</strong>
+              <p>{t(`missionPhases.${active.phase.id}.description`)}</p>
             </>
           )}
         </div>
         {webgl && (
-          <div className="stage-hud stage-cameras" role="group" aria-label="Camera view">
+          <div className="stage-hud stage-cameras" role="group" aria-label={t("missionStage.cameraView")}>
             {cameraModes.map((mode) => (
               <button
-                key={mode.id}
+                key={mode}
                 type="button"
-                aria-pressed={cameraMode === mode.id}
-                onClick={() => setCameraMode(mode.id)}
+                aria-pressed={cameraMode === mode}
+                onClick={() => setCameraMode(mode)}
               >
-                {mode.label}
+                {t(`missionStage.camera.${mode}`)}
               </button>
             ))}
           </div>
         )}
         <div className="stage-hud stage-legend">
           <span>
-            <i className="legend-sun" /> Sun
+            <i className="legend-sun" /> {t("common.sun")}
           </span>
           <span>
-            <i className="legend-earth" /> Earth
+            <i className="legend-earth" /> {t("common.earth")}
           </span>
           <span>
-            <i className="legend-trail" /> Flown path
+            <i className="legend-trail" /> {t("missionStage.flownPath")}
           </span>
           <span>
-            <i className="legend-ring" /> Terrain coverage 80–90° S
+            <i className="legend-ring" /> {t("missionStage.coverage")}
           </span>
-          <small>Earth, Moon &amp; distances to scale · spacecraft enlarged · not a computed trajectory</small>
+          <small>{t("missionStage.scaleNote")}</small>
         </div>
         <div className="stage-hud stage-target">
-          <span className="eyebrow">TARGET SITE</span>
-          <strong>{coordinateLabel(lat, lon)}</strong>
+          <span className="eyebrow">{t("missionStage.target")}</span>
+          <strong>{coordinateLabel(t, lat, lon)}</strong>
           {siteStatus && <div className="stage-status">{siteStatus}</div>}
           {webgl && !busy && (
             <small>
               {picking
-                ? "Click inside the dashed ring to choose · drag to rotate · scroll to zoom"
+                ? t("missionStage.hint.picking")
                 : cameraView === "landing"
-                  ? "Illustrative landing close-up · drag to rotate · use South pole to choose another site"
+                  ? t("missionStage.hint.landing")
                   : cameraView === "launch"
-                    ? "Illustrative launch close-up · drag to rotate · scroll to zoom"
-                  : "Click the Moon to zoom in and choose a site · drag to rotate"}
+                    ? t("missionStage.hint.launch")
+                  : t("missionStage.hint.default")}
             </small>
           )}
         </div>
@@ -313,12 +384,78 @@ export default function MissionStage({
       </div>
       {timeline}
       </div>
-      <aside className="stage-controls">
+      {!panelOpen && (
+        <button
+          type="button"
+          className="panel-reopen"
+          onClick={() => setPanelOpen(true)}
+          aria-label={t("missionStage.showPanel")}
+        >
+          ‹ {t("missionStage.panel")}
+        </button>
+      )}
+      <aside
+        className="stage-controls"
+        hidden={!panelOpen}
+        aria-label={t("missionStage.panelLabel")}
+      >
+        <div
+          className="panel-resizer"
+          role="separator"
+          aria-orientation="vertical"
+          aria-label={t("missionStage.resize")}
+          aria-valuemin={PANEL_MIN_WIDTH_PX}
+          aria-valuenow={panelWidth}
+          tabIndex={0}
+          onPointerDown={startResize}
+          onDoubleClick={() => resizePanel(PANEL_DEFAULT_WIDTH_PX)}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowLeft") resizePanel(panelWidth + PANEL_KEY_STEP_PX);
+            else if (e.key === "ArrowRight") resizePanel(panelWidth - PANEL_KEY_STEP_PX);
+            else return;
+            e.preventDefault();
+          }}
+        />
+        <div className="panel-bar">
+          <div className="panel-tabs" role="tablist" aria-label={t("missionStage.modules")}>
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                id={`tab-${tab.id}`}
+                aria-selected={activeModule === tab.id}
+                aria-controls={`tabpanel-${tab.id}`}
+                onClick={() => onModuleChange(tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          <div className="panel-bar-end">
+            {status}
+            <button
+              type="button"
+              className="panel-collapse"
+              onClick={() => setPanelOpen(false)}
+              aria-label={t("missionStage.hidePanel")}
+            >
+              ›
+            </button>
+          </div>
+        </div>
+        <div
+          className="panel-body"
+          role="tabpanel"
+          id="tabpanel-plan"
+          aria-labelledby="tab-plan"
+          hidden={activeModule !== "plan"}
+        >
         {children}
         <section className="panel flight-panel" aria-labelledby="flight-title">
           <div className="panel-heading">
-            <span id="flight-title">FLIGHT SIMULATION</span>
-            <small>Illustrative</small>
+            <span id="flight-title">{t("missionStage.flight")}</span>
+            <small>{t("missionStage.illustrative")}</small>
           </div>
           <div className="flight-body">
             <div className="flight-actions">
@@ -329,14 +466,14 @@ export default function MissionStage({
                 disabled={!path}
               >
                 {reduced
-                  ? "Jump to landing"
+                  ? t("missionStage.jump")
                   : flying
-                    ? "Pause flight"
+                    ? t("missionStage.pauseFlight")
                     : progress >= 1
-                      ? "Fly again"
+                      ? t("missionStage.flyAgain")
                       : progress > 0
-                        ? "Resume flight"
-                        : "Simulate flight"}{" "}
+                        ? t("missionStage.resume")
+                        : t("missionStage.simulate")}{" "}
                 <span>{flying ? "Ⅱ" : "▷"}</span>
               </button>
               <button
@@ -348,13 +485,13 @@ export default function MissionStage({
                 }}
                 disabled={progress === 0}
               >
-                Restart
+                {t("missionStage.restart")}
               </button>
             </div>
             <input
               type="range"
-              aria-label="Mission progress"
-              aria-valuetext={`${active.phase.label}, ${Math.round(progress * 100)}%`}
+              aria-label={t("missionStage.progress")}
+              aria-valuetext={`${phaseLabel(active.phase.id)}, ${Math.round(progress * 100)}%`}
               min="0"
               max="1000"
               value={Math.round(progress * 1000)}
@@ -381,17 +518,27 @@ export default function MissionStage({
                     }}
                     disabled={!path}
                   >
-                    <b>{String(i + 1).padStart(2, "0")}</b> {phase.label}
+                    <b>{String(i + 1).padStart(2, "0")}</b> {phaseLabel(phase.id)}
                   </button>
                 </li>
               ))}
             </ol>
-            <p className="field-help">
-              Shows the order of mission phases only. Sun and Earth visibility
-              at the site come from the analysis below.
-            </p>
+            <p className="field-help">{t("missionStage.phasesNote")}</p>
           </div>
         </section>
+        </div>
+        {modules.map((module) => (
+          <div
+            key={module.id}
+            className="panel-body"
+            role="tabpanel"
+            id={`tabpanel-${module.id}`}
+            aria-labelledby={`tab-${module.id}`}
+            hidden={activeModule !== module.id}
+          >
+            {module.content}
+          </div>
+        ))}
       </aside>
     </div>
   );

@@ -19,31 +19,18 @@ import Communication from "./components/Communication";
 import Recommendations from "./components/Recommendations";
 import Descent from "./components/Descent";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
+import { LanguageToggle, useTranslate, type Translate } from "./i18n";
 
 const MoonScene = lazy(() => import("./components/MoonScene"));
 const activeStates = ["pending", "preparing", "analyzing", "refining"];
-const stateLabel: Record<string, string> = {
-  pending: "Waiting in queue",
-  preparing: "Acquiring & checking NASA data",
-  analyzing: "Computing your horizon",
-  refining: "Computing & refining visibility",
-  ready: "Analysis ready",
-  insufficient_data: "Partial result · missing coverage",
-  failed: "Analysis could not complete",
-};
-const displayState: Record<string, string> = {
-  full: "Full sunlight",
-  partial: "Partial sunlight",
-  dark: "Terrain-blocked",
-  visible: "Center visible",
-  blocked: "Center blocked",
-  unknown: "Unknown",
-  boundary: "At the horizon",
-};
-const hours = (seconds: number | undefined) =>
-  seconds === undefined ? "—" : `${(seconds / 3600).toFixed(1)} h`;
-const utcLabel = (value: string) =>
-  new Date(value).toLocaleString("en-GB", {
+const stateLabel = (t: Translate, status: string) => t(`jobState.${status}`);
+const displayState = (t: Translate, state: string) => t(`displayState.${state}`);
+const hours = (t: Translate, seconds: number | undefined) =>
+  seconds === undefined
+    ? "—"
+    : t("units.hours", { value: (seconds / 3600).toFixed(1) });
+const utcLabel = (value: string, locale: string) =>
+  new Date(value).toLocaleString(locale, {
     timeZone: "UTC",
     day: "2-digit",
     month: "short",
@@ -51,34 +38,22 @@ const utcLabel = (value: string) =>
     minute: "2-digit",
     hour12: false,
   });
-type View =
-  | "home"
-  | "mission"
-  | "recommend"
-  | "descent"
-  | "classroom";
+type View = "home" | "mission";
 const routes: Record<View, string> = {
   home: "",
   mission: "#/mission-control",
-  recommend: "#/recommendations",
-  descent: "#/descent",
-  classroom: "#/classroom",
 };
-/** Time search now lives inside mission control; the old hash still opens it. */
-const LEGACY_SEARCH_HASH = "#/time-search";
+/** Former standalone pages are mission-control panel tabs; their hashes still open them. */
+const MODULE_HASHES: Record<string, string> = {
+  "#/time-search": "window-search",
+  "#/recommendations": "recommendations",
+  "#/descent": "descent",
+  "#/classroom": "classroom",
+};
+const moduleFromHash = (hash: string): string | undefined =>
+  MODULE_HASHES[hash];
 const viewFromHash = (hash: string): View =>
-  hash === LEGACY_SEARCH_HASH
-    ? "mission"
-    : ((Object.keys(routes) as View[]).find(
-        (view) => view !== "home" && routes[view] === hash,
-      ) ?? "home");
-const jump = (id: string) =>
-  document.getElementById(id)?.scrollIntoView({
-    behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
-      ? "auto"
-      : "smooth",
-  });
-
+  moduleFromHash(hash) || hash === routes.mission ? "mission" : "home";
 class SceneBoundary extends Component<
   { children: ReactNode },
   { failed: boolean }
@@ -90,15 +65,16 @@ class SceneBoundary extends Component<
   render() {
     return this.state.failed ? (
       <div className="scene-fallback">
-        <img
-          src="/nasa/moon.jpg"
-          alt="NASA lunar surface texture. The 3D scene is unavailable; mission analysis remains usable."
-        />
+        <SceneFallbackImage />
       </div>
     ) : (
       this.props.children
     );
   }
+}
+function SceneFallbackImage() {
+  const { t } = useTranslate();
+  return <img src="/nasa/moon.jpg" alt={t("app.sceneFallbackAlt")} />;
 }
 async function api(path: string, init?: RequestInit) {
   const response = await fetch(`/api${path}`, init);
@@ -109,33 +85,36 @@ async function api(path: string, init?: RequestInit) {
         ? body.detail
         : Array.isArray(body.detail)
           ? body.detail.map((item: { msg: string }) => item.msg).join("; ")
-          : "Request failed. Please try again.";
-    throw new Error(detail);
+          : "";
+    throw new Error(detail || "request-failed");
   }
   return body;
 }
 function SettingText({ value }: { value?: Setting }) {
+  const { t, locale } = useTranslate();
   if (!value) return <>—</>;
   if (!value.estimated_at_utc)
     return (
       <span className="small-value">
         {value.status === "insufficient_data"
-          ? "Insufficient data"
-          : "No event in range"}
+          ? t("app.setting.insufficientData")
+          : t("app.setting.noEvent")}
       </span>
     );
   return (
     <>
-      <span>{utcLabel(value.estimated_at_utc)}</span>
+      <span>{utcLabel(value.estimated_at_utc, locale)}</span>
       <small>
         {value.status === "candidate_after_unknown"
-          ? "Earlier event may be missing"
+          ? t("app.setting.earlierMissing")
           : value.status === "transition_overlaps_selected_time"
-            ? "Transition overlaps selected time"
-            : `Estimated · UTC · in ${hours(value.time_until_estimate_s)}`}
+            ? t("app.setting.overlaps")
+            : t("app.setting.estimated", {
+                hours: hours(t, value.time_until_estimate_s),
+              })}
         {value.bracket_start_utc &&
           value.bracket_end_utc &&
-          ` · ${utcLabel(value.bracket_start_utc)}–${utcLabel(value.bracket_end_utc)}`}
+          ` · ${utcLabel(value.bracket_start_utc, locale)}–${utcLabel(value.bracket_end_utc, locale)}`}
       </small>
     </>
   );
@@ -153,6 +132,7 @@ function Timeline({
   end: string;
   current: string;
 }) {
+  const { t, locale } = useTranslate();
   const from = Date.parse(start),
     duration = Date.parse(end) - from;
   return (
@@ -161,7 +141,7 @@ function Timeline({
       <div
         className="timeline-track"
         role="img"
-        aria-label={`${title}: ${intervals.map((i) => `${displayState[i.state]}, ${hours(i.duration_s)}`).join("; ")}`}
+        aria-label={`${title}: ${intervals.map((i) => `${displayState(t, i.state)}, ${hours(t, i.duration_s)}`).join("; ")}`}
       >
         {intervals.map((interval, i) => (
           <div
@@ -171,12 +151,16 @@ function Timeline({
               left: `${((Date.parse(interval.start_utc) - from) / duration) * 100}%`,
               width: `${((Date.parse(interval.end_utc) - Date.parse(interval.start_utc)) / duration) * 100}%`,
             }}
-            title={`${displayState[interval.state]} · ${utcLabel(interval.start_utc)} to ${utcLabel(interval.end_utc)} UTC`}
+            title={t("app.timeline.segment", {
+              state: displayState(t, interval.state),
+              start: utcLabel(interval.start_utc, locale),
+              end: utcLabel(interval.end_utc, locale),
+            })}
           />
         ))}
         <i
           className="time-cursor"
-          title="Selected observation time"
+          title={t("app.timeline.cursor")}
           style={{
             left: `${((Date.parse(current) - from) / duration) * 100}%`,
           }}
@@ -186,6 +170,13 @@ function Timeline({
   );
 }
 export default function App() {
+  const { t, locale } = useTranslate();
+  const h = (seconds: number | undefined) => hours(t, seconds);
+  const utc = (value: string) => utcLabel(value, locale);
+  const errorText = (e: unknown, fallback: string) =>
+    e instanceof Error && e.message !== "request-failed"
+      ? e.message
+      : t(fallback);
   const intro = useRef<HTMLElement>(null);
   const sourcesOpener = useRef<HTMLElement | null>(null);
   const openSources = () => {
@@ -225,15 +216,15 @@ export default function App() {
   const [view, setView] = useState<View>(() =>
     shared.current.has("analysis") ? "mission" : viewFromHash(location.hash),
   );
-  const classroomOpen = view === "classroom";
-  const recommendOpen = view === "recommend";
-  const descentOpen = view === "descent";
   const goTo = (next: View) => {
     if (window.scrollY) window.scrollTo({ top: 0, behavior: "auto" });
     const url = `${location.pathname}${location.search}${routes[next]}`;
     if (location.hash !== routes[next]) window.history.pushState({}, "", url);
     setView(next);
   };
+  const [panel, setPanel] = useState<string>(
+    () => moduleFromHash(location.hash) ?? "plan",
+  );
   const [resolved, setResolved] = useState("");
   const busy = submitting || (!!job && activeStates.includes(job.status));
   const frame = result?.frames[frameIndex];
@@ -287,7 +278,7 @@ export default function App() {
         setSites(data.sites);
         setApiError("");
       })
-      .catch((e) => setApiError(e.message));
+      .catch((e) => setApiError(errorText(e, "app.errors.requestFailed")));
   };
   useEffect(() => {
     loadSites();
@@ -317,9 +308,7 @@ export default function App() {
         })
         .catch(() => {
           if (shared.current.has("analysis"))
-            setError(
-              "Shared analysis is unavailable on this server. Ask for a scenario JSON file or the original server URL.",
-            );
+            setError(t("app.errors.sharedUnavailable"));
           else localStorage.removeItem("lunar-analysis-id");
         });
   }, []);
@@ -351,19 +340,19 @@ export default function App() {
                 setSharedB(other);
                 setComparisonBase({ id: job.id, result: view });
               }
-              setTimeout(() => jump(other ? "comparison" : "mission"), 0);
+              setPanel(other ? "comparison" : "results");
             }
             setError("");
           }
         } else if (next.status === "failed")
-          setError(
-            next.error || "The analysis failed. You can try a new request.",
-          );
+          setError(next.error || t("app.errors.analysisFailed"));
         else timer = setTimeout(poll, 1800);
       } catch (e) {
         if (!canceled) {
           setError(
-            `Connection interrupted. Retrying… ${e instanceof Error ? e.message : ""}`,
+            t("app.errors.connectionInterrupted", {
+              detail: e instanceof Error ? errorText(e, "app.errors.requestFailed") : "",
+            }),
           );
           timer = setTimeout(poll, 4000);
         }
@@ -396,11 +385,9 @@ export default function App() {
   useEffect(() => {
     const follow = () => {
       setView(viewFromHash(location.hash));
-      if (location.hash === LEGACY_SEARCH_HASH)
-        setTimeout(() => jump("window-search"), 0);
+      const module = moduleFromHash(location.hash);
+      if (module) setPanel(module);
     };
-    if (location.hash === LEGACY_SEARCH_HASH)
-      setTimeout(() => jump("window-search"), 0);
     window.addEventListener("popstate", follow);
     window.addEventListener("hashchange", follow);
     return () => {
@@ -473,7 +460,7 @@ export default function App() {
     setPlaying(false);
     setResult(null);
     setLaunchKey((key) => key + 1);
-    jump("mission");
+    setPanel("plan");
     try {
       let body: ReturnType<typeof makeBody>;
       if (example) {
@@ -506,7 +493,7 @@ export default function App() {
       localStorage.setItem("lunar-analysis-id", next.id);
     } catch (e) {
       setJob(null);
-      setError(e instanceof Error ? e.message : "Unable to start analysis");
+      setError(errorText(e, "app.errors.unableToStart"));
     } finally {
       setSubmitting(false);
     }
@@ -551,11 +538,11 @@ export default function App() {
     setError("");
     localStorage.setItem("lunar-analysis-id", id);
     setComparisonBase(compare ? { id, result: view } : null);
-    setTimeout(() => jump(compare ? "comparison" : "mission"), 0);
+    setPanel(compare ? "comparison" : "results");
   };
 
   const resolve = async () => {
-    setResolved("Checking cached terrain…");
+    setResolved(t("app.resolve.checking"));
     try {
       const observer = await api("/observers/resolve", {
         method: "POST",
@@ -563,14 +550,332 @@ export default function App() {
         body: JSON.stringify(makeBody()),
       });
       setResolved(
-        `Reference-sphere altitude: ${observer.altitude_km.toFixed(4)} km. Containing 80 m pixel.`,
+        t("app.resolve.altitude", { km: observer.altitude_km.toFixed(4) }),
       );
     } catch (e) {
-      setResolved(
-        e instanceof Error ? e.message : "Terrain is not available yet.",
-      );
+      setResolved(errorText(e, "app.resolve.unavailable"));
     }
   };
+
+  const resultsModule = (
+    <section className="analysis-results" aria-labelledby="analysis-title">
+      <div className="analysis-intro">
+        <p className="eyebrow">{t("app.results.eyebrow")}</p>
+        <h3 id="analysis-title">{t("app.results.title")}</h3>
+        <p>{t("app.results.intro")}</p>
+      </div>
+      <div className="result-heading">
+        <div>
+          <p className="eyebrow">{t("app.results.terrainView")}</p>
+          <h3>
+            {result
+              ? result.analysis.request.site.site_id.replaceAll("-", " ")
+              : t("app.results.windowTitle")}
+          </h3>
+        </div>
+        <span className="outline-tag">MOON_ME / UTC</span>
+      </div>
+      <div className="metric-grid">
+        <div className="metric-card">
+          <span className="metric-label">
+            <i className="sun-dot" /> {t("app.results.sunlight")}
+          </span>
+          <strong>
+            {result
+              ? `${result.analysis.sun.metrics.visible_percent_of_interval.toFixed(1)}%`
+              : "—"}
+          </strong>
+          <small>
+            {result
+              ? t("app.results.sunlightDetail", {
+                  hours: h(result.analysis.sun.metrics.visible_duration_s),
+                })
+              : t("app.results.ofWindow")}
+          </small>
+        </div>
+        <div className="metric-card">
+          <span className="metric-label">
+            <i className="earth-dot" /> {t("app.results.earth")}
+          </span>
+          <strong>
+            {result
+              ? `${result.analysis.earth.metrics.visible_percent_of_interval.toFixed(1)}%`
+              : "—"}
+          </strong>
+          <small>
+            {result
+              ? t("app.results.earthDetail", {
+                  hours: h(result.analysis.earth.metrics.visible_duration_s),
+                })
+              : t("app.results.earthEmpty")}
+          </small>
+        </div>
+        <div className="metric-card">
+          <span className="metric-label">{t("app.results.longestDark")}</span>
+          <strong>{h(result?.analysis.sun.metrics.longest_blocked_s)}</strong>
+          <small>{t("app.results.longestDarkDetail")}</small>
+        </div>
+      </div>
+      <div className="panel horizon-panel">
+        <div className="panel-heading">
+          <span>{t("app.results.localHorizon")}</span>
+          <div className="legend">
+            <span>
+              <i className="sun-dot" /> {t("common.sun")}
+            </span>
+            <span>
+              <i className="earth-dot" /> {t("common.earth")}
+            </span>
+            <span>
+              <i className="terrain-dot" /> {t("common.terrain")}
+            </span>
+          </div>
+        </div>
+        <p className="panel-help">{t("app.results.horizonHelp")}</p>
+        {result && frame ? (
+          <>
+            <HorizonPlot result={result} frame={frame} />
+            <div className="body-readouts">
+              <span>
+                <i className="sun-dot" /> {t("common.sun")}{" "}
+                {frame.sun.elevation_deg?.toFixed(2) ?? "—"}°{" "}
+                <b>{displayState(t, frame.sun.state)}</b>
+              </span>
+              <span>
+                <i className="earth-dot" /> {t("common.earth")}{" "}
+                {frame.earth.elevation_deg?.toFixed(2) ?? "—"}°{" "}
+                <b>{displayState(t, frame.earth.state)}</b>
+              </span>
+            </div>
+          </>
+        ) : (
+          <div className="empty-horizon">
+            <div className="empty-orbit">
+              <i />
+            </div>
+            <h3>
+              {busy
+                ? t("app.results.tracing")
+                : t("app.results.awaits")}
+            </h3>
+            <p>
+              {busy
+                ? t("app.results.tracingDetail")
+                : t("app.results.awaitsDetail")}
+            </p>
+            {!busy && (
+              <button
+                className="text-button"
+                onClick={() => launch(true)}
+              >
+                {t("app.results.runExample")} ↗
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="panel playback-panel">
+        <div className="playback-heading">
+          <div>
+            <p className="eyebrow">{t("app.playback.eyebrow")}</p>
+            <strong>
+              {frame ? `${utc(frame.utc)} UTC` : t("app.playback.selectMoment")}
+            </strong>
+          </div>
+          <button
+            className="play-button"
+            disabled={!result?.frames.length}
+            onClick={() => {
+              if (result && frameIndex === result.frames.length - 1)
+                setFrameIndex(0);
+              setPlaying(!playing);
+            }}
+            aria-label={playing ? t("app.playback.pause") : t("app.playback.play")}
+          >
+            {playing ? "Ⅱ" : "▷"}
+          </button>
+        </div>
+        <input
+          aria-label={t("app.playback.time")}
+          aria-valuetext={frame ? `${utc(frame.utc)} UTC` : undefined}
+          type="range"
+          min="0"
+          max={Math.max(0, (result?.frames.length || 1) - 1)}
+          value={frameIndex}
+          disabled={!result?.frames.length}
+          onChange={(e) => {
+            setPlaying(false);
+            setFrameIndex(Number(e.target.value));
+          }}
+        />
+        <div className="range-labels">
+          <span>
+            {result
+              ? `${utc(result.analysis.request.start_utc)} UTC`
+              : t("app.playback.start")}
+          </span>
+          <span>{t("app.playback.drag")}</span>
+          <span>
+            {result
+              ? `${utc(result.analysis.request.end_utc)} UTC`
+              : t("app.playback.end")}
+          </span>
+        </div>
+        {result && frame && (
+          <div className="timelines">
+            <Timeline
+              title={t("app.playback.sunTrack")}
+              intervals={result.analysis.sun.intervals}
+              start={result.analysis.request.start_utc}
+              end={result.analysis.request.end_utc}
+              current={frame.utc}
+            />
+            <Timeline
+              title={t("app.playback.earthTrack")}
+              intervals={result.analysis.earth.intervals}
+              start={result.analysis.request.start_utc}
+              end={result.analysis.request.end_utc}
+              current={frame.utc}
+            />
+            <div className="timeline-legend">
+              <span className="cursor-key">│ {t("app.legend.selected")}</span>
+              <span>▰ {t("app.legend.full")}</span>
+              <span>▧ {t("app.legend.partial")}</span>
+              <span>▰ {t("app.legend.blocked")}</span>
+              <span>▨ {t("app.legend.unknown")}</span>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="event-grid">
+        <div className="panel event-card">
+          <span className="metric-label">{t("app.events.sunset")}</span>
+          <strong>
+            <SettingText value={frame?.sun.next_setting} />
+          </strong>
+        </div>
+        <div className="panel event-card">
+          <span className="metric-label">{t("app.events.earthset")}</span>
+          <strong>
+            <SettingText value={frame?.earth.next_setting} />
+          </strong>
+        </div>
+      </div>
+      {result && job && (
+        <Communication key={job.id} jobId={job.id} current={frame?.utc} />
+      )}
+      {result && (
+        <div className="panel trace-panel">
+          <details>
+            <summary>
+              {t("app.trace.summary")} <span>+</span>
+            </summary>
+            <div className="trace-content">
+              <p>
+                <b>{t("common.sun")}:</b>{" "}
+                {t("app.trace.sun", {
+                  longest: h(result.analysis.sun.metrics.longest_visible_s),
+                  unknown: h(result.analysis.sun.metrics.unknown_duration_s),
+                })}
+              </p>
+              <p>
+                <b>{t("common.earth")}:</b>{" "}
+                {t("app.trace.earth", {
+                  longest: h(result.analysis.earth.metrics.longest_visible_s),
+                  blocked: h(result.analysis.earth.metrics.longest_blocked_s),
+                  unknown: h(result.analysis.earth.metrics.unknown_duration_s),
+                })}
+              </p>
+              <p>
+                {t("app.trace.grid", {
+                  radius: (
+                    result.horizon.settings.search_distance_m / 1000
+                  ).toFixed(0),
+                  spacing: result.horizon.settings.azimuth_step_deg,
+                  height:
+                    result.horizon.observer_height_above_terrain_m.toFixed(1),
+                })}
+              </p>
+              <p>
+                {t("app.trace.limits", {
+                  offset: result.analysis.spatial_sensitivity.offset_deg,
+                })}
+              </p>
+              <p>
+                {t("app.trace.refinement", {
+                  status: result.analysis.refinement.status.replaceAll("_", " "),
+                  count: result.analysis.provenance.ephemerides.length,
+                })}
+              </p>
+              <code>
+                {t("app.trace.analysis")} {result.analysis.analysis_id}
+              </code>
+              <button className="text-button" onClick={openSources}>
+                {t("app.trace.viewSources")} ↗
+              </button>
+            </div>
+          </details>
+        </div>
+      )}
+      {result && job && (
+        <ExportPanel
+          jobId={job.id}
+          result={result}
+          frameIndex={frameIndex}
+        />
+      )}
+      {result && job && (
+        <button
+          className="primary add-comparison"
+          onClick={() => {
+            setPlaying(false);
+            setSharedB(undefined);
+            setComparisonBase({ id: job.id, result });
+            setPanel("comparison");
+          }}
+        >
+          {t("app.results.addComparison")} ↗
+        </button>
+      )}
+      <p className="results-footnote">{t("app.results.footnote")}</p>
+      <ScenarioTransfer onOpen={openSearchResult} />
+    </section>
+  );
+  const stageModules = [
+    { id: "results", label: t("app.modules.results"), content: resultsModule },
+    ...(comparisonBase
+      ? [{ id: "comparison", label: t("app.modules.compare"), content: comparisonBase ? (
+      <Comparison
+        key={comparisonBase.id}
+        aId={comparisonBase.id}
+        initialBId={sharedB}
+        initialCursor={Number(shared.current.get("cursor") || 0)}
+        a={comparisonBase.result}
+        sites={sites}
+        onClose={() => {
+          setComparisonBase(null);
+          setPanel("results");
+        }}
+      />
+    ) : null }]
+      : []),
+    {
+      id: "window-search",
+      label: t("app.modules.timeSearch"),
+      content: <WindowSearch sites={sites} onChoose={openSearchResult} />,
+    },
+    {
+      id: "recommendations",
+      label: t("app.modules.recommend"),
+      content: <Recommendations sites={sites} />,
+    },
+    { id: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} /> },
+    {
+      id: "classroom",
+      label: t("app.modules.classroom"),
+      content: <Classroom onOpen={openSearchResult} />,
+    },
+  ];
 
   return (
     <main data-view={view}>
@@ -578,12 +883,13 @@ export default function App() {
         className="skip-link"
         onClick={() => {
           goTo("mission");
+          setPanel("plan");
           setTimeout(() => {
             document.getElementById("mission")?.focus({ preventScroll: true });
           }, 0);
         }}
       >
-        Skip to mission control
+        {t("app.nav.skip")}
       </button>
       <header className="navigation">
         <button
@@ -596,58 +902,50 @@ export default function App() {
                 })
               : goTo("home")
           }
-          aria-label="Back to introduction"
+          aria-label={t("app.nav.back")}
         >
           <span className="brand-mark">◒</span>
           <span>
-            LUNAR<span className="brand-sub">LANDING NAVIGATOR</span>
+            {t("app.brand.main")}
+            <span className="brand-sub">{t("app.brand.sub")}</span>
           </span>
         </button>
-        <nav aria-label="Main navigation">
+        <nav aria-label={t("app.nav.label")}>
+          <button
+            aria-current={view === "home" ? "page" : undefined}
+            onClick={() => goTo("home")}
+          >
+            {t("app.nav.home")}
+          </button>
           <button
             aria-current={view === "mission" ? "page" : undefined}
             onClick={() => goTo("mission")}
           >
-            Mission control
-          </button>
-          <button
-            aria-current={recommendOpen ? "page" : undefined}
-            onClick={() => goTo("recommend")}
-          >
-            Recommend
-          </button>
-          <button
-            aria-current={descentOpen ? "page" : undefined}
-            onClick={() => goTo("descent")}
-          >
-            Descent
-          </button>
-          <button
-            aria-current={classroomOpen ? "page" : undefined}
-            onClick={() => goTo("classroom")}
-          >
-            Classroom
+            {t("app.nav.mission")}
           </button>
           <button onClick={openSources}>
-            Sources <span>↗</span>
+            {t("app.nav.sources")} <span>↗</span>
           </button>
         </nav>
-        <span className="team-label">
-          2GBRAM <i /> NASA SPACE APPS
-        </span>
+        <div className="header-tools">
+          <LanguageToggle />
+          <span className="team-label">
+            2GBRAM <i /> NASA SPACE APPS
+          </span>
+        </div>
       </header>
       <section
         className="introduction"
         hidden={view !== "home"}
         ref={intro}
-        aria-label="From orbit to the lunar surface"
+        aria-label={t("app.intro.label")}
       >
         <div className="scene-pin" aria-hidden="true">
           {webgl ? (
             <SceneBoundary>
               <Suspense
                 fallback={
-                  <div className="scene-loading">Loading lunar scene…</div>
+                  <div className="scene-loading">{t("app.intro.loading")}</div>
                 }
               >
                 <MoonScene
@@ -675,28 +973,26 @@ export default function App() {
             <span className="readout-cross">+</span>
             <p>
               {progress < 0.49
-                ? "LUNAR RECONNAISSANCE"
+                ? t("app.intro.readout.recon")
                 : progress < 0.935
-                  ? "SURFACE APPROACH"
-                  : "SURFACE CONTACT"}
+                  ? t("app.intro.readout.approach")
+                  : t("app.intro.readout.contact")}
             </p>
             <strong>
               {progress < 0.49
-                ? "LRO / ORBITAL VIEW"
-                : "APOLLO / CONCEPT SCENE"}
+                ? t("app.intro.readout.orbital")
+                : t("app.intro.readout.concept")}
             </strong>
             <span className="readout-rule" />
             <small>
               {progress < 0.49
-                ? "FROM A DIFFERENT PERSPECTIVE"
-                : "ILLUSTRATIVE TERRAIN"}
+                ? t("app.intro.readout.perspective")
+                : t("app.intro.readout.illustrative")}
             </small>
           </div>
           <div className="scene-caption">
-            <span>NASA MODELS · ORIGINAL TERRAIN</span>
-            <span>
-              Illustrative orbit & descent · not a trajectory simulation
-            </span>
+            <span>{t("app.intro.captionModels")}</span>
+            <span>{t("app.intro.captionNote")}</span>
           </div>
           <div className="scene-index">
             <span>
@@ -726,40 +1022,39 @@ export default function App() {
               {motionPaused || reduced ? "▷" : "Ⅱ"}
             </span>
             {reduced
-              ? "Reduced motion"
+              ? t("app.intro.reducedMotion")
               : motionPaused
-                ? "Resume ambient motion"
-                : "Pause ambient motion"}
+                ? t("app.intro.resumeMotion")
+                : t("app.intro.pauseMotion")}
           </button>
           <span className="scroll-cue">
-            SCROLL TO EXPLORE <span aria-hidden="true">↓</span>
+            {t("app.intro.scroll")} <span aria-hidden="true">↓</span>
           </span>
         </div>
         <section className="story hero" id="intro">
           <div className="story-copy">
             <p className="eyebrow">
-              <i /> THE NEXT FRONTIER STARTS WITH A PERSPECTIVE
+              <i /> {t("app.hero.eyebrow")}
             </p>
             <h1>
-              <span className="hero-title-top">Lunar Landing</span>
+              <span className="hero-title-top">{t("app.hero.titleTop")}</span>
               <br />
-              <em>Navigator</em>
+              <em>{t("app.hero.titleEm")}</em>
             </h1>
             <p className="intro-copy">
-              Find your place.
+              {t("app.hero.line1")}
               <br />
-              Choose your moment.
+              {t("app.hero.line2")}
             </p>
             <p className="muted story-description">
-              A journey from lunar orbit to the surface. Explore the light,
-              terrain and connections that shape your mission.
+              {t("app.hero.description")}
             </p>
             <div className="hero-actions">
               <button
                 className="primary"
                 onClick={() => goTo("mission")}
               >
-                Plan your observation <span>↗</span>
+                {t("app.hero.plan")} <span>↗</span>
               </button>
               <button
                 className="text-button"
@@ -771,78 +1066,72 @@ export default function App() {
                   })
                 }
               >
-                Explore the descent <span>↓</span>
+                {t("app.hero.explore")} <span>↓</span>
               </button>
             </div>
             <div className="hero-meta">
               <span>
-                80–90° S <small>EXPLORATION REGION</small>
+                80–90° S <small>{t("app.hero.region")}</small>
               </span>
               <span>
-                NASA / LOLA <small>REAL TERRAIN DATA</small>
+                NASA / LOLA <small>{t("app.hero.terrain")}</small>
               </span>
             </div>
           </div>
         </section>
         <section className="story orbit">
           <div className="story-copy">
-            <p className="eyebrow">01 / ORBITAL RECONNAISSANCE</p>
+            <p className="eyebrow">{t("app.story.orbit.eyebrow")}</p>
             <h2>
-              First, see
+              {t("app.story.orbit.title1")}
               <br />
-              the whole picture.
+              {t("app.story.orbit.title2")}
             </h2>
-            <p className="intro-copy">Every ridge changes the horizon.</p>
+            <p className="intro-copy">{t("app.story.orbit.copy")}</p>
             <p className="muted story-description">
-              Lunar Reconnaissance Orbiter data gives us the terrain. Sun and
-              Earth positions reveal how that terrain changes what you can see.
+              {t("app.story.orbit.description")}
             </p>
             <div className="story-note">
-              <span className="note-line" /> LRO MODEL · NASA / CHRISTOPHER R.
-              MEANEY
+              <span className="note-line" /> {t("app.story.orbit.note")}
             </div>
           </div>
         </section>
         <section className="story descent">
           <div className="story-copy">
-            <p className="eyebrow">02 / THE FINAL APPROACH</p>
+            <p className="eyebrow">{t("app.story.descent.eyebrow")}</p>
             <h2>
-              A new
+              {t("app.story.descent.title1")}
               <br />
-              <em>point of view.</em>
+              <em>{t("app.story.descent.title2")}</em>
             </h2>
-            <p className="intro-copy">The surface changes everything.</p>
+            <p className="intro-copy">{t("app.story.descent.copy")}</p>
             <p className="muted story-description">
-              Beyond the crater rims, a different horizon comes into view.
-              Follow the descent from open space to the ground.
+              {t("app.story.descent.description")}
             </p>
             <div className="story-note">
               <span className="note-line" />
-              APOLLO MODEL · ILLUSTRATIVE DESCENT
+              {t("app.story.descent.note")}
             </div>
           </div>
         </section>
         <section className="story touchdown">
           <div className="story-copy">
-            <p className="eyebrow">03 / ON THE SURFACE</p>
+            <p className="eyebrow">{t("app.story.touchdown.eyebrow")}</p>
             <h2>
-              Make every
+              {t("app.story.touchdown.title1")}
               <br />
-              <em>hour count.</em>
+              <em>{t("app.story.touchdown.title2")}</em>
             </h2>
             <p className="muted story-description">
-              Set your location and observation window. See when sunlight
-              reaches your horizon—and when Earth slips behind it.
+              {t("app.story.touchdown.description")}
             </p>
             <button
               className="primary"
               onClick={() => goTo("mission")}
             >
-              Enter mission control <span>↓</span>
+              {t("app.story.touchdown.enter")} <span>↓</span>
             </button>
-            <div className="story-note">
-              APOLLO MODEL · ILLUSTRATIVE LANDING
-            </div>
+            <div className="story-note">{t("app.story.touchdown.note")}</div>
           </div>
         </section>
       </section>
@@ -853,30 +1142,6 @@ export default function App() {
         className="mission-section"
         hidden={view !== "mission"}
       >
-        <div className="section-heading mission-title">
-          <div>
-            <p className="eyebrow">
-              01 CHOOSE A SITE · 02 FLY THERE · 03 ANALYZE THE SKY
-            </p>
-            <h2>
-              Mission control<span>.</span>
-            </h2>
-          </div>
-          <p className="workspace-description">
-            Pick a landing site on the Moon's south polar cap, watch the
-            illustrative flight from Earth, then see how Sun and Earth move
-            above that horizon.
-          </p>
-          <div className={`connection ${busy ? "working" : ""}`}>
-            <i /> {job ? stateLabel[job.status] : "Ready to plan"}
-          </div>
-        </div>
-        {apiError && (
-          <div className="alert" role="alert">
-            The API is unavailable. {apiError}{" "}
-            <button onClick={loadSites}>Reconnect</button>
-          </div>
-        )}
         <MissionStage
           lat={Number(lat)}
           lon={Number(lon)}
@@ -900,12 +1165,12 @@ export default function App() {
             frame && result ? (
               <>
                 <span>
-                  <i className="sun-dot" /> {displayState[frame.sun.state]}
+                  <i className="sun-dot" /> {displayState(t, frame.sun.state)}
                 </span>
                 <span>
-                  <i className="earth-dot" /> {displayState[frame.earth.state]}
+                  <i className="earth-dot" /> {displayState(t, frame.earth.state)}
                 </span>
-                <small>{utcLabel(frame.utc)} UTC · analyzed site</small>
+                <small>{t("app.analyzedSite", { time: utc(frame.utc) })}</small>
               </>
             ) : undefined
           }
@@ -917,6 +1182,14 @@ export default function App() {
             setResolved("");
           }}
           onSceneFailure={() => setWebgl(false)}
+          modules={stageModules}
+          activeModule={panel}
+          onModuleChange={setPanel}
+          status={
+            <span className={`connection ${busy ? "working" : ""}`}>
+              <i /> {job ? stateLabel(t, job.status) : t("app.ready")}
+            </span>
+          }
           timeline={
             <DateScrubber
               value={start}
@@ -926,6 +1199,12 @@ export default function App() {
             />
           }
         >
+          {apiError && (
+            <div className="alert" role="alert">
+              {t("app.errors.apiUnavailable")} {apiError}{" "}
+              <button onClick={loadSites}>{t("app.errors.reconnect")}</button>
+            </div>
+          )}
           <form
             className="panel parameters"
             onSubmit={(e) => {
@@ -934,12 +1213,12 @@ export default function App() {
             }}
           >
             <div className="panel-heading">
-              <span>LANDING SITE & OBSERVATION</span>
-              <small>Parameters</small>
+              <span>{t("app.form.heading")}</span>
+              <small>{t("app.form.parameters")}</small>
             </div>
             <fieldset disabled={busy}>
               <label>
-                Landing region
+                {t("app.form.region")}
                 <select
                   value={siteId}
                   onChange={(e) => {
@@ -950,7 +1229,7 @@ export default function App() {
                     else setSiteId("custom");
                   }}
                 >
-                  <option value="custom">Custom coordinates</option>
+                  <option value="custom">{t("app.form.custom")}</option>
                   {sites.length ? (
                     sites.map((site) => (
                       <option key={site.site_id} value={site.site_id}>
@@ -966,9 +1245,9 @@ export default function App() {
               </label>
               <div className="field-pair">
                 <label>
-                  Latitude · °
+                  {t("app.form.latitude")} · °
                   <input
-                    aria-label="Latitude"
+                    aria-label={t("app.form.latitude")}
                     type="number"
                     min="-90"
                     max="-80"
@@ -983,9 +1262,9 @@ export default function App() {
                   />
                 </label>
                 <label>
-                  Longitude · °E
+                  {t("app.form.longitude")} · °E
                   <input
-                    aria-label="Longitude"
+                    aria-label={t("app.form.longitude")}
                     type="number"
                     min="0"
                     max="359.999999"
@@ -1001,7 +1280,7 @@ export default function App() {
                 </label>
               </div>
               <label>
-                Observer height above terrain · m
+                {t("app.form.height")} · m
                 <input
                   type="number"
                   min="0.1"
@@ -1020,7 +1299,7 @@ export default function App() {
                 className="text-button height-check"
                 onClick={resolve}
               >
-                Check terrain height ↗
+                {t("app.form.checkHeight")} ↗
               </button>
               {resolved && (
                 <p className="field-help" role="status">
@@ -1028,21 +1307,22 @@ export default function App() {
                 </p>
               )}
               <p className="field-help">
-                Start · {start.replace("T", " ")} UTC — set it on the date
-                strip below the simulation.
+                {t("app.form.startHint", { start: start.replace("T", " ") })}
               </p>
               <label>
-                Observation duration
+                {t("app.form.duration")}
                 <select
                   value={duration}
                   onChange={(e) => setDuration(e.target.value)}
                 >
-                  <option value="24">24 hours</option>
-                  <option value="72">3 days</option>
-                  <option value="168">7 days</option>
-                  <option value="720">30 days</option>
+                  <option value="24">{t("app.form.hours", { n: 24 })}</option>
+                  <option value="72">{t("app.form.days", { n: 3 })}</option>
+                  <option value="168">{t("app.form.days", { n: 7 })}</option>
+                  <option value="720">{t("app.form.days", { n: 30 })}</option>
                   {!["24", "72", "168", "720"].includes(duration) && (
-                    <option value={duration}>{duration} hours</option>
+                    <option value={duration}>
+                      {t("app.form.hours", { n: duration })}
+                    </option>
                   )}
                 </select>
               </label>
@@ -1053,16 +1333,16 @@ export default function App() {
                   onChange={(e) => setRefine(e.target.checked)}
                 />
                 <span>
-                  Refine detected transitions
-                  <small>5-minute → 1-minute samples</small>
+                  {t("app.form.refine")}
+                  <small>{t("app.form.refineDetail")}</small>
                 </span>
               </label>
               <button className="primary run-button" type="submit">
-                {busy ? "Analysis in progress" : "Run analysis"}{" "}
+                {busy ? t("app.form.running") : t("app.form.run")}{" "}
                 <span>{busy ? "◌" : "↗"}</span>
               </button>
               <p className="field-help">
-                NASA source data · estimated geometric visibility
+                {t("app.form.footnote")}
               </p>
             </fieldset>
           </form>
@@ -1075,336 +1355,21 @@ export default function App() {
             <div className="job-progress" role="status">
               <span className="pulse" />
               <div>
-                <strong>{stateLabel[job?.status || "pending"]}</strong>
-                <p>
-                  You can leave this page. Your analysis ID is saved on this
-                  device.
-                </p>
+                <strong>{stateLabel(t, job?.status || "pending")}</strong>
+                <p>{t("app.progressNote")}</p>
               </div>
               <span className="mono">{job?.id.slice(0, 8)}</span>
             </div>
           )}
         </MissionStage>
-        <section className="analysis-results" aria-labelledby="analysis-title">
-          <div className="analysis-intro">
-            <p className="eyebrow">SURFACE ANALYSIS</p>
-            <h3 id="analysis-title">What the site sees</h3>
-            <p>
-              After landing, the analysis traces the terrain horizon around the
-              site and follows Sun and Earth through your observation window.
-              Move the observation time to see each sample.
-            </p>
-          </div>
-          <div className="result-heading">
-            <div>
-              <p className="eyebrow">TERRAIN-RELATIVE VIEW</p>
-              <h3>
-                {result
-                  ? result.analysis.request.site.site_id.replaceAll("-", " ")
-                  : "Your window to the surface"}
-              </h3>
-            </div>
-            <span className="outline-tag">MOON_ME / UTC</span>
-          </div>
-          <div className="metric-grid">
-            <div className="metric-card">
-              <span className="metric-label">
-                <i className="sun-dot" /> SUNLIGHT AVAILABILITY
-              </span>
-              <strong>
-                {result
-                  ? `${result.analysis.sun.metrics.visible_percent_of_interval.toFixed(1)}%`
-                  : "—"}
-              </strong>
-              <small>
-                {result
-                  ? `${hours(result.analysis.sun.metrics.visible_duration_s)} · full + partial disk`
-                  : "of the observation window"}
-              </small>
-            </div>
-            <div className="metric-card">
-              <span className="metric-label">
-                <i className="earth-dot" /> EARTH VISIBILITY
-              </span>
-              <strong>
-                {result
-                  ? `${result.analysis.earth.metrics.visible_percent_of_interval.toFixed(1)}%`
-                  : "—"}
-              </strong>
-              <small>
-                {result
-                  ? `${hours(result.analysis.earth.metrics.visible_duration_s)} · center visibility`
-                  : "geometric center visibility"}
-              </small>
-            </div>
-            <div className="metric-card">
-              <span className="metric-label">LONGEST DARKNESS</span>
-              <strong>
-                {hours(result?.analysis.sun.metrics.longest_blocked_s)}
-              </strong>
-              <small>continuous terrain-blocked sunlight</small>
-            </div>
-          </div>
-          <div className="panel horizon-panel">
-            <div className="panel-heading">
-              <span>LOCAL HORIZON</span>
-              <div className="legend">
-                <span>
-                  <i className="sun-dot" /> Sun
-                </span>
-                <span>
-                  <i className="earth-dot" /> Earth
-                </span>
-                <span>
-                  <i className="terrain-dot" /> Terrain
-                </span>
-              </div>
-            </div>
-            <p className="panel-help">
-              The grey skyline is the terrain seen from the site in every
-              compass direction. Sun and Earth are visible when their dot is
-              above it; below it the terrain blocks them.
-            </p>
-            {result && frame ? (
-              <>
-                <HorizonPlot result={result} frame={frame} />
-                <div className="body-readouts">
-                  <span>
-                    <i className="sun-dot" /> Sun{" "}
-                    {frame.sun.elevation_deg?.toFixed(2) ?? "—"}°{" "}
-                    <b>{displayState[frame.sun.state]}</b>
-                  </span>
-                  <span>
-                    <i className="earth-dot" /> Earth{" "}
-                    {frame.earth.elevation_deg?.toFixed(2) ?? "—"}°{" "}
-                    <b>{displayState[frame.earth.state]}</b>
-                  </span>
-                </div>
-              </>
-            ) : (
-              <div className="empty-horizon">
-                <div className="empty-orbit">
-                  <i />
-                </div>
-                <h3>
-                  {busy
-                    ? "Tracing your horizon…"
-                    : "A new perspective awaits."}
-                </h3>
-                <p>
-                  {busy
-                    ? "Checking terrain, observer height and Sun / Earth positions."
-                    : "Choose a region and time to reveal the terrain, light and visibility."}
-                </p>
-                {!busy && (
-                  <button
-                    className="text-button"
-                    onClick={() => launch(true)}
-                  >
-                    Run the Malapert example ↗
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-          <div className="panel playback-panel">
-            <div className="playback-heading">
-              <div>
-                <p className="eyebrow">OBSERVATION TIME</p>
-                <strong>
-                  {frame ? `${utcLabel(frame.utc)} UTC` : "Select a moment"}
-                </strong>
-              </div>
-              <button
-                className="play-button"
-                disabled={!result?.frames.length}
-                onClick={() => {
-                  if (result && frameIndex === result.frames.length - 1)
-                    setFrameIndex(0);
-                  setPlaying(!playing);
-                }}
-                aria-label={playing ? "Pause playback" : "Play observation"}
-              >
-                {playing ? "Ⅱ" : "▷"}
-              </button>
-            </div>
-            <input
-              aria-label="Observation time"
-              aria-valuetext={
-                frame ? `${utcLabel(frame.utc)} UTC` : undefined
-              }
-              type="range"
-              min="0"
-              max={Math.max(0, (result?.frames.length || 1) - 1)}
-              value={frameIndex}
-              disabled={!result?.frames.length}
-              onChange={(e) => {
-                setPlaying(false);
-                setFrameIndex(Number(e.target.value));
-              }}
-            />
-            <div className="range-labels">
-              <span>
-                {result
-                  ? `${utcLabel(result.analysis.request.start_utc)} UTC`
-                  : "START"}
-              </span>
-              <span>Drag to move through the analysis samples</span>
-              <span>
-                {result
-                  ? `${utcLabel(result.analysis.request.end_utc)} UTC`
-                  : "END"}
-              </span>
-            </div>
-            {result && frame && (
-              <div className="timelines">
-                <Timeline
-                  title="SUN"
-                  intervals={result.analysis.sun.intervals}
-                  start={result.analysis.request.start_utc}
-                  end={result.analysis.request.end_utc}
-                  current={frame.utc}
-                />
-                <Timeline
-                  title="EARTH"
-                  intervals={result.analysis.earth.intervals}
-                  start={result.analysis.request.start_utc}
-                  end={result.analysis.request.end_utc}
-                  current={frame.utc}
-                />
-                <div className="timeline-legend">
-                  <span className="cursor-key">│ Selected time</span>
-                  <span>▰ Full / visible</span>
-                  <span>▧ Partial</span>
-                  <span>▰ Blocked</span>
-                  <span>▨ Unknown</span>
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="event-grid">
-            <div className="panel event-card">
-              <span className="metric-label">NEXT SUNSET · LAST LIMB</span>
-              <strong>
-                <SettingText value={frame?.sun.next_setting} />
-              </strong>
-            </div>
-            <div className="panel event-card">
-              <span className="metric-label">NEXT EARTHSET · CENTER</span>
-              <strong>
-                <SettingText value={frame?.earth.next_setting} />
-              </strong>
-            </div>
-          </div>
-          {result && job && (
-            <Communication key={job.id} jobId={job.id} current={frame?.utc} />
-          )}
-          {result && (
-            <div className="panel trace-panel">
-              <details>
-                <summary>
-                  Observation details & model limits <span>+</span>
-                </summary>
-                <div className="trace-content">
-                  <p>
-                    <b>Sun:</b> longest continuous visibility{" "}
-                    {hours(result.analysis.sun.metrics.longest_visible_s)} ·
-                    unknown{" "}
-                    {hours(result.analysis.sun.metrics.unknown_duration_s)}.
-                  </p>
-                  <p>
-                    <b>Earth:</b> longest continuous visibility{" "}
-                    {hours(result.analysis.earth.metrics.longest_visible_s)} ·
-                    longest blocked period{" "}
-                    {hours(result.analysis.earth.metrics.longest_blocked_s)} ·
-                    unknown{" "}
-                    {hours(result.analysis.earth.metrics.unknown_duration_s)}.
-                  </p>
-                  <p>
-                    80 m terrain grid ·{" "}
-                    {(
-                      result.horizon.settings.search_distance_m / 1000
-                    ).toFixed(0)}{" "}
-                    km search radius ·{" "}
-                    {result.horizon.settings.azimuth_step_deg}° horizon
-                    spacing. Ground height uses the containing pixel; observer{" "}
-                    {result.horizon.observer_height_above_terrain_m.toFixed(
-                      1,
-                    )}{" "}
-                    m above it.
-                  </p>
-                  <p>
-                    Durations are estimates. Fine time sampling does not
-                    remove terrain uncertainty. The ±
-                    {result.analysis.spatial_sensitivity.offset_deg}°
-                    sensitivity scenarios are not error bounds. No eclipse,
-                    link-budget or landing-safety model.
-                  </p>
-                  <p>
-                    Refinement:{" "}
-                    {result.analysis.refinement.status.replaceAll("_", " ")} ·{" "}
-                    {result.analysis.provenance.ephemerides.length} source
-                    bundles.
-                  </p>
-                  <code>Analysis {result.analysis.analysis_id}</code>
-                  <button className="text-button" onClick={openSources}>
-                    View NASA sources ↗
-                  </button>
-                </div>
-              </details>
-            </div>
-          )}
-          {result && job && (
-            <ExportPanel
-              jobId={job.id}
-              result={result}
-              frameIndex={frameIndex}
-            />
-          )}
-          {result && job && (
-            <button
-              className="primary add-comparison"
-              onClick={() => {
-                setPlaying(false);
-                setSharedB(undefined);
-                setComparisonBase({ id: job.id, result });
-                setTimeout(() => jump("comparison"), 0);
-              }}
-            >
-              Add comparison ↗
-            </button>
-          )}
-          <p className="results-footnote">
-            A horizon is a perspective, not a promise. Results describe the
-            sampled terrain and observation window.
-          </p>
-          <ScenarioTransfer onOpen={openSearchResult} />
-        </section>
       </section>
-      {comparisonBase && view === "mission" && (
-        <Comparison
-          key={comparisonBase.id}
-          aId={comparisonBase.id}
-          initialBId={sharedB}
-          initialCursor={Number(shared.current.get("cursor") || 0)}
-          a={comparisonBase.result}
-          sites={sites}
-          onClose={() => setComparisonBase(null)}
-        />
-      )}
-      {view === "mission" && (
-        <WindowSearch sites={sites} onChoose={openSearchResult} />
-      )}
-      {classroomOpen && <Classroom onOpen={openSearchResult} />}
-      {recommendOpen && <Recommendations sites={sites} />}
-      {descentOpen && <Descent sites={sites} />}
       <footer>
         <span>
-          2GBRAM <i> / </i> LUNAR LANDING NAVIGATOR
+          2GBRAM <i> / </i> {t("app.footer.name")}
         </span>
-        <span>Built with NASA open data.</span>
+        <span>{t("app.footer.built")}</span>
         <a href="/api/docs" target="_blank" rel="noreferrer">
-          Open API documentation ↗
+          {t("app.footer.docs")} ↗
         </a>
       </footer>
       {sources && (
@@ -1423,21 +1388,13 @@ export default function App() {
               autoFocus
               className="modal-close"
               onClick={() => setSources(false)}
-              aria-label="Close sources"
+              aria-label={t("app.sources.close")}
             >
               ×
             </button>
-            <p className="eyebrow">PROVENANCE</p>
-            <h2 id="sources-title">A view built on real data.</h2>
-            <p>
-              NASA models illustrate the journey. The introductory crater
-              terrain is original decorative geometry, not the selected
-              location. The mission-control flight from Earth to the Moon is
-              illustrative: Earth, the Moon and their distance are to scale,
-              the spacecraft are enlarged and the Sun is shown closer at its
-              true apparent size; it is not a computed trajectory. Scientific results use cached Horizons ephemerides and
-              the verified LOLA terrain product.
-            </p>
+            <p className="eyebrow">{t("app.sources.eyebrow")}</p>
+            <h2 id="sources-title">{t("app.sources.title")}</h2>
+            <p>{t("app.sources.body")}</p>
             <ul>
               <li>
                 <a
@@ -1445,7 +1402,7 @@ export default function App() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  LRO model
+                  {t("app.sources.lro")}
                 </a>{" "}
                 · NASA / Christopher R. Meaney
               </li>
@@ -1485,7 +1442,7 @@ export default function App() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  LOLA south-pole terrain
+                  {t("app.sources.lola")}
                 </a>{" "}
                 · Barker et al. (2023)
               </li>
@@ -1497,7 +1454,7 @@ export default function App() {
                 >
                   JPL Horizons
                 </a>{" "}
-                · Sun and Earth observer ephemerides
+                · {t("app.sources.horizons")}
               </li>
               {sites.map((site) => (
                 <li key={site.site_id}>
@@ -1506,16 +1463,12 @@ export default function App() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {site.display_name} coordinate source
+                    {t("app.sources.coordinate", { name: site.display_name })}
                   </a>
                 </li>
               ))}
             </ul>
-            <small>
-              The introduction is an illustrative animation. Apollo is not shown
-              as a historical south-pole mission. NASA does not endorse this
-              application.
-            </small>
+            <small>{t("app.sources.disclaimer")}</small>
           </section>
         </div>
       )}

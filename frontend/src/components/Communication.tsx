@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { errorText, useTranslate, type Translate } from "../i18n";
 
 // R2/S4: displays backend communication windows; no geometry is computed here.
 type Window = {
@@ -36,26 +37,17 @@ type CommunicationJob = {
 };
 
 const ACTIVE = ["pending", "acquiring", "computing"];
-const STATUS: Record<string, string> = {
-  pending: "Waiting in queue",
-  acquiring: "Requesting DSN station geometry from NASA/JPL",
-  computing: "Intersecting station and Earth visibility",
-  ready: "Communication windows ready",
-  insufficient_data: "Partial result · unknown coverage",
-  failed: "Communication analysis could not complete",
-};
+const STATUSES = ["pending", "acquiring", "computing", "ready", "insufficient_data", "failed"];
 const LIMITS = [
-  { value: 6, label: "6° · DSN receive (generic)" },
-  { value: 10, label: "10° · low-power transmit (generic)" },
+  { value: 6, key: "communication.limit6" },
+  { value: 10, key: "communication.limit10" },
 ];
-const STATE_LABEL = {
-  available: "Communication possible",
-  unavailable: "No communication",
-  unknown: "Unknown",
-};
-const hours = (s: number) => `${(s / 3600).toFixed(1)} h`;
-const utc = (value: string) =>
-  new Date(value).toLocaleString("en-GB", {
+const stateLabel = (t: Translate, state: Window["state"]) =>
+  t(`communication.state.${state}`);
+const hours = (t: Translate, s: number) =>
+  t("units.hours", { value: (s / 3600).toFixed(1) });
+const utc = (value: string, locale: string) =>
+  new Date(value).toLocaleString(locale, {
     timeZone: "UTC",
     day: "2-digit",
     month: "short",
@@ -86,7 +78,7 @@ async function call(path: string, init?: RequestInit) {
   const body = await response.json();
   if (!response.ok) {
     const detail = body?.detail;
-    throw Error(typeof detail === "string" ? detail : "Request failed");
+    throw Error(typeof detail === "string" ? detail : "");
   }
   return body;
 }
@@ -104,6 +96,7 @@ function Band({
   end: string;
   current?: string;
 }) {
+  const { t, locale } = useTranslate();
   const from = Date.parse(start);
   const span = Date.parse(end) - from;
   const pct = (value: string) => ((Date.parse(value) - from) / span) * 100;
@@ -114,7 +107,14 @@ function Band({
         className="timeline-track"
         role="img"
         aria-label={`${title}: ${intervals
-          .map((i) => `${STATE_LABEL[i.state]} ${utc(i.start_utc)} to ${utc(i.end_utc)} UTC`)
+          .map((i) =>
+            t("communication.segment", {
+              state: stateLabel(t, i.state),
+              via: "",
+              start: utc(i.start_utc, locale),
+              end: utc(i.end_utc, locale),
+            }),
+          )
           .join("; ")}`}
       >
         {intervals.map((interval, i) => (
@@ -125,9 +125,14 @@ function Band({
               left: `${pct(interval.start_utc)}%`,
               width: `${pct(interval.end_utc) - pct(interval.start_utc)}%`,
             }}
-            title={`${STATE_LABEL[interval.state]}${
-              interval.station_ids?.length ? ` via ${interval.station_ids.join(", ")}` : ""
-            } · ${utc(interval.start_utc)} to ${utc(interval.end_utc)} UTC`}
+            title={t("communication.segment", {
+              state: stateLabel(t, interval.state),
+              via: interval.station_ids?.length
+                ? t("communication.via", { stations: interval.station_ids.join(", ") })
+                : "",
+              start: utc(interval.start_utc, locale),
+              end: utc(interval.end_utc, locale),
+            })}
           />
         ))}
         {current && <i className="time-cursor" style={{ left: `${pct(current)}%` }} />}
@@ -143,6 +148,9 @@ export default function Communication({
   jobId: string;
   current?: string;
 }) {
+  const { t, tText, locale } = useTranslate();
+  const h = (s: number) => hours(t, s);
+  const u = (value: string) => utc(value, locale);
   const [limit, setLimit] = useState(6);
   const [job, setJob] = useState<CommunicationJob | null>(null);
   const [error, setError] = useState("");
@@ -159,7 +167,7 @@ export default function Communication({
           timer.current = window.setTimeout(() => poll(id), 1500);
         }
       })
-      .catch((e: Error) => setError(e.message));
+      .catch((e: Error) => setError(errorText(e, t, "communication.requestFailed")));
   };
 
   useEffect(() => {
@@ -185,7 +193,7 @@ export default function Communication({
       setJob(created);
       poll(created.id);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Request failed");
+      setError(errorText(e, t, "communication.requestFailed"));
     } finally {
       setBusy(false);
     }
@@ -199,26 +207,26 @@ export default function Communication({
   return (
     <section className="panel communication-panel" aria-labelledby="communication-title">
       <div className="panel-heading">
-        <span id="communication-title">DIRECT-TO-EARTH COMMUNICATION</span>
-        <small>NASA DSN · GEOMETRIC</small>
+        <span id="communication-title">{t("communication.title")}</span>
+        <small>{t("communication.subtitle")}</small>
       </div>
       <div className="communication-body">
         <p className="communication-intro">
-          A window needs Earth above your local horizon <b>and</b> the Moon above a
-          Deep Space Network antenna's elevation limit.
+          {t("communication.introBefore")} <b>{t("communication.introAnd")}</b>{" "}
+          {t("communication.introAfter")}
         </p>
         <div className="communication-controls">
           <label>
-            Station elevation limit
+            {t("communication.limit")}
             <select
-              aria-label="Station elevation limit"
+              aria-label={t("communication.limit")}
               value={limit}
               disabled={busy || running}
               onChange={(e) => setLimit(Number(e.target.value))}
             >
               {LIMITS.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t(option.key)}
                 </option>
               ))}
             </select>
@@ -228,12 +236,14 @@ export default function Communication({
             disabled={busy || running}
             onClick={start}
           >
-            {result ? "Recalculate windows" : "Check DSN communication"} ↗
+            {result ? t("communication.recalculate") : t("communication.check")} ↗
           </button>
         </div>
         {job && (
           <p className={`communication-status ${job.status}`} role="status">
-            {STATUS[job.status] ?? job.status}
+            {STATUSES.includes(job.status)
+              ? t(`communication.status.${job.status}`)
+              : job.status}
             {job.error ? ` — ${job.error}` : ""}
           </p>
         )}
@@ -246,19 +256,29 @@ export default function Communication({
           <>
             <div className="communication-metrics">
               <div>
-                <span className="metric-label">COMMUNICATION</span>
+                <span className="metric-label">{t("communication.metric")}</span>
                 <strong>{combined.metrics.available_percent_of_interval.toFixed(1)}%</strong>
-                <small>{hours(combined.metrics.available_duration_s)} of the window</small>
+                <small>
+                  {t("communication.ofWindow", {
+                    hours: h(combined.metrics.available_duration_s),
+                  })}
+                </small>
               </div>
               <div>
-                <span className="metric-label">WINDOWS</span>
+                <span className="metric-label">{t("communication.windows")}</span>
                 <strong>{combined.metrics.window_count}</strong>
-                <small>longest {hours(combined.metrics.longest_available_s)}</small>
+                <small>
+                  {t("communication.longest", {
+                    hours: h(combined.metrics.longest_available_s),
+                  })}
+                </small>
               </div>
               <div>
-                <span className="metric-label">UNKNOWN</span>
-                <strong>{hours(combined.metrics.unknown_duration_s)}</strong>
-                <small>at {result.min_elevation_deg}° station limit</small>
+                <span className="metric-label">{t("communication.unknown")}</span>
+                <strong>{h(combined.metrics.unknown_duration_s)}</strong>
+                <small>
+                  {t("communication.atLimit", { deg: result.min_elevation_deg })}
+                </small>
               </div>
             </div>
             <div className="timelines communication-bands">
@@ -273,51 +293,52 @@ export default function Communication({
                 />
               ))}
               <Band
-                title="ANY"
+                title={t("communication.any")}
                 intervals={combined.intervals}
                 start={result.start_utc}
                 end={result.end_utc}
                 current={current}
               />
               <div className="timeline-legend">
-                <span>▰ Communication possible</span>
-                <span>▰ No communication</span>
-                <span>▨ Unknown</span>
+                <span>▰ {t("communication.state.available")}</span>
+                <span>▰ {t("communication.state.unavailable")}</span>
+                <span>▨ {t("communication.state.unknown")}</span>
               </div>
             </div>
             <ul className="station-key">
               {result.stations.map((station) => (
                 <li key={station.station_id}>
                   <b>{station.station_id}</b> {station.complex} · {station.antenna} ·{" "}
-                  {hours(result.windows.stations[station.station_id].metrics.available_duration_s)}
+                  {h(result.windows.stations[station.station_id].metrics.available_duration_s)}
                 </li>
               ))}
             </ul>
             {windows.length ? (
-              <ol className="window-list" aria-label="Communication windows">
+              <ol className="window-list" aria-label={t("communication.windowList")}>
                 {windows.map((w, i) => (
                   <li key={i}>
-                    {utc(w.start_utc)} – {utc(w.end_utc)} UTC · {hours(w.duration_s)} ·{" "}
+                    {u(w.start_utc)} – {u(w.end_utc)} UTC · {h(w.duration_s)} ·{" "}
                     {w.station_ids?.join(" + ")}
                   </li>
                 ))}
               </ol>
             ) : (
               <p className="communication-empty">
-                No direct-to-Earth window in this observation interval.
+                {t("communication.empty")}
               </p>
             )}
             <details className="communication-limits">
               <summary>
-                Model limits & sources <span>+</span>
+                {t("communication.limits")} <span>+</span>
               </summary>
               <ul>
                 {result.limitations.map((text) => (
-                  <li key={text}>{text}</li>
+                  <li key={text}>{tText(text)}</li>
                 ))}
                 <li>
-                  Station rise/set is interpolated between {result.source.sample_step_s / 60}-minute
-                  JPL Horizons samples.
+                  {t("communication.interpolated", {
+                    minutes: result.source.sample_step_s / 60,
+                  })}
                 </li>
               </ul>
               <a href={result.source.station_url} target="_blank" rel="noreferrer">

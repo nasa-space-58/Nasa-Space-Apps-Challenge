@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslate, type Translate } from "../i18n";
 
 // R5 (S7): renders the backend route grid; fuel and safety come from the API.
 export type Route = {
@@ -32,9 +33,11 @@ export type RouteResult = {
 // Reference categorical slots 1-3 (dark), validated on #10171e; scatter caps at three.
 const ORBIT_COLORS = ["#3987e5", "#d95926", "#199e70"];
 const NMI_KM = 1.852;
-const nmi = (km: number) => `${Math.round(km / NMI_KM)} n.mi.`;
+const nmi = (t: Translate, km: number) =>
+  t("routes.nmi", { value: Math.round(km / NMI_KM) });
 
 function Scatter({ result }: { result: RouteResult }) {
+  const { t } = useTranslate();
   const [hover, setHover] = useState<Route | null>(null);
   const orbits = [...new Set(result.routes.map((r) => r.orbit_altitude_km))].sort((a, b) => a - b);
   const color = (r: Route) => ORBIT_COLORS[orbits.indexOf(r.orbit_altitude_km) % ORBIT_COLORS.length];
@@ -72,7 +75,7 @@ function Scatter({ result }: { result: RouteResult }) {
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"
-        aria-label="Propellant used versus landing-area assessment time for each route; route details are in the table below."
+        aria-label={t("routes.chartLabel")}
       >
         {ticks(y0, y1).map((v) => (
           <g key={`y${v}`}>
@@ -88,10 +91,10 @@ function Scatter({ result }: { result: RouteResult }) {
           </text>
         ))}
         <text x={L} y={H - 6} className="axis-title">
-          Propellant used from DOI · kg
+          {t("routes.xAxis")}
         </text>
         <text x={8} y={14} className="axis-title">
-          Assessment time (approach + terminal) · s
+          {t("routes.yAxis")}
         </text>
         {front.length > 1 && (
           <polyline
@@ -129,7 +132,7 @@ function Scatter({ result }: { result: RouteResult }) {
               className="direct-label"
               textAnchor={i === 0 ? "start" : "end"}
             >
-              {i === 0 ? "Lowest fuel" : "Longest assessment"}
+              {i === 0 ? t("routes.lowestFuel") : t("routes.longestAssessment")}
             </text>
           ) : null;
         })}
@@ -152,35 +155,48 @@ function Scatter({ result }: { result: RouteResult }) {
           role="status"
         >
           <b>
-            {hover.id} · {nmi(hover.orbit_altitude_km)} · {hover.approach_s}s + {hover.terminal_s}s
+            {hover.id} · {nmi(t, hover.orbit_altitude_km)} · {hover.approach_s}s + {hover.terminal_s}s
           </b>
-          <span>Propellant {hover.propellant_used_kg!.toFixed(0)} kg</span>
-          <span>Reserve margin {hover.reserve_margin_kg!.toFixed(0)} kg · hover {hover.hover_margin_s!.toFixed(0)} s</span>
-          <span>{hover.feasible ? "Feasible" : `Rejected: ${hover.rejection_reasons[0]?.reason.replaceAll("_", " ")}`}</span>
+          <span>{t("routes.propellant", { kg: hover.propellant_used_kg!.toFixed(0) })}</span>
+          <span>
+            {t("routes.marginHover", {
+              kg: hover.reserve_margin_kg!.toFixed(0),
+              s: hover.hover_margin_s!.toFixed(0),
+            })}
+          </span>
+          <span>
+            {hover.feasible
+              ? t("routes.feasible")
+              : t("routes.rejectedReason", {
+                  reason: hover.rejection_reasons[0]?.reason.replaceAll("_", " ") ?? "",
+                })}
+          </span>
         </div>
       )}
       <div className="contribution-legend scatter-legend">
         {orbits.map((o, i) => (
           <span key={o}>
-            <i style={{ background: ORBIT_COLORS[i % ORBIT_COLORS.length] }} /> {nmi(o)} orbit
+            <i style={{ background: ORBIT_COLORS[i % ORBIT_COLORS.length] }} />{" "}
+            {t("routes.orbit", { nmi: nmi(t, o) })}
           </span>
         ))}
         <span>
-          <i className="legend-front" /> Pareto front (larger dots)
+          <i className="legend-front" /> {t("routes.paretoFront")}
         </span>
-        <span>✕ Rejected</span>
+        <span>✕ {t("routes.rejected")}</span>
       </div>
     </div>
   );
 }
 
 export default function RouteOptimizer({ result }: { result: RouteResult }) {
+  const { t, tText } = useTranslate();
   const tag = (id: string) =>
     [
-      id === result.lowest_fuel_id && "lowest fuel",
-      id === result.longest_assessment_id && "longest assessment",
-      id === result.reference_route_id && "Apollo 11 reference",
-      result.pareto_ids.includes(id) && "Pareto",
+      id === result.lowest_fuel_id && t("routes.tag.lowestFuel"),
+      id === result.longest_assessment_id && t("routes.tag.longestAssessment"),
+      id === result.reference_route_id && t("routes.tag.apollo"),
+      result.pareto_ids.includes(id) && t("routes.tag.pareto"),
     ]
       .filter(Boolean)
       .join(" · ");
@@ -193,32 +209,37 @@ export default function RouteOptimizer({ result }: { result: RouteResult }) {
     <div className="route-optimizer">
       <div className="panel descent-verdict ok" role="status">
         <strong>
-          {result.feasible_ids.length} of {result.routes.length} routes keep the{" "}
-          {(result.reserve.delta_v_mps / 0.3048).toFixed(0)} fps reserve
+          {t("routes.verdict", {
+            n: result.feasible_ids.length,
+            total: result.routes.length,
+            fps: (result.reserve.delta_v_mps / 0.3048).toFixed(0),
+          })}
         </strong>
         <p>
-          Reserve source: {result.reserve.source}. Budget from DOI:{" "}
-          {result.propellant_at_doi_kg.toFixed(0)} kg.
+          {t("routes.reserveSource", {
+            source: result.reserve.source,
+            kg: result.propellant_at_doi_kg.toFixed(0),
+          })}
         </p>
       </div>
       <Scatter result={result} />
       <div className="table-scroll">
       <table className="ranking-table">
-        <caption>Routes, lowest propellant first</caption>
+        <caption>{t("routes.caption")}</caption>
         <thead>
           <tr>
-            <th scope="col">Route</th>
-            <th scope="col">Propellant</th>
-            <th scope="col">Reserve margin</th>
-            <th scope="col">Assessment</th>
-            <th scope="col">Status</th>
+            <th scope="col">{t("routes.col.route")}</th>
+            <th scope="col">{t("routes.col.propellant")}</th>
+            <th scope="col">{t("routes.col.margin")}</th>
+            <th scope="col">{t("routes.col.assessment")}</th>
+            <th scope="col">{t("routes.col.status")}</th>
           </tr>
         </thead>
         <tbody>
           {sorted.map((r) => (
             <tr key={r.id} className={r.feasible ? "" : "route-rejected"}>
               <th scope="row">
-                {r.id} · {nmi(r.orbit_altitude_km)} · {r.approach_s} s + {r.terminal_s} s
+                {r.id} · {nmi(t, r.orbit_altitude_km)} · {r.approach_s} s + {r.terminal_s} s
                 {tag(r.id) && <small>{tag(r.id)}</small>}
               </th>
               <td>
@@ -227,11 +248,13 @@ export default function RouteOptimizer({ result }: { result: RouteResult }) {
               </td>
               <td>
                 {r.reserve_margin_kg !== undefined ? `${r.reserve_margin_kg.toFixed(0)} kg` : "—"}
-                {r.hover_margin_s !== undefined && <small>hover {r.hover_margin_s.toFixed(0)} s</small>}
+                {r.hover_margin_s !== undefined && (
+                  <small>{t("routes.hover", { s: r.hover_margin_s.toFixed(0) })}</small>
+                )}
               </td>
               <td>{r.assessment_time_s} s</td>
               <td>
-                {r.feasible ? "✓ Feasible" : "✕ Rejected"}
+                {r.feasible ? `✓ ${t("routes.feasible")}` : `✕ ${t("routes.rejected")}`}
                 {r.rejection_reasons.map((x) => (
                   <small key={x.reason}>{x.detail}</small>
                 ))}
@@ -243,11 +266,11 @@ export default function RouteOptimizer({ result }: { result: RouteResult }) {
       </div>
       <details className="communication-limits">
         <summary>
-          Route model & assumptions <span>+</span>
+          {t("routes.assumptions")} <span>+</span>
         </summary>
         <ul>
           {result.assumptions.map((a) => (
-            <li key={a}>{a}</li>
+            <li key={a}>{tText(a)}</li>
           ))}
         </ul>
       </details>

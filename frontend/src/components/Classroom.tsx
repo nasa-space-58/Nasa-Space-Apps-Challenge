@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import type { Result } from "../types";
 import HorizonPlot from "./HorizonPlot";
 import ExportPanel from "./ExportPanel";
+import { errorText, useTranslate } from "../i18n";
 type Lesson = {
   id: string;
   title: string;
@@ -9,16 +10,7 @@ type Lesson = {
   limitation: string;
   cards: { title: string; text: string }[];
 };
-const explanation: Record<string, string> = {
-  full: "The whole solar disk clears the modeled terrain horizon at this sample.",
-  partial:
-    "Only part of the Sun clears the ridge. A point-sized Sun would miss this transition.",
-  dark: "Terrain hides the solar disk at this observer. This does not mean the whole region is permanently shadowed.",
-  boundary:
-    "This sample is at a modeled visibility boundary. Sampling and terrain uncertainty matter.",
-  unknown:
-    "Coverage is missing here. We cannot conclude that this sample is dark or illuminated.",
-};
+const EXPLAINED_STATES = ["full", "partial", "dark", "boundary", "unknown"];
 async function api(path: string, post = false) {
   const response = await fetch(
       "/api" + path,
@@ -27,7 +19,7 @@ async function api(path: string, post = false) {
     body = await response.json();
   if (!response.ok)
     throw Error(
-      typeof body.detail === "string" ? body.detail : "Lesson unavailable",
+      typeof body.detail === "string" ? body.detail : "",
     );
   return body;
 }
@@ -36,6 +28,7 @@ export default function Classroom({
 }: {
   onOpen: (id: string, compare: boolean) => Promise<void>;
 }) {
+  const { t, tText } = useTranslate();
   const [lessons, setLessons] = useState<Lesson[]>([]),
     [selected, setSelected] = useState<Lesson | null>(null);
   const [id, setId] = useState<string | null>(null),
@@ -53,7 +46,7 @@ export default function Classroom({
       .then((data) => {
         if (active) setLessons(data.lessons);
       })
-      .catch((e) => active && setError(e.message));
+      .catch((e) => active && setError(errorText(e, t, "classroom.unavailable")));
     return () => {
       active = false;
     };
@@ -69,9 +62,7 @@ export default function Classroom({
         setPhase(job.status);
         setError("");
         if (job.status === "failed") {
-          setError(
-            job.error || "Lesson analysis failed; select a lesson to retry.",
-          );
+          setError(job.error || t("classroom.failed"));
           return;
         }
         if (["ready", "insufficient_data"].includes(job.status)) {
@@ -83,7 +74,7 @@ export default function Classroom({
         } else timer = setTimeout(poll, 1800);
       } catch (e) {
         if (active) {
-          setError(e instanceof Error ? e.message : "Connection interrupted");
+          setError(errorText(e, t, "scenario.connection"));
           timer = setTimeout(poll, 5000);
         }
       }
@@ -128,7 +119,7 @@ export default function Classroom({
       setRetry((n) => n + 1);
     } catch (e) {
       setPhase("failed");
-      setError(e instanceof Error ? e.message : "Unable to start lesson");
+      setError(errorText(e, t, "classroom.unableToStart"));
     } finally {
       setStarting(false);
     }
@@ -138,33 +129,32 @@ export default function Classroom({
     <section id="classroom" className="classroom-section">
       <div className="section-heading">
         <div>
-          <p className="eyebrow">LEARN / THE SAME PLACE, A DIFFERENT DAY</p>
+          <p className="eyebrow">{t("classroom.eyebrow")}</p>
           <h2>
-            Follow the light<span>.</span>
+            {t("classroom.title")}<span>.</span>
           </h2>
-          <p className="muted">
-            Two short lessons. Real observations. No technical setup.
-          </p>
+          <p className="muted">{t("classroom.intro")}</p>
         </div>
-        <span className="outline-tag">CLASSROOM</span>
+        <span className="outline-tag">{t("classroom.tag")}</span>
       </div>
       <div className="lesson-options">
         {lessons.map((lesson) => (
           <article className="panel lesson-card" key={lesson.id}>
-            <h3>{lesson.title}</h3>
+            <h3>{tText(lesson.title)}</h3>
             <p>
-              Malapert Massif · {lesson.id === "later-start" ? "6" : "4"}{" "}
-              November 2026 · 24 hours
+              {t("classroom.lessonMeta", {
+                day: lesson.id === "later-start" ? "6" : "4",
+              })}
             </p>
             <button
               disabled={starting}
               className="primary"
               onClick={() => start(lesson)}
             >
-              Start lesson:{" "}
+              {t("classroom.start")}:{" "}
               {lesson.id === "later-start"
-                ? "48 hours later"
-                : "changing light"}{" "}
+                ? t("classroom.later")
+                : t("classroom.changing")}{" "}
               ↗
             </button>
           </article>
@@ -174,50 +164,49 @@ export default function Classroom({
         <div role="alert" className="alert">
           {error}{" "}
           <button onClick={() => setRetry((n) => n + 1)}>
-            Reconnect lessons
+            {t("classroom.reconnect")}
           </button>
         </div>
       )}
       {selected && !result && (
         <p role="status">
-          {phase.replaceAll("_", " ")} · The first run may take minutes to
-          acquire NASA data. Saved lessons open again without a new calculation.
+          {t(`jobState.${phase}`)} · {t("classroom.firstRun")}
         </p>
       )}
       {selected && result && frame && (
         <div className="lesson-stage">
           <article className="panel lesson-sky">
             <div className="panel-heading">
-              <span>{selected.title}</span>
+              <span>{tText(selected.title)}</span>
               <span>UTC</span>
             </div>
             <HorizonPlot result={result} frame={frame} />
             <div className="lesson-player">
               <strong>{frame.utc}</strong>
               <button
-                aria-label={playing ? "Pause lesson" : "Play lesson"}
+                aria-label={playing ? t("classroom.pause") : t("classroom.play")}
                 onClick={() => {
                   if (index === result.frames.length - 1) setIndex(0);
                   setPlaying(!playing);
                 }}
               >
-                {playing ? "Pause Ⅱ" : "Play ▷"}
+                {playing ? `${t("classroom.pauseShort")} Ⅱ` : `${t("classroom.playShort")} ▷`}
               </button>
               <label>
-                Playback speed
+                {t("classroom.speed")}
                 <select
-                  aria-label="Lesson playback speed"
+                  aria-label={t("classroom.speedLabel")}
                   value={speed}
                   onChange={(e) => setSpeed(e.target.value)}
                 >
-                  <option value="2000">Slow · 2 s / sample</option>
-                  <option value="1000">Normal · 1 s / sample</option>
-                  <option value="250">Fast · 4 samples / s</option>
+                  <option value="2000">{t("classroom.slow")}</option>
+                  <option value="1000">{t("classroom.normal")}</option>
+                  <option value="250">{t("classroom.fast")}</option>
                 </select>
               </label>
               <input
                 type="range"
-                aria-label="Lesson time"
+                aria-label={t("classroom.time")}
                 aria-valuetext={frame.utc}
                 min="0"
                 max={result.frames.length - 1}
@@ -227,70 +216,71 @@ export default function Classroom({
                   setIndex(Number(e.target.value));
                 }}
               />
-              <p className="field-help">
-                Playback advances through computed samples; unequal UTC gaps are
-                shown by the timestamp.
-              </p>
+              <p className="field-help">{t("classroom.playbackNote")}</p>
             </div>
           </article>
           <aside
             className="panel lesson-explanation"
-            aria-label="Current observation explanation"
+            aria-label={t("classroom.explanationLabel")}
           >
-            <p className="eyebrow">AT THIS MOMENT</p>
-            <h3>Sun: {frame.sun.state}</h3>
-            <p>{explanation[frame.sun.state] || explanation.unknown}</p>
-            <h3>Earth: {frame.earth.state}</h3>
+            <p className="eyebrow">{t("classroom.atMoment")}</p>
+            <h3>
+              {t("common.sun")}: {t(`displayState.${frame.sun.state}`)}
+            </h3>
+            <p>
+              {t(
+                `classroom.explanation.${EXPLAINED_STATES.includes(frame.sun.state) ? frame.sun.state : "unknown"}`,
+              )}
+            </p>
+            <h3>
+              {t("common.earth")}: {t(`displayState.${frame.earth.state}`)}
+            </h3>
             <p>
               {frame.earth.state === "visible"
-                ? "Earth's centre clears this horizon. A ground station or working radio link is not established by this alone."
+                ? t("classroom.earthVisible")
                 : frame.earth.state === "unknown"
-                  ? "Earth visibility is unknown at this sample."
-                  : "Earth's centre is blocked or at the horizon boundary at this sample."}
+                  ? t("classroom.earthUnknown")
+                  : t("classroom.earthBlocked")}
             </p>
             <p>
-              Across this window:{" "}
-              {result.analysis.sun.metrics.visible_percent_of_interval.toFixed(
-                1,
-              )}
-              % sunlight;{" "}
-              {(result.analysis.sun.metrics.longest_blocked_s / 3600).toFixed(
-                2,
-              )}{" "}
-              h longest darkness.
+              {t("classroom.across", {
+                percent:
+                  result.analysis.sun.metrics.visible_percent_of_interval.toFixed(1),
+                hours: (
+                  result.analysis.sun.metrics.longest_blocked_s / 3600
+                ).toFixed(2),
+              })}
             </p>
           </aside>
           <div className="lesson-cards">
             {selected.cards.map((card) => (
               <article className="panel" key={card.title}>
-                <h3>{card.title}</h3>
-                <p>{card.text}</p>
+                <h3>{tText(card.title)}</h3>
+                <p>{tText(card.text)}</p>
               </article>
             ))}
           </div>
-          <p className="search-limitation">{selected.limitation}</p>
+          <p className="search-limitation">{tText(selected.limitation)}</p>
           <details className="panel lesson-details">
-            <summary>Technical details and sources</summary>
+            <summary>{t("classroom.technical")}</summary>
             <p>
-              Observer height {result.horizon.observer_height_above_terrain_m}{" "}
-              m. Terrain search radius{" "}
-              {result.horizon.settings.search_distance_m} m. Analysis{" "}
-              {result.analysis.analysis_id}.
+              {t("classroom.technicalDetail", {
+                height: result.horizon.observer_height_above_terrain_m,
+                radius: result.horizon.settings.search_distance_m,
+                id: result.analysis.analysis_id,
+              })}
             </p>
             <a href={selected.source_url} target="_blank" rel="noreferrer">
-              NASA coordinate source ↗
+              {t("classroom.coordinateSource")} ↗
             </a>
-            <p>
-              LOLA terrain and JPL Horizons ephemerides. Open mission control
-              for coverage and provenance.
-            </p>
+            <p>{t("classroom.sourcesNote")}</p>
             <button
               onClick={() => {
                 setPlaying(false);
                 onOpen(id!, false).catch((e) => setError(e.message));
               }}
             >
-              Open full analysis ↗
+              {t("classroom.openFull")} ↗
             </button>
           </details>
           <ExportPanel jobId={id!} result={result} frameIndex={index} />

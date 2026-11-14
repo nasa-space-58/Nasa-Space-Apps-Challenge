@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Preset } from "../types";
 import RouteOptimizer, { type RouteResult } from "./RouteOptimizer";
+import { errorText, useTranslate } from "../i18n";
 
 // R4 (S6): renders backend descent plans; all physics runs in the API.
 type Sample = {
@@ -58,9 +59,9 @@ type Profile = {
 
 // Reference categorical slots 1-3 (dark), validated on the #10171e surface.
 const PHASES = [
-  { key: "braking", label: "Braking", color: "#3987e5" },
-  { key: "approach", label: "Approach", color: "#d95926" },
-  { key: "terminal", label: "Terminal descent", color: "#199e70" },
+  { key: "braking", color: "#3987e5" },
+  { key: "approach", color: "#d95926" },
+  { key: "terminal", color: "#199e70" },
 ];
 const FT = 0.3048;
 const minutes = (s: number) => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
@@ -75,13 +76,14 @@ async function call(path: string, init?: RequestInit) {
         ? detail
         : Array.isArray(detail)
           ? detail.map((d: { msg: string }) => d.msg).join("; ")
-          : "Request failed",
+          : "",
     );
   }
   return body;
 }
 
 function ProfileChart({ samples, zoom }: { samples: Sample[]; zoom: boolean }) {
+  const { t } = useTranslate();
   const [hover, setHover] = useState<Sample | null>(null);
   const shown = zoom ? samples.filter((s) => s.downrange_m >= -10000) : samples;
   const W = 720,
@@ -106,7 +108,11 @@ function ProfileChart({ samples, zoom }: { samples: Sample[]; zoom: boolean }) {
   const gates = PHASES.map((p) => [...samples].reverse().find((s) => s.phase === p.key)).filter(
     (s): s is Sample => !!s && (!zoom || s.downrange_m >= -10000),
   );
-  const gateNames = ["High gate", "Low gate", "Touchdown"];
+  const gateNames = [
+    t("descent.gate.high"),
+    t("descent.gate.low"),
+    t("descent.gate.touchdown"),
+  ];
   const move = (e: React.MouseEvent<SVGRectElement>) => {
     const box = e.currentTarget.getBoundingClientRect();
     const km = xMin + ((e.clientX - box.left) / box.width) * (0 - xMin);
@@ -121,7 +127,9 @@ function ProfileChart({ samples, zoom }: { samples: Sample[]; zoom: boolean }) {
       <svg
         viewBox={`0 0 ${W} ${H}`}
         role="img"
-        aria-label={`Altitude above the site versus downrange, ${zoom ? "final 10 km" : "full powered descent"}. Phase details are in the table below.`}
+        aria-label={t("descent.chartLabel", {
+          range: zoom ? t("descent.rangeFinal") : t("descent.rangeFull"),
+        })}
       >
         {yTicks.map((v) => (
           <g key={`y${v}`}>
@@ -137,10 +145,10 @@ function ProfileChart({ samples, zoom }: { samples: Sample[]; zoom: boolean }) {
           </text>
         ))}
         <text x={L} y={H - 6} className="axis-title">
-          Downrange to site · km
+          {t("descent.xAxis")}
         </text>
         <text x={8} y={14} className="axis-title">
-          Altitude above site · km
+          {t("descent.yAxis")}
         </text>
         {PHASES.map((p) => {
           const own = shown.filter((s) => s.phase === p.key || (p.key === "terminal" && s.phase === "landed"));
@@ -208,14 +216,18 @@ function ProfileChart({ samples, zoom }: { samples: Sample[]; zoom: boolean }) {
           style={{ left: `${Math.min(85, Math.max(15, (x(hover.downrange_m / 1000) / W) * 100))}%` }}
           role="status"
         >
-          <b>T+{minutes(hover.t_s)} after PDI</b>
+          <b>{t("descent.afterPdi", { time: minutes(hover.t_s) })}</b>
           <span>
-            {PHASES.find((p) => p.key === hover.phase)?.label ?? "Touchdown"}
+            {PHASES.some((p) => p.key === hover.phase)
+              ? t(`descent.phase.${hover.phase}`)
+              : t("descent.gate.touchdown")}
           </span>
-          <span>Altitude {(hover.altitude_m / 1000).toFixed(2)} km</span>
-          <span>Downrange {(hover.downrange_m / 1000).toFixed(2)} km</span>
-          <span>Speed {hover.speed_mps.toFixed(1)} m/s</span>
-          <span>Throttle {(hover.throttle_fraction * 100).toFixed(0)} % of design</span>
+          <span>{t("descent.tip.altitude", { km: (hover.altitude_m / 1000).toFixed(2) })}</span>
+          <span>{t("descent.tip.downrange", { km: (hover.downrange_m / 1000).toFixed(2) })}</span>
+          <span>{t("descent.tip.speed", { v: hover.speed_mps.toFixed(1) })}</span>
+          <span>
+            {t("descent.tip.throttle", { pct: (hover.throttle_fraction * 100).toFixed(0) })}
+          </span>
         </div>
       )}
     </div>
@@ -223,6 +235,7 @@ function ProfileChart({ samples, zoom }: { samples: Sample[]; zoom: boolean }) {
 }
 
 export default function Descent({ sites }: { sites: Preset[] }) {
+  const { t, tText } = useTranslate();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [siteId, setSiteId] = useState("malapert-massif-r23");
   const [lat, setLat] = useState("-85.9948");
@@ -251,7 +264,7 @@ export default function Descent({ sites }: { sites: Preset[] }) {
   useEffect(() => {
     call("/vehicle-profiles")
       .then((body) => setProfiles(body.profiles))
-      .catch((e: Error) => setError(e.message));
+      .catch((e: Error) => setError(errorText(e, t, "communication.requestFailed")));
   }, []);
 
   const vehicle = () =>
@@ -283,7 +296,7 @@ export default function Descent({ sites }: { sites: Preset[] }) {
         }),
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Request failed");
+      setError(errorText(e, t, "communication.requestFailed"));
     } finally {
       setOptimizing(false);
     }
@@ -309,7 +322,7 @@ export default function Descent({ sites }: { sites: Preset[] }) {
         }),
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Request failed");
+      setError(errorText(e, t, "communication.requestFailed"));
     } finally {
       setBusy(false);
     }
@@ -319,19 +332,16 @@ export default function Descent({ sites }: { sites: Preset[] }) {
   const powered = useMemo(() => plan?.phases.filter((p) => p.name !== "coast") ?? [], [plan]);
 
   return (
-    <section id="descent" className="window-search-section descent-section" aria-label="Descent trajectory">
+    <section id="descent" className="window-search-section descent-section" aria-label={t("descent.label")}>
       <div className="section-heading">
         <div>
-          <p className="eyebrow">07 / PLAN THE DESCENT</p>
+          <p className="eyebrow">{t("descent.eyebrow")}</p>
           <h2>
-            How do we get down<span>?</span>
+            {t("descent.title")}<span>?</span>
           </h2>
-          <p className="muted">
-            From lunar orbit to touchdown: descent orbit insertion, braking, approach and
-            terminal descent, with timing and delta-v for each phase.
-          </p>
+          <p className="muted">{t("descent.intro")}</p>
         </div>
-        <span className="outline-tag">APOLLO 11 PROFILE</span>
+        <span className="outline-tag">{t("descent.tag")}</span>
       </div>
       <div className="search-layout">
         <form
@@ -342,11 +352,11 @@ export default function Descent({ sites }: { sites: Preset[] }) {
           }}
         >
           <fieldset disabled={busy}>
-            <h3>Landing site</h3>
+            <h3>{t("descent.landingSite")}</h3>
             <label>
-              Site
+              {t("descent.site")}
               <select
-                aria-label="Descent site"
+                aria-label={t("descent.siteLabel")}
                 value={siteId}
                 onChange={(e) => {
                   setSiteId(e.target.value);
@@ -357,7 +367,7 @@ export default function Descent({ sites }: { sites: Preset[] }) {
                   }
                 }}
               >
-                <option value="custom">Custom coordinates</option>
+                <option value="custom">{t("app.form.custom")}</option>
                 {sites.map((s) => (
                   <option key={s.site_id} value={s.site_id}>
                     {s.display_name}
@@ -367,40 +377,40 @@ export default function Descent({ sites }: { sites: Preset[] }) {
             </label>
             <div className="field-pair">
               <label>
-                Latitude · °
+                {t("app.form.latitude")} · °
                 <input type="number" step="any" min="-90" max="-80" value={lat} onChange={(e) => setLat(e.target.value)} />
               </label>
               <label>
-                Longitude · °E
+                {t("app.form.longitude")} · °E
                 <input type="number" step="any" min="0" max="359.999" value={lon} onChange={(e) => setLon(e.target.value)} />
               </label>
             </div>
-            <h3>Vehicle</h3>
+            <h3>{t("descent.vehicle")}</h3>
             <label>
-              Profile
-              <select aria-label="Vehicle profile" value={profileId} onChange={(e) => setProfileId(e.target.value)}>
+              {t("descent.profile")}
+              <select aria-label={t("descent.profileLabel")} value={profileId} onChange={(e) => setProfileId(e.target.value)}>
                 {profiles.map((p) => (
                   <option key={p.profile_id} value={p.profile_id}>
                     {p.name}
                   </option>
                 ))}
-                <option value="custom">Custom parameters</option>
+                <option value="custom">{t("descent.customParams")}</option>
               </select>
             </label>
             {profileId === "custom" &&
               (
                 [
-                  ["mass_at_pdi_kg", "Mass at PDI · kg"],
-                  ["usable_propellant_kg", "Propellant at PDI · kg"],
-                  ["max_thrust_n", "Maximum thrust · N"],
-                  ["design_thrust_n", "Design thrust · N"],
-                  ["min_throttle_fraction", "Minimum throttle · fraction"],
-                  ["max_throttle_fraction", "Throttleable up to · fraction"],
-                  ["isp_s", "Specific impulse · s"],
+                  "mass_at_pdi_kg",
+                  "usable_propellant_kg",
+                  "max_thrust_n",
+                  "design_thrust_n",
+                  "min_throttle_fraction",
+                  "max_throttle_fraction",
+                  "isp_s",
                 ] as const
-              ).map(([key, label]) => (
+              ).map((key) => (
                 <label key={key}>
-                  {label}
+                  {t(`descent.custom.${key}`)}
                   <input
                     type="number"
                     step="any"
@@ -411,21 +421,25 @@ export default function Descent({ sites }: { sites: Preset[] }) {
               ))}
             {selected && profileId !== "custom" && (
               <p className="field-help">
-                {(selected.mass_at_pdi_kg / 1000).toFixed(2)} t at PDI ·{" "}
-                {(selected.usable_propellant_kg / 1000).toFixed(2)} t propellant ·{" "}
-                {(selected.max_thrust_n / 1000).toFixed(1)} kN · Isp {selected.isp_s} s · throttle{" "}
-                {selected.min_throttle_fraction * 100}–{selected.max_throttle_fraction * 100} % of design
+                {t("descent.profileSummary", {
+                  mass: (selected.mass_at_pdi_kg / 1000).toFixed(2),
+                  propellant: (selected.usable_propellant_kg / 1000).toFixed(2),
+                  thrust: (selected.max_thrust_n / 1000).toFixed(1),
+                  isp: selected.isp_s,
+                  min: selected.min_throttle_fraction * 100,
+                  max: selected.max_throttle_fraction * 100,
+                })}
               </p>
             )}
-            <h3>Initial orbit</h3>
+            <h3>{t("descent.initialOrbit")}</h3>
             <label>
-              Circular orbit altitude · km
+              {t("descent.altitude")}
               <input type="number" step="any" min="30" max="500" value={altitude} onChange={(e) => setAltitude(e.target.value)} />
             </label>
             <label>
-              Inclination · °
+              {t("descent.inclination")} · °
               <input
-                aria-label="Orbit inclination"
+                aria-label={t("descent.inclinationLabel")}
                 type="number"
                 step="any"
                 min="0"
@@ -436,16 +450,16 @@ export default function Descent({ sites }: { sites: Preset[] }) {
             </label>
             <label className="checkbox-label">
               <input type="checkbox" checked={allowTurn} onChange={(e) => setAllowTurn(e.target.checked)} />
-              Allow a plane change if the orbit misses the site
+              {t("descent.planeChange")}
             </label>
             <button type="submit" className="primary">
-              {busy ? "Computing trajectory…" : "Compute descent ↗"}
+              {busy ? t("descent.computing") : `${t("descent.compute")} ↗`}
             </button>
-            <h3>Fuel optimization</h3>
+            <h3>{t("descent.fuel")}</h3>
             <label>
-              Touchdown reserve · fps
+              {t("descent.reserve")}
               <input
-                aria-label="Reserve delta-v fps"
+                aria-label={t("descent.reserveLabel")}
                 type="number"
                 min="0"
                 max="1600"
@@ -460,18 +474,11 @@ export default function Descent({ sites }: { sites: Preset[] }) {
               disabled={optimizing}
               onClick={optimize}
             >
-              {optimizing ? "Optimizing 27 routes…" : "Optimize routes ↗"}
+              {optimizing ? t("descent.optimizing") : `${t("descent.optimize")} ↗`}
             </button>
-            <p className="field-help">
-              145 fps = Apollo contingencies for landing-site redesignation (60 fps) and
-              manual hover (85 fps), NASA TN D-6846 Table II. Routes vary the orbit
-              (40/60/80 n.mi.) and the approach and terminal-descent durations.
-            </p>
+            <p className="field-help">{t("descent.reserveNote")}</p>
           </fieldset>
-          <p className="field-help">
-            Default: 60 n.mi. circular orbit and the Apollo 11 Lunar Module (NASA TN D-6846,
-            Apollo 11 Mission Report). The site height comes from the cached LOLA terrain.
-          </p>
+          <p className="field-help">{t("descent.defaultNote")}</p>
         </form>
         <div className="search-results">
           {error && (
@@ -480,12 +487,14 @@ export default function Descent({ sites }: { sites: Preset[] }) {
             </div>
           )}
           {!plan && !routes && !error && (
-            <div className="panel search-empty">Choose a site and compute a descent or optimize routes.</div>
+            <div className="panel search-empty">{t("descent.empty")}</div>
           )}
           {plan && (
             <>
               <div className={`panel descent-verdict ${plan.feasible ? "ok" : "blocked"}`} role="status">
-                <strong>{plan.feasible ? "✓ Reaches the site within tolerance" : "✕ Not feasible as specified"}</strong>
+                <strong>
+                  {plan.feasible ? `✓ ${t("descent.feasible")}` : `✕ ${t("descent.notFeasible")}`}
+                </strong>
                 {plan.limiting_factors.map((f) => (
                   <p key={f.factor}>
                     <b>{f.factor.replaceAll("_", " ")}:</b> {f.detail}
@@ -494,73 +503,91 @@ export default function Descent({ sites }: { sites: Preset[] }) {
               </div>
               <div className="communication-metrics descent-metrics">
                 <div>
-                  <span className="metric-label">POWERED DELTA-V</span>
+                  <span className="metric-label">{t("descent.metric.dv")}</span>
                   <strong>{plan.totals.powered_delta_v_mps.toFixed(0)} m/s</strong>
                   <small>
                     {plan.reference_comparison.model_powered_delta_v_fps.toFixed(0)} fps ·{" "}
                     {plan.reference_comparison.difference_percent >= 0 ? "+" : ""}
-                    {plan.reference_comparison.difference_percent.toFixed(1)} % vs Apollo 11 plan
+                    {t("descent.vsApollo", {
+                      pct: plan.reference_comparison.difference_percent.toFixed(1),
+                    })}
                   </small>
                 </div>
                 <div>
-                  <span className="metric-label">DESCENT TIME</span>
+                  <span className="metric-label">{t("descent.metric.time")}</span>
                   <strong>{minutes(plan.totals.duration_s)}</strong>
                   <small>
-                    {minutes(plan.deorbit.coast_s)} coast + {minutes(plan.totals.duration_s - plan.deorbit.coast_s)} powered
+                    {t("descent.coastPowered", {
+                      coast: minutes(plan.deorbit.coast_s),
+                      powered: minutes(plan.totals.duration_s - plan.deorbit.coast_s),
+                    })}
                   </small>
                 </div>
                 <div>
-                  <span className="metric-label">PROPELLANT</span>
+                  <span className="metric-label">{t("descent.metric.propellant")}</span>
                   <strong>{plan.totals.propellant_used_kg.toFixed(0)} kg</strong>
-                  <small>margin {plan.totals.propellant_margin_kg.toFixed(0)} kg</small>
+                  <small>
+                    {t("descent.margin", { kg: plan.totals.propellant_margin_kg.toFixed(0) })}
+                  </small>
                 </div>
               </div>
               <div className="descent-chart-head">
                 <div className="contribution-legend">
                   {PHASES.map((p) => (
                     <span key={p.key}>
-                      <i style={{ background: p.color }} /> {p.label}
+                      <i style={{ background: p.color }} /> {t(`descent.phase.${p.key}`)}
                     </span>
                   ))}
                 </div>
-                <div role="group" aria-label="Chart range" className="chart-range">
+                <div role="group" aria-label={t("descent.chartRange")} className="chart-range">
                   <button type="button" className="text-button" aria-pressed={!zoom} onClick={() => setZoom(false)}>
-                    Full descent
+                    {t("descent.fullDescent")}
                   </button>
                   <button type="button" className="text-button" aria-pressed={zoom} onClick={() => setZoom(true)}>
-                    Final 10 km
+                    {t("descent.final10")}
                   </button>
                 </div>
               </div>
               <ProfileChart samples={plan.samples} zoom={zoom} />
               <table className="ranking-table">
-                <caption>Phase timing and budget</caption>
+                <caption>{t("descent.table.caption")}</caption>
                 <thead>
                   <tr>
-                    <th scope="col">Phase</th>
-                    <th scope="col">Time</th>
-                    <th scope="col">Delta-v</th>
-                    <th scope="col">Propellant</th>
+                    <th scope="col">{t("descent.table.phase")}</th>
+                    <th scope="col">{t("descent.table.time")}</th>
+                    <th scope="col">{t("descent.table.dv")}</th>
+                    <th scope="col">{t("descent.table.propellant")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <th scope="row">Descent orbit insertion</th>
-                    <td>T+0:00 (impulsive)</td>
+                    <th scope="row">{t("descent.table.doi")}</th>
+                    <td>{t("descent.table.impulsive")}</td>
                     <td>{plan.deorbit.delta_v_mps.toFixed(1)} m/s</td>
-                    <td>in mass at PDI</td>
+                    <td>{t("descent.table.inMass")}</td>
                   </tr>
                   {plan.plane_change.required_deg > 0 && (
                     <tr>
-                      <th scope="row">Plane change {plan.plane_change.applied ? "" : "(not applied)"}</th>
-                      <td>before DOI</td>
+                      <th scope="row">
+                        {t("descent.table.planeChange")}{" "}
+                        {plan.plane_change.applied ? "" : t("descent.table.notApplied")}
+                      </th>
+                      <td>{t("descent.table.beforeDoi")}</td>
                       <td>{plan.plane_change.delta_v_mps.toFixed(1)} m/s</td>
-                      <td>{plan.plane_change.required_deg.toFixed(2)}° rotation</td>
+                      <td>
+                        {t("descent.table.rotation", {
+                          deg: plan.plane_change.required_deg.toFixed(2),
+                        })}
+                      </td>
                     </tr>
                   )}
                   {plan.phases.map((p) => (
                     <tr key={p.name}>
-                      <th scope="row">{p.name === "coast" ? "Coast to PDI" : PHASES.find((x) => x.key === p.name)?.label}</th>
+                      <th scope="row">
+                        {p.name === "coast"
+                          ? t("descent.table.coast")
+                          : t(`descent.phase.${p.name}`)}
+                      </th>
                       <td>
                         {minutes(p.start_s)} → {minutes(p.end_s)}
                       </td>
@@ -574,23 +601,28 @@ export default function Descent({ sites }: { sites: Preset[] }) {
               </table>
               <ul className="candidate-status">
                 <li>
-                  Powered descent starts {(plan.pdi_range_m / 1000).toFixed(0)} km uprange at{" "}
-                  {plan.deorbit.periapsis_speed_mps.toFixed(0)} m/s; {powered.length} powered phases.
+                  {t("descent.pdiStart", {
+                    km: (plan.pdi_range_m / 1000).toFixed(0),
+                    speed: plan.deorbit.periapsis_speed_mps.toFixed(0),
+                    n: powered.length,
+                  })}
                 </li>
                 <li>
-                  Touchdown: {plan.touchdown.position_error_m.toFixed(2)} m from the site, vertical{" "}
-                  {Math.abs(plan.touchdown.vertical_speed_mps).toFixed(2)} m/s, horizontal{" "}
-                  {plan.touchdown.horizontal_speed_mps.toFixed(2)} m/s. Site{" "}
-                  {plan.site.terrain_height_m.toFixed(0)} m above the 1737.4 km sphere.
+                  {t("descent.touchdown", {
+                    error: plan.touchdown.position_error_m.toFixed(2),
+                    vertical: Math.abs(plan.touchdown.vertical_speed_mps).toFixed(2),
+                    horizontal: plan.touchdown.horizontal_speed_mps.toFixed(2),
+                    height: plan.site.terrain_height_m.toFixed(0),
+                  })}
                 </li>
               </ul>
               <details className="communication-limits">
                 <summary>
-                  Physical assumptions & sources <span>+</span>
+                  {t("descent.assumptions")} <span>+</span>
                 </summary>
                 <ul>
                   {plan.assumptions.map((a) => (
-                    <li key={a}>{a}</li>
+                    <li key={a}>{tText(a)}</li>
                   ))}
                   {selected?.sources &&
                     Object.entries(selected.sources).map(([k, v]) => (

@@ -16,6 +16,7 @@ import * as THREE from "three";
 import { Dust, Model, Terrain, smooth } from "./LunarSurface";
 import LaunchSite from "./LaunchSite";
 import type { Preset } from "../types";
+import { useTranslate } from "../i18n";
 import {
   ASTRONOMICAL_UNIT_KM,
   COVERAGE_MAX_LATITUDE_DEG,
@@ -928,9 +929,10 @@ export default function MissionScene(
   const { visible, animate, compact, onFailure, progressValue, ...scene } =
     props;
   const progress = useRef(progressValue);
+  const { t } = useTranslate();
   return (
     <Canvas
-      aria-label="Illustrative Earth, Moon and Sun scene with launch and landing close-ups. Click the south polar cap to choose a landing site; the latitude and longitude fields offer keyboard input."
+      aria-label={t("missionScene.label")}
       camera={{ position: [150, 190, 175], fov: 50, near: 0.001, far: 8000 }}
       dpr={compact ? 1 : [1, 1.75]}
       shadows={{ type: THREE.PCFShadowMap }}

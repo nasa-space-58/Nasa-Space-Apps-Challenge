@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useTranslate, type Translate } from "../i18n";
 
 /**
  * Horizontal UTC date strip under the mission-control scene. Dragging,
@@ -12,20 +13,18 @@ const PX_PER_HOUR = 4;
 const CLICK_SLOP_PX = 4;
 const MIN_UTC = "2026-01-01T00:00";
 const MAX_UTC = "2027-12-31T23:00";
-const MONTHS = [
-  "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
-  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
-];
-const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const month = (t: Translate, index: number) => t(`dateScrubber.months.${index}`);
+const weekday = (t: Translate, index: number) =>
+  t(`dateScrubber.weekdays.${index}`);
 
 const toMs = (value: string) => Date.parse(value + "Z");
 const toValue = (ms: number) => new Date(ms).toISOString().slice(0, 16);
 const clamp = (ms: number) =>
   Math.min(toMs(MAX_UTC), Math.max(toMs(MIN_UTC), ms));
 const snap = (ms: number) => clamp(Math.round(ms / HOUR_MS) * HOUR_MS);
-const fullLabel = (ms: number) => {
+const fullLabel = (t: Translate, ms: number) => {
   const d = new Date(ms);
-  return `${WEEKDAYS[d.getUTCDay()]} ${String(d.getUTCDate()).padStart(2, "0")} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()} · ${String(d.getUTCHours()).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")} UTC`;
+  return `${weekday(t, d.getUTCDay())} ${String(d.getUTCDate()).padStart(2, "0")} ${month(t, d.getUTCMonth())} ${d.getUTCFullYear()} · ${String(d.getUTCHours()).padStart(2, "0")}:${String(d.getUTCMinutes()).padStart(2, "0")} UTC`;
 };
 
 export default function DateScrubber({
@@ -39,6 +38,7 @@ export default function DateScrubber({
   disabled: boolean;
   onChange: (value: string) => void;
 }) {
+  const { t } = useTranslate();
   const track = useRef<HTMLDivElement>(null);
   const editor = useRef<HTMLInputElement>(null);
   const drag = useRef<{ x: number; ms: number; moved: boolean } | null>(null);
@@ -90,11 +90,11 @@ export default function DateScrubber({
     return (
       <div className="date-scrubber editing">
         <label>
-          <span className="eyebrow">START · UTC</span>
+          <span className="eyebrow">{t("dateScrubber.startUtc")}</span>
           <input
             ref={editor}
             type="datetime-local"
-            aria-label="Start date and time UTC"
+            aria-label={t("dateScrubber.editLabel")}
             min={MIN_UTC}
             max={MAX_UTC}
             value={value}
@@ -114,7 +114,7 @@ export default function DateScrubber({
           onMouseDown={(e) => e.preventDefault()}
           onClick={() => setEditing(false)}
         >
-          Done
+          {t("dateScrubber.done")}
         </button>
       </div>
     );
@@ -122,7 +122,7 @@ export default function DateScrubber({
   const halfDays = Math.ceil(width / 2 / (24 * PX_PER_HOUR)) + 1;
   const firstDay = Math.floor(ms / DAY_MS) - halfDays;
   const days = Array.from({ length: halfDays * 2 + 1 }, (_, i) => firstDay + i);
-  const x = (t: number) => width / 2 + ((t - ms) / HOUR_MS) * PX_PER_HOUR;
+  const x = (at: number) => width / 2 + ((at - ms) / HOUR_MS) * PX_PER_HOUR;
   const spanEnd = ms + Math.max(0, durationHours) * HOUR_MS;
 
   return (
@@ -131,11 +131,11 @@ export default function DateScrubber({
       ref={track}
       role="slider"
       tabIndex={disabled ? -1 : 0}
-      aria-label="Observation start, UTC. Drag or scroll to change; press Enter to type a date."
+      aria-label={t("dateScrubber.sliderLabel")}
       aria-valuemin={toMs(MIN_UTC)}
       aria-valuemax={toMs(MAX_UTC)}
       aria-valuenow={ms}
-      aria-valuetext={fullLabel(ms)}
+      aria-valuetext={fullLabel(t, ms)}
       aria-disabled={disabled}
       onPointerDown={(e) => {
         if (disabled || e.button !== 0) return;
@@ -193,8 +193,8 @@ export default function DateScrubber({
             >
               <span>
                 {monthStart
-                  ? `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`
-                  : `${String(d.getUTCDate()).padStart(2, "0")} ${MONTHS[d.getUTCMonth()]}`}
+                  ? `${month(t, d.getUTCMonth())} ${d.getUTCFullYear()}`
+                  : `${String(d.getUTCDate()).padStart(2, "0")} ${month(t, d.getUTCMonth())}`}
               </span>
             </div>
           );
@@ -202,9 +202,9 @@ export default function DateScrubber({
       </div>
       <div className="scrubber-needle" aria-hidden="true" />
       <div className="scrubber-readout">
-        <strong>{fullLabel(ms)}</strong>
+        <strong>{fullLabel(t, ms)}</strong>
         <small>
-          {disabled ? "Locked while analysis runs" : "Drag or scroll · click to type a date"}
+          {disabled ? t("dateScrubber.locked") : t("dateScrubber.hint")}
         </small>
       </div>
     </div>

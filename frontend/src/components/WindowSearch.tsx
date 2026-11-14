@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Preset } from "../types";
+import { errorText, useTranslate } from "../i18n";
 
 type Condition = {
   name: string;
@@ -26,19 +27,6 @@ type SearchView = {
   limitation: string;
   candidates: Candidate[];
 };
-const labels: Record<string, string> = {
-  waiting: "Queued",
-  processing: "Analyzing",
-  match: "Meets all conditions",
-  not_met: "Conditions not met",
-  unknown: "Unknown coverage",
-  failed: "Analysis failed",
-};
-const conditionLabels: Record<string, string> = {
-  sunlight_percent: "Sunlight · %",
-  longest_darkness_hours: "Longest darkness · h",
-  earth_visible_hours: "Earth visible · h",
-};
 const stamp = (value: string) =>
   new Date(value).toISOString().replace("T", " ").replace(".000Z", " UTC");
 async function api(path: string, body?: unknown) {
@@ -59,7 +47,7 @@ async function api(path: string, body?: unknown) {
         ? data.detail
         : Array.isArray(data.detail)
           ? data.detail.map((x: { msg: string }) => x.msg).join("; ")
-          : "Search unavailable",
+          : "",
     );
   return data;
 }
@@ -70,6 +58,9 @@ export default function WindowSearch({
   sites: Preset[];
   onChoose: (id: string, compare: boolean) => Promise<void>;
 }) {
+  const { t, tText } = useTranslate();
+  const labels = (state: string) => t(`windowSearch.state.${state}`);
+  const conditionLabels = (name: string) => t(`windowSearch.condition.${name}`);
   const [site, setSite] = useState("malapert-massif-r23");
   const [lat, setLat] = useState("-85.9948");
   const [lon, setLon] = useState("359.76422");
@@ -110,7 +101,7 @@ export default function WindowSearch({
           setRankError("");
         }
       })
-      .catch((e) => active && setRankError(e.message));
+      .catch((e) => active && setRankError(errorText(e, t, "windowSearch.unavailable")));
     return () => {
       active = false;
     };
@@ -158,7 +149,7 @@ export default function WindowSearch({
           timer = setTimeout(poll, 1800);
       } catch (e) {
         if (active) {
-          setError(e instanceof Error ? e.message : "Connection interrupted");
+          setError(errorText(e, t, "scenario.connection"));
           timer = setTimeout(poll, 5000);
         }
       }
@@ -220,7 +211,7 @@ export default function WindowSearch({
         }),
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unable to start search");
+      setError(errorText(e, t, "windowSearch.unableToStart"));
     } finally {
       setSending(false);
     }
@@ -231,7 +222,7 @@ export default function WindowSearch({
     try {
       await onChoose(candidate.job_id, compare);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unable to open result");
+      setError(errorText(e, t, "windowSearch.unableToOpen"));
     } finally {
       setOpening(false);
     }
@@ -254,20 +245,17 @@ export default function WindowSearch({
     <section
       id="window-search"
       className="window-search-section"
-      aria-label="Observation time search"
+      aria-label={t("windowSearch.label")}
     >
       <div className="section-heading">
         <div>
-          <p className="eyebrow">05 / FIND YOUR WINDOW</p>
+          <p className="eyebrow">{t("windowSearch.eyebrow")}</p>
           <h2>
-            When could it work<span>?</span>
+            {t("windowSearch.title")}<span>?</span>
           </h2>
-          <p className="muted">
-            Explore candidate starts that meet your light and visibility
-            conditions.
-          </p>
+          <p className="muted">{t("windowSearch.intro")}</p>
         </div>
-        <span className="outline-tag">UP TO 16 STARTS</span>
+        <span className="outline-tag">{t("windowSearch.tag")}</span>
       </div>
       <div className="search-layout">
         <form
@@ -279,9 +267,9 @@ export default function WindowSearch({
         >
           <fieldset disabled={busy}>
             <label>
-              Search region
+              {t("windowSearch.region")}
               <select
-                aria-label="Search region"
+                aria-label={t("windowSearch.region")}
                 value={site}
                 onChange={(e) => {
                   setSite(e.target.value);
@@ -292,7 +280,7 @@ export default function WindowSearch({
                   }
                 }}
               >
-                <option value="custom">Custom coordinates</option>
+                <option value="custom">{t("app.form.custom")}</option>
                 {!sites.some((s) => s.site_id === site) &&
                   site !== "custom" && <option value={site}>{site}</option>}
                 {sites.map((s) => (
@@ -304,9 +292,9 @@ export default function WindowSearch({
             </label>
             <div className="field-pair">
               <label>
-                Latitude · °
+                {t("app.form.latitude")} · °
                 <input
-                  aria-label="Search latitude"
+                  aria-label={t("windowSearch.latitude")}
                   type="number"
                   required
                   min="-90"
@@ -320,9 +308,9 @@ export default function WindowSearch({
                 />
               </label>
               <label>
-                Longitude · °E
+                {t("app.form.longitude")} · °E
                 <input
-                  aria-label="Search longitude"
+                  aria-label={t("windowSearch.longitude")}
                   type="number"
                   required
                   min="0"
@@ -337,9 +325,9 @@ export default function WindowSearch({
               </label>
             </div>
             <label>
-              Height above terrain · m
+              {t("windowSearch.height")} · m
               <input
-                aria-label="Search observer height"
+                aria-label={t("windowSearch.heightLabel")}
                 type="number"
                 required
                 min="0.1"
@@ -350,9 +338,9 @@ export default function WindowSearch({
               />
             </label>
             <label>
-              First candidate start · UTC
+              {t("windowSearch.first")} · UTC
               <input
-                aria-label="First candidate start UTC"
+                aria-label={t("windowSearch.first")}
                 type="datetime-local"
                 required
                 min="2026-01-01T00:00"
@@ -362,9 +350,9 @@ export default function WindowSearch({
               />
             </label>
             <label>
-              Last candidate start · UTC
+              {t("windowSearch.last")} · UTC
               <input
-                aria-label="Last candidate start UTC"
+                aria-label={t("windowSearch.last")}
                 type="datetime-local"
                 required
                 min={first}
@@ -375,9 +363,9 @@ export default function WindowSearch({
             </label>
             <div className="field-pair">
               <label>
-                Mission duration · h
+                {t("windowSearch.duration")} · {t("windowSearch.h")}
                 <input
-                  aria-label="Search mission duration"
+                  aria-label={t("windowSearch.duration")}
                   type="number"
                   required
                   min="1"
@@ -388,9 +376,9 @@ export default function WindowSearch({
                 />
               </label>
               <label>
-                Start spacing · h
+                {t("windowSearch.spacing")} · {t("windowSearch.h")}
                 <input
-                  aria-label="Candidate start spacing"
+                  aria-label={t("windowSearch.spacing")}
                   type="number"
                   required
                   min="1"
@@ -401,11 +389,11 @@ export default function WindowSearch({
                 />
               </label>
             </div>
-            <h3>Your conditions</h3>
+            <h3>{t("windowSearch.conditions")}</h3>
             <label>
-              Minimum sunlight · %
+              {t("windowSearch.minSun")} · %
               <input
-                aria-label="Minimum sunlight percentage"
+                aria-label={t("windowSearch.minSun")}
                 type="number"
                 required
                 min="0"
@@ -416,9 +404,9 @@ export default function WindowSearch({
               />
             </label>
             <label>
-              Maximum continuous darkness · h
+              {t("windowSearch.maxDark")} · {t("windowSearch.h")}
               <input
-                aria-label="Maximum darkness hours"
+                aria-label={t("windowSearch.maxDark")}
                 type="number"
                 required
                 min="0"
@@ -429,9 +417,9 @@ export default function WindowSearch({
               />
             </label>
             <label>
-              Minimum Earth visibility · h
+              {t("windowSearch.minEarth")} · {t("windowSearch.h")}
               <input
-                aria-label="Minimum Earth visibility hours"
+                aria-label={t("windowSearch.minEarth")}
                 type="number"
                 required
                 min="0"
@@ -447,33 +435,25 @@ export default function WindowSearch({
                 checked={refine}
                 onChange={(e) => setRefine(e.target.checked)}
               />
-              Refine detected transitions
+              {t("app.form.refine")}
             </label>
             <button type="submit" className="primary">
-              {busy ? "Searching…" : "Search candidate starts"} ↗
+              {busy ? t("windowSearch.searching") : t("windowSearch.search")} ↗
             </button>
             <button className="text-button" type="button" onClick={example}>
-              Set sunlight example · Earth minimum 0 h
+              {t("windowSearch.example")}
             </button>
           </fieldset>
-          <p className="field-help">
-            Each candidate is a complete analysis. Start span ≤31 days; at most
-            16 starts and 2 active searches. Initial data acquisition may take
-            minutes.
-          </p>
+          <p className="field-help">{t("windowSearch.formNote")}</p>
         </form>
         <div className="search-results">
-          <p className="search-limitation">
-            This checks a grid of possible starts, not every instant. Shorter
-            opportunities between starts may be missed. Meeting these conditions
-            is not a landing-safety recommendation.
-          </p>
+          <p className="search-limitation">{t("windowSearch.limitation")}</p>
           {error && (
             <div className="alert" role="alert">
               {error}{" "}
               {id && (
                 <button onClick={() => setRetry((n) => n + 1)}>
-                  Reconnect search
+                  {t("windowSearch.reconnect")}
                 </button>
               )}
             </div>
@@ -483,33 +463,33 @@ export default function WindowSearch({
               <div className="panel search-progress" role="status">
                 <div>
                   <b>
-                    {view.completed} / {view.total} evaluated
+                    {t("windowSearch.evaluated", {
+                      done: view.completed,
+                      total: view.total,
+                    })}
                   </b>
                   <span>
-                    {view.matches} meet all conditions · {view.status}
+                    {t("windowSearch.meetAll", { n: view.matches })} ·{" "}
+                    {t(`windowSearch.searchStatus.${view.status}`)}
                   </span>
                 </div>
                 <progress
-                  aria-label="Search progress"
+                  aria-label={t("windowSearch.progress")}
                   max={view.total}
                   value={view.completed}
                 />
-                <small>
-                  Search {view.id.slice(0, 8)} · saved on this device
-                </small>
+                <small>{t("windowSearch.saved", { id: view.id.slice(0, 8) })}</small>
               </div>
               {view.completed === view.total && view.matches === 0 && (
                 <div className="panel search-empty">
-                  No confirmed match on this grid. Review each unmet condition
-                  or unknown coverage below; try different dates or adjust your
-                  thresholds.
+                  {t("windowSearch.noMatch")}
                 </div>
               )}
               {rankError && (
                 <p className="alert">
-                  Closest-results ranking unavailable: {rankError}{" "}
+                  {t("windowSearch.rankUnavailable")}: {rankError}{" "}
                   <button onClick={() => setRetry((n) => n + 1)}>
-                    Retry ranking
+                    {t("windowSearch.retryRanking")}
                   </button>
                 </p>
               )}
@@ -517,8 +497,8 @@ export default function WindowSearch({
                 view.completed === view.total &&
                 view.matches === 0 && (
                   <div className="panel closest-results">
-                    <h3>Closest evaluated starts</h3>
-                    <p>{ranking.method}</p>
+                    <h3>{t("windowSearch.closest")}</h3>
+                    <p>{tText(ranking.method)}</p>
                     {ranking.ranked.length ? (
                       <ol>
                         {ranking.ranked.slice(0, 3).map((row) => (
@@ -529,18 +509,18 @@ export default function WindowSearch({
                                   (c) => c.job_id === row.job_id,
                                 )!.start_utc,
                               )}{" "}
-                              · deficit {row.score.toFixed(4)}
+                              · {t("windowSearch.deficit")} {row.score.toFixed(4)}
                             </strong>
                             <ul>
                               {row.deficits
                                 .filter((d) => d.shortfall > 0)
                                 .map((d) => (
                                   <li key={d.name}>
-                                    {conditionLabels[d.name]}:{" "}
+                                    {conditionLabels(d.name)}:{" "}
                                     {d.shortfall.toFixed(2)} {d.unit}{" "}
                                     {d.name === "longest_darkness_hours"
-                                      ? "over your maximum"
-                                      : "below your minimum"}
+                                      ? t("windowSearch.overMax")
+                                      : t("windowSearch.belowMin")}
                                   </li>
                                 ))}
                             </ul>
@@ -556,18 +536,17 @@ export default function WindowSearch({
                                 )
                               }
                             >
-                              Review this candidate ↗
+                              {t("windowSearch.review")} ↗
                             </button>
                           </li>
                         ))}
                       </ol>
                     ) : (
-                      <p>No fully evaluated candidate can be ranked.</p>
+                      <p>{t("windowSearch.noRank")}</p>
                     )}
                     {ranking.excluded.length > 0 && (
                       <p>
-                        {ranking.excluded.length} unknown, failed or unfinished
-                        candidate(s) excluded.
+                        {t("windowSearch.excluded", { n: ranking.excluded.length })}
                       </p>
                     )}
                   </div>
@@ -578,19 +557,22 @@ export default function WindowSearch({
                   checked={onlyMatches}
                   onChange={(e) => setOnlyMatches(e.target.checked)}
                 />
-                Show confirmed matches only
+                {t("windowSearch.onlyMatches")}
               </label>
               <div
                 className="search-grid-strip"
                 role="list"
-                aria-label="Candidate start grid"
+                aria-label={t("windowSearch.grid")}
               >
                 {view.candidates.map((c, i) => (
                   <button
                     role="listitem"
                     key={c.job_id}
                     className={c.state}
-                    aria-label={`Candidate ${i + 1}: ${labels[c.state]}`}
+                    aria-label={t("windowSearch.candidate", {
+                      n: i + 1,
+                      state: labels(c.state),
+                    })}
                     title={stamp(c.start_utc)}
                     onClick={() =>
                       document
@@ -617,12 +599,12 @@ export default function WindowSearch({
                     key={c.job_id}
                   >
                     <div className="panel-heading">
-                      <span>{labels[c.state]}</span>
+                      <span>{labels(c.state)}</span>
                       <small>{c.job_id.slice(0, 8)}</small>
                     </div>
                     <div className="search-candidate-content">
                       <h3>{stamp(c.start_utc)}</h3>
-                      <p>Through {stamp(c.end_utc)}</p>
+                      <p>{t("windowSearch.through", { end: stamp(c.end_utc) })}</p>
                       {c.conditions && (
                         <ul>
                           {c.conditions.map((condition) => (
@@ -633,7 +615,7 @@ export default function WindowSearch({
                                   : condition.passed
                                     ? "✓"
                                     : "×"}{" "}
-                                {conditionLabels[condition.name]}
+                                {conditionLabels(condition.name)}
                               </span>
                               <b>
                                 {condition.actual.toFixed(2)}{" "}
@@ -641,10 +623,10 @@ export default function WindowSearch({
                                 <small>
                                   ·{" "}
                                   {condition.passed === null
-                                    ? "unknown"
+                                    ? t("windowSearch.unknown")
                                     : condition.passed
-                                      ? "met"
-                                      : "not met"}
+                                      ? t("windowSearch.met")
+                                      : t("windowSearch.notMet")}
                                 </small>
                               </b>
                             </li>
@@ -655,9 +637,10 @@ export default function WindowSearch({
                         (c.unknown_seconds.sun > 0 ||
                           c.unknown_seconds.earth > 0) && (
                           <p>
-                            Unknown coverage: Sun {c.unknown_seconds.sun} s ·
-                            Earth {c.unknown_seconds.earth} s. This candidate is
-                            not confirmed suitable.
+                            {t("windowSearch.unknownCoverage", {
+                              sun: c.unknown_seconds.sun,
+                              earth: c.unknown_seconds.earth,
+                            })}
                           </p>
                         )}
                       {c.error && <p className="alert">{c.error}</p>}
@@ -668,14 +651,14 @@ export default function WindowSearch({
                             disabled={opening}
                             onClick={() => choose(c, false)}
                           >
-                            Open analysis ↗
+                            {t("windowSearch.open")} ↗
                           </button>
                           <button
                             className="text-button"
                             disabled={opening}
                             onClick={() => choose(c, true)}
                           >
-                            Use as comparison A ↗
+                            {t("windowSearch.useA")} ↗
                           </button>
                         </div>
                       )}
@@ -685,11 +668,8 @@ export default function WindowSearch({
             </>
           ) : (
             <div className="panel search-empty">
-              <h3>Define your observation window.</h3>
-              <p>
-                Choose where to observe and the conditions that matter. Results
-                show both matches and the reasons other starts do not qualify.
-              </p>
+              <h3>{t("windowSearch.emptyTitle")}</h3>
+              <p>{t("windowSearch.emptyText")}</p>
             </div>
           )}
         </div>

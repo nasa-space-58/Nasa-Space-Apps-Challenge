@@ -2,6 +2,7 @@ import ExportPanel from "./ExportPanel";
 import { useEffect, useState } from "react";
 import HorizonPlot from "./HorizonPlot";
 import type { Result, Preset, Frame } from "../types";
+import { errorText, useTranslate, type Translate } from "../i18n";
 
 type Submission = {
   site_id: string;
@@ -37,18 +38,11 @@ type ComparisonResult = {
   }[];
   explanations: string[];
 };
-const names: Record<string, string> = {
-  full: "Full sunlight",
-  partial: "Partial sunlight",
-  dark: "Terrain-blocked",
-  visible: "Center visible",
-  blocked: "Center blocked",
-  unknown: "Unknown",
-  boundary: "At horizon",
-};
+const stateName = (t: Translate, state: string) => t(`displayState.${state}`);
 const date = (value: string) =>
   new Date(value).toISOString().replace("T", " ").replace(".000Z", " UTC");
-const hours = (value: number) => `${(value / 3600).toFixed(2)} h`;
+const hoursOf = (t: Translate, value: number) =>
+  t("units.hours", { value: (value / 3600).toFixed(2) });
 async function api(path: string, init?: RequestInit) {
   const response = await fetch("/api" + path, init);
   const body = await response.json();
@@ -58,7 +52,7 @@ async function api(path: string, init?: RequestInit) {
         ? body.detail
         : Array.isArray(body.detail)
           ? body.detail.map((x: { msg: string }) => x.msg).join("; ")
-          : "Request unavailable. Please retry.",
+          : "",
     );
   return body;
 }
@@ -85,21 +79,24 @@ function Scenario({
   age: number | null;
   scaleResults: Result[];
 }) {
+  const { t } = useTranslate();
+  const hours = (value: number) => hoursOf(t, value);
+  const names = (state: string) => stateName(t, state);
   const start = Date.parse(result.analysis.request.start_utc),
     end = Date.parse(result.analysis.request.end_utc),
     duration = end - start;
   return (
     <article
       className="panel compare-scenario"
-      aria-label={`Scenario ${label} results`}
+      aria-label={t("comparison.scenarioResults", { label })}
     >
       <div className="panel-heading">
-        <span>SCENARIO {label}</span>
+        <span>{t("comparison.scenarioUpper", { label })}</span>
         <span>{result.analysis.request.site.site_id.replaceAll("-", " ")}</span>
       </div>
       <div className="compare-dates">
         <b>{date(result.analysis.request.start_utc)}</b>
-        <span>to {date(result.analysis.request.end_utc)}</span>
+        <span>{t("comparison.to", { end: date(result.analysis.request.end_utc) })}</span>
         <span>
           {result.analysis.request.site.latitude_deg}° ·{" "}
           {result.analysis.request.site.longitude_deg_east}°E
@@ -107,19 +104,19 @@ function Scenario({
       </div>
       <div className="compare-totals">
         <span>
-          Sunlight
+          {t("comparison.sunlight")}
           <strong>
             {hours(result.analysis.sun.metrics.visible_duration_s)}
           </strong>
         </span>
         <span>
-          Earth visible
+          {t("comparison.earthVisible")}
           <strong>
             {hours(result.analysis.earth.metrics.visible_duration_s)}
           </strong>
         </span>
         <span>
-          Longest dark
+          {t("comparison.longestDark")}
           <strong>
             {hours(result.analysis.sun.metrics.longest_blocked_s)}
           </strong>
@@ -134,32 +131,37 @@ function Scenario({
           />
           <div className="compare-readout">
             <span>
-              Sun: {names[frame.sun.state]} ·{" "}
+              {t("common.sun")}: {names(frame.sun.state)} ·{" "}
               {frame.sun.elevation_deg?.toFixed(2) ?? "—"}°
             </span>
             <span>
-              Earth: {names[frame.earth.state]} ·{" "}
+              {t("common.earth")}: {names(frame.earth.state)} ·{" "}
               {frame.earth.elevation_deg?.toFixed(2) ?? "—"}°
             </span>
             <small>
-              Displayed sample: {date(frame.utc)}
-              {age ? ` · ${hours(age)} before cursor` : " · at cursor"}
+              {t("comparison.displayedSample", { utc: date(frame.utc) })}
+              {age
+                ? ` · ${t("comparison.beforeCursor", { hours: hours(age) })}`
+                : ` · ${t("comparison.atCursor")}`}
             </small>
           </div>
         </>
       ) : (
         <p className="compare-readout">
-          No preceding sample. Sky positions are unknown.
+          {t("comparison.noSample")}
         </p>
       )}
       <div className="compare-timelines">
         {(["sun", "earth"] as const).map((target) => (
           <div className="timeline-row" key={target}>
-            <span>{target.toUpperCase()}</span>
+            <span>{t(`comparison.target.${target}`)}</span>
             <div
               className="timeline-track"
               role="img"
-              aria-label={`${label} ${target} visibility timeline`}
+              aria-label={t("comparison.timelineLabel", {
+                label,
+                target: t(`common.${target}`),
+              })}
             >
               {result.analysis[target].intervals.map((row, index) => (
                 <div
@@ -169,7 +171,7 @@ function Scenario({
                     left: `${((Date.parse(row.start_utc) - start) / duration) * 100}%`,
                     width: `${((Date.parse(row.end_utc) - Date.parse(row.start_utc)) / duration) * 100}%`,
                   }}
-                  title={`${names[row.state]}: ${date(row.start_utc)} – ${date(row.end_utc)}`}
+                  title={`${names(row.state)}: ${date(row.start_utc)} – ${date(row.end_utc)}`}
                 />
               ))}
               <i
@@ -181,17 +183,19 @@ function Scenario({
         ))}
       </div>
       <p className="compare-unknown">
-        Unknown: Sun {hours(result.analysis.sun.metrics.unknown_duration_s)} ·
-        Earth {hours(result.analysis.earth.metrics.unknown_duration_s)}
+        {t("comparison.unknownLine", {
+          sun: hours(result.analysis.sun.metrics.unknown_duration_s),
+          earth: hours(result.analysis.earth.metrics.unknown_duration_s),
+        })}
       </p>
       <details className="compare-intervals">
-        <summary>Read visibility intervals</summary>
+        <summary>{t("comparison.readIntervals")}</summary>
         {(["sun", "earth"] as const).map((target) => (
           <div key={target}>
-            <h4>{target.toUpperCase()}</h4>
+            <h4>{t(`comparison.target.${target}`)}</h4>
             {result.analysis[target].intervals.map((row, index) => (
               <p key={index}>
-                {names[row.state]} · {date(row.start_utc)} → {date(row.end_utc)}
+                {names(row.state)} · {date(row.start_utc)} → {date(row.end_utc)}
               </p>
             ))}
           </div>
@@ -216,6 +220,9 @@ export default function Comparison({
   sites: Preset[];
   onClose: () => void;
 }) {
+  const { t } = useTranslate();
+  const hours = (value: number) => hoursOf(t, value);
+  const names = (state: string) => stateName(t, state);
   const key = `lunar-comparison:${aId}`;
   const [base, setBase] = useState<Submission | null>(null);
   const [draft, setDraft] = useState<Submission | null>(null);
@@ -261,9 +268,9 @@ export default function Comparison({
                 );
               }
             })
-            .catch((e) => active && setError(e.message));
+            .catch((e) => active && setError(errorText(e, t, "comparison.requestFailed")));
       })
-      .catch((e) => active && setError(e.message));
+      .catch((e) => active && setError(errorText(e, t, "comparison.requestFailed")));
     return () => {
       active = false;
     };
@@ -283,7 +290,7 @@ export default function Comparison({
         if (!active) return;
         setPhase(job.status);
         if (job.status === "failed") {
-          setError(job.error || "Scenario B failed");
+          setError(job.error || t("comparison.bFailed"));
           setBusy(false);
           return;
         }
@@ -307,9 +314,7 @@ export default function Comparison({
         } else timer = setTimeout(poll, 1800);
       } catch (e) {
         if (active) {
-          setError(
-            e instanceof Error ? e.message : "Unable to load comparison",
-          );
+          setError(errorText(e, t, "comparison.loadFailed"));
           setBusy(false);
         }
       }
@@ -383,7 +388,7 @@ export default function Comparison({
       setPhase(job.status);
     } catch (e) {
       setBusy(false);
-      setError(e instanceof Error ? e.message : "Unable to submit scenario B");
+      setError(errorText(e, t, "comparison.submitFailed"));
     }
   };
   const draftChanged = !!(
@@ -395,34 +400,32 @@ export default function Comparison({
   );
   const point = comparison?.cursor[cursor];
   const metrics = [
-    ["sun", "visible_duration_s", "Sunlight", "h"],
-    ["sun", "longest_blocked_s", "Longest darkness", "h"],
-    ["earth", "visible_duration_s", "Earth visibility", "h"],
-    ["sun", "visible_percent_of_interval", "Sunlight percentage", "pp"],
+    ["sun", "visible_duration_s", t("comparison.metric.sunlight"), "h"],
+    ["sun", "longest_blocked_s", t("comparison.metric.darkness"), "h"],
+    ["earth", "visible_duration_s", t("comparison.metric.earth"), "h"],
+    ["sun", "visible_percent_of_interval", t("comparison.metric.percent"), "pp"],
   ];
   return (
     <section
       id="comparison"
       className="comparison-section"
-      aria-label="Scenario comparison"
+      aria-label={t("comparison.label")}
     >
       <div className="section-heading">
         <div>
-          <p className="eyebrow">04 / TWO PERSPECTIVES</p>
+          <p className="eyebrow">{t("comparison.eyebrow")}</p>
           <h2>
-            What changes<span>?</span>
+            {t("comparison.title")}<span>?</span>
           </h2>
-          <p className="muted">
-            Keep your baseline. Explore a different place or a later start.
-          </p>
+          <p className="muted">{t("comparison.intro")}</p>
         </div>
         <button className="text-button" onClick={onClose}>
-          Close comparison ×
+          {t("comparison.close")} ×
         </button>
       </div>
       <div className="panel comparison-setup">
         <div>
-          <span className="outline-tag">A · SAVED BASELINE</span>
+          <span className="outline-tag">{t("comparison.baseline")}</span>
           <h3>{a.analysis.request.site.site_id.replaceAll("-", " ")}</h3>
           <p>{date(a.analysis.request.start_utc)}</p>
           <p>
@@ -431,12 +434,11 @@ export default function Comparison({
                 Date.parse(a.analysis.request.start_utc)) /
                 1000,
             )}{" "}
-            observation · {a.horizon.observer_height_above_terrain_m.toFixed(1)}{" "}
-            m above terrain
+            {t("comparison.observation", {
+              height: a.horizon.observer_height_above_terrain_m.toFixed(1),
+            })}
           </p>
-          <small>
-            Changes below apply to B only. A's inputs and result remain saved.
-          </small>
+          <small>{t("comparison.bOnly")}</small>
         </div>
         <form
           onSubmit={(e) => {
@@ -451,14 +453,14 @@ export default function Comparison({
                 aria-pressed={mode === "dates"}
                 onClick={() => chooseMode("dates")}
               >
-                Same place, different date
+                {t("comparison.modeDates")}
               </button>
               <button
                 type="button"
                 aria-pressed={mode === "sites"}
                 onClick={() => chooseMode("sites")}
               >
-                Same date, different place
+                {t("comparison.modeSites")}
               </button>
             </div>
             {draft && (
@@ -466,9 +468,9 @@ export default function Comparison({
                 {mode === "dates" ? (
                   <>
                     <label>
-                      Scenario B start · UTC
+                      {t("comparison.bStart")} · UTC
                       <input
-                        aria-label="Scenario B start UTC"
+                        aria-label={t("comparison.bStart")}
                         type="datetime-local"
                         step="1"
                         min="2026-01-01T00:00"
@@ -485,15 +487,15 @@ export default function Comparison({
                       className="text-button"
                       onClick={delay}
                     >
-                      Use +48-hour delay ↗
+                      {t("comparison.delay")} ↗
                     </button>
                   </>
                 ) : (
                   <>
                     <label>
-                      Scenario B region
+                      {t("comparison.bRegion")}
                       <select
-                        aria-label="Scenario B region"
+                        aria-label={t("comparison.bRegion")}
                         value={draft.site_id}
                         onChange={(e) => {
                           const site = sites.find(
@@ -509,7 +511,7 @@ export default function Comparison({
                           else setDraft({ ...draft, site_id: "custom" });
                         }}
                       >
-                        <option value="custom">Custom coordinates</option>
+                        <option value="custom">{t("app.form.custom")}</option>
                         {!sites.some(
                           (site) => site.site_id === draft.site_id,
                         ) &&
@@ -527,9 +529,9 @@ export default function Comparison({
                     </label>
                     <div className="field-pair">
                       <label>
-                        Latitude · °
+                        {t("app.form.latitude")} · °
                         <input
-                          aria-label="Scenario B latitude"
+                          aria-label={t("comparison.bLatitude")}
                           type="number"
                           required
                           min="-90"
@@ -546,9 +548,9 @@ export default function Comparison({
                         />
                       </label>
                       <label>
-                        Longitude · °E
+                        {t("app.form.longitude")} · °E
                         <input
-                          aria-label="Scenario B longitude"
+                          aria-label={t("comparison.bLongitude")}
                           type="number"
                           required
                           min="0"
@@ -567,12 +569,9 @@ export default function Comparison({
                     </div>
                   </>
                 )}
-                <p className="field-help">
-                  Same duration, observer height, horizon and sampling settings
-                  as A.
-                </p>
+                <p className="field-help">{t("comparison.sameSettings")}</p>
                 <button className="primary" type="submit">
-                  {busy ? "Processing scenario B…" : "Run scenario B"} ↗
+                  {busy ? t("comparison.processing") : t("comparison.run")} ↗
                 </button>
               </>
             )}
@@ -583,19 +582,20 @@ export default function Comparison({
         <div className="alert" role="alert">
           {error}{" "}
           <button onClick={() => setRetry((value) => value + 1)}>
-            Retry connection
+            {t("comparison.retry")}
           </button>
         </div>
       )}
       {busy && (
         <p role="status" className="job-progress">
-          Scenario B: {phase.replaceAll("_", " ")}. A remains available.
+          {t("comparison.bPhase", {
+            phase: t(`jobState.${phase}`),
+          })}
         </p>
       )}
       {draftChanged && (
         <p className="alert" role="status">
-          B inputs have changed. Run scenario B to update the displayed results;
-          the cards below still show the saved run.
+          {t("comparison.changed")}
         </p>
       )}
       {comparison && b && point ? (
@@ -620,12 +620,13 @@ export default function Comparison({
                   <span className="metric-label">{label} · B − A</span>
                   <strong>
                     {value > 0 ? "+" : ""}
-                    {value.toFixed(2)} <small>{unit}</small>
+                    {value.toFixed(2)}{" "}
+                    <small>{t(`comparison.unit.${unit}`)}</small>
                   </strong>
                   <small>
                     {unit === "pp"
-                      ? "percentage points"
-                      : "over the full observation window"}
+                      ? t("comparison.pp")
+                      : t("comparison.fullWindow")}
                   </small>
                 </div>
               );
@@ -644,14 +645,16 @@ export default function Comparison({
               <div>
                 <p className="eyebrow">
                   {comparison.alignment === "shared_utc"
-                    ? "SAME UTC · TWO LOCATIONS"
-                    : "SAME ELAPSED TIME · TWO UTC DATES"}
+                    ? t("comparison.sameUtc")
+                    : t("comparison.sameElapsed")}
                 </p>
-                <strong>+{hours(point.elapsed_s)} since each start</strong>
+                <strong>
+                  +{t("comparison.sinceStart", { hours: hours(point.elapsed_s) })}
+                </strong>
               </div>
               <button
                 className="play-button"
-                aria-label={playing ? "Pause comparison" : "Play comparison"}
+                aria-label={playing ? t("comparison.pause") : t("comparison.play")}
                 onClick={() => {
                   if (cursor === comparison.cursor.length - 1) setCursor(0);
                   setPlaying(!playing);
@@ -661,8 +664,10 @@ export default function Comparison({
               </button>
             </div>
             <input
-              aria-label="Comparison time"
-              aria-valuetext={`${hours(point.elapsed_s)} since each start`}
+              aria-label={t("comparison.time")}
+              aria-valuetext={t("comparison.sinceStart", {
+                hours: hours(point.elapsed_s),
+              })}
               type="range"
               min="0"
               max={comparison.cursor.length - 1}
@@ -674,7 +679,7 @@ export default function Comparison({
             />
             <div className="comparison-cursor-dates">
               <span>
-                A cursor ·{" "}
+                {t("comparison.cursor", { label: "A" })} ·{" "}
                 {date(
                   new Date(
                     Date.parse(a.analysis.request.start_utc) +
@@ -683,7 +688,7 @@ export default function Comparison({
                 )}
               </span>
               <span>
-                B cursor ·{" "}
+                {t("comparison.cursor", { label: "B" })} ·{" "}
                 {date(
                   new Date(
                     Date.parse(b.analysis.request.start_utc) +
@@ -692,16 +697,12 @@ export default function Comparison({
                 )}
               </span>
             </div>
-            <p className="field-help">
-              Sample-by-sample playback. Each sky view shows its preceding
-              calculated sample and age; no interpolated sky position is
-              implied.
-            </p>
+            <p className="field-help">{t("comparison.playbackNote")}</p>
           </div>
           <div
             className="compare-tabs"
             role="tablist"
-            aria-label="Scenario results"
+            aria-label={t("comparison.results")}
           >
             <button
               role="tab"
@@ -716,7 +717,7 @@ export default function Comparison({
                 }
               }}
             >
-              Scenario A
+              {t("scenario.title", { name: "A" })}
             </button>
             <button
               role="tab"
@@ -731,7 +732,7 @@ export default function Comparison({
                 }
               }}
             >
-              Scenario B
+              {t("scenario.title", { name: "B" })}
             </button>
           </div>
           <div className="compare-columns">
@@ -761,24 +762,21 @@ export default function Comparison({
             </div>
           </div>
           <details className="panel comparison-changes">
-            <summary>Which intervals changed?</summary>
-            <p>
-              Offsets use elapsed time since each scenario's own start. UTC
-              dates are shown above.
-            </p>
+            <summary>{t("comparison.whichChanged")}</summary>
+            <p>{t("comparison.offsets")}</p>
             {(["sun", "earth"] as const).map((target) => (
               <div key={target}>
-                <h4>{target.toUpperCase()}</h4>
+                <h4>{t(`comparison.target.${target}`)}</h4>
                 {comparison.changes[target].length ? (
                   comparison.changes[target].map((row, index) => (
                     <p key={index}>
                       +{hours(row.start_elapsed_s)} → +
-                      {hours(row.end_elapsed_s)}: A {names[row.a_state]} / B{" "}
-                      {names[row.b_state]}
+                      {hours(row.end_elapsed_s)}: A {names(row.a_state)} / B{" "}
+                      {names(row.b_state)}
                     </p>
                   ))
                 ) : (
-                  <p>No state differences in the computed interval.</p>
+                  <p>{t("comparison.noDiff")}</p>
                 )}
               </div>
             ))}
@@ -786,30 +784,24 @@ export default function Comparison({
         </>
       ) : (
         <p className="comparison-empty">
-          Run B to compare two saved results. The original single-site analysis
-          remains above.
+          {t("comparison.empty")}
         </p>
       )}
       <details className="panel comparison-glossary">
-        <summary>Horizon, elevation and visibility — a short guide</summary>
+        <summary>{t("comparison.glossary.summary")}</summary>
         <p>
-          <b>Horizon:</b> the angle of the terrain skyline in each compass
-          direction.
+          <b>{t("comparison.glossary.horizon")}:</b>{" "}
+          {t("comparison.glossary.horizonText")}
         </p>
         <p>
-          <b>Elevation:</b> how high the Sun or Earth is above the local
-          horizontal plane.
+          <b>{t("comparison.glossary.elevation")}:</b>{" "}
+          {t("comparison.glossary.elevationText")}
         </p>
         <p>
-          <b>Visibility:</b> the modeled object clears that terrain skyline.
-          Partial sunlight means only part of the Sun's disk is visible.
-          Earth-center visibility does not guarantee a communication link.
+          <b>{t("comparison.glossary.visibility")}:</b>{" "}
+          {t("comparison.glossary.visibilityText")}
         </p>
-        <p>
-          Differences describe this model and interval, not a safe landing
-          recommendation. Fine time sampling does not remove terrain
-          uncertainty.
-        </p>
+        <p>{t("comparison.glossary.note")}</p>
       </details>
     </section>
   );
