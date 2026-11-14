@@ -4,7 +4,7 @@ H0 defines shared inputs and unvalidated plan records for classical and quantum 
 
 ## Delivery and test-first evidence
 
-Base: `origin/tahakrcc` at `d67a32f`. Branch: `codex/h0-hybrid-contracts`; merge remains manual. Skeleton commit: `a4437db`. Frozen tests: `774a50f`. No existing contract, endpoint, scientific calculation or frontend file was changed.
+Base: `origin/tahakrcc` at `d67a32f`. Branch: `codex/h0-hybrid-contracts`; merge remains manual. Skeleton commit: `a4437db`. Frozen tests: `774a50f`. The H0 implementation changes no existing contract, endpoint, scientific calculation or frontend file. Before delivery, upstream tahakrcc `b678a8b` (including R4/R5) was merged into this feature branch and the combined tree was verified.
 
 ## Start in Jupyter
 
@@ -97,7 +97,7 @@ A feasible/infeasible label here is a hand-authored benchmark intention, not out
 
 ## Verification
 
-On 2026-11-14: 77 H0 contract tests passed, within 456 passing backend tests; 112 ingestion tests passed. Notebook execution completed all 8 code cells with zero errors using the dedicated kernel. The running Jupyter server returned the notebook with its `lunar-h0` kernel metadata. Frontend production build passed; no frontend tests or screenshot checks were performed.
+On 2026-11-14: 77 H0 contract tests passed, within 533 passing backend tests after synchronizing with upstream; 112 ingestion tests passed. Notebook execution completed all 8 code cells with zero errors using the dedicated kernel. The running Jupyter server returned the notebook with its `lunar-h0` kernel metadata. Frontend production build passed; no frontend tests or screenshot checks were performed.
 
 Re-run from the existing isolated preview:
 
