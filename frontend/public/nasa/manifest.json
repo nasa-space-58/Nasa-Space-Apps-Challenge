@@ -25,6 +25,16 @@
       "source_page": "https://svs.gsfc.nasa.gov/4720/",
       "bytes": 457942,
       "sha256": "f7130a1822681fa7512d7dcfd40db8c10b9ba4f06777910348698260ed7a2170"
+    },
+    {
+      "file": "moon-relief.jpg",
+      "name": "CGI Moon Kit, 1K 8-bit relief preview",
+      "credit": "NASA / Goddard / Scientific Visualization Studio / Ernie Wright",
+      "source_page": "https://svs.gsfc.nasa.gov/4720/",
+      "download_url": "https://svs.gsfc.nasa.gov/vis/a000000/a004700/a004720/ldem_3_8bit.jpg",
+      "bytes": 111552,
+      "sha256": "6d93f887e7d8bedfe35ab89ba785e5e3ca12381bd092a5e6abe2c707dda8bb98",
+      "usage": "Decorative globe bump map only; never used for elevation analysis"
     }
   ]
 }
