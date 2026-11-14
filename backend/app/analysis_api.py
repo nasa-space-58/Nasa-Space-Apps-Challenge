@@ -499,6 +499,9 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
             raise HTTPException(409, {"status": job["status"], "error": job["error"]})
         return job["result"]
 
+    from app.campaign_planning import register_campaign_routes
+
+    register_campaign_routes(app, store, communications, data_dir)
     from app.comparison import register_comparison_routes
 
     register_comparison_routes(app, store)
