@@ -177,10 +177,12 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 ### R2 — Ground-station communication analysis
 
-- [ ] Source DSN station coordinates and define station elevation thresholds.
-- [ ] Implement S4 geometry for the landing site and individual ground stations.
-- [ ] Display station-specific and combined visibility intervals.
-- [ ] Document antenna, station availability and link-budget assumptions required for operational interpretation.
+- [x] Source DSN station coordinates and define station elevation thresholds.
+- [x] Implement S4 geometry for the landing site and individual ground stations.
+- [x] Display station-specific and combined visibility intervals.
+- [x] Document antenna, station availability and link-budget assumptions required for operational interpretation.
+
+**R2 delivery** — See [ground-station communication](ground-station-communication.md). Stations DSS-14/43/63 come from DSN 810-005 module 301 Rev. P, Table 5. The generic 6° receive and 10° low-power transmit limits apply; station horizon masks, keyhole, scheduling and link budget are documented as not modeled. Frozen tests: `233a9b8`.
 
 **Completion evidence** — Each reported geometric window satisfies the modeled line-of-sight conditions at both ends.
 
