@@ -175,3 +175,20 @@ Bu oturumda ilk 24 saatlik analiz yaklaşık **268 sn**, önbellekten aynı anal
 [Doğrulama raporu](docs/mvp-verification.md) · [Demo akışı ve takım arkadaşı kontrol listesi](docs/demo-runbook.md).
 
 **Takım arkadaşının kullanım değerlendirmesi hâlâ bekliyor; tüm MVP yayın kapısı kapanmış sayılmıyor.** Task 6 yalnızca `feature/task6-demo-verification` dalına gönderilir; tahakrcc/main ile birleştirilmez.
+
+## Task 7: Uygun başlangıç zamanı arama
+
+Üst menüde **Time search** seçin. Konum, UTC başlangıç aralığı, görev süresi ve
+adaylar arasındaki saat farkını; ardından minimum güneşlenme yüzdesi, maksimum
+kesintisiz karanlık ve minimum Dünya görünürlüğünü girin. En fazla 16 aday hesaplanır.
+
+Her adayın sağladığı/sağlamadığı koşullar gösterilir; eksik veri uygun sonuç sayılmaz.
+**Open analysis** sonucu açar, **Use as comparison A** karşılaştırmanın A senaryosu
+yapar. Arama ilerlemesi yeniden başlatmalarda korunur.
+
+Hazır güneş örneği Dünya şartını açıkça 0 saate indirir; 4–6 Kasım 2026 Malapert
+başlangıçlarında yalnızca 6 Kasım güneş koşullarını sağlar. Dünya şartı 4 saatse
+bu üç adayın hiçbiri uygun çıkmaz. Aradaki bütün anlar taranmaz; kısa fırsatlar kaçabilir.
+
+**243 test**, Ruff, derleme ve npm audit geçti. [Kullanım ve API](docs/window-search.md).
+Task 7 yalnızca `feature/task7-window-search` dalına gönderilir; tahakrcc/main ile birleştirilmez.

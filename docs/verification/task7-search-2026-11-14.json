@@ -1,0 +1,595 @@
+{
+  "verified_utc": "2026-11-14T14:59:05Z",
+  "example": {
+    "id": "4fdd7b50-c0fe-446f-91b8-32d5ddb1bd74",
+    "status": "ready",
+    "request": {
+      "template": {
+        "site_id": "malapert-massif-r23",
+        "latitude_deg": -85.9948,
+        "longitude_deg_east": 359.76422,
+        "observer_height_m": 2.0,
+        "start_utc": "2026-11-04T00:00:00Z",
+        "end_utc": "2026-11-05T00:00:00Z",
+        "step_s": 3600,
+        "refine": true,
+        "horizon": {
+          "azimuth_step_deg": 1.0,
+          "search_distance_m": 100000,
+          "radial_step_m": 40,
+          "source_extent": "raw"
+        }
+      },
+      "last_start_utc": "2026-11-06T00:00:00Z",
+      "start_step_hours": 24,
+      "min_sunlight_percent": 70.0,
+      "max_darkness_hours": 6.0,
+      "min_earth_hours": 0.0
+    },
+    "total": 3,
+    "completed": 3,
+    "matches": 1,
+    "created_utc": "2026-11-14T14:54:29.075084+00:00",
+    "limitation": "Only sampled candidate starts are evaluated; shorter windows between starts may be missed.",
+    "candidates": [
+      {
+        "job_id": "8910a78d-6cbf-5693-9663-0bea28d29e67",
+        "start_utc": "2026-11-04T00:00:00+00:00",
+        "end_utc": "2026-11-05T00:00:00+00:00",
+        "submission": {
+          "site_id": "malapert-massif-r23",
+          "latitude_deg": -85.9948,
+          "longitude_deg_east": 359.76422,
+          "observer_height_m": 2.0,
+          "start_utc": "2026-11-04T00:00:00Z",
+          "end_utc": "2026-11-05T00:00:00Z",
+          "step_s": 3600,
+          "refine": true,
+          "horizon": {
+            "azimuth_step_deg": 1.0,
+            "search_distance_m": 100000,
+            "radial_step_m": 40,
+            "source_extent": "raw"
+          }
+        },
+        "state": "not_met",
+        "conditions": [
+          {
+            "name": "sunlight_percent",
+            "actual": 20.530274722222224,
+            "threshold": 70.0,
+            "operator": ">=",
+            "passed": false
+          },
+          {
+            "name": "longest_darkness_hours",
+            "actual": 19.07273406666667,
+            "threshold": 6.0,
+            "operator": "<=",
+            "passed": false
+          },
+          {
+            "name": "earth_visible_hours",
+            "actual": 0.0,
+            "threshold": 0.0,
+            "operator": ">=",
+            "passed": true
+          }
+        ],
+        "analysis_id": "f93f9a84ad684fe74f72d838f2930aced188ff8f8c64cebd3be3169d24c0d438",
+        "unknown_seconds": {
+          "sun": 0,
+          "earth": 0
+        }
+      },
+      {
+        "job_id": "c5a75543-aaa7-52a1-80a7-58a1c0987f8f",
+        "start_utc": "2026-11-05T00:00:00+00:00",
+        "end_utc": "2026-11-06T00:00:00+00:00",
+        "submission": {
+          "site_id": "malapert-massif-r23",
+          "latitude_deg": -85.9948,
+          "longitude_deg_east": 359.76422,
+          "observer_height_m": 2.0,
+          "start_utc": "2026-11-05T00:00:00Z",
+          "end_utc": "2026-11-06T00:00:00Z",
+          "step_s": 3600,
+          "refine": true,
+          "horizon": {
+            "azimuth_step_deg": 1.0,
+            "search_distance_m": 100000,
+            "radial_step_m": 40,
+            "source_extent": "raw"
+          }
+        },
+        "state": "not_met",
+        "conditions": [
+          {
+            "name": "sunlight_percent",
+            "actual": 6.398626612268519,
+            "threshold": 70.0,
+            "operator": ">=",
+            "passed": false
+          },
+          {
+            "name": "longest_darkness_hours",
+            "actual": 22.464329613055558,
+            "threshold": 6.0,
+            "operator": "<=",
+            "passed": false
+          },
+          {
+            "name": "earth_visible_hours",
+            "actual": 0.0,
+            "threshold": 0.0,
+            "operator": ">=",
+            "passed": true
+          }
+        ],
+        "analysis_id": "e14e6ce943f8f24078116202697a1bb93543c43de31ae32de8052f48c70d1c71",
+        "unknown_seconds": {
+          "sun": 0,
+          "earth": 0
+        }
+      },
+      {
+        "job_id": "46cfdfd8-4e34-58b2-ba98-337e0e782e19",
+        "start_utc": "2026-11-06T00:00:00+00:00",
+        "end_utc": "2026-11-07T00:00:00+00:00",
+        "submission": {
+          "site_id": "malapert-massif-r23",
+          "latitude_deg": -85.9948,
+          "longitude_deg_east": 359.76422,
+          "observer_height_m": 2.0,
+          "start_utc": "2026-11-06T00:00:00Z",
+          "end_utc": "2026-11-07T00:00:00Z",
+          "step_s": 3600,
+          "refine": true,
+          "horizon": {
+            "azimuth_step_deg": 1.0,
+            "search_distance_m": 100000,
+            "radial_step_m": 40,
+            "source_extent": "raw"
+          }
+        },
+        "state": "match",
+        "conditions": [
+          {
+            "name": "sunlight_percent",
+            "actual": 100.0,
+            "threshold": 70.0,
+            "operator": ">=",
+            "passed": true
+          },
+          {
+            "name": "longest_darkness_hours",
+            "actual": 0.0,
+            "threshold": 6.0,
+            "operator": "<=",
+            "passed": true
+          },
+          {
+            "name": "earth_visible_hours",
+            "actual": 0.0,
+            "threshold": 0.0,
+            "operator": ">=",
+            "passed": true
+          }
+        ],
+        "analysis_id": "ad6902af5c885ee166a844adbf3412bc1cc259b45090f084466fe62734ab148f",
+        "unknown_seconds": {
+          "sun": 0,
+          "earth": 0
+        }
+      }
+    ]
+  },
+  "restart": {
+    "before": {
+      "id": "ae16bccf-9ad5-400b-b20c-2c344fcb7997",
+      "status": "running",
+      "request": {
+        "template": {
+          "site_id": "malapert-massif-r23",
+          "latitude_deg": -85.9948,
+          "longitude_deg_east": 359.76422,
+          "observer_height_m": 2.0,
+          "start_utc": "2026-11-04T00:00:00Z",
+          "end_utc": "2026-11-05T00:00:00Z",
+          "step_s": 3600,
+          "refine": true,
+          "horizon": {
+            "azimuth_step_deg": 1.0,
+            "search_distance_m": 100000,
+            "radial_step_m": 40,
+            "source_extent": "raw"
+          }
+        },
+        "last_start_utc": "2026-11-06T00:00:00Z",
+        "start_step_hours": 24,
+        "min_sunlight_percent": 70.0,
+        "max_darkness_hours": 6.0,
+        "min_earth_hours": 4.0
+      },
+      "total": 3,
+      "completed": 0,
+      "matches": 0,
+      "created_utc": "2026-11-14T14:58:48.613511+00:00",
+      "limitation": "Only sampled candidate starts are evaluated; shorter windows between starts may be missed.",
+      "candidates": [
+        {
+          "job_id": "d2fca08e-345c-586f-9f6a-5ae4c93debc9",
+          "start_utc": "2026-11-04T00:00:00+00:00",
+          "end_utc": "2026-11-05T00:00:00+00:00",
+          "submission": {
+            "site_id": "malapert-massif-r23",
+            "latitude_deg": -85.9948,
+            "longitude_deg_east": 359.76422,
+            "observer_height_m": 2.0,
+            "start_utc": "2026-11-04T00:00:00Z",
+            "end_utc": "2026-11-05T00:00:00Z",
+            "step_s": 3600,
+            "refine": true,
+            "horizon": {
+              "azimuth_step_deg": 1.0,
+              "search_distance_m": 100000,
+              "radial_step_m": 40,
+              "source_extent": "raw"
+            }
+          },
+          "state": "processing"
+        },
+        {
+          "job_id": "699b7be1-6244-5302-8597-e9de292785bd",
+          "start_utc": "2026-11-05T00:00:00+00:00",
+          "end_utc": "2026-11-06T00:00:00+00:00",
+          "submission": {
+            "site_id": "malapert-massif-r23",
+            "latitude_deg": -85.9948,
+            "longitude_deg_east": 359.76422,
+            "observer_height_m": 2.0,
+            "start_utc": "2026-11-05T00:00:00Z",
+            "end_utc": "2026-11-06T00:00:00Z",
+            "step_s": 3600,
+            "refine": true,
+            "horizon": {
+              "azimuth_step_deg": 1.0,
+              "search_distance_m": 100000,
+              "radial_step_m": 40,
+              "source_extent": "raw"
+            }
+          },
+          "state": "waiting"
+        },
+        {
+          "job_id": "fbdf5315-4175-5df1-8879-de7f5dfbe74c",
+          "start_utc": "2026-11-06T00:00:00+00:00",
+          "end_utc": "2026-11-07T00:00:00+00:00",
+          "submission": {
+            "site_id": "malapert-massif-r23",
+            "latitude_deg": -85.9948,
+            "longitude_deg_east": 359.76422,
+            "observer_height_m": 2.0,
+            "start_utc": "2026-11-06T00:00:00Z",
+            "end_utc": "2026-11-07T00:00:00Z",
+            "step_s": 3600,
+            "refine": true,
+            "horizon": {
+              "azimuth_step_deg": 1.0,
+              "search_distance_m": 100000,
+              "radial_step_m": 40,
+              "source_extent": "raw"
+            }
+          },
+          "state": "waiting"
+        }
+      ]
+    },
+    "after": {
+      "id": "ae16bccf-9ad5-400b-b20c-2c344fcb7997",
+      "status": "ready",
+      "request": {
+        "template": {
+          "site_id": "malapert-massif-r23",
+          "latitude_deg": -85.9948,
+          "longitude_deg_east": 359.76422,
+          "observer_height_m": 2.0,
+          "start_utc": "2026-11-04T00:00:00Z",
+          "end_utc": "2026-11-05T00:00:00Z",
+          "step_s": 3600,
+          "refine": true,
+          "horizon": {
+            "azimuth_step_deg": 1.0,
+            "search_distance_m": 100000,
+            "radial_step_m": 40,
+            "source_extent": "raw"
+          }
+        },
+        "last_start_utc": "2026-11-06T00:00:00Z",
+        "start_step_hours": 24,
+        "min_sunlight_percent": 70.0,
+        "max_darkness_hours": 6.0,
+        "min_earth_hours": 4.0
+      },
+      "total": 3,
+      "completed": 3,
+      "matches": 0,
+      "created_utc": "2026-11-14T14:58:48.613511+00:00",
+      "limitation": "Only sampled candidate starts are evaluated; shorter windows between starts may be missed.",
+      "candidates": [
+        {
+          "job_id": "d2fca08e-345c-586f-9f6a-5ae4c93debc9",
+          "start_utc": "2026-11-04T00:00:00+00:00",
+          "end_utc": "2026-11-05T00:00:00+00:00",
+          "submission": {
+            "site_id": "malapert-massif-r23",
+            "latitude_deg": -85.9948,
+            "longitude_deg_east": 359.76422,
+            "observer_height_m": 2.0,
+            "start_utc": "2026-11-04T00:00:00Z",
+            "end_utc": "2026-11-05T00:00:00Z",
+            "step_s": 3600,
+            "refine": true,
+            "horizon": {
+              "azimuth_step_deg": 1.0,
+              "search_distance_m": 100000,
+              "radial_step_m": 40,
+              "source_extent": "raw"
+            }
+          },
+          "state": "not_met",
+          "conditions": [
+            {
+              "name": "sunlight_percent",
+              "actual": 20.530274722222224,
+              "threshold": 70.0,
+              "operator": ">=",
+              "passed": false
+            },
+            {
+              "name": "longest_darkness_hours",
+              "actual": 19.07273406666667,
+              "threshold": 6.0,
+              "operator": "<=",
+              "passed": false
+            },
+            {
+              "name": "earth_visible_hours",
+              "actual": 0.0,
+              "threshold": 4.0,
+              "operator": ">=",
+              "passed": false
+            }
+          ],
+          "analysis_id": "f93f9a84ad684fe74f72d838f2930aced188ff8f8c64cebd3be3169d24c0d438",
+          "unknown_seconds": {
+            "sun": 0,
+            "earth": 0
+          }
+        },
+        {
+          "job_id": "699b7be1-6244-5302-8597-e9de292785bd",
+          "start_utc": "2026-11-05T00:00:00+00:00",
+          "end_utc": "2026-11-06T00:00:00+00:00",
+          "submission": {
+            "site_id": "malapert-massif-r23",
+            "latitude_deg": -85.9948,
+            "longitude_deg_east": 359.76422,
+            "observer_height_m": 2.0,
+            "start_utc": "2026-11-05T00:00:00Z",
+            "end_utc": "2026-11-06T00:00:00Z",
+            "step_s": 3600,
+            "refine": true,
+            "horizon": {
+              "azimuth_step_deg": 1.0,
+              "search_distance_m": 100000,
+              "radial_step_m": 40,
+              "source_extent": "raw"
+            }
+          },
+          "state": "not_met",
+          "conditions": [
+            {
+              "name": "sunlight_percent",
+              "actual": 6.398626612268519,
+              "threshold": 70.0,
+              "operator": ">=",
+              "passed": false
+            },
+            {
+              "name": "longest_darkness_hours",
+              "actual": 22.464329613055558,
+              "threshold": 6.0,
+              "operator": "<=",
+              "passed": false
+            },
+            {
+              "name": "earth_visible_hours",
+              "actual": 0.0,
+              "threshold": 4.0,
+              "operator": ">=",
+              "passed": false
+            }
+          ],
+          "analysis_id": "e14e6ce943f8f24078116202697a1bb93543c43de31ae32de8052f48c70d1c71",
+          "unknown_seconds": {
+            "sun": 0,
+            "earth": 0
+          }
+        },
+        {
+          "job_id": "fbdf5315-4175-5df1-8879-de7f5dfbe74c",
+          "start_utc": "2026-11-06T00:00:00+00:00",
+          "end_utc": "2026-11-07T00:00:00+00:00",
+          "submission": {
+            "site_id": "malapert-massif-r23",
+            "latitude_deg": -85.9948,
+            "longitude_deg_east": 359.76422,
+            "observer_height_m": 2.0,
+            "start_utc": "2026-11-06T00:00:00Z",
+            "end_utc": "2026-11-07T00:00:00Z",
+            "step_s": 3600,
+            "refine": true,
+            "horizon": {
+              "azimuth_step_deg": 1.0,
+              "search_distance_m": 100000,
+              "radial_step_m": 40,
+              "source_extent": "raw"
+            }
+          },
+          "state": "not_met",
+          "conditions": [
+            {
+              "name": "sunlight_percent",
+              "actual": 100.0,
+              "threshold": 70.0,
+              "operator": ">=",
+              "passed": true
+            },
+            {
+              "name": "longest_darkness_hours",
+              "actual": 0.0,
+              "threshold": 6.0,
+              "operator": "<=",
+              "passed": true
+            },
+            {
+              "name": "earth_visible_hours",
+              "actual": 0.0,
+              "threshold": 4.0,
+              "operator": ">=",
+              "passed": false
+            }
+          ],
+          "analysis_id": "ad6902af5c885ee166a844adbf3412bc1cc259b45090f084466fe62734ab148f",
+          "unknown_seconds": {
+            "sun": 0,
+            "earth": 0
+          }
+        }
+      ]
+    },
+    "candidate_ids_preserved": true,
+    "prior_search_unchanged": true
+  },
+  "unknown": {
+    "id": "d33982c8-bab0-4faa-a771-df4c64108e30",
+    "status": "partial",
+    "request": {
+      "template": {
+        "site_id": "malapert-massif-r23",
+        "latitude_deg": -85.9948,
+        "longitude_deg_east": 359.76422,
+        "observer_height_m": 2.0,
+        "start_utc": "2026-11-04T00:00:00Z",
+        "end_utc": "2026-11-05T00:00:00Z",
+        "step_s": 3600,
+        "refine": false,
+        "horizon": {
+          "azimuth_step_deg": 1.0,
+          "search_distance_m": 300000,
+          "radial_step_m": 40,
+          "source_extent": "raw"
+        }
+      },
+      "last_start_utc": "2026-11-04T00:00:00Z",
+      "start_step_hours": 24,
+      "min_sunlight_percent": 0.0,
+      "max_darkness_hours": 744.0,
+      "min_earth_hours": 0.0
+    },
+    "total": 1,
+    "completed": 1,
+    "matches": 0,
+    "created_utc": "2026-11-14T14:59:00.751475+00:00",
+    "limitation": "Only sampled candidate starts are evaluated; shorter windows between starts may be missed.",
+    "candidates": [
+      {
+        "job_id": "0c394887-a46b-5077-acc3-237053b7593a",
+        "start_utc": "2026-11-04T00:00:00+00:00",
+        "end_utc": "2026-11-05T00:00:00+00:00",
+        "submission": {
+          "site_id": "malapert-massif-r23",
+          "latitude_deg": -85.9948,
+          "longitude_deg_east": 359.76422,
+          "observer_height_m": 2.0,
+          "start_utc": "2026-11-04T00:00:00Z",
+          "end_utc": "2026-11-05T00:00:00Z",
+          "step_s": 3600,
+          "refine": false,
+          "horizon": {
+            "azimuth_step_deg": 1.0,
+            "search_distance_m": 300000,
+            "radial_step_m": 40,
+            "source_extent": "raw"
+          }
+        },
+        "state": "unknown",
+        "conditions": [
+          {
+            "name": "sunlight_percent",
+            "actual": 20.530822394675926,
+            "threshold": 0.0,
+            "operator": ">=",
+            "passed": true
+          },
+          {
+            "name": "longest_darkness_hours",
+            "actual": 19.072602625277778,
+            "threshold": 744.0,
+            "operator": "<=",
+            "passed": true
+          },
+          {
+            "name": "earth_visible_hours",
+            "actual": 0.0,
+            "threshold": 0.0,
+            "operator": ">=",
+            "passed": null
+          }
+        ],
+        "analysis_id": "93f038a2462d26f99fbbc9c2e35c9959b9bc70a7aed981d6fcb88d7af726a258",
+        "unknown_seconds": {
+          "sun": 0,
+          "earth": 86400.0
+        }
+      }
+    ]
+  },
+  "branch": "feature/task7-window-search",
+  "base_commit": "16d59d05b5ffeb42e4cf8fa869f477ba2996dcaa",
+  "frozen_test_commit": "20fc132",
+  "tests": {
+    "backend": 153,
+    "ingestion": 75,
+    "frontend": 15,
+    "total": 243
+  },
+  "checks": {
+    "ruff": "passed",
+    "python_dependency_checks": "passed",
+    "typescript_and_production_build": "passed",
+    "npm_audit_vulnerabilities": 0,
+    "frozen_backend_tests_unchanged": true
+  },
+  "browser": {
+    "url": "http://localhost:5174",
+    "desktop": "1280x720",
+    "mobile": "390x844",
+    "checks": [
+      "real search submission and completion",
+      "confirmed match filtering",
+      "open selected November 6 analysis with restored inputs",
+      "use selected result as comparison A",
+      "reload restores search and submitted thresholds",
+      "no horizontal overflow on mobile",
+      "zero console errors"
+    ],
+    "ui_search_id": "6c05a8c7-0980-48f1-882e-a1d37db6b34a"
+  },
+  "limitations": [
+    "Candidate grid can miss opportunities between starts",
+    "No landing safety or operational communication guarantee",
+    "Human teammate MVP acceptance still pending"
+  ]
+}
