@@ -170,3 +170,7 @@ At the user's explicit request, tahakrcc (`28f8380`) was fast-forwarded directly
 ### Space weather main push exception (user, 2026-11-15)
 
 At the user's explicit request, `feature/space-weather-noaa` (NOAA SWPC solar activity; frozen tests `be593c9`, see docs/space-weather.md) was fast-forwarded directly onto `main` and `temel` from `cb17bdd` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### R10 delivery (user, 2026-11-15)
+
+R10 (classical-versus-hybrid benchmark) starts from `main` `a5171d4` on `feature/r10-hybrid-optimization`; push only that branch, no merge into or push to tahakrcc/main. Frozen tests `6c96376` and `411d549`; see `docs/hybrid-benchmark.md`. SciPy (HiGHS MILP) is now locked in the backend. The pre-registered held-out decision is NO-GO for both direct QAOA and QAOA-solved subproblems, so the MILP solver is retained. Do not tune on held-out cases after the fact, present the illustrative noise model as calibrated, or claim quantum advantage.

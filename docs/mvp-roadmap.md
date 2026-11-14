@@ -266,23 +266,32 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 - [x] Define a common solver interface receiving the same candidate options, objectives, constraints and state/version identifiers.
 - [x] Keep physical modeling, candidate generation, state estimation and final feasibility validation classical.
-- [ ] Implement a classical exact reference for small problems and select a CP-SAT or MILP baseline for larger problems.
+- [x] Implement a classical exact reference for small problems and select a CP-SAT or MILP baseline for larger problems.
 - [x] Define binary mission-option variables and encode selection, incompatibility and resource constraints as a QUBO.
 - [x] Verify that the QUBO corresponds to the original constrained problem; document penalty scales, coefficient normalization and any auxiliary variables.
 - [x] Implement an initial QAOA experiment using three missions with four options each; verify all feasible assignments against classical enumeration.
 - [x] Add a classical outer loop for quantum circuit parameters and record circuit depth, shots, seeds and optimization settings.
-- [ ] Scale experiments across problem size, constraint density and resource contention; measure logical-variable and circuit resource growth.
-- [ ] Add bounded subproblem selection so larger mission plans can use a small quantum optimization step inside a classical search.
+- [x] Scale experiments across problem size, constraint density and resource contention; measure logical-variable and circuit resource growth.
+- [x] Add bounded subproblem selection so larger mission plans can use a small quantum optimization step inside a classical search.
 - [x] Validate every solver result against the original constraints independently of the QUBO objective value.
-- [ ] Record raw quantum feasibility separately from any classical repair, including repair cost and changes.
-- [ ] Compare quantum-generated candidates with classical and random candidates using the same repair/local-improvement procedure.
+- [x] Record raw quantum feasibility separately from any classical repair, including repair cost and changes.
+- [x] Compare quantum-generated candidates with classical and random candidates using the same repair/local-improvement procedure.
 - [x] Run noiseless simulation, noise-model experiments and a bounded hardware experiment when access is available; label each execution mode explicitly.
-- [ ] Benchmark feasible-solution rate, objective quality, optimum gap where known, variability and end-to-end runtime, including preparation, tuning, queueing and validation.
-- [ ] Use multiple reproducible instances and held-out evaluation cases with documented compute budgets.
-- [ ] Define go/no-go criteria for each quantum application and retain the classical solver when measured benefit is absent.
-- [ ] Publish reproducible classical-versus-hybrid results without assuming or claiming an unmeasured quantum advantage.
+- [x] Benchmark feasible-solution rate, objective quality, optimum gap where known, variability and end-to-end runtime, including preparation, tuning, queueing and validation.
+- [x] Use multiple reproducible instances and held-out evaluation cases with documented compute budgets.
+- [x] Define go/no-go criteria for each quantum application and retain the classical solver when measured benefit is absent.
+- [x] Publish reproducible classical-versus-hybrid results without assuming or claiming an unmeasured quantum advantage.
 
-**R10 status (audited 2026-11-14)** — Ticked items are delivered by H0–H2 and H7: shared H0 scenario/fingerprint input to both solvers ([contracts](hybrid-contracts.md)), classical physics and validation, exact enumeration ([H1](classical-planning.md)), an audited one-hot QUBO with documented penalty/normalization and a seeded three-by-four QAOA experiment ([H2](quantum-mapping.md)), and labeled noiseless, noise-model and single bounded hardware runs ([H7](openquantum-hardware.md)). Open: a MILP/CP-SAT baseline, scaling sweeps, bounded subproblem selection, repair/random-candidate comparison, held-out benchmark instances, go/no-go criteria and a published benchmark.
+**R10 status (completed 2026-11-15)** — H0–H2 and H7 deliver the shared solver input, classical validation, exact enumeration, the audited QUBO/QAOA experiment and labeled noiseless, noise-model and hardware runs. [R10](hybrid-benchmark.md) adds the remaining items:
+
+- a HiGHS MILP baseline revalidated by the exact validator;
+- enumeration-free resource sweeps over size, constraint density and contention;
+- bounded subproblem search;
+- raw-versus-repaired records and same-repair comparison against random and annealing samplers;
+- dev/held-out instances with documented budgets;
+- pre-registered go/no-go rules.
+
+The published results ([summary](verification/r10-hybrid-benchmark-2026-11-15.json)) are **no-go** for both direct QAOA selection and QAOA-solved subproblems, so the classical MILP solver is retained. No quantum advantage is claimed.
 
 ### R11 — Multi-mission planning and shared resources
 

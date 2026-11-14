@@ -29,3 +29,6 @@ frontend/.vite/
 
 # Optional local H7 environment
 .venv-h7/
+
+# Full R10 benchmark report (reproducible; only the compact summary is committed)
+docs/verification/r10-hybrid-benchmark-full.json

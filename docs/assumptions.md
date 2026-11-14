@@ -36,6 +36,10 @@ See [terrain verification and sources](terrain-and-sites.md), [machine-readable 
 - A setting event outside the computed interval is reported as no event found in that interval.
 - Earth-center visibility is a geometric metric. DSN geometry, station availability and link budgets enter the later communication release.
 
+## R10 hybrid benchmark assumptions
+
+R10 benchmark instances are seeded synthetic planning problems (generator `r10-generator-v1`). They are not NASA missions, DSN bookings or validated landing sites. The noise model (0.1% per single-qubit gate, 1% per CX, 2% readout flips, global depolarization) is an illustrative assumption taken from H7, not a device calibration. Gate counts are logical all-to-all estimates. See [hybrid-benchmark.md](hybrid-benchmark.md).
+
 ## Current verification status
 
 Local Docker services and the full test suite passed on 2026-11-14. Horizons CLI acquisition returned 25 samples per target and cache reuse passed; see horizons-ingestion.md. Python transitive dependency locks and a fresh-clone Docker installation were verified; see clean-install-verification.md. Step 0 terrain/source definition is complete for the two documented initial observers. Task 1 ingestion and Task 2 bounded horizon calculation are now locally verified; see ingestion-pipeline.md and terrain-horizon.md. Task 3 now derives sampled visibility intervals and estimated metrics; see visibility-metrics.md for temporal, terrain and disk-model limitations. API/UI remain Task 4. The CLI accepts only whole-second UTC timestamps.
