@@ -3,6 +3,7 @@
 import hashlib
 import json
 from collections import Counter
+from copy import deepcopy
 from datetime import datetime, timedelta
 from itertools import groupby
 
@@ -398,7 +399,7 @@ def replay_recovery(
             revision=revision,
             estimated_state=estimate.model_dump(mode="json"),
             available_thrust_n=available,
-            landing_hazards=hazards,
+            landing_hazards=list(hazards),
             outage_end_utc=outage_end.isoformat(),
             uncertainty=uncertainty.model_dump(mode="json"),
             previous_target_id=previous,
@@ -417,6 +418,27 @@ def replay_recovery(
                 uncertainty_draws=draws,
             )
         )
+        if target_selector is not None:
+            proposed = target_selector(deepcopy(decisions[-1]))
+            if proposed is not None and proposed not in {
+                row["target_id"] for row in accepted
+            }:
+                raise ValueError(
+                    "External selector must choose a currently accepted target"
+                )
+            selected = proposed
+            choice = next(
+                (row for row in accepted if row["target_id"] == selected), None
+            )
+            decisions[-1].update(
+                selected_target_id=selected,
+                selection_policy="external_validated_candidates",
+                action="no_feasible_continuation"
+                if selected is None
+                else "continue"
+                if selected == previous
+                else "retarget",
+            )
         if choice is None:
             status = "infeasible"
             final_reasons = ["no_validated_candidate"]

@@ -149,3 +149,8 @@ Continue on `codex/quantum-hybrid`; push only that branch, without tahakrcc/main
 ### H5 continuation (user, 2026-11-14)
 
 Continue on `codex/quantum-hybrid`; push only this branch without tahakrcc/main merges. Skeleton `9fd35a7`, frozen tests `9c9a6d1`, `1a4fc36` and `432cd67`; see `docs/self-healing.md`. H5 uses exact-time planar fault replay, explicit truth/observation/estimate separation, seeded shared uncertainty draws and classical retargeting. Never present finite Monte Carlo passes as certified probabilities, a landing exclusion as volumetric obstacle geometry, infeasibility as a safe abort, or synchronous planning as a real-time/hardware guarantee. H6 async quantum/fallback integration remains open.
+
+
+### H6 continuation (user, 2026-11-14)
+
+Continue on `codex/quantum-hybrid`; push only this branch, without tahakrcc/main merges. Skeleton `5b9252a`, frozen tests `d872606` and `bfe96d5`; see `docs/hybrid-recovery.md`. H6 connects H5 screened targets and downstream schedules to the local H2 QAOA worker. Classical preparation precedes the quantum acceptance deadline; every resolution rechecks current physical and campaign inputs. Offline flight time is paused during planning, and running Python work is not forcibly killed. Do not present this as live control, hardware execution or quantum advantage. H7 hardware/provider experiments remain separate work.
