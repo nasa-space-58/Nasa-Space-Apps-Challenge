@@ -12,6 +12,7 @@ import type { Preset } from "../types";
 import {
   COVERAGE_MAX_LATITUDE_DEG,
   LANDING_CLOSEUP_START_PROGRESS,
+  LAUNCH_CLOSEUP_END_PROGRESS,
   MISSION_PHASES,
   buildTransferPath,
   phaseAt,
@@ -21,7 +22,7 @@ import type { CameraMode, CameraView, SiteCondition } from "./MissionScene";
 
 const MissionScene = lazy(() => import("./MissionScene"));
 /** Wall-clock length of one illustrative flight playback. */
-const FLIGHT_PLAYBACK_S = 30;
+const FLIGHT_PLAYBACK_S = 40;
 const TICK_MS = 50;
 const lockedNotice =
   "An analysis is running. The landing site is locked until it finishes.";
@@ -32,6 +33,7 @@ const cameraModes: { id: CameraMode; label: string }[] = [
   { id: "moon", label: "Moon orbit" },
   { id: "pole", label: "South pole" },
   { id: "spacecraft", label: "Spacecraft" },
+  { id: "launch", label: "Launch" },
   { id: "landing", label: "Landing" },
 ];
 
@@ -99,15 +101,18 @@ export default function MissionStage({
   const active = phaseAt(progress);
   // Auto camera: with true-scale distances the wide Earth–Moon view only
   // suits the coast, so the spacecraft close-up covers Earth orbit and early
-  // descent; the final descent and touchdown cut to the landing close-up.
+  // descent; lift-off opens on the launch close-up and the final descent and
+  // touchdown cut to the landing close-up.
   const cameraView: CameraView =
     cameraMode !== "auto"
       ? cameraMode
-      : progress === 0
+      : progress === 0 && !flying
         ? focusMoon
           ? "pole"
           : "system"
-        : active.phase.id === "translunar_coast"
+        : progress < LAUNCH_CLOSEUP_END_PROGRESS
+          ? "launch"
+          : active.phase.id === "translunar_coast"
           ? "system"
           : active.phase.id === "lunar_orbit"
             ? "moon"
@@ -290,6 +295,8 @@ export default function MissionStage({
                 ? "Click inside the dashed ring to choose · drag to rotate · scroll to zoom"
                 : cameraView === "landing"
                   ? "Illustrative landing close-up · drag to rotate · use South pole to choose another site"
+                  : cameraView === "launch"
+                    ? "Illustrative launch close-up · drag to rotate · scroll to zoom"
                   : "Click the Moon to zoom in and choose a site · drag to rotate"}
             </small>
           )}

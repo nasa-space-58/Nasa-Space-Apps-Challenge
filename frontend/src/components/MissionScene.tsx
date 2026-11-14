@@ -14,6 +14,7 @@ import {
 } from "@react-three/fiber";
 import * as THREE from "three";
 import { Dust, Model, Terrain, smooth } from "./LunarSurface";
+import LaunchSite from "./LaunchSite";
 import type { Preset } from "../types";
 import {
   ASTRONOMICAL_UNIT_KM,
@@ -64,6 +65,7 @@ export type CameraMode =
   | "moon"
   | "pole"
   | "spacecraft"
+  | "launch"
   | "landing";
 export type CameraView = Exclude<CameraMode, "auto">;
 export type SiteCondition = "sunlit" | "dark" | "unknown";
@@ -402,7 +404,7 @@ function CameraRig({
   progress,
   reduced,
 }: {
-  mode: Exclude<CameraView, "landing">;
+  mode: Exclude<CameraView, "landing" | "launch">;
   lat: number;
   lon: number;
   spacecraft: MutableRefObject<THREE.Vector3>;
@@ -705,7 +707,13 @@ function System({
         </>
       )}
       <CameraRig
-        mode={cameraMode === "landing" ? "pole" : cameraMode}
+        mode={
+          cameraMode === "landing"
+            ? "pole"
+            : cameraMode === "launch"
+              ? "spacecraft"
+              : cameraMode
+        }
         lat={lat}
         lon={lon}
         spacecraft={spacecraft}
@@ -851,6 +859,27 @@ function LandingSite({
   );
 }
 
+/** Launch close-up with drag-to-orbit and wheel-to-zoom camera input. */
+function LaunchCloseup({
+  progress,
+  reduced,
+  compact,
+}: {
+  progress: MutableRefObject<number>;
+  reduced: boolean;
+  compact: boolean;
+}) {
+  const user = useOrbitInput("launch");
+  return (
+    <LaunchSite
+      progress={progress}
+      reduced={reduced}
+      compact={compact}
+      user={user}
+    />
+  );
+}
+
 type SceneProps = {
   lat: number;
   lon: number;
@@ -901,7 +930,7 @@ export default function MissionScene(
   const progress = useRef(progressValue);
   return (
     <Canvas
-      aria-label="Illustrative Earth, Moon and Sun scene with a landing close-up. Click the south polar cap to choose a landing site; the latitude and longitude fields offer keyboard input."
+      aria-label="Illustrative Earth, Moon and Sun scene with launch and landing close-ups. Click the south polar cap to choose a landing site; the latitude and longitude fields offer keyboard input."
       camera={{ position: [150, 190, 175], fov: 50, near: 0.001, far: 8000 }}
       dpr={compact ? 1 : [1, 1.75]}
       shadows={{ type: THREE.PCFShadowMap }}
@@ -925,7 +954,13 @@ export default function MissionScene(
         snap={!animate}
       />
       <Suspense fallback={null}>
-        {scene.cameraMode === "landing" ? (
+        {scene.cameraMode === "launch" ? (
+          <LaunchCloseup
+            progress={progress}
+            reduced={scene.reduced}
+            compact={compact}
+          />
+        ) : scene.cameraMode === "landing" ? (
           <LandingSite
             progress={progress}
             condition={scene.condition}
