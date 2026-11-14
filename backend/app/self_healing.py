@@ -323,7 +323,9 @@ def _screen(base, estimate, target, available, hazards, draws, policy_reason):
     return record
 
 
-def replay_recovery(scenario: RecoveryScenario, *, replan: bool = True) -> dict:
+def replay_recovery(
+    scenario: RecoveryScenario, *, replan: bool = True, target_selector=None
+) -> dict:
     """Run synthetic faults on a planar vehicle; no hardware, live telemetry or safe-abort claim."""
     scenario = RecoveryScenario.model_validate(scenario.model_dump())
     base = scenario.initial_request
