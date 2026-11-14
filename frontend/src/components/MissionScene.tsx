@@ -70,6 +70,9 @@ const SYSTEM_VIEW_YAW = 0.12;
 const SYSTEM_VIEW_PITCH = 0.42;
 /** Earth's atmosphere shell (display thickness ≈ 100 km). */
 const EARTH_ATMOSPHERE_RADIUS_SCENE = SCENE_LAYOUT.earth_radius_scene * 1.016;
+/** Display spin rates (illustrative, not physical rotation periods). */
+const EARTH_SPIN_RAD_PER_S = 0.25;
+const MOON_SPIN_RAD_PER_S = 0.08;
 
 export type CameraMode =
   | "auto"
@@ -721,13 +724,28 @@ function System({
       }),
     [],
   );
+  // Illustrative spin (not a physical rotation rate). The Moon, with its site
+  // markers, only spins in the idle overview; during the flight and while
+  // picking it eases back to its Earth-facing pose so the path and the
+  // selected site stay aligned with the transfer geometry.
+  const moonFrame = useRef<THREE.Group>(null!);
+  const moonSpin = useRef(0);
   useFrame((_, delta) => {
-    if (!reduced) earth.current.rotation.y += delta * 0.05;
+    const step = Math.min(delta, 0.05);
+    if (!reduced) earth.current.rotation.y += step * EARTH_SPIN_RAD_PER_S;
+    const free = !reduced && cameraMode === "system" && progress.current <= 0;
+    if (free) moonSpin.current += step * MOON_SPIN_RAD_PER_S;
+    else {
+      const rest =
+        Math.round(moonSpin.current / (Math.PI * 2)) * Math.PI * 2;
+      moonSpin.current += (rest - moonSpin.current) * Math.min(1, step * 3);
+    }
+    moonFrame.current.rotation.y = moonSpin.current;
   });
   const pick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
     if (event.delta > 6) return;
-    const point = event.point;
+    const point = moonFrame.current.worldToLocal(event.point.clone());
     onPick(siteSelectionFromPoint([point.x, point.y, point.z]));
   };
   return (
@@ -794,6 +812,7 @@ function System({
         strength={0.4}
       />
       <Line points={parkingRing} color="#9ac9e5" opacity={0.18} />
+      <group ref={moonFrame}>
       <mesh
         onClick={pick}
         onPointerOver={() => {
@@ -818,7 +837,6 @@ function System({
         dashed
         dashSize={0.04}
       />
-      <ScienceOrbiter reduced={reduced} />
       {sites.map((site) => (
         <mesh
           key={site.site_id}
@@ -835,6 +853,8 @@ function System({
       {Number.isFinite(lat) && Number.isFinite(lon) && (
         <SiteMarker lat={lat} lon={lon} condition={condition} reduced={reduced} />
       )}
+      </group>
+      <ScienceOrbiter reduced={reduced} />
       {path && (
         <>
           <Line
