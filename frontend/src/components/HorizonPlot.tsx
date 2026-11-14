@@ -1,19 +1,27 @@
+import { useId } from "react";
 import type { Frame, Result } from "../types";
 export default function HorizonPlot({
   result,
   frame,
+  scaleResults,
 }: {
   result: Result;
   frame: Frame;
+  scaleResults?: Result[];
 }) {
+  const clipId = useId();
   const x = (az: number) => 48 + (az / 360) * 820;
   // Display bounds include every returned sample so scrubbing does not rescale.
   const elevations = [
-    ...result.horizon.directions.map((point) => point.elevation_deg),
-    ...result.frames.flatMap((sample) => [
-      sample.sun.elevation_deg,
-      sample.earth.elevation_deg,
-    ]),
+    ...(scaleResults || [result]).flatMap((view) =>
+      view.horizon.directions.map((point) => point.elevation_deg),
+    ),
+    ...(scaleResults || [result])
+      .flatMap((view) => view.frames)
+      .flatMap((sample) => [
+        sample.sun.elevation_deg,
+        sample.earth.elevation_deg,
+      ]),
   ].filter((value): value is number => value !== null);
   const lower = Math.min(-5, Math.floor(Math.min(...elevations) / 5) * 5);
   const upper = Math.max(10, Math.ceil(Math.max(...elevations) / 5) * 5);
@@ -36,12 +44,12 @@ export default function HorizonPlot({
   return (
     <svg
       className="horizon-plot"
-      viewBox="0 0 910 270"
+      viewBox="-60 0 1030 270"
       role="img"
       aria-label={`Terrain horizon. Sun ${frame.sun.state}, Earth ${frame.earth.state}. Elevation in degrees.`}
     >
       <defs>
-        <clipPath id="plot-clip">
+        <clipPath id={clipId}>
           <rect x="48" y="15" width="820" height="220" />
         </clipPath>
       </defs>
@@ -67,7 +75,7 @@ export default function HorizonPlot({
           </text>
         </g>
       ))}
-      <g clipPath="url(#plot-clip)">
+      <g clipPath={`url(#${clipId})`}>
         <path d={path} fill="none" stroke="#9aa5a9" strokeWidth="2" />
         {(["sun", "earth"] as const).map((target) => {
           const item = frame[target];

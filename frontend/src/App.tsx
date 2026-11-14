@@ -9,6 +9,7 @@ import {
 } from "react";
 import HorizonPlot from "./components/HorizonPlot";
 import PolarMap from "./components/PolarMap";
+import Comparison from "./components/Comparison";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
 
 const MoonScene = lazy(() => import("./components/MoonScene"));
@@ -43,13 +44,11 @@ const utcLabel = (value: string) =>
     hour12: false,
   });
 const jump = (id: string) =>
-  document
-    .getElementById(id)
-    ?.scrollIntoView({
-      behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
-        ? "auto"
-        : "smooth",
-    });
+  document.getElementById(id)?.scrollIntoView({
+    behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+      ? "auto"
+      : "smooth",
+  });
 
 class SceneBoundary extends Component<
   { children: ReactNode },
@@ -177,6 +176,10 @@ export default function App() {
   const [refine, setRefine] = useState(true);
   const [job, setJob] = useState<Job | null>(null);
   const [result, setResult] = useState<Result | null>(null);
+  const [comparisonBase, setComparisonBase] = useState<{
+    id: string;
+    result: Result;
+  } | null>(null);
   const [frameIndex, setFrameIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState("");
@@ -1012,6 +1015,18 @@ export default function App() {
                 </details>
               </div>
             )}
+            {result && job && (
+              <button
+                className="primary add-comparison"
+                onClick={() => {
+                  setPlaying(false);
+                  setComparisonBase({ id: job.id, result });
+                  setTimeout(() => jump("comparison"), 0);
+                }}
+              >
+                Add comparison ↗
+              </button>
+            )}
             <p className="results-footnote">
               A horizon is a perspective, not a promise. Results describe the
               sampled terrain and observation window.
@@ -1019,6 +1034,15 @@ export default function App() {
           </div>
         </div>
       </section>
+      {comparisonBase && (
+        <Comparison
+          key={comparisonBase.id}
+          aId={comparisonBase.id}
+          a={comparisonBase.result}
+          sites={sites}
+          onClose={() => setComparisonBase(null)}
+        />
+      )}
       <footer>
         <span>
           2GBRAM <i> / </i> LUNAR LANDING NAVIGATOR

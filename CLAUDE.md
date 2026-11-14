@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo contains the completed Step 0 foundation and Task 1 RabbitMQ ingestion, persistent terrain/Horizons caches, Task 2 bounded terrain horizon computation, Task 3 sampled visibility metrics/refinement, and Task 4 persistent analysis API plus NASA-model scroll interface and tests. Local Docker runtime verification and frontend lock generation passed on 2026-11-14; Python transitive locks and a clean-clone Docker test also passed; terrain/site input definitions were also verified against NASA/USGS sources; Step 0 is complete; see docs/mvp-roadmap.md. The README is in Turkish; everything else (code, comments, commits, docs) must be in English.
+**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo contains the completed Step 0 foundation and Task 1 RabbitMQ ingestion, persistent terrain/Horizons caches, Task 2 bounded terrain horizon computation, Task 3 sampled visibility metrics/refinement, and Task 4 persistent analysis API plus NASA-model scroll interface, and Task 5 saved A/B comparison with synchronized playback and tests. Local Docker runtime verification and frontend lock generation passed on 2026-11-14; Python transitive locks and a clean-clone Docker test also passed; terrain/site input definitions were also verified against NASA/USGS sources; Step 0 is complete; see docs/mvp-roadmap.md. The README is in Turkish; everything else (code, comments, commits, docs) must be in English.
 
 `docs/` is the source of truth. Read the relevant file before working:
 - `docs/mvp-roadmap.md`: first-release scope, release order, task checklist and acceptance criteria.
@@ -78,3 +78,7 @@ Task 3 starts from Task 2 on `feature/task3-visibility-metrics`. Push only this 
 ### Task 4 delivery override (user, 2026-11-14)
 
 Task 4 starts from Task 3 on `feature/task4-mission-interface`. Push only this new branch; the user manually merges. Do not merge into or push to tahakrcc or main.
+
+### Task 5 delivery override (user, 2026-11-14)
+
+Task 5 starts from current tahakrcc (`c29086d`) on `feature/task5-scenario-comparison`. Push only this new branch. Do not merge into or push to tahakrcc or main. Task 4 was merged into tahakrcc separately at the user's explicit request.

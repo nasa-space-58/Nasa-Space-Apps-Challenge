@@ -1,0 +1,1006 @@
+{
+  "verified_utc": "2026-11-14",
+  "branch": "feature/task5-scenario-comparison",
+  "base_tahakrcc": "c29086d415346058c379b2cfbaa17b4a9571dbc9",
+  "frozen_tests": "27d92be",
+  "tests": {
+    "backend": 128,
+    "ingestion": 75,
+    "frontend": 9
+  },
+  "cases": {
+    "delay": {
+      "mode": "dates",
+      "status": "ready",
+      "alignment": "elapsed_since_start",
+      "duration_s": 86400.0,
+      "start_offset_s": 172800.0,
+      "deltas": {
+        "sun": {
+          "visible_duration_s": 68661.84264,
+          "visible_percent_of_interval": 79.46972527777777,
+          "longest_blocked_s": -68661.84264,
+          "longest_visible_s": 68661.84264,
+          "unknown_duration_s": 0
+        },
+        "earth": {
+          "visible_duration_s": 0,
+          "visible_percent_of_interval": 0.0,
+          "longest_blocked_s": 0.0,
+          "longest_visible_s": 0.0,
+          "unknown_duration_s": 0
+        }
+      },
+      "changes": {
+        "sun": [
+          {
+            "start_elapsed_s": 17738.15736,
+            "end_elapsed_s": 86400.0,
+            "a_state": "dark",
+            "b_state": "partial"
+          }
+        ],
+        "earth": []
+      },
+      "cursor": [
+        {
+          "elapsed_s": 0.0,
+          "a_index": 0,
+          "a_sample_age_s": 0.0,
+          "b_index": 0,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 3600.0,
+          "a_index": 1,
+          "a_sample_age_s": 0.0,
+          "b_index": 1,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 7200.0,
+          "a_index": 2,
+          "a_sample_age_s": 0.0,
+          "b_index": 2,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 10800.0,
+          "a_index": 3,
+          "a_sample_age_s": 0.0,
+          "b_index": 3,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 14400.0,
+          "a_index": 4,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 14700.0,
+          "a_index": 5,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 300.0
+        },
+        {
+          "elapsed_s": 15000.0,
+          "a_index": 6,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 600.0
+        },
+        {
+          "elapsed_s": 15300.0,
+          "a_index": 7,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 900.0
+        },
+        {
+          "elapsed_s": 15600.0,
+          "a_index": 8,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 1200.0
+        },
+        {
+          "elapsed_s": 15900.0,
+          "a_index": 9,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 1500.0
+        },
+        {
+          "elapsed_s": 16200.0,
+          "a_index": 10,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 1800.0
+        },
+        {
+          "elapsed_s": 16500.0,
+          "a_index": 11,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 2100.0
+        },
+        {
+          "elapsed_s": 16800.0,
+          "a_index": 12,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 2400.0
+        },
+        {
+          "elapsed_s": 17100.0,
+          "a_index": 13,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 2700.0
+        },
+        {
+          "elapsed_s": 17400.0,
+          "a_index": 14,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 3000.0
+        },
+        {
+          "elapsed_s": 17700.0,
+          "a_index": 15,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 3300.0
+        },
+        {
+          "elapsed_s": 17760.0,
+          "a_index": 16,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 3360.0
+        },
+        {
+          "elapsed_s": 17820.0,
+          "a_index": 17,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 3420.0
+        },
+        {
+          "elapsed_s": 17880.0,
+          "a_index": 18,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 3480.0
+        },
+        {
+          "elapsed_s": 17940.0,
+          "a_index": 19,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 3540.0
+        },
+        {
+          "elapsed_s": 18000.0,
+          "a_index": 20,
+          "a_sample_age_s": 0.0,
+          "b_index": 5,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 21600.0,
+          "a_index": 21,
+          "a_sample_age_s": 0.0,
+          "b_index": 6,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 25200.0,
+          "a_index": 22,
+          "a_sample_age_s": 0.0,
+          "b_index": 7,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 28800.0,
+          "a_index": 23,
+          "a_sample_age_s": 0.0,
+          "b_index": 8,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 32400.0,
+          "a_index": 24,
+          "a_sample_age_s": 0.0,
+          "b_index": 9,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 36000.0,
+          "a_index": 25,
+          "a_sample_age_s": 0.0,
+          "b_index": 10,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 39600.0,
+          "a_index": 26,
+          "a_sample_age_s": 0.0,
+          "b_index": 11,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 43200.0,
+          "a_index": 27,
+          "a_sample_age_s": 0.0,
+          "b_index": 12,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 46800.0,
+          "a_index": 28,
+          "a_sample_age_s": 0.0,
+          "b_index": 13,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 50400.0,
+          "a_index": 29,
+          "a_sample_age_s": 0.0,
+          "b_index": 14,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 54000.0,
+          "a_index": 30,
+          "a_sample_age_s": 0.0,
+          "b_index": 15,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 57600.0,
+          "a_index": 31,
+          "a_sample_age_s": 0.0,
+          "b_index": 16,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 61200.0,
+          "a_index": 32,
+          "a_sample_age_s": 0.0,
+          "b_index": 17,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 64800.0,
+          "a_index": 33,
+          "a_sample_age_s": 0.0,
+          "b_index": 18,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 68400.0,
+          "a_index": 34,
+          "a_sample_age_s": 0.0,
+          "b_index": 19,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 72000.0,
+          "a_index": 35,
+          "a_sample_age_s": 0.0,
+          "b_index": 20,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 75600.0,
+          "a_index": 36,
+          "a_sample_age_s": 0.0,
+          "b_index": 21,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 79200.0,
+          "a_index": 37,
+          "a_sample_age_s": 0.0,
+          "b_index": 22,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 82800.0,
+          "a_index": 38,
+          "a_sample_age_s": 0.0,
+          "b_index": 23,
+          "b_sample_age_s": 0.0
+        }
+      ],
+      "explanations": [
+        "Sunlight: B has 19.07 h more modeled visibility than A over the same 24 h window.",
+        "Sunlight: 1 elapsed-time segment(s) have different states; see both UTC timelines. Estimates inherit terrain and sampling limits.",
+        "Earth-center visibility: A and B have the same modeled visibility duration over the same 24 h window.",
+        "Earth-center visibility: 0 elapsed-time segment(s) have different states; see both UTC timelines. Estimates inherit terrain and sampling limits."
+      ],
+      "analysis_ids": [
+        "f93f9a84ad684fe74f72d838f2930aced188ff8f8c64cebd3be3169d24c0d438",
+        "ad6902af5c885ee166a844adbf3412bc1cc259b45090f084466fe62734ab148f"
+      ],
+      "job_ids": {
+        "a_id": "c88ce319-e99f-44fd-97b2-1c427121773a",
+        "b_id": "81d095ba-1384-497c-8897-473cac083b3b"
+      }
+    },
+    "site": {
+      "mode": "sites",
+      "status": "ready",
+      "alignment": "shared_utc",
+      "duration_s": 86400.0,
+      "start_offset_s": 0.0,
+      "deltas": {
+        "sun": {
+          "visible_duration_s": -17738.15736,
+          "visible_percent_of_interval": -20.530274722222224,
+          "longest_blocked_s": 17738.157359999997,
+          "longest_visible_s": -17738.15736,
+          "unknown_duration_s": 0
+        },
+        "earth": {
+          "visible_duration_s": 21876.480279,
+          "visible_percent_of_interval": 25.320000322916666,
+          "longest_blocked_s": -21876.480279000003,
+          "longest_visible_s": 21876.480279,
+          "unknown_duration_s": 0
+        }
+      },
+      "changes": {
+        "sun": [
+          {
+            "start_elapsed_s": 0.0,
+            "end_elapsed_s": 17738.15736,
+            "a_state": "partial",
+            "b_state": "dark"
+          }
+        ],
+        "earth": [
+          {
+            "start_elapsed_s": 0.0,
+            "end_elapsed_s": 21876.480279,
+            "a_state": "blocked",
+            "b_state": "visible"
+          }
+        ]
+      },
+      "cursor": [
+        {
+          "elapsed_s": 0.0,
+          "a_index": 0,
+          "a_sample_age_s": 0.0,
+          "b_index": 0,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 3600.0,
+          "a_index": 1,
+          "a_sample_age_s": 0.0,
+          "b_index": 1,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 7200.0,
+          "a_index": 2,
+          "a_sample_age_s": 0.0,
+          "b_index": 2,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 10800.0,
+          "a_index": 3,
+          "a_sample_age_s": 0.0,
+          "b_index": 3,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 14400.0,
+          "a_index": 4,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 14700.0,
+          "a_index": 5,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 300.0
+        },
+        {
+          "elapsed_s": 15000.0,
+          "a_index": 6,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 600.0
+        },
+        {
+          "elapsed_s": 15300.0,
+          "a_index": 7,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 900.0
+        },
+        {
+          "elapsed_s": 15600.0,
+          "a_index": 8,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 1200.0
+        },
+        {
+          "elapsed_s": 15900.0,
+          "a_index": 9,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 1500.0
+        },
+        {
+          "elapsed_s": 16200.0,
+          "a_index": 10,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 1800.0
+        },
+        {
+          "elapsed_s": 16500.0,
+          "a_index": 11,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 2100.0
+        },
+        {
+          "elapsed_s": 16800.0,
+          "a_index": 12,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 2400.0
+        },
+        {
+          "elapsed_s": 17100.0,
+          "a_index": 13,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 2700.0
+        },
+        {
+          "elapsed_s": 17400.0,
+          "a_index": 14,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 3000.0
+        },
+        {
+          "elapsed_s": 17700.0,
+          "a_index": 15,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 3300.0
+        },
+        {
+          "elapsed_s": 17760.0,
+          "a_index": 16,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 3360.0
+        },
+        {
+          "elapsed_s": 17820.0,
+          "a_index": 17,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 3420.0
+        },
+        {
+          "elapsed_s": 17880.0,
+          "a_index": 18,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 3480.0
+        },
+        {
+          "elapsed_s": 17940.0,
+          "a_index": 19,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 3540.0
+        },
+        {
+          "elapsed_s": 18000.0,
+          "a_index": 20,
+          "a_sample_age_s": 0.0,
+          "b_index": 5,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 21600.0,
+          "a_index": 21,
+          "a_sample_age_s": 0.0,
+          "b_index": 6,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 21660.0,
+          "a_index": 21,
+          "a_sample_age_s": 60.0,
+          "b_index": 7,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 21720.0,
+          "a_index": 21,
+          "a_sample_age_s": 120.0,
+          "b_index": 8,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 21780.0,
+          "a_index": 21,
+          "a_sample_age_s": 180.0,
+          "b_index": 9,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 21840.0,
+          "a_index": 21,
+          "a_sample_age_s": 240.0,
+          "b_index": 10,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 21900.0,
+          "a_index": 21,
+          "a_sample_age_s": 300.0,
+          "b_index": 11,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 22200.0,
+          "a_index": 21,
+          "a_sample_age_s": 600.0,
+          "b_index": 12,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 22500.0,
+          "a_index": 21,
+          "a_sample_age_s": 900.0,
+          "b_index": 13,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 22800.0,
+          "a_index": 21,
+          "a_sample_age_s": 1200.0,
+          "b_index": 14,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 23100.0,
+          "a_index": 21,
+          "a_sample_age_s": 1500.0,
+          "b_index": 15,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 23400.0,
+          "a_index": 21,
+          "a_sample_age_s": 1800.0,
+          "b_index": 16,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 23700.0,
+          "a_index": 21,
+          "a_sample_age_s": 2100.0,
+          "b_index": 17,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 24000.0,
+          "a_index": 21,
+          "a_sample_age_s": 2400.0,
+          "b_index": 18,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 24300.0,
+          "a_index": 21,
+          "a_sample_age_s": 2700.0,
+          "b_index": 19,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 24600.0,
+          "a_index": 21,
+          "a_sample_age_s": 3000.0,
+          "b_index": 20,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 24900.0,
+          "a_index": 21,
+          "a_sample_age_s": 3300.0,
+          "b_index": 21,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 25200.0,
+          "a_index": 22,
+          "a_sample_age_s": 0.0,
+          "b_index": 22,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 28800.0,
+          "a_index": 23,
+          "a_sample_age_s": 0.0,
+          "b_index": 23,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 32400.0,
+          "a_index": 24,
+          "a_sample_age_s": 0.0,
+          "b_index": 24,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 36000.0,
+          "a_index": 25,
+          "a_sample_age_s": 0.0,
+          "b_index": 25,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 39600.0,
+          "a_index": 26,
+          "a_sample_age_s": 0.0,
+          "b_index": 26,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 43200.0,
+          "a_index": 27,
+          "a_sample_age_s": 0.0,
+          "b_index": 27,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 46800.0,
+          "a_index": 28,
+          "a_sample_age_s": 0.0,
+          "b_index": 28,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 50400.0,
+          "a_index": 29,
+          "a_sample_age_s": 0.0,
+          "b_index": 29,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 54000.0,
+          "a_index": 30,
+          "a_sample_age_s": 0.0,
+          "b_index": 30,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 57600.0,
+          "a_index": 31,
+          "a_sample_age_s": 0.0,
+          "b_index": 31,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 61200.0,
+          "a_index": 32,
+          "a_sample_age_s": 0.0,
+          "b_index": 32,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 64800.0,
+          "a_index": 33,
+          "a_sample_age_s": 0.0,
+          "b_index": 33,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 68400.0,
+          "a_index": 34,
+          "a_sample_age_s": 0.0,
+          "b_index": 34,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 72000.0,
+          "a_index": 35,
+          "a_sample_age_s": 0.0,
+          "b_index": 35,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 75600.0,
+          "a_index": 36,
+          "a_sample_age_s": 0.0,
+          "b_index": 36,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 79200.0,
+          "a_index": 37,
+          "a_sample_age_s": 0.0,
+          "b_index": 37,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 82800.0,
+          "a_index": 38,
+          "a_sample_age_s": 0.0,
+          "b_index": 38,
+          "b_sample_age_s": 0.0
+        }
+      ],
+      "explanations": [
+        "Sunlight: B has 4.93 h less modeled visibility than A over the same 24 h window.",
+        "Sunlight: 1 elapsed-time segment(s) have different states; see both UTC timelines. Estimates inherit terrain and sampling limits.",
+        "Earth-center visibility: B has 6.08 h more modeled visibility than A over the same 24 h window.",
+        "Earth-center visibility: 1 elapsed-time segment(s) have different states; see both UTC timelines. Estimates inherit terrain and sampling limits."
+      ],
+      "analysis_ids": [
+        "f93f9a84ad684fe74f72d838f2930aced188ff8f8c64cebd3be3169d24c0d438",
+        "2efa84a7dde88bedc0fb39fac9dfb4ee365a240c9811f70c0dd53d4655446bc4"
+      ],
+      "job_ids": {
+        "a_id": "c88ce319-e99f-44fd-97b2-1c427121773a",
+        "b_id": "a8f56bb6-9734-4497-806f-539373f4bf5f"
+      }
+    },
+    "unknown": {
+      "mode": "dates",
+      "status": "insufficient_data",
+      "alignment": "elapsed_since_start",
+      "duration_s": 86400.0,
+      "start_offset_s": 172800.0,
+      "deltas": {
+        "sun": {
+          "visible_duration_s": 68661.369451,
+          "visible_percent_of_interval": 79.46917760532408,
+          "longest_blocked_s": -68661.369451,
+          "longest_visible_s": 68661.369451,
+          "unknown_duration_s": 0
+        },
+        "earth": {
+          "visible_duration_s": 0,
+          "visible_percent_of_interval": 0.0,
+          "longest_blocked_s": 0.0,
+          "longest_visible_s": 0.0,
+          "unknown_duration_s": 0.0
+        }
+      },
+      "changes": {
+        "sun": [
+          {
+            "start_elapsed_s": 17738.630549,
+            "end_elapsed_s": 86400.0,
+            "a_state": "dark",
+            "b_state": "partial"
+          }
+        ],
+        "earth": []
+      },
+      "cursor": [
+        {
+          "elapsed_s": 0.0,
+          "a_index": 0,
+          "a_sample_age_s": 0.0,
+          "b_index": 0,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 3600.0,
+          "a_index": 1,
+          "a_sample_age_s": 0.0,
+          "b_index": 1,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 7200.0,
+          "a_index": 2,
+          "a_sample_age_s": 0.0,
+          "b_index": 2,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 10800.0,
+          "a_index": 3,
+          "a_sample_age_s": 0.0,
+          "b_index": 3,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 14400.0,
+          "a_index": 4,
+          "a_sample_age_s": 0.0,
+          "b_index": 4,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 18000.0,
+          "a_index": 5,
+          "a_sample_age_s": 0.0,
+          "b_index": 5,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 21600.0,
+          "a_index": 6,
+          "a_sample_age_s": 0.0,
+          "b_index": 6,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 25200.0,
+          "a_index": 7,
+          "a_sample_age_s": 0.0,
+          "b_index": 7,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 28800.0,
+          "a_index": 8,
+          "a_sample_age_s": 0.0,
+          "b_index": 8,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 32400.0,
+          "a_index": 9,
+          "a_sample_age_s": 0.0,
+          "b_index": 9,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 36000.0,
+          "a_index": 10,
+          "a_sample_age_s": 0.0,
+          "b_index": 10,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 39600.0,
+          "a_index": 11,
+          "a_sample_age_s": 0.0,
+          "b_index": 11,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 43200.0,
+          "a_index": 12,
+          "a_sample_age_s": 0.0,
+          "b_index": 12,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 46800.0,
+          "a_index": 13,
+          "a_sample_age_s": 0.0,
+          "b_index": 13,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 50400.0,
+          "a_index": 14,
+          "a_sample_age_s": 0.0,
+          "b_index": 14,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 54000.0,
+          "a_index": 15,
+          "a_sample_age_s": 0.0,
+          "b_index": 15,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 57600.0,
+          "a_index": 16,
+          "a_sample_age_s": 0.0,
+          "b_index": 16,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 61200.0,
+          "a_index": 17,
+          "a_sample_age_s": 0.0,
+          "b_index": 17,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 64800.0,
+          "a_index": 18,
+          "a_sample_age_s": 0.0,
+          "b_index": 18,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 68400.0,
+          "a_index": 19,
+          "a_sample_age_s": 0.0,
+          "b_index": 19,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 72000.0,
+          "a_index": 20,
+          "a_sample_age_s": 0.0,
+          "b_index": 20,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 75600.0,
+          "a_index": 21,
+          "a_sample_age_s": 0.0,
+          "b_index": 21,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 79200.0,
+          "a_index": 22,
+          "a_sample_age_s": 0.0,
+          "b_index": 22,
+          "b_sample_age_s": 0.0
+        },
+        {
+          "elapsed_s": 82800.0,
+          "a_index": 23,
+          "a_sample_age_s": 0.0,
+          "b_index": 23,
+          "b_sample_age_s": 0.0
+        }
+      ],
+      "explanations": [
+        "Unknown coverage is present. Differences are not a reliable ranking of the scenarios.",
+        "Sunlight: B has 19.07 h more modeled visibility than A over the same 24 h window.",
+        "Sunlight: 1 elapsed-time segment(s) have different states; see both UTC timelines. Estimates inherit terrain and sampling limits.",
+        "Earth-center visibility: A and B have the same modeled visibility duration over the same 24 h window.",
+        "Earth-center visibility: 0 elapsed-time segment(s) have different states; see both UTC timelines. Estimates inherit terrain and sampling limits."
+      ],
+      "analysis_ids": [
+        "93f038a2462d26f99fbbc9c2e35c9959b9bc70a7aed981d6fcb88d7af726a258",
+        "9fbcf86a44303948e120b4b0a9ae6b73627a47506f4d571b363a41705d544d94"
+      ],
+      "job_ids": {
+        "a_id": "981a785e-6606-4985-9bbf-ff143effa769",
+        "b_id": "2da839a8-f420-418d-80bb-17d2e01933eb"
+      }
+    }
+  },
+  "browser": {
+    "desktop": [
+      1440,
+      1000
+    ],
+    "mobile": [
+      390,
+      844
+    ],
+    "playback_before": "2026-11-04T04:05:00Z",
+    "playback_after": "2026-11-04T04:15:00Z",
+    "mobile_horizontal_overflow": false,
+    "a_baseline_preserved": true,
+    "b_draft_and_job_restored": true,
+    "page_errors": []
+  }
+}
