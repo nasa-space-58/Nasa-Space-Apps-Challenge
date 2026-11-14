@@ -26,6 +26,10 @@ Four Docker Compose services; the only host requirement is Docker:
 
 Data files are never committed to Git. Config via `.env` (commit `.env.example` only).
 
+## Delivery instruction (user, 2026-11-14)
+
+After completing each task, commit the verified work and push it to `origin/tahakrcc`. Integrate task branches into `tahakrcc` as needed, preserving remote work. Do not merge into or push to `main`. Continue to synchronize before pushing and run the required checks.
+
 ## Commands (planned, per docs/technologies.md)
 
 ```bash
