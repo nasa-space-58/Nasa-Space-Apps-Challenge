@@ -188,11 +188,13 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 ### R3 — Explained recommendations and priorities
 
-- [ ] Define terrain constraints, hazard data and visibility scoring rules.
-- [ ] Implement S8 ranking with available terrain, sunlight and communication criteria.
-- [ ] Implement S9 weight controls using cached metrics.
-- [ ] Explain rejected candidates and each criterion's contribution.
-- [ ] Suggest alternate locations/dates for changed schedules.
+- [x] Define terrain constraints, hazard data and visibility scoring rules.
+- [x] Implement S8 ranking with available terrain, sunlight and communication criteria.
+- [x] Implement S9 weight controls using cached metrics.
+- [x] Explain rejected candidates and each criterion's contribution.
+- [x] Suggest alternate locations/dates for changed schedules.
+
+**R3 delivery** — See [explained recommendations](recommendations.md). The terrain screen uses Horn slope on the cached LOLA 80 m DEM with a configurable 10° landing-area limit (planning assumption; NASA publishes no numeric value) and steep-terrain distance; it cannot resolve lander-scale craters or boulders. Fuel and science value are listed as not modeled. Frozen tests: `cee01e4`.
 
 **Completion evidence** — Every ranked candidate and rejection can be traced to its inputs and scoring rules.
 
