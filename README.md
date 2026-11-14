@@ -162,3 +162,16 @@ Ortak süre/yükseklik/hesaplama ayarları korunur. Güneşlenme, en uzun karanl
 [Kullanım, API ve model sınırları](docs/scenario-comparison.md) · [Gerçek veri doğrulaması](docs/verification/task5-comparison-2026-11-14.json).
 
 Bu çalışma yalnızca `feature/task5-scenario-comparison` dalına gönderilir; tahakrcc ve main ile birleştirilmez.
+
+
+## Task 6: Doğrulama ve demo hazırlığı
+
+Teknik kontroller tamamlandı: **222 test** (136 backend, 75 ingestion, 11 arayüz), önbelleksiz Docker kurulumu, gerçek ilk indirme/önbellek karşılaştırması, hata/toparlanma ve üretim arayüzü kontrol edildi.
+
+Düzeltilenler: boş tarih alanında hazır örneğin başlatılması, sayfa yenilendiğinde kayıtlı analiz girdilerinin forma geri gelmesi ve RabbitMQ hazır olmadan başlayan backend bağlantısının sınırlı tekrar denemesi.
+
+Bu oturumda ilk 24 saatlik analiz yaklaşık **268 sn**, önbellekten aynı analiz **4 sn**, 30 günlük detaylandırılmış analiz **58 sn** sürdü. Bunlar yerel ölçümlerdir; sunumdan önce örnekleri hazırlayın.
+
+[Doğrulama raporu](docs/mvp-verification.md) · [Demo akışı ve takım arkadaşı kontrol listesi](docs/demo-runbook.md).
+
+**Takım arkadaşının kullanım değerlendirmesi hâlâ bekliyor; tüm MVP yayın kapısı kapanmış sayılmıyor.** Task 6 yalnızca `feature/task6-demo-verification` dalına gönderilir; tahakrcc/main ile birleştirilmez.

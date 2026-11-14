@@ -233,7 +233,25 @@ export default function App() {
     const saved = localStorage.getItem("lunar-analysis-id");
     if (saved)
       api(`/analyses/${saved}`)
-        .then(setJob)
+        .then((savedJob) => {
+          setJob(savedJob);
+          const submitted = savedJob.submission;
+          if (submitted) {
+            setSiteId(submitted.site_id);
+            setLat(String(submitted.latitude_deg));
+            setLon(String(submitted.longitude_deg_east));
+            setHeight(String(submitted.observer_height_m));
+            setStart(new Date(submitted.start_utc).toISOString().slice(0, 16));
+            setDuration(
+              String(
+                (Date.parse(submitted.end_utc) -
+                  Date.parse(submitted.start_utc)) /
+                  3600000,
+              ),
+            );
+            setRefine(submitted.refine);
+          }
+        })
         .catch(() => localStorage.removeItem("lunar-analysis-id"));
   }, []);
   useEffect(() => {
@@ -351,7 +369,7 @@ export default function App() {
     setResult(null);
     jump("mission");
     try {
-      let body = makeBody();
+      let body: ReturnType<typeof makeBody>;
       if (example) {
         setLat("-85.9948");
         setLon("359.76422");
@@ -370,6 +388,8 @@ export default function App() {
           step_s: 3600,
           refine: true,
         };
+      } else {
+        body = makeBody();
       }
       const next: Job = await api("/analyses", {
         method: "POST",

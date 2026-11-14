@@ -117,6 +117,8 @@ This requires three kinds of data:
 - **Resolution:** 240 m/pixel and 60 m/pixel (south + north pole).
 - **Role in the project:** A heat-map layer on the map: **"how much sunlight does this area usually get / how often does it see Earth"**. Shows good vs. bad regions from NASA's own precomputed results without running our own computation. Also an excellent reference for **validating** our own calculations.
 
+**Task 6 comparability note:** Product 69 averages approximately 18.6 years, uses different pixel scales and counts any visible Earth limb. It is not a numerical acceptance target for this MVP’s short-window, 80 m, Earth-center calculations. See [verification limits](mvp-verification.md).
+
 ## 4. Future alternative — Skyfield + NAIF SPICE kernels ⭐⭐⭐⭐ ✅
 
 - **What:** A Python astronomy library. Computes Sun/Earth altitude and azimuth **offline**, "relative to the astronaut's horizon" for an observer standing on the lunar surface (`altaz()`).
