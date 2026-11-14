@@ -11,21 +11,21 @@ These limits are implementation defaults selected for the initial setup and can 
 | Sampling | 3600 s default; 300 s and 60 s for refinement |
 | Size | At most 10,000 regularly spaced samples per request, including the start |
 | Default demonstration duration | 24 hours |
-| Coordinate frame | Moon Mean Earth / polar axis, stored as `MOON_ME`; source frame metadata must be verified during ingestion |
+| Coordinate frame | Moon Mean Earth / polar axis, stored as `MOON_ME`; DE421 Mean-Earth realization; source metadata verified in terrain-and-sites.md |
 | Latitude | Degrees, south negative, [-90, 90] |
 | Longitude | Degrees east, [0, 360); normalize input explicitly at the UI boundary |
 | Altitude | km relative to the 1737.4 km reference sphere reported by the existing Horizons query |
 | Observer height | Proposed 2 m above local terrain for the first terrain demonstration; this is a team assumption |
 
-`altitude_km` is distinct from height above terrain. Step 1 must reconcile the DEM's vertical reference with the Horizons site definition before deriving observer altitude. No terrain coverage is currently downloaded or certified.
+`altitude_km` is distinct from height above terrain. Product 90 heights in meters are relative to the 1737.4 km sphere. The frame/reference match and provisional pixel-based observer altitudes are documented in terrain-and-sites.md. Two research windows were downloaded and checked; production terrain ingestion remains Step 1 work.
 
 ## Terrain and initial sites
 
-The initial terrain acquisition target is the 80–90° S region from PGDA product 90. Actual usable coverage will be determined by raster bounds, NoData values and the horizon search radius. A valid latitude/longitude alone does not establish terrain coverage.
+Initial product: PGDA 90 `LDEM_80S_80MPP_ADJ.TIF` (80 m/pixel; nominal 80–90° S). Actual verification covers two 501 × 501 pixel windows around the initial observers, both entirely finite and unmasked. Arbitrary locations require fresh bounds/NoData checks. These windows do not establish a sufficient horizon radius.
 
-The existing query reference at 0° E, 89.5° S and 0 km is a reproducibility fixture, not a curated landing site. Initial candidate regions are Mons Mouton and the Malapert region. Exact preset coordinates and source product identifiers remain pending verification in Step 1, before they are exposed as selectable presets.
+Initial source-backed observers: Mons Mouton feature center (−84.60°, 31.00° E; IAU/USGS feature 16070) and Malapert Massif R23 (−85.9948°, 359.76422° E; NASA M2M-30044, p.75). They are comparison inputs, not safe landing-site certifications. Runtime preset selection remains unimplemented.
 
-References are recorded in [data-sources.md](data-sources.md) and [2gbram_horizons_veri_notlari.md](2gbram_horizons_veri_notlari.md).
+See [terrain verification and sources](terrain-and-sites.md), [machine-readable catalog](initial-sites.json) and [inspection evidence](verification/terrain-2026-11-14.json). The previous 0° E, 89.5° S, 0 km query remains a spherical-reference fixture only.
 
 ## Visibility semantics for Step 3
 
@@ -38,4 +38,4 @@ References are recorded in [data-sources.md](data-sources.md) and [2gbram_horizo
 
 ## Current verification status
 
-Local Docker services and the full test suite passed on 2026-11-14. Horizons CLI acquisition returned 25 samples per target and cache reuse passed; see horizons-ingestion.md. Python transitive dependency locks and a fresh-clone Docker installation were verified; see clean-install-verification.md. Terrain coverage and curated site coordinates remain open. The CLI accepts only whole-second UTC timestamps.
+Local Docker services and the full test suite passed on 2026-11-14. Horizons CLI acquisition returned 25 samples per target and cache reuse passed; see horizons-ingestion.md. Python transitive dependency locks and a fresh-clone Docker installation were verified; see clean-install-verification.md. Step 0 terrain/source definition is complete for the two documented initial observers. Production DEM ingestion and horizon calculations remain open. The CLI accepts only whole-second UTC timestamps.

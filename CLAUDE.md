@@ -4,13 +4,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo contains Step 0 service skeletons, shared input contracts, Docker Compose configuration and initial tests. Local Docker runtime verification and frontend lock generation passed on 2026-11-14; Python transitive locks and a clean-clone Docker test also passed; terrain/site inputs remain pending; see docs/mvp-roadmap.md. The README is in Turkish; everything else (code, comments, commits, docs) must be in English.
+**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo contains Step 0 service skeletons, shared input contracts, Docker Compose configuration and initial tests. Local Docker runtime verification and frontend lock generation passed on 2026-11-14; Python transitive locks and a clean-clone Docker test also passed; terrain/site input definitions were also verified against NASA/USGS sources; Step 0 is complete; see docs/mvp-roadmap.md. The README is in Turkish; everything else (code, comments, commits, docs) must be in English.
 
 `docs/` is the source of truth. Read the relevant file before working:
 - `docs/mvp-roadmap.md`: first-release scope, release order, task checklist and acceptance criteria.
 - `docs/technologies.md`: stack, service architecture, Docker Compose, planned repo layout. Changes need whole-team agreement.
 - `docs/coding-conventions.md`: git, test-first workflow, code style.
 - `docs/user-scenarios.md`: personas, modules, scenarios S1–S16, build order, acceptance criteria. Numeric thresholds there are example defaults.
+- `docs/terrain-and-sites.md`, `docs/initial-sites.json`: verified initial terrain and observer inputs; runtime presets remain pending.
 - `docs/data-sources.md`, `docs/2gbram_horizons_veri_notlari.md`: NASA data source catalog and JPL Horizons notes.
 
 The first release focuses on site/date comparison, terrain-relative Sun/Earth visibility and understandable energy/communication metrics. Extended mission planning follows the phased roadmap.

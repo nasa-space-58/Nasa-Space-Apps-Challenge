@@ -1,0 +1,124 @@
+{
+  "verified_at_utc": "2026-11-14T11:57:49.352419+00:00",
+  "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_80MPP_ADJ.TIF",
+  "rasterio_version": "1.4.3",
+  "gdal_version": "3.9.3",
+  "width": 7600,
+  "height": 7600,
+  "crs_wkt": "PROJCS[\"Moon (2015) - Sphere / Ocentric / South Polar\",GEOGCS[\"Moon (2015) - Sphere / Ocentric\",DATUM[\"Moon (2015) - Sphere\",SPHEROID[\"Moon (2015) - Sphere\",1737400,0]],PRIMEM[\"Reference Meridian\",0],UNIT[\"degree\",0.0174532925199433,AUTHORITY[\"EPSG\",\"9122\"]]],PROJECTION[\"Polar_Stereographic\"],PARAMETER[\"latitude_of_origin\",-90],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],UNIT[\"metre\",1],AXIS[\"Easting\",NORTH],AXIS[\"Northing\",NORTH]]",
+  "bounds_m": [
+    -304000.0,
+    -304000.0,
+    304000.0,
+    304000.0
+  ],
+  "resolution_m": [
+    80.0,
+    80.0
+  ],
+  "nodata": "NaN",
+  "dtype": "float32",
+  "scales": [
+    1.0
+  ],
+  "offsets": [
+    0.0
+  ],
+  "tags": {
+    "NC_GLOBAL#Conventions": "CF-1.7",
+    "NC_GLOBAL#description": "Mean value per bin",
+    "NC_GLOBAL#GMT_version": "6.5.0_2402709_2023.01.09 [64-bit]",
+    "NC_GLOBAL#history": "gmt grdmath ldem_80s_final_adj_80mpp_surf.grd 1000.0 MUL = test.grd",
+    "NC_GLOBAL#node_offset": "1",
+    "NC_GLOBAL#title": "Produced by grdmath",
+    "x#actual_range": "{-304,304}",
+    "x#axis": "X",
+    "x#long_name": "x",
+    "y#actual_range": "{-304,304}",
+    "y#axis": "Y",
+    "y#long_name": "y",
+    "z#actual_range": "{-7295.51708984375,7026.3310546875}",
+    "z#long_name": "z",
+    "z#_FillValue": "nan",
+    "AREA_OR_POINT": "Area"
+  },
+  "image_structure": {
+    "LAYOUT": "COG",
+    "COMPRESSION": "DEFLATE",
+    "INTERLEAVE": "BAND",
+    "PREDICTOR": "3"
+  },
+  "sites": [
+    {
+      "site_id": "mons-mouton-feature-center",
+      "longitude_deg_east": 31.0,
+      "latitude_deg": -84.6,
+      "projected_x_m": 84397.95447974422,
+      "projected_y_m": 140461.78399299132,
+      "pixel_row": 2044,
+      "pixel_col": 4854,
+      "window": [
+        4604,
+        1794,
+        501,
+        501
+      ],
+      "window_bounds_m": [
+        64320.0,
+        120400.0,
+        104400.0,
+        160480.0
+      ],
+      "valid_cells": 251001,
+      "total_cells": 251001,
+      "nearest_pixel_value": 5039.1572265625,
+      "surface_height_m": 5039.1572265625,
+      "window_min_m": 2850.275634765625,
+      "window_max_m": 7026.3310546875,
+      "local_crop_sha256": "4837e26ff7bc3b26cace82fd5df4cd9cda017dd6260815a3a2a90d625e5cb42b"
+    },
+    {
+      "site_id": "malapert-massif-r23",
+      "longitude_deg_east": 359.76422,
+      "latitude_deg": -85.9948,
+      "projected_x_m": -499.9900921042967,
+      "projected_y_m": 121499.53502323072,
+      "pixel_row": 2281,
+      "pixel_col": 3793,
+      "window": [
+        3543,
+        2031,
+        501,
+        501
+      ],
+      "window_bounds_m": [
+        -20560.0,
+        101440.0,
+        19520.0,
+        141520.0
+      ],
+      "valid_cells": 251001,
+      "total_cells": 251001,
+      "nearest_pixel_value": 4784.62451171875,
+      "surface_height_m": 4784.62451171875,
+      "window_min_m": -1467.2586669921875,
+      "window_max_m": 5172.486328125,
+      "local_crop_sha256": "26f0889799200ba7e9f86d8c91b2f6c8ab62a78686dbd3de43effe8f4f7002cd"
+    }
+  ],
+  "remote_file_identity": {
+    "content_length_bytes": 189158392,
+    "last_modified_http": "Fri, 07 Jul 2023 22:03:02 GMT",
+    "weak_etag": "W/\"b4653f8-189326141f0\"",
+    "range_request_status": 206,
+    "whole_file_sha256": null
+  },
+  "coordinate_sources": {
+    "mons-mouton-feature-center": "https://planetarynames.wr.usgs.gov/Feature/16070",
+    "malapert-massif-r23": "https://ntrs.nasa.gov/api/citations/20250002845/downloads/M2M-30044%20Lunar%20Surface%20Data%20Book%20Baseline_Final.pdf#page=75"
+  },
+  "source_pdf_sha256": {
+    "nasa-lunar-data-book.pdf": "87f28000685fff1b9ee20378d1765805b98026088036f9b045db9d9254fe982b",
+    "nasa-lola-paper.pdf": "c6ce5e34174e1a99274a67cdff861e1a74e73f321e49f78b3fed6c888149dd8b"
+  }
+}

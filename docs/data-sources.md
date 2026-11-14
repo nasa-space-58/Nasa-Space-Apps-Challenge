@@ -103,6 +103,7 @@ This requires three kinds of data:
   - 5 m/pixel data folder: https://pgda.gsfc.nasa.gov/data/LOLA_5mpp/ (from the team's data notes)
 - **Format:** Cloud-Optimized GeoTIFF (COG); south polar stereographic X/Y (meters), MOON_ME reference frame.
 - **Example file:** `LDEM_80S_20MPP_ADJ.TIF` (surface height, meters). Error (`_ERR`), slope and other layers are available alongside it.
+- **Initial product decision (2026-11-14):** `LDEM_80S_80MPP_ADJ.TIF`, 80 m/pixel; two native-resolution windows verified. See [coverage, frames and site sources](terrain-and-sites.md).
 - **Role in the project:** **Horizon mask** computation. For each landing site, look around 360° and answer "how many degrees above flat is the horizon in this direction?". If the Sun is below that angle → shadow; if Earth is below it → no communication.
 - **Tip:** Don't download whole files. Because they are COGs, you can read only the window around each landing site (`rasterio`/GDAL windowed reads). For the hackathon, a 60–120 m/pixel version is enough and much smaller.
 
@@ -161,7 +162,9 @@ The challenge suggests a list of "past Apollo missions, future CLPS targets, oth
 | USGS Gazetteer of Planetary Nomenclature ✅ | All IAU-approved lunar crater/mountain names + coordinates (downloadable as CSV/KML) | https://planetarynames.wr.usgs.gov/ |
 | LROC IM-2 landing region 🔎 | Mons Mouton imagery and location | https://www.lroc.asu.edu/images/1401 |
 
-**Starter list (approximate coordinates — verify in Quickmap before use):**
+**Historical research list (approximate; not active presets):**
+
+The verified initial inputs are now [Mons Mouton feature center and Malapert Massif R23](terrain-and-sites.md), with an explicit source per coordinate. The entries below remain research leads and must not be used as verified presets.
 
 | Site | Latitude | Longitude (East +) | Source / note |
 |---|---|---|---|

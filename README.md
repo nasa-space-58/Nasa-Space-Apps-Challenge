@@ -4,7 +4,7 @@
 
 ## Mevcut durum
 
-Step 0 servis iskeleti yerel Docker ortamında doğrulandı. Backend sağlık endpoint'i, ortak veri modelleri ve başlangıç arayüzü mevcut. Horizons Güneş/Dünya verileri ingestion komutuyla indirilip önbelleğe alınabilir. Arazi ve görünürlük hesaplamaları sonraki adımlardadır.
+Task 0 tamamlandı: servis kurulumu, bağımlılık kilitleri, temiz kurulum ve başlangıç arazi/nokta kaynakları doğrulandı. Backend sağlık endpoint'i, ortak veri modelleri ve başlangıç arayüzü mevcut. Horizons Güneş/Dünya verileri ingestion komutuyla indirilip önbelleğe alınabilir. Arazi ve görünürlük hesaplamaları sonraki adımlardadır.
 
 ## Kurulum
 
@@ -50,6 +50,8 @@ docker compose --env-file .env.example run --rm --no-deps data-ingestion \
 ```
 
 Referans noktasında 14–15 Kasım 2026 için saatlik 25 örnek indirildi; tekrar çalıştırma önbelleği kullandı. Ham yanıtlar, kaynak bilgileri ve eşleştirilmiş Güneş/Dünya verileri ortak `/data/horizons/` dizininde saklanır. Uzun süre çalışan worker için kuyruk tüketicisi henüz eklenmedi; bu aşama CLI üzerinden çalışır. [Ayrıntılar ve doğrulama](docs/horizons-ingestion.md).
+
+Başlangıç karşılaştırma noktaları Mons Mouton merkezi ve Malapert Massif R23 olarak kaynaklandırıldı. İki noktanın çevresindeki DEM pencerelerinde veri kapsamı doğrulandı. Bunlar güvenli iniş noktası sertifikası değildir; uygulama içi nokta seçimi ve arazi ufku hesabı henüz eklenmedi. [Arazi ve koordinat kaynakları](docs/terrain-and-sites.md).
 
 ## Plan ve veri sözleşmeleri
 

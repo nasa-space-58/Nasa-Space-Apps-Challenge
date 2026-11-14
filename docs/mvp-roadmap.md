@@ -49,7 +49,7 @@ Follow the non-UI skeleton → frozen test commit → implementation workflow in
 
 ### Step 0 — Confirm inputs and development setup
 
-- [ ] Record supported south-pole terrain coverage, initial preset sites and coordinate sources.
+- [x] Record supported south-pole terrain coverage, initial preset sites and coordinate sources.
 - [x] Define default analysis duration, supported date range, sampling limits and observer height.
 - [x] Record coordinate frames, vertical reference, units and UTC handling in shared data contracts.
 - [x] Define the meaning of partial/full sunlight and the handling of boundary and unknown states.
@@ -57,7 +57,7 @@ Follow the non-UI skeleton → frozen test commit → implementation workflow in
 - [x] Create the four-service Docker Compose setup, health checks and .env.example.
 - [x] Pin documented dependencies and provide container-based run, lint and test commands.
 
-**Verification evidence (2026-11-14)** — A fresh local Git clone of `2707be2` passed no-cache Docker builds, startup with new volumes, 30 backend tests, 39 ingestion tests and 1 frontend test. Both Python Ruff checks and pip check, frontend npm ci, production build and npm audit (zero findings) passed. Python locks pin 22 backend and 23 ingestion packages with SHA-256 hashes; regeneration produced no diff. Backend/frontend returned HTTP 200 and the worker connected to RabbitMQ. See [clean-install evidence](clean-install-verification.md). Terrain coverage, initial preset sites and their coordinate sources remain open; Step 0 is not fully complete.
+**Verification evidence (2026-11-14)** — A fresh local Git clone of `2707be2` passed no-cache Docker builds, startup with new volumes, 30 backend tests, 39 ingestion tests and 1 frontend test. Both Python Ruff checks and pip check, frontend npm ci, production build and npm audit (zero findings) passed. Python locks pin 22 backend and 23 ingestion packages with SHA-256 hashes; regeneration produced no diff. Backend/frontend returned HTTP 200 and the worker connected to RabbitMQ. See [clean-install evidence](clean-install-verification.md). Terrain product, coordinate/height references, two initial observers and two finite native-resolution DEM windows were verified against NASA/USGS sources; see [terrain and site evidence](terrain-and-sites.md). All seven Step 0 checklist items are complete. Operational terrain ingestion and horizon calculations remain subsequent steps.
 
 ### Step 1 — Obtain and cache real data
 
