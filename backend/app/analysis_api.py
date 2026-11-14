@@ -410,6 +410,10 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
 
     register_twin_routes(app, data_dir)
 
+    from app.solver_arena import register_arena_routes
+
+    register_arena_routes(app)
+
     @app.get("/health")
     def health():
         return {"status": "ok", "service": "backend"}

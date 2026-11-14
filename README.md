@@ -261,3 +261,10 @@ Jupyter notebook: [`notebooks/H0_shared_contracts.ipynb`](notebooks/H0_shared_co
 [`notebooks/H3_resource_integration.ipynb`](notebooks/H3_resource_integration.ipynb), geometrik görüşü istasyon tahsisinden ayırır; faaliyet tüketimini başlangıç enerjisi, kapasite, rezerv ve üretimle birlikte değerlendirir. Dolu bataryada depolanamayan üretim ve sonradan gelen enerji yanlışlıkla kullanılabilir sayılmaz. Desteklenen örnekte klasik ve kuantum çözücü aynı girdiyi kullanır; kuantum kodlamasına sığmayan kısıtlar açıkça bildirilir.
 
 [Varsayımlar, yöntem ve doğrulama](docs/resource-integration.md). Notebook verileri sentetiktir; gerçek DSN tahsisi, radyo bağlantı garantisi veya fiziksel batarya doğrulaması değildir.
+
+## H8 — Klasik ve kuantum karşılaştırması
+
+Görev kontrolündeki **Çözücü arenası** sekmesi (`#/solver-arena`), aynı örnek senaryoda klasik tam arama ile yerel QAOA simülasyonunu karşılaştırır. Gerçek hesap adımlarını oynatabilir, ham ölçümleri ve doğrulanmış planları inceleyebilir, sonuçları JSON olarak indirebilirsin. H7'nin kayıtlı Rigetti deneyi ayrı gösterilir; yeni kuantum işi gönderilmez ve kredi harcanmaz.
+
+- Açıklama ve sınırlar: [H8 solver arena](docs/solver-arena.md)
+- Çalıştırılmış notebook: [H8_solver_arena.ipynb](notebooks/H8_solver_arena.ipynb)

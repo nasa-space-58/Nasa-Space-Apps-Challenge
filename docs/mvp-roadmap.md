@@ -357,9 +357,9 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 ### Proposed hybrid demonstration features
 
-These are planned concepts, not implemented features. Each one reuses the H1–H3 problem, solvers and validator, so it adds presentation and measurement rather than a new scientific model.
+Completed demonstrations are checked below; unchecked items remain planned concepts. H8 reuses the H1–H3 contracts, solvers and validator and adds presentation and measurement rather than a new scientific model.
 
-- [ ] **H8 — Side-by-side solver arena:** run the classical solver and QAOA on the same multi-mission instance in two synchronized panels.
+- [x] **H8 — Side-by-side solver arena:** deliver the bilingual mission-control comparison panel, exact shared-input benchmarks, real optimizer-history playback, independently checked final outcomes and inclusive local compute timings. H7 hardware is shown only as archived evidence; see [solver arena](solver-arena.md).
   - Animate the QAOA measurement distribution across optimization iterations, highlighting feasible plans and the known optimum.
   - Finish with a shared scoreboard: feasible-solution rate, objective value, optimum gap and end-to-end runtime, including tuning and validation.
   - Label the execution mode (noiseless simulator, noise model or hardware) and never declare a winner the measurements do not support.

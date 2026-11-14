@@ -166,3 +166,7 @@ The user explicitly authorized merging `codex/quantum-hybrid` into current `taha
 ### Main push exception (user, 2026-11-14)
 
 At the user's explicit request, tahakrcc (`28f8380`) was fast-forwarded directly onto `main` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### H8 delivery (user, 2026-11-14)
+
+Start from current main `cb17bdd` on `codex/h8-solver-arena`. Push only this new branch; do not merge into or push to main/tahakrcc. Skeleton `8bfd5be`, frozen tests `4071a81`. H8 records actual classical/QAOA computation history for progress-normalized replay; it is not a live hardware race. The two-qubit benchmark preserves the exact H7 input snapshot across platforms. Show H7 hardware only as archived evidence with its original budget and cost. No new provider submission is part of H8. See `docs/solver-arena.md`.
