@@ -7,6 +7,7 @@ docker compose run --rm -v ./docs:/workspace/docs backend \
 import argparse
 import hashlib
 import json
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -120,17 +121,56 @@ def summarize_report(report: BenchmarkReport, full_report_sha256: str) -> dict:
     scaling points, hardware_jobs, statement and the full report's SHA-256.
     Raise ValueError for a digest that is not 64 lowercase hex characters.
     """
-    raise NotImplementedError
+    if not isinstance(full_report_sha256, str) or not re.fullmatch(
+        "[0-9a-f]{64}", full_report_sha256
+    ):
+        raise ValueError("full_report_sha256 must be 64 lowercase hex characters")
+    data = report.model_dump(mode="json")
+    return {
+        "schema_id": data["schema_id"],
+        "full_report_sha256": full_report_sha256,
+        "generated_utc": data["generated_utc"],
+        "config_fingerprint": data["config_fingerprint"],
+        "config": data["config"],
+        "environment": data["environment"],
+        "instances": [
+            {
+                "split": item["split"],
+                "spec": item["spec"],
+                "scenario_id": item["scenario_id"],
+                "input_fingerprint": item["input_fingerprint"],
+                "profile": item["profile"],
+                "optimum_exact_score": item["optimum_exact_score"],
+                "optimum_source": item["optimum_source"],
+                "exact_status": item["exact_status"],
+                "exact_elapsed_s": item["exact_elapsed_s"],
+                "milp_status": item["milp"]["status"],
+                "milp_elapsed_s": item["milp"]["elapsed_s"],
+                "method_runs": len(item["methods"]),
+            }
+            for item in data["instances"]
+        ],
+        "aggregates": data["aggregates"],
+        "decisions": data["decisions"],
+        "scaling": data["scaling"],
+        "hardware_jobs": data["hardware_jobs"],
+        "statement": data["statement"],
+    }
 
 
 def main(argv: list[str] | None = None) -> int:
     """Parse --output (required) and optional --summary; run, write and report."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--output", required=True, type=Path)
+    parser.add_argument("--summary", type=Path)
     args = parser.parse_args(argv)
     report = run_benchmark(published_config(), generated_utc=datetime.now(timezone.utc))
     digest = write_report(report, args.output)
     print(f"wrote {args.output} sha256={digest}")
+    if args.summary is not None:
+        text = json.dumps(summarize_report(report, digest), sort_keys=True, indent=2)
+        args.summary.write_text(text + "\n", encoding="utf-8")
+        print(f"wrote {args.summary}")
     for decision in report.decisions:
         print(
             f"{decision.application}: {decision.verdict} -> {decision.retained_solver}"
