@@ -409,6 +409,9 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     from app.twin import register_twin_routes
 
     register_twin_routes(app, data_dir)
+    from app.self_healing import register_self_healing_routes
+
+    register_self_healing_routes(app, data_dir)
 
     @app.get("/health")
     def health():
