@@ -326,3 +326,28 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 - [ ] **H5 — Classical self-healing:** add R6/R9 uncertainty, event replay and R12 classical replanning with feasible and infeasible recovery cases.
 - [ ] **H6 — Hybrid recovery:** connect candidate-plan selection to downstream multi-mission scheduling, with deadlines, stale-result rejection and validated fallback behavior.
 - [ ] **H7 — Evidence and demonstration:** run hardware experiments where available, publish reproducible benchmarks, and demonstrate a fault changing both one vehicle's landing plan and subsequent mission schedules.
+
+### Proposed hybrid demonstration features
+
+These are planned concepts, not implemented features. Each one reuses the H1–H3 problem, solvers and validator, so it adds presentation and measurement rather than a new scientific model.
+
+- [ ] **H8 — Side-by-side solver arena:** run the classical solver and QAOA on the same multi-mission instance in two synchronized panels.
+  - Animate the QAOA measurement distribution across optimization iterations, highlighting feasible plans and the known optimum.
+  - Finish with a shared scoreboard: feasible-solution rate, objective value, optimum gap and end-to-end runtime, including tuning and validation.
+  - Label the execution mode (noiseless simulator, noise model or hardware) and never declare a winner the measurements do not support.
+- [ ] **H9 — Artemis-style shared-antenna scenario:** an illustrative campaign with one crewed lander and two robotic CLPS-class missions sharing limited DSN capacity.
+  - Use candidate sites and start times from the existing sunlight and R2 communication analyses, each with a deadline and communication demand.
+  - Show a shared timeline in which moving one mission's landing date shifts the others' antenna windows and resolves or creates conflicts.
+  - Contrast independently chosen "best" options that conflict with a jointly feasible plan, and explain mission sets with no feasible plan.
+  - Label the scenario as illustrative; it is not a NASA mission plan or a DSN scheduling commitment.
+- [ ] **H10 — Problem-scaling outlook:** a chart showing where exhaustive classical search stops being practical as the mission count grows.
+  - Plot the number of candidate plans, measured exact/CP-SAT/MILP runtime and required logical qubits against mission and option counts.
+  - Mark measured points separately from extrapolated trends, and record the hardware and compute budget behind each measurement.
+  - State plainly that classical methods suffice at the current three-mission scale; the chart identifies the problem sizes worth benchmarking, not a demonstrated quantum advantage.
+- [ ] **H11 — Three-body relay-orbit selection:** choose lunar relay orbits that restore communication for south-pole sites without direct Earth visibility.
+  - Motivation: the Task 4 Malapert verification case (2026-11-04, 24 hours) reports 0% Earth-center visibility, so direct-to-Earth links cannot be assumed.
+  - Classical physics: propagate candidate relay orbits in the Earth–Moon circular restricted three-body problem (for example, L2 halo and near-rectilinear halo orbit families) with documented initial conditions, integrator tolerances and reference checks.
+  - Classical geometry: compute each candidate's line-of-sight windows to the terrain-relative sites and to Earth, reusing the existing horizon and R2 visibility rules.
+  - Hybrid decision: encode "select k relay orbits from n candidates" with coverage, gap and per-mission communication-demand constraints as a QUBO, solved by the H8 classical/QAOA pair.
+  - Independent validation: check every selected set against the original coverage constraints, independent of the QUBO objective value.
+  - Scope: quantum computation selects among classically computed orbits; it does not propagate trajectories. Relay link budgets, station keeping and launch constraints remain outside this concept unless separately modeled.
