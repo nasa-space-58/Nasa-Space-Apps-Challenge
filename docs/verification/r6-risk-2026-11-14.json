@@ -1,0 +1,67 @@
+{
+  "verified_on": "2026-11-14",
+  "branch": "feature/r6-risk-uncertainty",
+  "skeleton": "bd8f44c",
+  "frozen_tests": "9e0b58d",
+  "environment": "Docker Compose nasa-task4 preview; real cached LDEM_80S_80MPP_ADJ (Task 1 SHA-256 82030dcb...)",
+  "request": {
+    "site_id": "malapert-massif-r23",
+    "latitude_deg": -85.9948,
+    "longitude_deg_east": 359.76422,
+    "runs": 200,
+    "seed": 2026,
+    "uncertainty": "defaults",
+    "approach_azimuth_deg": 180.0
+  },
+  "result_id": "c29fe632ffd4fc3552f1f7b957f91a9e64f0f65d279948bececbb3e7b1867bc7",
+  "repeat_result_id_identical": true,
+  "ui_result_id_prefix": "c29fe632ff",
+  "runtime_s_approx": 18,
+  "terrain_height_m": 4784.62451171875,
+  "nominal_feasible": true,
+  "success": {
+    "count": 104,
+    "rate": 0.52,
+    "wilson95": [
+      0.4510366005581654,
+      0.5882095592051018
+    ]
+  },
+  "failure_causes": {
+    "vertical_speed": 96
+  },
+  "ellipse_3sigma_m": {
+    "semi_major": 316.6,
+    "semi_minor": 279.1
+  },
+  "within_3sigma_fraction": 0.99,
+  "hazard_ellipse_cells": {
+    "count": 52,
+    "steep_fraction": 0.019230769230769232,
+    "unknown_fraction": 0.0
+  },
+  "propellant_margin_above_reserve_kg": {
+    "min": 606.8,
+    "p05": 637.6,
+    "p50": 675.7,
+    "p95": 714.0,
+    "max": 736.0
+  },
+  "dominant_failure_source": "terrain_height",
+  "significant_sources": [
+    "pdi_downrange",
+    "terrain_height"
+  ],
+  "noise_threshold": 0.1414213562373095,
+  "tests": {
+    "backend": 497,
+    "risk": 41,
+    "ingestion": 112,
+    "frontend": 6
+  },
+  "browser": {
+    "page": "Descent > Risk & uncertainty",
+    "console_errors": 0
+  },
+  "interpretation": "Hard landings dominate because the R4 model has no landing radar or contact-probe altitude update: a 2 m (1-sigma) DEM height error becomes free fall or early contact against a 1.0 m/s vertical tolerance. This is a model finding, not a prediction for a radar-equipped lander."
+}
