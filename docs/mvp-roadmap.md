@@ -128,15 +128,17 @@ Step 4 implementation and local verification completed on 2026-11-14 in `feature
 
 Depends on Step 4.
 
-- [ ] Add a second scenario with its own site and landing time.
-- [ ] Support same-date site comparison and same-site date comparison.
-- [ ] Display aligned timelines with explicit UTC dates and shared analysis settings.
-- [ ] Show numerical differences in sunlight, darkness and Earth-visible duration.
-- [ ] Provide a 48-hour-delay example and explain which observed intervals change.
-- [ ] Provide an accessible preset and brief explanations of horizon, elevation and visibility.
-- [ ] Check that switching scenarios preserves the original scenario's parameters.
+- [x] Add a second scenario with its own site and landing time.
+- [x] Support same-date site comparison and same-site date comparison.
+- [x] Display aligned timelines with explicit UTC dates and shared analysis settings.
+- [x] Show numerical differences in sunlight, darkness and Earth-visible duration.
+- [x] Provide a 48-hour-delay example and explain which observed intervals change.
+- [x] Provide an accessible preset and brief explanations of horizon, elevation and visibility.
+- [x] Check that switching scenarios preserves the original scenario's parameters.
 
 **Completion evidence** — A user can compare a baseline and a delayed landing and identify the changes from the interface.
+
+Task 5 implementation and local verification completed on 2026-11-14 in `feature/task5-scenario-comparison`. Real same-site/date-delay and same-date/site comparisons, synchronized samples, unknown coverage and preserved scenarios are documented in [scenario comparison](scenario-comparison.md). Teammate review and manual integration remain separate.
 
 ### Step 6 — Verify and prepare the MVP demonstration
 

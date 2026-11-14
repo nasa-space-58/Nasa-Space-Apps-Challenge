@@ -149,3 +149,16 @@ docker compose -p nasa-task4 --env-file .env.example \
 [API sözleşmeleri, kaynaklar ve kullanım](docs/analysis-api-and-interface.md) · [Task 4 doğrulama raporu](docs/verification/task4-interface-2026-11-14.json).
 
 Task 4 yalnızca `feature/task4-mission-interface` dalına gönderilir; tahakrcc/main ile birleştirme kullanıcıya aittir. İki senaryoyu karşılaştırma Task 5 kapsamındadır.
+
+
+## Task 5: A/B konum ve tarih karşılaştırması
+
+Tek nokta analizinin altındaki **Add comparison** düğmesiyle mevcut sonucu A olarak koruyun. B için aynı yerde farklı tarih veya aynı tarihte farklı konum seçin. **Use +48-hour delay** hazır gecikme örneğini kurar; **Run scenario B** gerçek analiz başlatır.
+
+Ortak süre/yükseklik/hesaplama ayarları korunur. Güneşlenme, en uzun karanlık ve Dünya görünürlüğü farkları B−A olarak gösterilir. Ortak zaman kontrolünde iki UTC tarihi ve gerçekten hesaplanmış örneklerin zamanı açıkça yazılır. Masaüstünde yan yana, mobilde A/B sekmeleriyle kullanılır. B taslağı ve iş kimliği tarayıcıda saklanır; A değişmez.
+
+`POST /comparisons` iki tamamlanmış iş kimliği alır. Uyumsuz koşulları reddeder; eksik kapsamı sıfır görünürlük gibi yorumlamaz. Task 5 doğrulamasında **212 test** (128 backend, 75 ingestion, 9 arayüz), lint, derleme ve npm audit geçti.
+
+[Kullanım, API ve model sınırları](docs/scenario-comparison.md) · [Gerçek veri doğrulaması](docs/verification/task5-comparison-2026-11-14.json).
+
+Bu çalışma yalnızca `feature/task5-scenario-comparison` dalına gönderilir; tahakrcc ve main ile birleştirilmez.
