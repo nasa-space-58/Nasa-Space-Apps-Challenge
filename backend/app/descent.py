@@ -212,8 +212,18 @@ def _state(site_radius_m, downrange_m, altitude_m, horizontal_mps, vertical_mps)
     return radius * up, horizontal_mps * east + vertical_mps * up
 
 
-def gate_states(site_radius_m: float) -> list[dict]:
-    """Apollo 11 gate targets as planar states relative to the site (TN D-6846)."""
+def gate_states(
+    site_radius_m: float,
+    approach_s: float | None = None,
+    terminal_s: float | None = None,
+) -> list[dict]:
+    """Apollo 11 gate targets as planar states relative to the site (TN D-6846).
+
+    R5 may override the approach and terminal-descent durations (s); the gate
+    states themselves stay at the Apollo 11 values.
+    """
+    if approach_s is not None or terminal_s is not None:
+        raise NotImplementedError
     ref = apollo11_reference()
     high, low, touch = ref["high_gate"], ref["low_gate"], ref["touchdown"]
     high_horizontal = math.sqrt(
@@ -288,6 +298,8 @@ def simulate_powered_descent(
     periapsis_speed_mps: float,
     dt_s: float = 0.1,
     record: bool = True,
+    approach_s: float | None = None,
+    terminal_s: float | None = None,
 ) -> dict:
     """Integrate braking, approach and terminal phases with RK4.
 

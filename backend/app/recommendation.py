@@ -49,6 +49,8 @@ class Weights(BaseModel):
     darkness: float = Field(default=1.0, ge=0, le=10)
     communication: float = Field(default=1.0, ge=0, le=10)
     terrain_safety: float = Field(default=1.0, ge=0, le=10)
+    # R5: used only when a recommendation includes descent fuel.
+    fuel: float = Field(default=0.0, ge=0, le=10)
 
     @model_validator(mode="after")
     def require_positive_total(self) -> "Weights":
@@ -86,6 +88,9 @@ class RecommendationRequest(BaseModel):
     min_elevation_deg: float = Field(default=6.0, ge=6, le=90)
     constraints: Constraints = Field(default_factory=Constraints)
     weights: Weights = Field(default_factory=Weights)
+    # R5: evaluate the R4 descent per candidate (reachability + fuel criterion).
+    include_descent: bool = False
+    descent_profile_id: str = "apollo-lm-11"
 
     @model_validator(mode="after")
     def validate_candidates(self) -> "RecommendationRequest":
@@ -181,6 +186,11 @@ def criterion_scores(
     }
 
 
+def descent_summary(plan: dict) -> dict:
+    """Reachability and fuel metrics of an R4 plan for the recommendation."""
+    raise NotImplementedError
+
+
 def _failure(constraint, actual, limit, unit) -> dict:
     return {"constraint": constraint, "actual": actual, "limit": limit, "unit": unit}
 
@@ -191,6 +201,7 @@ def evaluate(
     communication: dict,
     safety: dict,
     constraints: Constraints,
+    descent: dict | None = None,
 ) -> dict:
     """Classify as ranked, rejected (with failures) or insufficient_data.
 
