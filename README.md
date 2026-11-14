@@ -213,3 +213,10 @@ Görev kontrolündeki **Direct-to-Earth communication** paneli, kaydedilmiş bir
 
 Varsayılan sınır 6° (alma), alternatifi 10° (düşük güçlü gönderme). İstasyon koordinatları NASA DSN 810-005 modül 301 Rev. P'den, Ay konumları JPL Horizons'tan gelir. İstasyon ufuk maskeleri, takvim ve link-budget modellenmez; sonuç bir bağlantı garantisi değildir. [Kaynaklar, yöntem ve API](docs/ground-station-communication.md).
 
+## R3: Açıklamalı iniş noktası önerisi
+
+Gezinmedeki **Recommend** bölümü 2–6 aday noktayı aynı UTC zaman aralığında sıralar. Kullanılan kriterler güneş ışığı, en uzun karanlık, DSN iletişimi (R2) ve arazi güvenliğidir. Her sıranın kriter katkıları ve kısa bir açıklaması gösterilir. Elenen her noktanın hangi kesin koşulu hangi değerle geçemediği yazılır. Verisi eksik noktalar sıralanmaz, ayrıca gösterilir.
+
+Ağırlık kaydırıcıları değişince sıralama, analizler tekrar çalışmadan yeniden hesaplanır; eski ve yeni sıralama yan yana gösterilir. Takvim kaydığında (örneğin 48 saat) aynı adaylar yeni tarih için yeniden sıralanır ve en iyi alternatif önerilir.
+
+Eğim, önbellekteki 80 m LOLA verisinden Horn yöntemiyle hesaplanır. Varsayılan 10° iniş alanı sınırı bir planlama varsayımıdır; NASA sayısal bir değer yayımlamamıştır. 80 m çözünürlük küçük krater ve kayaları göremez; yakıt ve bilim değeri henüz modellenmez. [Yöntem, kaynaklar ve API](docs/recommendations.md).

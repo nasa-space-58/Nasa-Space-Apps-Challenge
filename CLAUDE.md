@@ -104,3 +104,6 @@ Push only this new branch. Do not merge into or push to tahakrcc/main. The user 
 
 R2 (DSN ground-station communication) starts from tahakrcc `a37e83c` on `feature/r2-ground-station-communication`. Push that branch and, at the user's explicit request, the same commits to `temel`. Do not merge into or push to tahakrcc or main.
 
+### R3 delivery override (user, 2026-11-14)
+
+R3 (explained recommendations) starts from `temel` `fdc4020` on `feature/r3-explained-recommendations`. Push that branch and the same commits to `temel`. Do not merge into or push to tahakrcc or main.
