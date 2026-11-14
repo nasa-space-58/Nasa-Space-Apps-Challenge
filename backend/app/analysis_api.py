@@ -397,6 +397,9 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     from app.fuel_optimization import register_fuel_routes
 
     register_fuel_routes(app, data_dir)
+    from app.risk import register_risk_routes
+
+    register_risk_routes(app, data_dir)
 
     @app.get("/health")
     def health():
