@@ -162,3 +162,7 @@ Continue on `codex/quantum-hybrid` and push only that branch; do not merge into 
 ### H0–H7 integration authorization (user, 2026-11-14)
 
 The user explicitly authorized merging `codex/quantum-hybrid` into current `tahakrcc`, preserving collaborator changes, resolving conflicts and pushing only `tahakrcc` after tests pass. This one-time integration overrides the preceding no-merge delivery instructions for H0–H7. Keep `main` untouched, update local checkouts, and explain H8 before implementation. See `docs/verification/quantum-hybrid-merge-2026-11-14.md`.
+
+### Main push exception (user, 2026-11-14)
+
+At the user's explicit request, tahakrcc (`28f8380`) was fast-forwarded directly onto `main` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
