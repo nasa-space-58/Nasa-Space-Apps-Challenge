@@ -52,7 +52,48 @@ export type MissionPhase = {
   end_progress: number;
 };
 
-export const MISSION_PHASES: readonly MissionPhase[] = [];
+export const MISSION_PHASES: readonly MissionPhase[] = [
+  {
+    id: "parking_orbit",
+    label: "Earth parking orbit",
+    description:
+      "The spacecraft circles Earth while systems are checked before departure.",
+    start_progress: 0,
+    end_progress: 0.12,
+  },
+  {
+    id: "translunar_coast",
+    label: "Translunar coast",
+    description:
+      "After the departure burn the spacecraft coasts towards the Moon for several days.",
+    start_progress: 0.12,
+    end_progress: 0.55,
+  },
+  {
+    id: "lunar_orbit",
+    label: "Polar lunar orbit",
+    description:
+      "A braking burn behind the Moon captures the spacecraft into a polar orbit over the landing longitude.",
+    start_progress: 0.55,
+    end_progress: 0.8,
+  },
+  {
+    id: "descent",
+    label: "Powered descent",
+    description:
+      "The lander leaves orbit and descends towards the selected south-polar site.",
+    start_progress: 0.8,
+    end_progress: 0.96,
+  },
+  {
+    id: "landed",
+    label: "On the surface",
+    description:
+      "The lander is at the site. Run the analysis to see what Sun and Earth do from here.",
+    start_progress: 0.96,
+    end_progress: 1,
+  },
+];
 
 export type SiteSelection = {
   latitude_deg: number;
@@ -60,88 +101,240 @@ export type SiteSelection = {
   within_coverage: boolean;
 };
 
+type FlightSegment = Exclude<PhaseId, "landed">;
+
 export type TransferPath = {
   layout: SceneLayout;
   site_scene: Vec3;
-  segments: Record<Exclude<PhaseId, "landed">, Vec3[]>;
+  /** Sampled vertices per phase for drawing; consecutive segments share ends. */
+  segments: Record<FlightSegment, Vec3[]>;
+  /** Exact position along each segment for a segment fraction in [0, 1]. */
+  evaluate: Record<FlightSegment, (fraction: number) => Vec3>;
 };
 
-/** Unit vector (scene frame) for a selenographic latitude / east longitude. */
+const RAD_PER_DEG = Math.PI / 180;
+const DESCENT_SWEEP_RAD = 0.45;
+const LUNAR_ORBIT_SWEEP_RAD = 1.5 * Math.PI;
+const PARKING_SWEEP_RAD = 1.5 * Math.PI;
+
+const requireFinite = (value: number, name: string) => {
+  if (!Number.isFinite(value))
+    throw new RangeError(`${name} must be a finite number, got ${value}`);
+};
+const add = (a: Vec3, b: Vec3): Vec3 => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+const sub = (a: Vec3, b: Vec3): Vec3 => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+const scale = (a: Vec3, k: number): Vec3 => [a[0] * k, a[1] * k, a[2] * k];
+const norm = (a: Vec3) => Math.hypot(a[0], a[1], a[2]);
+const unit = (a: Vec3): Vec3 => {
+  const n = norm(a);
+  if (!(n > 0)) throw new RangeError("Cannot normalize a zero vector");
+  return scale(a, 1 / n);
+};
+const round5 = (value: number) => Math.round(value * 1e5) / 1e5;
+const smoothstep = (t: number) => t * t * (3 - 2 * t);
+
 export function surfaceUnitVector(
   latitude_deg: number,
   longitude_deg_east: number,
 ): Vec3 {
-  void latitude_deg;
-  void longitude_deg_east;
-  throw new Error("not implemented");
+  requireFinite(latitude_deg, "latitude_deg");
+  requireFinite(longitude_deg_east, "longitude_deg_east");
+  if (Math.abs(latitude_deg) > 90)
+    throw new RangeError(`latitude_deg must be within ±90, got ${latitude_deg}`);
+  const latitude_rad = latitude_deg * RAD_PER_DEG;
+  const longitude_rad = longitude_deg_east * RAD_PER_DEG;
+  return [
+    Math.cos(longitude_rad) * Math.cos(latitude_rad),
+    Math.sin(latitude_rad),
+    -Math.sin(longitude_rad) * Math.cos(latitude_rad),
+  ];
 }
 
-/** Latitude / east longitude (degrees) of a scene-frame direction. */
 export function surfaceCoordinates(direction_scene: Vec3): {
   latitude_deg: number;
   longitude_deg_east: number;
 } {
-  void direction_scene;
-  throw new Error("not implemented");
+  direction_scene.forEach((c, i) => requireFinite(c, `direction_scene[${i}]`));
+  const [x, y, z] = unit(direction_scene);
+  const latitude_deg = Math.asin(Math.max(-1, Math.min(1, y))) / RAD_PER_DEG;
+  const longitude_deg_east =
+    (((Math.atan2(-z, x) / RAD_PER_DEG) % 360) + 360) % 360;
+  return { latitude_deg, longitude_deg_east };
 }
 
-/**
- * Converts a clicked point (relative to the Moon centre, scene frame) to a
- * site selection rounded to 5 decimals, flagging whether the cached
- * south-pole terrain covers it.
- */
 export function siteSelectionFromPoint(point_scene: Vec3): SiteSelection {
-  void point_scene;
-  throw new Error("not implemented");
+  const { latitude_deg, longitude_deg_east } = surfaceCoordinates(point_scene);
+  const latitude = round5(latitude_deg);
+  let longitude = round5(longitude_deg_east);
+  if (longitude >= 360) longitude = 0;
+  return {
+    latitude_deg: latitude,
+    longitude_deg_east: longitude,
+    within_coverage: latitude <= COVERAGE_MAX_LATITUDE_DEG,
+  };
 }
 
-/** Phase active at a mission progress fraction in [0, 1]. */
 export function phaseAt(progress: number): {
   phase: MissionPhase;
   index: number;
   phase_progress: number;
 } {
-  void progress;
-  throw new Error("not implemented");
+  requireFinite(progress, "progress");
+  const p = Math.max(0, Math.min(1, progress));
+  let index = MISSION_PHASES.findIndex((phase) => p < phase.end_progress);
+  if (index < 0) index = MISSION_PHASES.length - 1;
+  const phase = MISSION_PHASES[index];
+  const phase_progress = Math.max(
+    0,
+    Math.min(
+      1,
+      (p - phase.start_progress) / (phase.end_progress - phase.start_progress),
+    ),
+  );
+  return { phase, index, phase_progress };
 }
 
-/** Builds the illustrative path from Earth parking orbit to the site. */
 export function buildTransferPath(
   latitude_deg: number,
   longitude_deg_east: number,
   layout: SceneLayout = SCENE_LAYOUT,
   samples_per_segment = 96,
 ): TransferPath {
-  void latitude_deg;
-  void longitude_deg_east;
-  void layout;
-  void samples_per_segment;
-  throw new Error("not implemented");
+  if (!Number.isInteger(samples_per_segment) || samples_per_segment < 2)
+    throw new RangeError("samples_per_segment must be an integer of at least 2");
+  const site_unit = surfaceUnitVector(latitude_deg, longitude_deg_east);
+  const moon = layout.moon_center_scene;
+  const earth = layout.earth_center_scene;
+  const moon_r = layout.moon_radius_scene;
+  const orbit_r = layout.lunar_orbit_radius_scene;
+  const parking_r = layout.parking_orbit_radius_scene;
+  const site_scene = add(moon, scale(site_unit, moon_r));
+
+  // Polar orbit plane: spanned by the site's horizontal direction and +Y.
+  const horizontal_length = Math.hypot(site_unit[0], site_unit[2]);
+  const horizontal: Vec3 =
+    horizontal_length < 1e-9
+      ? [1, 0, 0]
+      : [site_unit[0] / horizontal_length, 0, site_unit[2] / horizontal_length];
+  const site_angle_rad = Math.atan2(site_unit[1], horizontal_length);
+  const orbitPoint = (angle_rad: number, radius: number): Vec3 =>
+    add(
+      moon,
+      add(
+        scale(horizontal, Math.cos(angle_rad) * radius),
+        [0, Math.sin(angle_rad) * radius, 0],
+      ),
+    );
+  const descent_start_rad = site_angle_rad + DESCENT_SWEEP_RAD;
+  const capture_rad = descent_start_rad + LUNAR_ORBIT_SWEEP_RAD;
+
+  const parking = (f: number): Vec3 => {
+    const angle_rad = (1 - f) * PARKING_SWEEP_RAD;
+    return add(earth, [
+      Math.sin(angle_rad) * parking_r,
+      0,
+      Math.cos(angle_rad) * parking_r,
+    ]);
+  };
+  const departure = parking(1);
+  const departure_heading = unit(sub(parking(1), parking(1 - 1e-6)));
+  const capture = orbitPoint(capture_rad, orbit_r);
+  const capture_heading: Vec3 = unit(
+    add(scale(horizontal, Math.sin(capture_rad)), [0, -Math.cos(capture_rad), 0]),
+  );
+  const separation = norm(sub(earth, moon));
+  const c1 = add(departure, scale(departure_heading, separation * 0.4));
+  const c2 = sub(capture, scale(capture_heading, separation * 0.25));
+  const pushOutside = (point: Vec3, center: Vec3, radius: number): Vec3 => {
+    const offset = sub(point, center);
+    const d = norm(offset);
+    return d < radius ? add(center, scale(unit(offset), radius)) : point;
+  };
+  const coast = (f: number): Vec3 => {
+    const g = 1 - f;
+    const raw = add(
+      add(scale(departure, g * g * g), scale(c1, 3 * g * g * f)),
+      add(scale(c2, 3 * g * f * f), scale(capture, f * f * f)),
+    );
+    return pushOutside(
+      pushOutside(raw, moon, orbit_r),
+      earth,
+      parking_r,
+    );
+  };
+  const lunar_orbit = (f: number): Vec3 =>
+    orbitPoint(capture_rad - f * LUNAR_ORBIT_SWEEP_RAD, orbit_r);
+  const descent = (f: number): Vec3 =>
+    f >= 1
+      ? site_scene
+      : orbitPoint(
+          descent_start_rad - f * DESCENT_SWEEP_RAD,
+          orbit_r + (moon_r - orbit_r) * smoothstep(f),
+        );
+
+  const evaluate: Record<FlightSegment, (fraction: number) => Vec3> = {
+    parking_orbit: parking,
+    translunar_coast: coast,
+    lunar_orbit,
+    descent,
+  };
+  const sample = (curve: (f: number) => Vec3) =>
+    Array.from({ length: samples_per_segment }, (_, i) =>
+      curve(i / (samples_per_segment - 1)),
+    );
+  return {
+    layout,
+    site_scene,
+    segments: {
+      parking_orbit: sample(parking),
+      translunar_coast: sample(coast),
+      lunar_orbit: sample(lunar_orbit),
+      descent: sample(descent),
+    },
+    evaluate,
+  };
 }
 
-/** Spacecraft position at a mission progress fraction. */
 export function positionAt(path: TransferPath, progress: number): Vec3 {
-  void path;
-  void progress;
-  throw new Error("not implemented");
+  const { phase, phase_progress } = phaseAt(progress);
+  if (phase.id === "landed") return path.site_scene;
+  return path.evaluate[phase.id](phase_progress);
 }
 
-/** Unit direction of travel at a progress fraction (zero vector once landed). */
 export function headingAt(path: TransferPath, progress: number): Vec3 {
-  void path;
-  void progress;
-  throw new Error("not implemented");
+  const { phase, phase_progress } = phaseAt(progress);
+  if (phase.id === "landed") return [0, 0, 0];
+  const curve = path.evaluate[phase.id];
+  const step = 1e-4;
+  const ahead = curve(Math.min(1, phase_progress + step));
+  const behind = curve(Math.max(0, phase_progress - step));
+  return unit(sub(ahead, behind));
 }
 
-/** Path vertices flown so far, ending exactly at the current position. */
+const flightOrder: FlightSegment[] = [
+  "parking_orbit",
+  "translunar_coast",
+  "lunar_orbit",
+  "descent",
+];
+
 export function pathPointsUntil(path: TransferPath, progress: number): Vec3[] {
-  void path;
-  void progress;
-  throw new Error("not implemented");
+  const { phase, index, phase_progress } = phaseAt(progress);
+  if (phase.id === "landed") return allPathPoints(path);
+  const points: Vec3[] = [];
+  for (let i = 0; i < index; i++) {
+    const segment = path.segments[flightOrder[i]];
+    points.push(...(i === 0 ? segment : segment.slice(1)));
+  }
+  const current = path.segments[phase.id];
+  const completed = Math.floor(phase_progress * (current.length - 1));
+  points.push(...current.slice(index === 0 ? 0 : 1, completed + 1));
+  points.push(positionAt(path, progress));
+  return points;
 }
 
-/** Every vertex of the full path in flight order. */
 export function allPathPoints(path: TransferPath): Vec3[] {
-  void path;
-  throw new Error("not implemented");
+  return flightOrder.flatMap((id, i) =>
+    i === 0 ? path.segments[id] : path.segments[id].slice(1),
+  );
 }
