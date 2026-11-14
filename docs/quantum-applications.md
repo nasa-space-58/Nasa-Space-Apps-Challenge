@@ -161,4 +161,128 @@ All inputs are **synthetic planning benchmarks**. Where marked, they are generat
 
 ## Delivery
 
-- **Branch:** `feature/r13-quantum-application-benchmarks`, from `main` at `456f4ef`. Only this branch is pushed; merging is manual.
+- **Branch:** `feature/r13-quantum-application-benchmarks`, from `main` at `456f4ef`. At the user's explicit request it is merged into `main` and pushed.
+- **Commits:**
+  - pre-registration and skeleton: `0bcb830` and `22c3e20` (contracts construct without validation);
+  - frozen tests: `351c1e1` (149 tests);
+  - implementation: `78aa8ea`, followed by the tolerance fixes below.
+- **Frozen tests:** no frozen test (R13, H0–H8 or R10) was changed.
+
+| File | Content |
+|---|---|
+| `backend/app/quantum_applications.py` | Shared engine: references, audit, repair, QAOA subproblem search, go/no-go, execution gate |
+| `backend/app/application_*.py` | The five applications (contracts, generators, validator, MILP, QUBO) |
+| `backend/app/run_r13_benchmark.py` | Pre-registered configuration, family sizes, builders, summary and CLI |
+| `docs/verification/r13-application-benchmark-2026-11-15.json` | Compact published summary; it cites the SHA-256 of the full report |
+
+## Reproduce
+
+```sh
+docker compose run --rm backend pytest -q tests/test_quantum_applications.py \
+  tests/test_application_comm_slots.py tests/test_application_science.py \
+  tests/test_application_relays.py tests/test_application_rover.py \
+  tests/test_application_robust.py tests/test_r13_summary.py
+docker compose run --rm --no-deps -v ./docs:/workspace/docs backend \
+  python -m app.run_r13_benchmark --output /tmp/r13-full.json \
+  --summary /workspace/docs/verification/r13-application-benchmark-2026-11-15.json
+git diff 351c1e1 HEAD -- backend/tests/
+```
+
+The run takes about 90 s on one x86-64 container, most of it R6 descents. Everything except wall-clock fields is deterministic. The full report (about 0.5 MB) is not committed. Its SHA-256 for the published run, and the configuration fingerprint `62516b97…3480`, are in the summary.
+
+## Implementation notes found during the first run
+
+Neither note changes a pre-registered setting, and held-out results were not used to tune anything.
+
+- **MILP versus exact agreement.** On robust dev instance 102, HiGHS returned a plan 1.2×10⁻⁹ below the exact optimum. Two plan pairs differ by about 10⁻⁵ m of worst-case cost, inside HiGHS floating-point tolerances.
+  - The cross-check now fails loudly only above a relative difference of 10⁻⁶.
+  - Smaller differences stay visible as a MILP optimum gap.
+  - Optimum hits in the summary use a 10⁻⁶ objective-unit tolerance.
+- **Audit ground-state tolerance.** The QUBO audit first grouped states within 10⁻⁹ × energy scale as ground states, which merged those near-ties. It now uses 10⁻¹² × scale (float rounding only).
+  - On robust dev 102, float rounding of the energies still ranks the HiGHS plan first, so `ground_state_optimal` is false there.
+  - Every other exact-declared QUBO audits as optimal with no infeasible state below the optimum.
+
+## Published results (2026-11-15)
+
+**Every application is NO-GO; the HiGHS MILP (`r13-highs-milp-v1`) is retained for all five, and `solve_application` never executes QAOA for them.** No hardware job was submitted (`hardware_jobs = 0`).
+
+### Decisions (held-out seeds 201–204)
+
+| Application | Feasibility | Quality vs MILP | Raw feasibility vs random | Repaired vs random | Runtime vs MILP | Verdict |
+|---|---|---|---|---|---|---|
+| Communication slots | pass (1.0) | **fail (+0.462)** | pass (+0.822) | pass (0) | **fail (96.7×)** | **NO-GO** |
+| Science activities | pass (1.0) | **fail (+0.246)** | pass (+0.532) | pass (0) | **fail (85.1×)** | **NO-GO** |
+| Relay selection | pass (1.0) | pass (0) | pass (+0.427) | pass (0) | **fail (26.6×)** | **NO-GO** |
+| Rover routes (R8) | pass (1.0) | pass (0) | pass (+0.606) | pass (0) | **fail (76.0×)** | **NO-GO** |
+| Robust plans (R6) | pass (1.0) | pass (0) | pass (+0.385) | pass (0) | **fail (65.0×)** | **NO-GO** |
+
+### Held-out instances and mapping audit
+
+| Application | Variables per instance | QUBO exact | Audit |
+|---|---|---|---|
+| Communication slots | 11, 13, 15, 26 | yes, except seed 203 (capacity 2) | exact cases optimal; the 26-variable instance uses the MILP optimum (not enumerable) |
+| Science activities | 6, 11, 9, 13 | no (binding energy rows) | 0, 15, 7 and 99 infeasible assignments below the optimum |
+| Relay selection | 3, 3, 4, 5 (after 3–7 coded rejections each) | no | ground state optimal on every instance |
+| Rover routes | 2, 8, 4, 10 (after 0–6 coded R8/communication rejections) | seed 201 only | ground state feasible but suboptimal on the heuristic cases |
+| Robust plans | 8 each (2 landers × 4 plans) | yes | optimal on every held-out instance |
+
+### Held-out aggregates
+
+Each search method ran 12 times per application: 4 instances × 3 seeds. Runtimes are wall-clock on one container.
+
+| Application | Method | Optimum hits | Mean gap | Mean raw feasible rate | Mean time (s) |
+|---|---|---:|---:|---:|---:|
+| Communication slots | MILP | 4/4 | 0 | — | 0.001 |
+| | search + QAOA (noiseless) | 6/12 | 0.462 | 0.926 | 0.129 |
+| | search + QAOA (noise model) | 6/12 | 0.462 | 0.586 | 0.149 |
+| | search + random | 6/12 | 0.462 | 0.103 | 0.045 |
+| | search + exact | 6/12 | 0.462 | 0.104 | 0.057 |
+| Science activities | MILP | 4/4 | 0 | — | 0.002 |
+| | search + QAOA (noiseless) | 11/12 | 0.246 | 0.589 | 0.124 |
+| | search + random | 11/12 | 0.246 | 0.057 | 0.096 |
+| | search + exact | 12/12 | 0 | 0.056 | 0.111 |
+| Relay selection | MILP | 4/4 | 0 | — | 0.003 |
+| | search + QAOA (noiseless) | 12/12 | 0 | 0.757 | 0.065 |
+| | search + random | 12/12 | 0 | 0.329 | 0.010 |
+| Rover routes | MILP | 4/4 | 0 | — | 0.001 |
+| | search + QAOA (noiseless) | 12/12 | 0 | 0.977 | 0.088 |
+| | search + random | 12/12 | 0 | 0.371 | 0.039 |
+| Robust plans | MILP | 4/4 | 0 | — | 0.002 |
+| | search + QAOA (noiseless) | 12/12 | 0 | 0.447 | 0.126 |
+| | search + random | 12/12 | 0 | 0.063 | 0.023 |
+
+### Application metrics of the retained MILP plans (held-out means)
+
+| Application | Mean metrics |
+|---|---|
+| Communication slots | 0 conflicts; 1.48×10⁹ bit delivered; 1.95×10⁸ bit unmet; mean latency 5873 s, maximum 8100 s |
+| Science activities | science value 15.5; 2.75 activities completed; 1.25 missed deadlines; minimum battery margin 27.5 J |
+| Relay selection | coverage 0.63; single-failure resilience 0.32; double coverage 0.23; longest uncovered run 13 500 s |
+| Rover routes | science return 12.75; 1.75 targets; 9.7 MJ; communication gap 4663 s total, 3587 s maximum |
+| Robust plans | campaign success 0.083 (mean Wilson 95% interval 0.028–0.253); worst-case cost 523 m, mean cost 270 m |
+
+### Interpretation
+
+- **Sampler role (positive result).** Noiseless QAOA produced raw samples that were feasible far more often than matched uniform sampling in every application. The illustrative noise model removed much of that gain:
+
+  | Application | Noiseless QAOA | Random |
+  |---|---:|---:|
+  | Rover routes | 0.98 | 0.37 |
+  | Communication slots | 0.93 | 0.10 |
+  | Relay selection | 0.76 | 0.33 |
+  | Science activities | 0.59 | 0.06 |
+  | Robust plans | 0.45 | 0.06 |
+
+  This is evidence about the sampler only.
+- **No end-to-end contribution (negative result).** After the shared acceptance and repair, QAOA and random sampling gave the same final plans on every held-out run. QAOA therefore made no measurable contribution to plan quality. MILP certified every optimum 26–97× faster, even with zero queue time.
+- **Outer search limits.** For communication slots and science activities, the bounded search (8 steps of at most 8 variables) stalled on the 13–26-variable instances with every sampler, including exact sub-enumeration for communication slots. MILP solved them directly. As in R10, a larger budget would be a new pre-registered experiment.
+- **Validation before selection works.** Relay geometry and capacity checks rejected 3–7 of 6–12 candidates per instance, and R8 and communication-gap checks rejected 0–6 of 8–10 route candidates. The remaining problems were small enough for exact enumeration in milliseconds.
+- **Robust plans after R6.** Under the common-cause assumption, miss distances hardly depend on the plan, so plans differ mainly through hazard-related success counts. The low campaign success rates mirror R6: terrain-height error dominates without landing radar. These are finite seeded counts, not certified probabilities.
+
+## Limits
+
+- Synthetic instances only. These are not NASA mission plans, DSN bookings, validated relay sites, certified traverse plans or landing-safety certification.
+- Only local statevector simulation; the noise model is illustrative, not calibrated. The H7 single hardware trial remains the only device evidence.
+- Logical, untranspiled gate estimates. Heuristic QUBOs (unbalanced penalties, coverage proxies) are labelled as such; their ground states can be infeasible or suboptimal, and the independent validator decides.
+- Small held-out suites: 4 instances per application, 3 seeds. Timing is descriptive wall-clock on one machine.
+- Random and QAOA budgets are matched by shot count, not by computational cost.

@@ -190,3 +190,8 @@ At the user's explicit request, PR #18 (`fix/healthinfo`: rover drive and surfac
 ### R12 completion and main push exception (user, 2026-11-15)
 
 R12's last item (visual event panel) was built from `main` `90d6561` on `feature/r12-event-panel`. Skeleton `e9600d0`, frozen tests `7332c3e`; see `docs/r12-event-panel.md`. The panel is built on H5/H6; the conflicting `feature/r12-self-healing` branch was not merged. At the user's explicit request, the branch (after merging PR #18 from `main` `8c3dff5`) was pushed directly onto `main` as a fast-forward without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### R13 delivery and main merge (user, 2026-11-15)
+
+R13 (additional quantum application benchmarks) starts from `main` `456f4ef` on `feature/r13-quantum-application-benchmarks`. Pre-registration/skeleton `0bcb830`, frozen tests `351c1e1`; see `docs/quantum-applications.md`. All five applications (communication slots, science activities, relay selection, R8 rover routes, R6 robust plans) are NO-GO on held-out instances, so `solve_application` keeps the HiGHS MILP and runs QAOA only for a held-out GO. At the user's explicit request the branch was merged into `main` and pushed, overriding the PR/approval rule for this one merge only. Do not present the raw-feasibility gain of noiseless QAOA as an end-to-end contribution, and do not tune on held-out cases after the fact.
+

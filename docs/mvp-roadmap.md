@@ -354,13 +354,25 @@ The R10 decision applies: the classical MILP is retained, and QAOA covers only H
 
 ### R13 — Additional quantum application benchmarks
 
-- [ ] Benchmark communication-slot allocation using shared-station conflicts, unmet demand, delivered data and latency.
-- [ ] Benchmark science-activity selection and ordering under energy/time constraints using completed science value and missed deadlines.
-- [ ] Benchmark relay-location selection after validating relay geometry/capacity, measuring coverage and resilience to one relay failure.
-- [ ] Benchmark rover target/route selection after R8, measuring science return, energy use and communication gaps.
-- [ ] Benchmark robust plan selection across reproducible uncertainty/fault scenarios after R6, measuring success rates and worst-case costs.
-- [ ] For each application, define the concrete decision variables, classical baseline, quantum subproblem, validation rules and measurable benefit before implementation.
-- [ ] Record negative as well as positive results and enable quantum execution only where its role and observed contribution are demonstrated.
+- [x] Benchmark communication-slot allocation using shared-station conflicts, unmet demand, delivered data and latency.
+- [x] Benchmark science-activity selection and ordering under energy/time constraints using completed science value and missed deadlines.
+- [x] Benchmark relay-location selection after validating relay geometry/capacity, measuring coverage and resilience to one relay failure.
+- [x] Benchmark rover target/route selection after R8, measuring science return, energy use and communication gaps.
+- [x] Benchmark robust plan selection across reproducible uncertainty/fault scenarios after R6, measuring success rates and worst-case costs.
+- [x] For each application, define the concrete decision variables, classical baseline, quantum subproblem, validation rules and measurable benefit before implementation.
+- [x] Record negative as well as positive results and enable quantum execution only where its role and observed contribution are demonstrated.
+
+**R13 status (completed 2026-11-15)** — [R13](quantum-applications.md) pre-registers each application before implementation. For each it defines the decision variables, an independent validator, a HiGHS MILP baseline, the QUBO and QAOA subproblem, validation rules and the measured benefit. It then benchmarks all five applications on dev/held-out instances using the R10 protocol:
+
+- communication-slot allocation;
+- science-activity selection and ordering;
+- relay selection after geometry/capacity validation;
+- rover routes built from R8 `plan_routes`;
+- robust plan pairs flown through R6 `run_monte_carlo`.
+
+**Negative results:** every application is **NO-GO**. Noiseless QAOA beats matched random sampling on raw feasibility (0.45–0.98 versus 0.06–0.37), but final plans are identical after the shared repair. The hybrid path is 26–97× slower than MILP, and the bounded search falls short of the optimum on communication slots and science activities.
+
+The execution gate (`solve_application`) therefore keeps the classical MILP everywhere and runs QAOA only for a held-out GO. Frozen tests: `351c1e1`. Results: [verification](verification/r13-application-benchmark-2026-11-15.json). No hardware job or quantum advantage is claimed.
 
 ## Hybrid development sequence
 
