@@ -70,6 +70,7 @@ export default function MissionStage({
   onSelect,
   onPreset,
   onSceneFailure,
+  timeline,
   children,
 }: {
   lat: number;
@@ -86,6 +87,8 @@ export default function MissionStage({
   onSelect: (latitude_deg: number, longitude_deg_east: number) => void;
   onPreset: (site: Preset) => void;
   onSceneFailure: () => void;
+  /** Rendered directly below the 3D viewport, e.g. the start-date strip. */
+  timeline?: ReactNode;
   children: ReactNode;
 }) {
   const [progress, setProgress] = useState(0);
@@ -202,6 +205,7 @@ export default function MissionStage({
 
   return (
     <div className="mission-stage">
+      <div className="stage-main">
       <div
         className="stage-viewport"
         role="region"
@@ -306,6 +310,8 @@ export default function MissionStage({
             {notice}
           </div>
         )}
+      </div>
+      {timeline}
       </div>
       <aside className="stage-controls">
         {children}

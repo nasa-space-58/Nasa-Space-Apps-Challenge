@@ -804,10 +804,16 @@ main[data-view="mission"] .mission-section {
   gap: 22px;
   align-items: start;
 }
-.stage-viewport {
+.stage-main {
   position: sticky;
   top: 104px;
-  height: max(520px, calc(100vh - 230px));
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.stage-viewport {
+  position: relative;
+  height: max(460px, calc(100vh - 230px - 74px));
   overflow: hidden;
   border: 1px solid #ffffff16;
   border-radius: 4px;
@@ -1104,6 +1110,10 @@ main[data-view="mission"] .mission-section {
   .mission-stage {
     grid-template-columns: 1fr;
   }
+  .stage-main {
+    position: relative;
+    top: 0;
+  }
   .stage-viewport {
     position: relative;
     top: 0;
@@ -1148,4 +1158,144 @@ main[data-view="mission"] .mission-section {
   .stage-status {
     justify-content: flex-start;
   }
+}
+
+/* Start-date strip under the mission-control scene. */
+.date-scrubber {
+  position: relative;
+  height: 64px;
+  overflow: hidden;
+  border: 1px solid #ffffff16;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #0b1218, #070b0f);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.date-scrubber:active {
+  cursor: grabbing;
+}
+.date-scrubber:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 2px;
+}
+.date-scrubber.disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.date-scrubber::before,
+.date-scrubber::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 18%;
+  z-index: 2;
+  pointer-events: none;
+}
+.date-scrubber::before {
+  left: 0;
+  background: linear-gradient(90deg, #070b0f, transparent);
+}
+.date-scrubber::after {
+  right: 0;
+  background: linear-gradient(270deg, #070b0f, transparent);
+}
+.scrubber-ruler {
+  position: absolute;
+  inset: 0;
+}
+.scrubber-day {
+  position: absolute;
+  bottom: 0;
+  height: 22px;
+  border-left: 1px solid #ffffff2a;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 23px,
+    #ffffff10 23px 24px
+  );
+}
+.scrubber-day span {
+  position: absolute;
+  left: 6px;
+  bottom: 5px;
+  font: 9px var(--mono);
+  letter-spacing: 0.08em;
+  color: #8fa0ab;
+  white-space: nowrap;
+}
+.scrubber-day.month-start {
+  height: 30px;
+  border-left-color: var(--gold);
+}
+.scrubber-day.month-start span {
+  color: var(--gold);
+}
+.scrubber-span {
+  position: absolute;
+  bottom: 0;
+  height: 22px;
+  background: #dab78226;
+  border-top: 1px solid #dab78288;
+}
+.scrubber-needle {
+  position: absolute;
+  left: 50%;
+  top: 30px;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--gold);
+  z-index: 3;
+}
+.scrubber-readout {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.scrubber-readout strong {
+  font: 12px var(--mono);
+  letter-spacing: 0.06em;
+  color: #f3eee4;
+}
+.scrubber-readout small {
+  font: 8px var(--mono);
+  letter-spacing: 0.1em;
+  color: #8fa0ab;
+  text-transform: uppercase;
+}
+.date-scrubber.editing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  cursor: default;
+}
+.date-scrubber.editing::before,
+.date-scrubber.editing::after {
+  display: none;
+}
+.date-scrubber.editing label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+.date-scrubber.editing .eyebrow {
+  margin: 0;
+  font: 9px var(--mono);
+  letter-spacing: 0.14em;
+  color: var(--gold);
+}
+.date-scrubber.editing input {
+  width: auto;
+  margin: 0;
 }

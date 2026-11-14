@@ -11,6 +11,7 @@ import HorizonPlot from "./components/HorizonPlot";
 import MissionStage from "./components/MissionStage";
 import Comparison from "./components/Comparison";
 import WindowSearch from "./components/WindowSearch";
+import DateScrubber from "./components/DateScrubber";
 import ExportPanel from "./components/ExportPanel";
 import ScenarioTransfer from "./components/ScenarioTransfer";
 import Classroom from "./components/Classroom";
@@ -53,22 +54,24 @@ const utcLabel = (value: string) =>
 type View =
   | "home"
   | "mission"
-  | "search"
   | "recommend"
   | "descent"
   | "classroom";
 const routes: Record<View, string> = {
   home: "",
   mission: "#/mission-control",
-  search: "#/time-search",
   recommend: "#/recommendations",
   descent: "#/descent",
   classroom: "#/classroom",
 };
+/** Time search now lives inside mission control; the old hash still opens it. */
+const LEGACY_SEARCH_HASH = "#/time-search";
 const viewFromHash = (hash: string): View =>
-  (Object.keys(routes) as View[]).find(
-    (view) => view !== "home" && routes[view] === hash,
-  ) ?? "home";
+  hash === LEGACY_SEARCH_HASH
+    ? "mission"
+    : ((Object.keys(routes) as View[]).find(
+        (view) => view !== "home" && routes[view] === hash,
+      ) ?? "home");
 const jump = (id: string) =>
   document.getElementById(id)?.scrollIntoView({
     behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
@@ -222,7 +225,6 @@ export default function App() {
   const [view, setView] = useState<View>(() =>
     shared.current.has("analysis") ? "mission" : viewFromHash(location.hash),
   );
-  const searchOpen = view === "search";
   const classroomOpen = view === "classroom";
   const recommendOpen = view === "recommend";
   const descentOpen = view === "descent";
@@ -392,7 +394,13 @@ export default function App() {
     if (reduced) setPlaying(false);
   }, [reduced]);
   useEffect(() => {
-    const follow = () => setView(viewFromHash(location.hash));
+    const follow = () => {
+      setView(viewFromHash(location.hash));
+      if (location.hash === LEGACY_SEARCH_HASH)
+        setTimeout(() => jump("window-search"), 0);
+    };
+    if (location.hash === LEGACY_SEARCH_HASH)
+      setTimeout(() => jump("window-search"), 0);
     window.addEventListener("popstate", follow);
     window.addEventListener("hashchange", follow);
     return () => {
@@ -601,12 +609,6 @@ export default function App() {
             onClick={() => goTo("mission")}
           >
             Mission control
-          </button>
-          <button
-            aria-current={searchOpen ? "page" : undefined}
-            onClick={() => goTo("search")}
-          >
-            Time search
           </button>
           <button
             aria-current={recommendOpen ? "page" : undefined}
@@ -915,6 +917,14 @@ export default function App() {
             setResolved("");
           }}
           onSceneFailure={() => setWebgl(false)}
+          timeline={
+            <DateScrubber
+              value={start}
+              durationHours={Number(duration)}
+              disabled={busy}
+              onChange={setStart}
+            />
+          }
         >
           <form
             className="panel parameters"
@@ -1017,17 +1027,10 @@ export default function App() {
                   {resolved}
                 </p>
               )}
-              <label>
-                Start date & time · UTC
-                <input
-                  type="datetime-local"
-                  min="2026-01-01T00:00"
-                  max="2027-12-31T23:59"
-                  required
-                  value={start}
-                  onChange={(e) => setStart(e.target.value)}
-                />
-              </label>
+              <p className="field-help">
+                Start · {start.replace("T", " ")} UTC — set it on the date
+                strip below the simulation.
+              </p>
               <label>
                 Observation duration
                 <select
@@ -1389,7 +1392,9 @@ export default function App() {
           onClose={() => setComparisonBase(null)}
         />
       )}
-      {searchOpen && <WindowSearch sites={sites} onChoose={openSearchResult} />}
+      {view === "mission" && (
+        <WindowSearch sites={sites} onChoose={openSearchResult} />
+      )}
       {classroomOpen && <Classroom onOpen={openSearchResult} />}
       {recommendOpen && <Recommendations sites={sites} />}
       {descentOpen && <Descent sites={sites} />}
