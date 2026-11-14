@@ -38,7 +38,10 @@ def test_explicit_layout_reaches_transpiler_and_preserves_measured_distribution(
     monkeypatch.setattr(bridge, "transpile", observe)
     ticket = prepare(g, layout)
     assert list(captured["initial_layout"]) == list(layout)
-    native = qasm2.loads((tmp_path / (ticket.circuit_sha256 + ".qasm")).read_text())
+    native = qasm2.loads(
+        (tmp_path / (ticket.circuit_sha256 + ".qasm")).read_text(),
+        custom_instructions=qasm2.LEGACY_CUSTOM_INSTRUCTIONS,
+    )
     # Reconstruct classical-bit probabilities from physical final measurements.
     mapping = {
         native.find_bit(op.clbits[0]).index: native.find_bit(op.qubits[0]).index
