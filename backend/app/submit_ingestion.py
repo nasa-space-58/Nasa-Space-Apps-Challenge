@@ -16,9 +16,22 @@ from shared.ingestion import (
 )
 
 
-async def connect_broker(broker_url: str, attempts: int = 10, delay_s: float = 2, connect_timeout_s: float = 5):
+async def connect_broker(
+    broker_url: str,
+    attempts: int = 10,
+    delay_s: float = 2,
+    connect_timeout_s: float = 5,
+):
     """Bound initial connection retries while the broker starts or restarts."""
-    raise NotImplementedError
+    if attempts < 1 or delay_s < 0 or connect_timeout_s <= 0:
+        raise ValueError("Require positive attempts/timeout and nonnegative delay")
+    for attempt in range(attempts):
+        try:
+            return await aio_pika.connect_robust(broker_url, timeout=connect_timeout_s)
+        except (aio_pika.exceptions.AMQPConnectionError, OSError, TimeoutError):
+            if attempt == attempts - 1:
+                raise
+            await asyncio.sleep(delay_s)
 
 
 async def submit(request: IngestionRequest, broker_url: str, timeout_s: float = 600):
@@ -27,7 +40,7 @@ async def submit(request: IngestionRequest, broker_url: str, timeout_s: float = 
     A timeout does not cancel ingestion. Resubmitting the identical envelope is
     safe. Completion delivery is at-least-once; request_id is the deduplication key.
     """
-    connection = await aio_pika.connect_robust(broker_url)
+    connection = await connect_broker(broker_url)
     try:
         channel = await connection.channel(
             publisher_confirms=True, on_return_raises=True
