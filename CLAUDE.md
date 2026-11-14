@@ -174,3 +174,7 @@ At the user's explicit request, `feature/space-weather-noaa` (NOAA SWPC solar ac
 ### R10 delivery (user, 2026-11-15)
 
 R10 (classical-versus-hybrid benchmark) starts from `main` `a5171d4` on `feature/r10-hybrid-optimization`; push only that branch, no merge into or push to tahakrcc/main. Frozen tests `6c96376` and `411d549`; see `docs/hybrid-benchmark.md`. SciPy (HiGHS MILP) is now locked in the backend. The pre-registered held-out decision is NO-GO for both direct QAOA and QAOA-solved subproblems, so the MILP solver is retained. Do not tune on held-out cases after the fact, present the illustrative noise model as calibrated, or claim quantum advantage.
+
+### R11 delivery (user, 2026-11-15)
+
+R11 (multi-mission planning) starts from `feature/r10-hybrid-optimization` `5f9a65b` on `feature/r11-multi-mission-planning`; push only that branch, no merge into or push to tahakrcc/main. Frozen tests `8504f81`; see `docs/multi-mission-planning.md`. Campaign contracts live in `shared/campaign.py` (H0 V1 is unchanged). Station geometry, calendar, capacity, data rate and exclusivity stay separate inputs; relay credit needs equipment, line-of-sight evidence, range and the relay's own station link. Do not present synthetic example campaigns as NASA plans or DSN bookings, or passing candidates as landing-safety certification.

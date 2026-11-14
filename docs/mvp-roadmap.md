@@ -295,21 +295,40 @@ The published results ([summary](verification/r10-hybrid-benchmark-2026-11-15.js
 
 ### R11 — Multi-mission planning and shared resources
 
-- [ ] Define mission types, priorities, deadlines, dependencies and required energy/communication/science resources.
+- [x] Define mission types, priorities, deadlines, dependencies and required energy/communication/science resources.
 - [x] Build an initial three-mission scenario with multiple site/start-time options and shared communication capacity.
-- [ ] Generate candidate options from validated terrain, illumination, communication and vehicle constraints.
+- [x] Generate candidate options from validated terrain, illumination, communication and vehicle constraints.
 - [x] Separate mandatory feasibility constraints from weighted preferences such as science value, fuel use, waiting time and reserve margins.
 - [x] Implement classical joint site/time selection and compare it with independently planned missions.
-- [ ] Schedule communication demand within visibility windows while modeling station availability, capacity, data rates and exclusivity as separate inputs.
+- [x] Schedule communication demand within visibility windows while modeling station availability, capacity, data rates and exclusivity as separate inputs.
 - [x] Implement energy and science-activity scheduling with battery limits, task durations, precedence and deadlines.
-- [ ] Add explicit defer/cancel alternatives where mission policy permits, and explain infeasible mission sets.
-- [ ] Model inter-vehicle relay links and their equipment/geometry constraints before crediting one mission with communication support for another.
+- [x] Add explicit defer/cancel alternatives where mission policy permits, and explain infeasible mission sets.
+- [x] Model inter-vehicle relay links and their equipment/geometry constraints before crediting one mission with communication support for another.
 - [x] Evaluate the downstream value of an early mission's location and schedule for subsequent missions.
 - [x] Connect the same candidate problem to the R10 hybrid solver and independent classical validator.
-- [ ] Show a shared mission timeline, resource conflicts, dependencies and the reasons for selected/rejected options.
+- [x] Show a shared mission timeline, resource conflicts, dependencies and the reasons for selected/rejected options.
 - [x] Verify cases where the best individual choices conflict but a joint feasible plan exists, and cases where no joint plan is feasible.
 
-**R11 status (audited 2026-11-14)** — Ticked items are delivered by H1, H3 and H6: the synthetic three-mission shared-channel case, hard constraints separated from weighted objectives, independent-versus-joint comparison with feasible and infeasible capacity cases ([H1](classical-planning.md)), ideal battery/activity limits ([H3](resource-integration.md)), landing-to-downstream dependencies ([H6](hybrid-recovery.md)) and the same scenario passed to QAOA and the independent validator. Open: mission types/priorities as contract fields, candidates generated from validated terrain/illumination/vehicle results, data rates, defer/cancel options, relay links and a mission-timeline interface.
+**R11 status (completed 2026-11-15)** — H1, H3 and H6 delivered the earlier ticked items:
+
+- the synthetic three-mission shared-channel case;
+- hard constraints separated from weighted objectives;
+- independent-versus-joint comparison with feasible and infeasible capacity cases ([H1](classical-planning.md));
+- ideal battery/activity limits ([H3](resource-integration.md));
+- landing-to-downstream dependencies ([H6](hybrid-recovery.md));
+- the same scenario passed to QAOA and the independent validator.
+
+[R11](multi-mission-planning.md) adds the remaining items:
+
+- a versioned campaign contract with mission types, priorities, deadlines, dependencies, resource requirements and defer/cancel policies;
+- candidates generated from Task 3 sunlight, R3 terrain safety, R4 descent propellant and vehicle evidence, with coded rejections;
+- slot-level downlink scheduling with station calendars, capacities, data rates and exclusivity as separate inputs;
+- relay credit only with relay equipment, line-of-sight evidence, range and the relay's own station link;
+- a HiGHS joint planner with a solver-independent validator;
+- minimal infeasible mission sets and measured explanations for each choice;
+- the shared timeline in the **Campaign** tab.
+
+The R10 decision applies: the classical MILP is retained, and QAOA covers only H0-representable selection subproblems. Frozen tests: `8504f81`. Results: [verification](verification/r11-campaign-planning-2026-11-15.json).
 
 ### R12 — Self-healing landing and event-driven replanning
 
