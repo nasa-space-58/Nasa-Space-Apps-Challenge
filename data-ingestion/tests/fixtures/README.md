@@ -35,3 +35,19 @@ ellipsoid height (km), formatted with 15 significant digits:
 Horizons echoes the site rounded to 7 decimals, so site checks use a 1e-6 degree
 and 1e-5 km absolute tolerance. Each window contains one 6-degree Moon elevation
 crossing per station, used as a reference case for crossing interpolation.
+
+## NOAA SWPC space weather products
+
+`swpc_solar_probabilities.json`, `swpc_xrays.json`, `swpc_protons.json` and
+`swpc_solar_regions.json` were fetched from https://services.swpc.noaa.gov on
+2026-11-14 at about 20:45 UTC (public US government data):
+
+- `/json/solar_probabilities.json`: the four newest entries (2026-11-14 back to 2026-11-11).
+- `/json/goes/primary/xrays-1-day.json`: the last 40 rows (20 minutes, both channels, GOES-18).
+- `/json/goes/primary/integral-protons-1-day.json`: the last 48 rows (six 5-minute samples x 8 channels).
+- `/json/solar_regions.json`: all rows observed on 2026-11-13 and 2026-11-14.
+
+Rows are unchanged; the files were trimmed and re-serialized as compact JSON.
+The SWPC 3-day forecast text issued 2026 Nov 14 1230 UTC lists the same
+R1-R2 25 %, R3+ 5 % and S1+ 5 % for Nov 14-16, which fixes the meaning of the
+probability `date` as the first forecast UTC day.
