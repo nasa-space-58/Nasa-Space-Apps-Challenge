@@ -1,0 +1,91 @@
+{
+  "verified_utc": "2026-11-14",
+  "branch": "feature/task4-mission-interface",
+  "base": "f25d945",
+  "environment": "Docker Compose nasa-task4; loopback frontend5174/backend8001; copied verified Task1 cache into separate volume",
+  "job_id": "c88ce319-e99f-44fd-97b2-1c427121773a",
+  "analysis_id": "f93f9a84ad684fe74f72d838f2930aced188ff8f8c64cebd3be3169d24c0d438",
+  "request": {
+    "site": {
+      "site_id": "malapert-massif-r23",
+      "longitude_deg_east": 359.76422,
+      "latitude_deg": -85.9948,
+      "altitude_km": 4.78662451171875,
+      "reference_frame": "MOON_ME"
+    },
+    "start_utc": "2026-11-04T00:00:00Z",
+    "end_utc": "2026-11-05T00:00:00Z",
+    "step_s": 3600
+  },
+  "status": "ready",
+  "frames": 39,
+  "horizon_directions": 360,
+  "sun_metrics": {
+    "visible_duration_s": 17738.15736,
+    "full_duration_s": 0,
+    "partial_duration_s": 17738.15736,
+    "blocked_duration_s": 68661.84264,
+    "unknown_duration_s": 0,
+    "visible_percent_of_interval": 20.530274722222224,
+    "longest_visible_s": 17738.15736,
+    "longest_blocked_s": 68661.84264
+  },
+  "earth_metrics": {
+    "visible_duration_s": 0,
+    "full_duration_s": 0,
+    "partial_duration_s": 0,
+    "blocked_duration_s": 86400.0,
+    "unknown_duration_s": 0,
+    "visible_percent_of_interval": 0.0,
+    "longest_visible_s": 0.0,
+    "longest_blocked_s": 86400.0
+  },
+  "first_next_sunset": {
+    "kind": "sunset",
+    "estimated_at_utc": "2026-11-04T04:55:38.157360Z",
+    "bracket_start_utc": "2026-11-04T04:55:00Z",
+    "bracket_end_utc": "2026-11-04T04:56:00Z",
+    "bracket_width_s": 60.0,
+    "status": "found",
+    "time_until_estimate_s": 17738.15736,
+    "time_until_bracket_s": [
+      17700.0,
+      17760.0
+    ]
+  },
+  "restart_result_sha256": "912fc9b85e576076e8606f7d5d27a0485fcf336e03c6a3cd1ea98a4e228990b7",
+  "restart_result_byte_identical": true,
+  "incomplete_coverage_probe": {
+    "search_distance_m": 300000,
+    "status": "insufficient_data",
+    "sun_unknown_s": 0,
+    "earth_unknown_s": 86400.0
+  },
+  "browser": {
+    "desktop": [
+      1440,
+      1000
+    ],
+    "mobile": [
+      390,
+      844
+    ],
+    "horizontal_overflow": false,
+    "playback_scrubbing": true,
+    "keyboard_modal_focus": true,
+    "reduced_motion": true,
+    "webgl_unavailable_analysis_usable": true,
+    "runtime_errors_after_fixes": 0
+  },
+  "tests": {
+    "backend": 112,
+    "ingestion": 75,
+    "frontend": 5
+  },
+  "limitations": [
+    "Local single-process job runner; no multi-worker deployment or authentication",
+    "Illustrative Apollo descent is not a physical trajectory",
+    "Time playback advances by samples, not uniform elapsed seconds",
+    "Scientific limitations are inherited from Task2/Task3"
+  ]
+}

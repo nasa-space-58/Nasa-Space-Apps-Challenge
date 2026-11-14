@@ -1,10 +1,5 @@
-"""Service health endpoint."""
-from fastapi import FastAPI
+"""Local mission analysis API and persistent job lifecycle."""
 
-app = FastAPI(title="Lunar Landing Navigator")
+from app.analysis_api import create_app
 
-
-@app.get("/health")
-def health() -> dict[str, str]:
-    """Return process liveness without external requests."""
-    return {"status": "ok", "service": "backend"}
+app = create_app()

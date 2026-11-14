@@ -20,3 +20,6 @@ data/
 
 # Local Vite test cache
 frontend/.vite/
+
+# Browser verification artifacts
+.playwright-cli/

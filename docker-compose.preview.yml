@@ -1,0 +1,9 @@
+# Separate project/volumes and loopback ports; does not replace the team's preview.
+# docker compose -p nasa-task4 --env-file .env.example -f docker-compose.yml -f docker-compose.preview.yml up -d --build
+services:
+  rabbitmq:
+    ports: !reset []
+  backend:
+    ports: !override ["127.0.0.1:8001:8000"]
+  frontend:
+    ports: !override ["127.0.0.1:5174:5173"]

@@ -112,15 +112,17 @@ Step 3 implementation and local verification completed on 2026-11-14 in `feature
 
 Depends on Step 3.
 
-- [ ] Define endpoints/contracts for presets, analysis requests, processing status and result retrieval.
-- [ ] Provide pending, ready, failed and insufficient-data responses.
-- [ ] Add site selection, coordinate input and UTC date/duration controls.
-- [ ] Render the lunar map, terrain horizon and Sun/Earth sky positions.
-- [ ] Add synchronized playback, pause and time scrubbing.
-- [ ] Show summary metrics, next setting events and source/model information.
-- [ ] Add loading/error/empty states, readable units, keyboard controls and text equivalents for color states.
+- [x] Define endpoints/contracts for presets, analysis requests, processing status and result retrieval.
+- [x] Provide pending, ready, failed and insufficient-data responses.
+- [x] Add site selection, coordinate input and UTC date/duration controls.
+- [x] Render the lunar map, terrain horizon and Sun/Earth sky positions.
+- [x] Add synchronized playback, pause and time scrubbing.
+- [x] Show summary metrics, next setting events and source/model information.
+- [x] Add loading/error/empty states, readable units, keyboard controls and text equivalents for color states.
 
 **Completion evidence** — A user completes the first five steps of the MVP journey using real data through the normal interface.
+
+Step 4 implementation and local verification completed on 2026-11-14 in `feature/task4-mission-interface`. Persistent API jobs, real-data playback, sourced presets and a NASA-model scroll introduction are available. See [API and interface details](analysis-api-and-interface.md) and [verification evidence](verification/task4-interface-2026-11-14.json). Site/date comparison remains Task 5; teammate review and manual integration remain separate.
 
 ### Step 5 — Compare locations and dates
 

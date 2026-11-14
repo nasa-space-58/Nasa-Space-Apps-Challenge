@@ -4,7 +4,7 @@
 
 ## Mevcut durum
 
-Task 0 tamamlandı: servis kurulumu, bağımlılık kilitleri, temiz kurulum ve başlangıç arazi/nokta kaynakları doğrulandı. Backend sağlık endpoint'i, ortak veri modelleri ve başlangıç arayüzü mevcut. Task 1 bu dalda uygulandı: RabbitMQ istekleri Güneş/Dünya verisi ve kalıcı LOLA arazi kesiti üretir. Task 2 arazi ufkunu, Task 3 görünürlük aralıklarını ve süre metriklerini hesaplar. Kullanıcı arayüzü ve analiz API'si Task 4 kapsamındadır.
+Task 0 tamamlandı: servis kurulumu, bağımlılık kilitleri, temiz kurulum ve başlangıç arazi/nokta kaynakları doğrulandı. Backend sağlık endpoint'i, ortak veri modelleri ve başlangıç arayüzü mevcut. Task 1 bu dalda uygulandı: RabbitMQ istekleri Güneş/Dünya verisi ve kalıcı LOLA arazi kesiti üretir. Task 2 arazi ufkunu, Task 3 görünürlük aralıklarını ve süre metriklerini hesaplar. Task 4 de bu dalda tamamlandı: kalıcı analiz API’si, NASA modelleriyle kaydırmalı 3D giriş, konum/tarih seçimi ve gerçek sonuçların zaman kontrollü arayüzü mevcut.
 
 ## Kurulum
 
@@ -34,7 +34,7 @@ docker compose run --rm backend ruff check app tests /workspace/shared
 docker compose run --rm data-ingestion ruff check app tests
 ```
 
-Doğrudan bağımlılıklar sabitlendi. Frontend Vite 7.3.8 ve Vitest 4.1.12 kullanır; kilit dosyası güncellendi ve `npm ci` ile doğrulandı. 14 Kasım 2026 kontrolünde `npm audit` sıfır açık bildirdi; 33 test, Python lint kontrolleri ve frontend derlemesi geçti. Python geçişli bağımlılıkları `requirements.lock` dosyalarında sürüm ve SHA-256 hash ile kilitlendi; Docker kurulumu `--require-hashes` ve `pip check` kullanır. [Kilitleri güncelleme](docs/python-dependencies.md).
+Doğrudan bağımlılıklar sabitlendi. Frontend Vite 7.3.8 ve Vitest 4.1.12 kullanır; kilit dosyası güncellendi ve `npm ci` ile doğrulandı. 14 Kasım 2026 kontrolünde `npm audit` sıfır açık bildirdi; Task 4 sonunda 192 test (112 backend, 75 veri alımı, 5 arayüz), Python lint kontrolleri ve frontend derlemesi geçti. Python geçişli bağımlılıkları `requirements.lock` dosyalarında sürüm ve SHA-256 hash ile kilitlendi; Docker kurulumu `--require-hashes` ve `pip check` kullanır. [Kilitleri güncelleme](docs/python-dependencies.md).
 
 ```bash
 docker compose run --rm --no-deps frontend npm ci
@@ -51,7 +51,7 @@ docker compose --env-file .env.example run --rm --no-deps data-ingestion \
 
 Referans noktasında 14–15 Kasım 2026 için saatlik 25 örnek indirildi; tekrar çalıştırma önbelleği kullandı. Ham yanıtlar, kaynak bilgileri ve eşleştirilmiş Güneş/Dünya verileri ortak `/data/horizons/` dizininde saklanır. Tek başına Horizons komutu kullanılabilir; aşağıdaki uçtan uca kuyruk komutu araziyi de hazırlar. [Ayrıntılar ve doğrulama](docs/horizons-ingestion.md).
 
-Başlangıç karşılaştırma noktaları Mons Mouton merkezi ve Malapert Massif R23 olarak kaynaklandırıldı. İki noktanın çevresindeki DEM pencerelerinde veri kapsamı doğrulandı. Bunlar güvenli iniş noktası sertifikası değildir; uygulama içi nokta seçimi ve arazi ufku hesabı henüz eklenmedi. [Arazi ve koordinat kaynakları](docs/terrain-and-sites.md).
+Başlangıç karşılaştırma noktaları Mons Mouton merkezi ve Malapert Massif R23 olarak kaynaklandırıldı. İki noktanın çevresindeki DEM pencerelerinde veri kapsamı doğrulandı. Bunlar güvenli iniş noktası sertifikası değildir; uygulama içi nokta seçimi, arazi ufku hesabı ve görünürlük analizi sonraki task’larda eklendi. [Arazi ve koordinat kaynakları](docs/terrain-and-sites.md).
 
 ## Task 1 — Kuyruk üzerinden veri hazırlama
 
@@ -126,3 +126,26 @@ arazi belirsizliği sonuçta korunur. Dünya'nın görünmesi gerçek bir haberl
 bağlantısı garantisi değildir. [Model, komutlar ve doğrulama](docs/visibility-metrics.md).
 Task 3 yalnızca `feature/task3-visibility-metrics` branch'ine gönderilir;
 birleştirmeyi kullanıcı yapar.
+
+
+## Task 4: Analiz API’si ve 3D arayüz
+
+Takımın 5173 portundaki ortamına dokunmadan yeni önizleme:
+
+```bash
+docker compose -p nasa-task4 --env-file .env.example \
+  -f docker-compose.yml -f docker-compose.preview.yml up -d --build --wait
+```
+
+- Arayüz: http://localhost:5174
+- API: http://localhost:8001/docs
+- `Plan your observation` doğrudan analiz paneline geçer. `Run the Malapert example` gerçek veriyle örnek analiz başlatır.
+- NASA LRO ve Apollo modelleriyle kaydırmalı giriş temsili bir animasyondur; fiziksel iniş yörüngesi hesabı değildir.
+- Nokta/koordinat, arazi üstü gözlemci yüksekliği, UTC başlangıç ve süre seçilir. Sonuçta ufuk, Güneş/Dünya konumları, görünürlük aralıkları ve sonraki batış gösterilir.
+- Zaman çubuğu ve oynatma örnekler arasında ilerler. Detaylandırılmış örneklerin zaman aralıkları eşit değildir.
+- İşler ayrı `analysis-state` diskinde kalır; tarayıcı son iş kimliğini saklar. Backend yeniden başladığında tamamlanmış sonuç korunur, yarım işler kuyruğa geri alınır.
+- İlk boş veri diskiyle çalışma NASA’dan arazi indirir; bağlantı gerekir. Backend veri diskine yazmaz, indirmeler RabbitMQ üzerinden ingestion servisine gider.
+
+[API sözleşmeleri, kaynaklar ve kullanım](docs/analysis-api-and-interface.md) · [Task 4 doğrulama raporu](docs/verification/task4-interface-2026-11-14.json).
+
+Task 4 yalnızca `feature/task4-mission-interface` dalına gönderilir; tahakrcc/main ile birleştirme kullanıcıya aittir. İki senaryoyu karşılaştırma Task 5 kapsamındadır.
