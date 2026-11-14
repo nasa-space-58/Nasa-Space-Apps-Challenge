@@ -19,6 +19,7 @@ import Communication from "./components/Communication";
 import SpaceWeather from "./components/SpaceWeather";
 import Recommendations from "./components/Recommendations";
 import Descent from "./components/Descent";
+import MissionPlanner from "./components/MissionPlanner";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
 import { LanguageToggle, useTranslate, type Translate } from "./i18n";
 
@@ -872,6 +873,7 @@ export default function App() {
       content: <Recommendations sites={sites} />,
     },
     { id: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} /> },
+    { id: "campaign", label: t("app.modules.campaign"), content: <MissionPlanner /> },
     {
       id: "classroom",
       label: t("app.modules.classroom"),

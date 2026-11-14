@@ -1,0 +1,262 @@
+/* R11: shared multi-mission timeline (kept separate from style.css). */
+.campaign-panel h3 {
+  margin: 0 0 8px;
+}
+.campaign-panel h4 {
+  margin: 22px 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.campaign-intro,
+.campaign-description {
+  color: var(--muted);
+  font-size: 13px;
+  max-width: 70ch;
+}
+.campaign-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  align-items: end;
+}
+.campaign-controls label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.campaign-controls .campaign-toggle {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.campaign-badge {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 11px;
+  color: var(--gold);
+}
+.campaign-error {
+  color: #f0a39d;
+}
+.campaign-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin: 14px 0;
+}
+.campaign-summary div {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  padding: 8px 10px;
+}
+.campaign-summary dt {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.campaign-summary dd {
+  margin: 4px 0 0;
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.campaign-summary .status-optimal,
+.campaign-summary .status-feasible {
+  color: #b5d99c;
+}
+.campaign-summary .status-infeasible {
+  color: #f0a39d;
+}
+.campaign-summary .status-limit_reached {
+  color: var(--gold);
+}
+.campaign-infeasible {
+  border: 1px solid #7a3a36;
+  background: #2a1513;
+  padding: 10px 12px;
+  margin: 10px 0;
+}
+.campaign-infeasible p {
+  margin: 6px 0 0;
+  font-size: 13px;
+}
+.campaign-timeline {
+  margin: 12px 0 0;
+  overflow-x: auto;
+}
+.campaign-timeline svg {
+  width: 100%;
+  min-width: 720px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}
+.campaign-timeline .tick {
+  stroke: var(--line);
+}
+.campaign-timeline .axis,
+.campaign-timeline .lane-sub {
+  fill: var(--muted);
+  font-size: 10px;
+  font-family: var(--mono);
+}
+.campaign-timeline .lane-label,
+.campaign-timeline .section-label {
+  fill: #e7e8e5;
+  font-size: 12px;
+}
+.campaign-timeline .section-label {
+  fill: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 10px;
+}
+.campaign-timeline .landing-band {
+  fill: #ffffff10;
+}
+.campaign-timeline .deadline {
+  stroke: #f0a39d;
+  stroke-width: 2;
+}
+.campaign-timeline .independent-bar {
+  fill: none;
+  stroke: #c9d1d6;
+  stroke-dasharray: 4 3;
+}
+.campaign-timeline .comm-line {
+  stroke-width: 2;
+  opacity: 0.55;
+}
+.campaign-timeline .surface-bar.deferred {
+  stroke: #ffffff;
+  stroke-dasharray: 3 2;
+}
+.campaign-timeline .cancelled-label {
+  fill: #f0a39d;
+  font-size: 11px;
+}
+.campaign-timeline .availability {
+  fill: #9ac9e512;
+}
+.campaign-timeline .slot.relay {
+  stroke: #ffffff;
+  stroke-width: 1;
+  stroke-dasharray: 2 1;
+}
+.campaign-timeline .dependency {
+  fill: none;
+  stroke: #c9d1d6;
+  stroke-width: 1.5;
+}
+.campaign-timeline .dependency.broken {
+  stroke: #e4675f;
+}
+.campaign-timeline figcaption {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+.campaign-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 6px;
+}
+.campaign-legend i {
+  display: inline-block;
+  width: 14px;
+  height: 10px;
+  vertical-align: middle;
+  margin-right: 4px;
+}
+.campaign-legend .legend-landing {
+  background: #ffffff22;
+}
+.campaign-legend .legend-deadline {
+  width: 3px;
+  background: #f0a39d;
+}
+.campaign-legend .legend-independent {
+  border: 1px dashed #c9d1d6;
+}
+.campaign-legend .legend-relay {
+  border: 1px dashed #ffffff;
+  background: #9ac9e5;
+}
+.campaign-legend .legend-conflict {
+  background: repeating-linear-gradient(45deg, #e4675f 0 2px, transparent 2px 5px);
+}
+.campaign-explanations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+}
+.campaign-card {
+  border: 1px solid var(--line);
+  border-left: 4px solid var(--gold);
+  background: var(--panel);
+  padding: 10px 12px;
+  font-size: 13px;
+}
+.campaign-card p {
+  margin: 6px 0;
+}
+.campaign-card .pill {
+  border-radius: 999px;
+  padding: 1px 8px;
+  font-size: 11px;
+  border: 1px solid var(--line);
+}
+.campaign-card .pill.deferred {
+  color: var(--gold);
+}
+.campaign-card .pill.cancelled,
+.campaign-card .pill.unplanned {
+  color: #f0a39d;
+}
+.campaign-meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+.campaign-alternatives {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.campaign-alternatives th,
+.campaign-alternatives td {
+  text-align: left;
+  padding: 3px 4px;
+  border-bottom: 1px solid var(--line);
+}
+.campaign-alternatives td:first-child {
+  font-family: var(--mono);
+  font-size: 11px;
+  word-break: break-all;
+}
+.campaign-alternatives tr.selected td,
+.campaign-alternatives tr.cancel_selected td {
+  color: #b5d99c;
+}
+.campaign-conflicts {
+  font-size: 13px;
+  padding-left: 18px;
+}
+.campaign-conflicts .conflict-code {
+  color: #f0a39d;
+}
+.campaign-conflicts .conflict-time {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 12px;
+}
+.campaign-limits {
+  margin-top: 16px;
+  font-size: 12px;
+  color: var(--muted);
+}
