@@ -160,7 +160,7 @@ def test_mapping_agrees_with_independent_set_oracle(evidence, k):
     assert exact.feasible_count == len(expected) * math.factorial(k)
     audit = audit_mapping(compile_qubo(s), s)
     assert audit.feasible_assignments == exact.feasible_count
-    assert audit.ground_matches_classical
+    assert audit.ground_matches_classical is bool(expected)
 
 
 def test_comparison_revalidates_original_constraints(evidence):
