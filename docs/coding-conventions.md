@@ -206,6 +206,7 @@ Sometimes a test itself is incorrect (wrong reference value, wrong expectation).
 ### 5.1 General
 
 - Follow the formatter and linter defined in `technologies.md`. Formatting is not up for debate; the tool decides.
+- Never hardcode secrets that could be written to `.env` to codebase, this is always a requirement.
 - Simple over clever. Explicit over implicit.
 - A function does one thing. If you need "and" to describe it, split it.
 - Prefer pure functions for calculations: same input → same output, no hidden state.
