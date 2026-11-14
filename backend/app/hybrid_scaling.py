@@ -114,9 +114,13 @@ class ScalingPoint(Contract):
 def generate_instance(spec: InstanceSpec) -> Scenario:
     """Return a deterministic synthetic H0 scenario for the given family member.
 
-    Uses Python's random.Random(spec.seed) (stable across NumPy versions). Every
-    mission keeps at least one option before its deadline. Raises ValueError for
-    invalid specs. No feasibility claim is attached to the result.
+    Uses Python's random.Random(spec.seed) (stable across NumPy versions). IDs are
+    mission-NN and mission-NN-option-KK (1-based, zero-padded); antennas are
+    antenna-NN with capacity 1 channel over the whole window, starting
+    2030-01-01T00:00:00Z UTC. Objectives: science_value (score, maximize,
+    weight 1, scale 10) and waiting_s (s, minimize, weight 1, scale 36000).
+    Every mission keeps at least one option ending by its deadline. Raises
+    ValueError for invalid specs. No feasibility claim is attached.
     """
     raise NotImplementedError
 

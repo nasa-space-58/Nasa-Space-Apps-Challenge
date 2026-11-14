@@ -81,8 +81,8 @@ class Move(Contract):
     mission_id: str
     from_option_id: str
     to_option_id: str
-    violations_before: int
-    violations_after: int
+    violation_before: str
+    violation_after: str
     exact_score_before: str | None
     exact_score_after: str | None
 
@@ -93,6 +93,7 @@ class RepairOutcome(Contract):
     raw_option_ids: tuple[str, ...]
     raw_status: Literal["feasible", "infeasible", "incomplete", "unsupported"]
     raw_violation_count: int
+    raw_violation_measure: str
     raw_exact_score: str | None
     final_plan: Plan
     final_validation: ValidationReport
@@ -168,10 +169,10 @@ class SubproblemStep(Contract):
     qubits: int
     raw_feasible_fraction: Probability
     proposal_option_ids: tuple[str, ...]
-    proposal_violations: int
+    proposal_violation: str
     proposal_exact_score: str | None
     accepted: bool
-    incumbent_violations: int
+    incumbent_violation: str
     incumbent_exact_score: str | None
 
 
@@ -330,9 +331,16 @@ def repair_and_improve(
 ) -> RepairOutcome:
     """Repair by steepest violation descent, then improve by steepest ascent.
 
-    Moves change one mission's option at a time; ties use exact score then
-    option IDs. The raw candidate is recorded before any change. Exactly one
-    option per mission is required; otherwise ValueError.
+    Violation measure (exact rational): capacity/budget excess required-capacity,
+    1 per deadline/availability issue and (selected - 1) per at-most-one issue.
+    Each step evaluates every single-mission option change and picks the minimum
+    key (measure, -exact score, sorted selected IDs). Repair stops when the best
+    neighbour does not lower the measure (repair_failed); improvement accepts only
+    feasible neighbours with a strictly higher exact score. validator_calls counts
+    evaluated assignments, including the raw one. Stopping at max_moves sets
+    budget_exhausted. The raw candidate is recorded before any change. Exactly
+    one known option per mission and a static complete scenario are required;
+    otherwise ValueError.
     """
     raise NotImplementedError
 
@@ -353,8 +361,15 @@ def compare_direct(
 ) -> tuple[MethodRecord, ...]:
     """Run QAOA (noiseless and, if given, noise-model), random and annealing.
 
-    Each method proposes up to candidate_budget distinct raw assignments (most
-    frequent first for samplers) and all pass through repair_and_improve.
+    Records are returned in that order. QAOA tunes noiselessly with tune_qaoa and
+    samples with SeedSequence(seed).spawn(2)[1], reproducing run_qaoa counts; the
+    noise-model record samples the same tuned state through apply_noise. Random
+    draws `shots` uniform assignments; annealing runs candidate_budget seeded
+    Metropolis chains of annealing_steps single-mission proposals on the compact
+    energy. Each method passes up to candidate_budget distinct raw assignments
+    (most frequent first, ties by basis index; random in draw order) through
+    repair_and_improve. Raise ValueError for infeasible, unsupported or
+    over-budget (qubits > max_qubits) problems.
     """
     raise NotImplementedError
 
