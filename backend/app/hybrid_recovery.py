@@ -541,6 +541,7 @@ def replay_hybrid(
     bindings: tuple[LandingBinding, ...],
     dependencies: tuple[LandingDependency, ...],
     budget: QuantumBudget = QuantumBudget(),
+    decision_timings: list | None = None,
 ) -> dict:
     """Offline replay: simulated flight clock is paused while selection runs.
 

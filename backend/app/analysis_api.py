@@ -479,4 +479,7 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     from app.release_r1 import register_r1_routes
 
     register_r1_routes(app, store, searches)
+    from app.recovery_api import register_recovery_routes
+
+    register_recovery_routes(app)
     return app

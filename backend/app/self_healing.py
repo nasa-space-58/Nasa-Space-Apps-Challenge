@@ -325,9 +325,18 @@ def _screen(base, estimate, target, available, hazards, draws, policy_reason):
 
 
 def replay_recovery(
-    scenario: RecoveryScenario, *, replan: bool = True, target_selector=None
+    scenario: RecoveryScenario,
+    *,
+    replan: bool = True,
+    target_selector=None,
+    decision_timings: list | None = None,
 ) -> dict:
-    """Run synthetic faults on a planar vehicle; no hardware, live telemetry or safe-abort claim."""
+    """Run synthetic faults on a planar vehicle; no hardware, live telemetry or safe-abort claim.
+
+    When ``decision_timings`` is a list, the wall-clock seconds spent in each
+    decision (screening plus any external selector) are appended to it. Timing is
+    kept outside the returned evidence so identical inputs replay identically.
+    """
     scenario = RecoveryScenario.model_validate(scenario.model_dump())
     base = scenario.initial_request
     state = base.initial_state
