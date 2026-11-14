@@ -326,7 +326,7 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 - [x] **H1 — Classical multi-mission baseline:** prepare explicitly supplied R11 site/time candidates, jointly plan small static problems by exact enumeration, and independently validate selections. Real-data candidate integration continues in H3/H4.
 - [x] **H2 — Quantum mapping:** deliver the bounded R10 QUBO/QAOA simulator experiment and prove mapping consistency against enumeration; compact encoding uses six qubits for the three-by-four example. General resource encodings and hardware experiments remain later work.
 - [x] **H3 — Resource integration:** connect explicit R2 geometry, station calendars and bounded ideal battery/activity models; compare classical/hybrid scheduling on identical supported inputs and report unsupported encodings. Real mission calibration and general resource encodings remain open.
-- [ ] **H4 — Descent foundation:** deliver the validated R4/R5 terminal-descent, fuel and reachability model; this can progress alongside H1–H3.
+- [x] **H4 — Descent foundation:** share fuel-limited dynamics with R4/R5, restart a bounded planar terminal descent, and screen explicit landing candidates at two resolutions. Synthetic/reference physics validation is complete; real-terrain/3D flight validation remains outside this model.
 - [ ] **H5 — Classical self-healing:** add R6/R9 uncertainty, event replay and R12 classical replanning with feasible and infeasible recovery cases.
 - [ ] **H6 — Hybrid recovery:** connect candidate-plan selection to downstream multi-mission scheduling, with deadlines, stale-result rejection and validated fallback behavior.
 - [ ] **H7 — Evidence and demonstration:** run hardware experiments where available, publish reproducible benchmarks, and demonstrate a fault changing both one vehicle's landing plan and subsequent mission schedules.
@@ -338,6 +338,8 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 **H2 delivery** — The 12-variable QUBO was checked across all 4096 bit strings against H1. A six-qubit local QAOA experiment and notebook compare one/two layers over three fixed seeds, report raw outcomes and logical gate estimates, and reject unsupported resource encodings. See [quantum mapping and measured limits](quantum-mapping.md). No hardware jobs or quantum advantage are claimed.
 
 **H3 delivery** — R2-shaped contact evidence, separately declared station calendars, and ideal storage/activity constraints feed the same H0 scenario. An eight-code-cell notebook shows binding energy limits, classical/QAOA comparison, unknown contact handling and spillage. See [resource integration and limitations](resource-integration.md).
+
+**H4 delivery** — Fuel exhaustion now stops thrust inside a time step. A restartable terminal checker validates sampled terrain contact, speed, slope and reserve; explicit target screening retains coarse/fine evidence. The 10-code-cell notebook and 55 H4 tests are described in [descent foundation and limits](descent-foundation.md). No quantum/provider calls or flight-certification claim are included.
 
 ### Proposed hybrid demonstration features
 

@@ -1,0 +1,59 @@
+{
+  "initial_state": {
+    "epoch_utc": "2030-01-01T00:00:00Z",
+    "vehicle_id": "demo-lander",
+    "revision": 0,
+    "reference_frame": "PLANAR_MOON_CENTERED_NONROTATING",
+    "position_m": [
+      0.0,
+      1737500.0
+    ],
+    "velocity_mps": [
+      0.0,
+      -3.0
+    ],
+    "propellant_kg": 100.0
+  },
+  "vehicle": {
+    "vehicle_id": "demo-lander",
+    "dry_mass_kg": 900.0,
+    "propellant_capacity_kg": 100.0,
+    "max_thrust_n": 10000.0,
+    "design_thrust_n": 10000.0,
+    "min_throttle_fraction": 0.0,
+    "max_throttle_fraction": 1.0,
+    "isp_s": 300.0,
+    "source": {
+      "source_id": "h4-declared-demo",
+      "kind": "synthetic",
+      "description": "Illustrative flat corridor and 1000 kg vehicle. Not a real landing site or calibrated spacecraft."
+    }
+  },
+  "terrain": {
+    "reference_radius_m": 1737400.0,
+    "points": [
+      {
+        "downrange_m": -20000.0,
+        "height_m": 0.0
+      },
+      {
+        "downrange_m": 20000.0,
+        "height_m": 0.0
+      }
+    ],
+    "source": {
+      "source_id": "h4-declared-demo",
+      "kind": "synthetic",
+      "description": "Illustrative flat corridor and 1000 kg vehicle. Not a real landing site or calibrated spacecraft."
+    }
+  },
+  "target_downrange_m": 0.0,
+  "duration_s": 30.0,
+  "dt_s": 0.1,
+  "reserve_kg": 10.0,
+  "target_vertical_speed_mps": -0.5,
+  "position_tolerance_m": 5.0,
+  "vertical_speed_limit_mps": 2.0,
+  "horizontal_speed_limit_mps": 1.0,
+  "slope_limit_deg": 15.0
+}

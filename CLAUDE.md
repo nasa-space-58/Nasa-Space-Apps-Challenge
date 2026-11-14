@@ -139,3 +139,8 @@ The user authorized continuing later H stages on `codex/quantum-hybrid`. H2 uses
 ### H3 continuation (user, 2026-11-14)
 
 H3 remains on `codex/quantum-hybrid`; no tahakrcc/main merge or push. Skeleton `839c167`, frozen tests `87d7d95`; see `docs/resource-integration.md`. Geometry is not a station booking or radio-link guarantee. Storage is an explicitly ideal constant-power model. Unsupported quantum mappings retain the classical answer and report the limit, never silently remove constraints.
+
+
+### H4 continuation (user, 2026-11-14)
+
+Continue on `codex/quantum-hybrid`; push only that branch, without tahakrcc/main merges. Skeleton `6292085`, frozen tests `3436c14` and `aa07539`; see `docs/descent-foundation.md`. Shared R4/H4 integration must stop thrust exactly at fuel depletion. H4's restartable terminal model uses an explicit nonrotating planar frame, sampled corridor clearance and two-resolution candidate screening. Never imply automatic MOON_ME conversion, continuous collision certification, a global reachability envelope or quantum execution from these checks.
