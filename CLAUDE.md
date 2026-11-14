@@ -177,3 +177,8 @@ H9 proceeds from completed H8 `74bcfba` on `codex/h9-shared-antenna`; push only 
 ### Space weather main push exception (user, 2026-11-15)
 
 At the user's explicit request, `feature/space-weather-noaa` (NOAA SWPC solar activity; frozen tests `be593c9`, see docs/space-weather.md) was fast-forwarded directly onto `main` and `temel` from `cb17bdd` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+
+### H10/H11 delivery (user, 2026-11-15)
+
+Start from H9 `fb59791` on `codex/h10-h11-scaling-relays`. Complete H10 then H11, run intermediate and combined tests, and push only this new branch for the user to merge. Never merge into or push main/tahakrcc. Ask before any real quantum credit expenditure, including free credits. H10 records exact/MILP benchmarks, not a quantum speedup; H11 supports k=1/2 relay selection on explicitly approximate, sampled CR3BP/terrain geometry. Preserve the local H6 notebook edit. Test baselines and two narrowly approved test corrections are documented in docs/problem-scaling.md and docs/relay-orbit-selection.md.

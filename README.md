@@ -276,3 +276,11 @@ H9, bir insanlı ve iki robotik örnek görevin tek anten paylaşımını planla
 - Arayüz: görev kontrolünde **Ortak anten**, `#/shared-antenna`.
 - [Kapsam, kaynaklar ve doğrulama](docs/shared-antenna-campaign.md)
 - [H9 Jupyter notebooku](notebooks/H9_shared_antenna.ipynb): Run All yeni kuantum işi göndermez veya kredi harcamaz.
+
+
+### H10–H11: Ölçek ve röle yörüngesi seçimi
+
+H10, aynı örnek problemlerde tam tarama ve MILP sürelerini ölçer; tahminleri ölçümlerden ayırır. H11, JPL yörüngelerini klasik olarak hesaplar ve bir/iki röle seçimini yerel QAOA ile karşılaştırır. Modelin çerçeve, örnekleme ve haberleşme sınırları ekranda belirtilir. Bu aşamalar gerçek kuantum işi göndermez ve kredi harcamaz.
+
+- [H10 ölçüm ve doğrulama](docs/problem-scaling.md), [notebook](notebooks/H10_problem_scaling.ipynb), arayüz: `#/scaling`.
+- [H11 kaynaklar ve sonuçlar](docs/relay-orbit-selection.md), [notebook](notebooks/H11_relay_orbits.ipynb), arayüz: `#/relays`.

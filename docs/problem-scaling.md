@@ -29,3 +29,5 @@ Open `notebooks/H10_problem_scaling.ipynb` with the existing Lunar H7 kernel. It
 New tests: skeleton `0e1fbdc`; frozen algorithm tests `64eeb3c`; report API skeleton `f54e930`; frozen report/API tests `2b884e4`. Algorithm tests cover an independent combinatorial oracle, determinism, invalid budgets, non-power-of-two register counts, partial-search status and exact/MILP agreement. API tests cover checksum failures, fixed report selection and display coordinates. Frontend verification uses TypeScript/Vite only, per repository instructions.
 
 The backend serves `/research/scaling`; the interface is at `#/scaling`. Raw observations remain available through the JSON export. Final combined verification is recorded with H11 delivery.
+
+Final combined verification: **1178 backend, 191 ingestion and 91 optional quantum tests passed**, Ruff and TypeScript/Vite passed, and both new notebooks executed (17 code cells total). The measured host was Apple M5, recorded alongside Python/NumPy/SciPy and OS metadata. See [H11 combined verification](relay-orbit-selection.md#final-combined-verification).

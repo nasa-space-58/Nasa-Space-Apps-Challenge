@@ -368,11 +368,11 @@ Completed demonstrations are checked below; unchecked items remain planned conce
   - Show a shared timeline in which moving one mission's landing date shifts the others' antenna windows and resolves or creates conflicts.
   - Contrast independently chosen "best" options that conflict with a jointly feasible plan, and explain mission sets with no feasible plan.
   - Label the scenario as illustrative; it is not a NASA mission plan or a DSN scheduling commitment.
-- [ ] **H10 — Problem-scaling outlook:** a chart showing where exhaustive classical search stops being practical as the mission count grows.
+- [x] **H10 — Problem-scaling outlook:** measured bounded enumeration/MILP runs, encoding-size charts, explicitly labeled extrapolations and a runnable notebook. MILP solved all recorded cases; no general classical limit or quantum advantage is claimed. See [scaling evidence](problem-scaling.md).
   - Plot the number of candidate plans, measured exact/CP-SAT/MILP runtime and required logical qubits against mission and option counts.
   - Mark measured points separately from extrapolated trends, and record the hardware and compute budget behind each measurement.
   - State plainly that classical methods suffice at the current three-mission scale; the chart identifies the problem sizes worth benchmarking, not a demonstrated quantum advantage.
-- [ ] **H11 — Three-body relay-orbit selection:** choose lunar relay orbits that restore communication for south-pole sites without direct Earth visibility.
+- [x] **H11 — Three-body relay-orbit selection:** audited JPL CR3BP candidates, sampled terrain/Earth-center geometry and validated k=1/2 relay selection using the H8 exact/QAOA pair. Includes the ideal synchronous-frame assumption, rejected surface-intersecting orbit and offline notebook. Real ephemeris frame conversion and RF/station scheduling remain outside this concept. See [relay evidence and limits](relay-orbit-selection.md).
   - Motivation: the Task 4 Malapert verification case (2026-11-04, 24 hours) reports 0% Earth-center visibility, so direct-to-Earth links cannot be assumed.
   - Classical physics: propagate candidate relay orbits in the Earth–Moon circular restricted three-body problem (for example, L2 halo and near-rectilinear halo orbit families) with documented initial conditions, integrator tolerances and reference checks.
   - Classical geometry: compute each candidate's line-of-sight windows to the terrain-relative sites and to Earth, reusing the existing horizon and R2 visibility rules.

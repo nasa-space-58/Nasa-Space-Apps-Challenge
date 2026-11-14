@@ -116,9 +116,18 @@ def build_report(inputs):
     coarse = build_geometry(inputs, step_s=600)
     fine = build_geometry(inputs, step_s=300)
     changed = total = 0
+    coverage_deltas = []
     for sid, rows in coarse["contacts"].items():
         for oid, values in rows.items():
             refined = fine["contacts"][sid][oid]
+            coverage_deltas.append(
+                dict(
+                    site_id=sid,
+                    orbit_id=oid,
+                    fine_minus_coarse_covered_s=300 * sum(v is True for v in refined)
+                    - 600 * sum(v is True for v in values),
+                )
+            )
             for i, value in enumerate(values):
                 sub = refined[2 * i : 2 * i + 2]
                 reduced = None if any(x is None for x in sub) else all(sub)
@@ -161,7 +170,35 @@ def build_report(inputs):
             interval_count=total,
             coarse_step_s=600,
             fine_step_s=300,
+            coverage_deltas=coverage_deltas,
         ),
         rejected_orbits=inputs.get("rejected_orbits", []),
         reference_comparison=compare_relays(fine, request),
     )
+
+
+if __name__ == "__main__":
+    import argparse
+    from pathlib import Path
+
+    parser = argparse.ArgumentParser(
+        description="Rebuild local H11 evidence without network/provider calls"
+    )
+    parser.add_argument("--inputs", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    report = build_report(json.loads(args.inputs.read_text()))
+    digest = hashlib.sha256(
+        json.dumps(
+            report, sort_keys=True, separators=(",", ":"), allow_nan=False
+        ).encode()
+    ).hexdigest()
+    args.output.write_text(
+        json.dumps(
+            {"sha256": digest, "payload": report},
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+        + "\n"
+    )
+    print("Wrote offline relay evidence; hardware_jobs=0, credits_spent=0")

@@ -1,5 +1,5 @@
 {
-  "sha256": "10d0321a71e59469158994cea251ba5e2925ed450b301c65da4659f7d2b1cd73",
+  "sha256": "aa647413e42d37a2e790d3513e584ddf51db37d879f9f1dd022c7823d1316206",
   "payload": {
     "version": "h10-scaling-v1",
     "hardware_jobs": 0,
@@ -10,7 +10,9 @@
       "scipy": "1.18.1",
       "platform": "macOS-27.2.1-arm64-arm-64bit",
       "machine": "arm64",
-      "processor": "arm"
+      "processor": "arm",
+      "cpu_model": "Apple M5",
+      "cpu_model_source": "sysctl machdep.cpu.brand_string; same host as recorded experiment"
     },
     "budget": {
       "repeats": 3,
