@@ -240,9 +240,11 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 ### R8 — Post-landing exploration
 
-- [ ] Implement S12 science-target selection and terrain-constrained surface routing.
-- [ ] Evaluate sunlight and communication along time-dependent routes.
-- [ ] Report distance, duration and shadowed segments with mobility assumptions.
+- [x] Implement S12 science-target selection and terrain-constrained surface routing.
+- [x] Evaluate sunlight and communication along time-dependent routes.
+- [x] Report distance, duration and shadowed segments with mobility assumptions.
+
+**R8 delivery** — See [post-landing exploration](surface-exploration.md). A* finds the shortest 3-D route over DEM cells at or below a mobility slope limit (15° planning assumption) to up to five targets given by bearing and distance. Unreachable targets are explained (outside terrain, target too steep, or no path). With a site analysis, sampled route points each get their own terrain horizon and the analysis' Sun/Earth direction at arrival. Each route reports length, duration, maximum slope, climb, detour and shadowed or no-Earth points, and the site gets a documented efficiency score. On Malapert (4 Nov), the sunlit east route never sees Earth and the north route regains Earth in shadow. Frozen tests: `46cb1d5`.
 
 **Completion evidence** — Generated routes satisfy documented slope and mobility constraints.
 

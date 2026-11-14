@@ -403,6 +403,9 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     from app.alternatives import register_alternative_routes
 
     register_alternative_routes(app, data_dir)
+    from app.surface_routes import register_surface_routes
+
+    register_surface_routes(app, data_dir, store)
 
     @app.get("/health")
     def health():

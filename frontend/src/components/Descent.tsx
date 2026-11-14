@@ -3,6 +3,7 @@ import type { Preset } from "../types";
 import RouteOptimizer, { type RouteResult } from "./RouteOptimizer";
 import RiskPanel from "./RiskPanel";
 import BackupPlans from "./BackupPlans";
+import SurfaceRoutes from "./SurfaceRoutes";
 
 // R4 (S6): renders backend descent plans; all physics runs in the API.
 type Sample = {
@@ -622,6 +623,7 @@ export default function Descent({ sites }: { sites: Preset[] }) {
           {routes && <RouteOptimizer result={routes} />}
           <RiskPanel base={planBase} />
           <BackupPlans base={planBase} />
+          <SurfaceRoutes site={planBase} />
         </div>
       </div>
     </section>

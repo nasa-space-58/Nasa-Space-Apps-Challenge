@@ -1,0 +1,99 @@
+{
+  "verified_on": "2026-11-14",
+  "branch": "feature/r8-surface-exploration",
+  "skeleton": "8a9c969",
+  "frozen_tests": "46cb1d5",
+  "environment": "Docker Compose nasa-task4 preview; real cached LDEM_80S_80MPP_ADJ; Task 4 analysis job 273e78bf (Malapert, 2026-11-04, 24 h, ready)",
+  "request": {
+    "site_id": "malapert-massif-r23",
+    "latitude_deg": -85.9948,
+    "longitude_deg_east": 359.76422,
+    "slope_limit_deg": 15,
+    "speed_mps": 0.1,
+    "waypoints_per_route": 5
+  },
+  "runtime_s_approx": 22,
+  "result_id": "b04c3f6d58eb3eab84cdb4b4d4ea257aa6e603f4c165cc9df65e6c68e29d58dd",
+  "departure_utc": "2026-11-04T00:00:00Z",
+  "efficiency": {
+    "score": 0.733,
+    "reachable_fraction": 0.667,
+    "detour_efficiency": 1.0,
+    "sunlit_fraction": 0.6,
+    "weights": {
+      "reachable": 0.5,
+      "detour": 0.25,
+      "sunlit": 0.25
+    }
+  },
+  "routes": [
+    {
+      "target_id": "North rim",
+      "bearing_deg": 0.0,
+      "distance_m": 2500.0,
+      "reachable": true,
+      "reason": null,
+      "length_m": 2499,
+      "detour_ratio": 1.0,
+      "max_slope_deg": 11.6,
+      "duration_h": 6.94,
+      "waypoint_sun": [
+        "partial",
+        "dark",
+        "dark",
+        "dark",
+        "dark"
+      ],
+      "waypoint_earth": [
+        "blocked",
+        "visible",
+        "visible",
+        "visible",
+        "visible"
+      ]
+    },
+    {
+      "target_id": "East slope",
+      "bearing_deg": 90.0,
+      "distance_m": 3000.0,
+      "reachable": true,
+      "reason": null,
+      "length_m": 3049,
+      "detour_ratio": 1.0,
+      "max_slope_deg": 8.5,
+      "duration_h": 8.47,
+      "waypoint_sun": [
+        "partial",
+        "full",
+        "full",
+        "full",
+        "full"
+      ],
+      "waypoint_earth": [
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked",
+        "blocked"
+      ]
+    },
+    {
+      "target_id": "South",
+      "bearing_deg": 200.0,
+      "distance_m": 4000.0,
+      "reachable": false,
+      "reason": "target_impassable",
+      "detail": "The target cell slope is 16.3 deg, above the 15 deg limit."
+    }
+  ],
+  "tests": {
+    "backend": 567,
+    "surface_routes": 34,
+    "frontend": 6
+  },
+  "browser": {
+    "page": "Descent > After landing",
+    "console_errors": 0
+  },
+  "interpretation": "North rim is a straight route that enters shadow after the first point but regains Earth visibility; East slope stays sunlit but never sees Earth. The site analysis frames are reused along the route; each sampled point gets its own terrain horizon."
+}
