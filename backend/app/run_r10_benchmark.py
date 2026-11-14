@@ -112,8 +112,19 @@ def write_report(report: BenchmarkReport, path: Path) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+def summarize_report(report: BenchmarkReport, full_report_sha256: str) -> dict:
+    """Return a compact JSON-ready summary without per-run plans and outcomes.
+
+    Keeps schema, UTC timestamp, config and its fingerprint, environment, per
+    instance identity/profile/optimum/reference status, aggregates, decisions,
+    scaling points, hardware_jobs, statement and the full report's SHA-256.
+    Raise ValueError for a digest that is not 64 lowercase hex characters.
+    """
+    raise NotImplementedError
+
+
 def main(argv: list[str] | None = None) -> int:
-    """Parse --output (required), run the published config, write and report."""
+    """Parse --output (required) and optional --summary; run, write and report."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args(argv)
