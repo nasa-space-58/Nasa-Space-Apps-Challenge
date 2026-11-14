@@ -1,0 +1,9 @@
+.git
+.venv
+.env
+node_modules
+**/node_modules
+**/__pycache__
+**/.pytest_cache
+graphify-out
+data

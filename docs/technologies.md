@@ -163,3 +163,10 @@ Rules:
 │   └── tests/
 └── data/            # not committed
 ```
+## Step 0 implementation status
+
+Shared Pydantic input contracts live in `shared/contracts.py`, mounted into both Python services. The backend exposes process liveness and the worker opens a broker connection. Message schemas and ingestion consumers follow in Step 1. Scientific libraries, React Three Fiber and Recharts will be installed with the features that use them. Direct dependency versions are pinned. The frontend lockfile and container checks were verified locally on 2026-11-14; Python transitive dependency locks remain pending. Vitest uses jsdom for DOM rendering tests.
+
+### Frontend audit remediation
+
+Vite 7.3.8 and Vitest 4.1.12 are pinned in package.json. The earlier Vitest 3.2.7 selection still triggered three npm audit findings. Updating with npm 11 worked around an npm 10.9.4 resolver error (`edgesOut`). The regenerated lockfile then passed npm ci with the image's original npm version, npm audit (zero vulnerabilities), the existing frontend test and the production build on 2026-11-14. No test files were changed.

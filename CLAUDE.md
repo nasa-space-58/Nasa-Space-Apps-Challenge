@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo currently contains **documentation only** (`docs/`, `README.md`); no application code, `docker-compose.yml` or tests exist yet. The README is in Turkish; everything else (code, comments, commits, docs) must be in English.
+**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo contains Step 0 service skeletons, shared input contracts, Docker Compose configuration and initial tests. Local Docker runtime verification and frontend lock generation passed on 2026-11-14; Python transitive locks and terrain/site inputs remain pending; see docs/mvp-roadmap.md. The README is in Turkish; everything else (code, comments, commits, docs) must be in English.
 
 `docs/` is the source of truth. Read the relevant file before working:
 - `docs/mvp-roadmap.md`: first-release scope, release order, task checklist and acceptance criteria.
@@ -53,7 +53,7 @@ Rules:
 - If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
 - Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
 - After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
-- A committed graphify-out/graph.json is rewritten whole on every build, so a large diff to it in a pull request is expected. Do not flag it as churn or suggest skipping the graph rebuild or its hooks.
+- Keep graphify-out/ local. The directory is ignored by Git and its generated graph, report and visualization are not committed or pushed.
 - ALWAYS read graphify output (graphify-out/GRAPH_REPORT.md, then `graphify query`) FIRST, before looking at any other file or source in this project.
 - ALWAYS update the graphify output after EVERY code change: run `graphify update .` right after writing or editing code, before moving on.
 - ALWAYS follow the documents under docs/ (docs/coding-conventions.md, docs/user-scenarios.md, and any others added there). Act according to them in every task; if a request conflicts with them, point out the conflict before proceeding.

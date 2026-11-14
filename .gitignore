@@ -11,4 +11,9 @@ Thumbs.db
 .vscode/
 .idea/
 
-graphify-out
+graphify-out/
+!.env.example
+data/
+.pytest_cache/
+.ruff_cache/
+*.tsbuildinfo

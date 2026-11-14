@@ -13,7 +13,7 @@ This plan derives the first release from the NASA challenge description supplied
 - React/TypeScript displays results. Python performs scientific processing.
 - The ingestion worker retrieves external data through HTTPX, communicates with the backend through RabbitMQ, and writes the shared data volume. The backend reads it.
 - Taha leads implementation. Teammates review feature PRs according to coding-conventions.md.
-- Repository status at planning time is documentation only. Every implementation checkbox below starts unchecked.
+- Step 0 service skeletons and contracts are implemented locally. Local container execution was verified on 2026-11-14; the frontend lockfile is verified, while Python transitive dependency locking remains pending. See assumptions.md for selected defaults and remaining data checks.
 - The full product scenarios remain in user-scenarios.md with release assignments. This document defines delivery order and MVP acceptance.
 
 ## First-release user journey
@@ -50,14 +50,14 @@ Follow the non-UI skeleton → frozen test commit → implementation workflow in
 ### Step 0 — Confirm inputs and development setup
 
 - [ ] Record supported south-pole terrain coverage, initial preset sites and coordinate sources.
-- [ ] Define default analysis duration, supported date range, sampling limits and observer height.
-- [ ] Record coordinate frames, vertical reference, units and UTC handling in shared data contracts.
-- [ ] Define the meaning of partial/full sunlight and the handling of boundary and unknown states.
-- [ ] Set up Graphify and generate the initial graph according to CLAUDE.md.
-- [ ] Create the four-service Docker Compose setup, health checks and .env.example.
+- [x] Define default analysis duration, supported date range, sampling limits and observer height.
+- [x] Record coordinate frames, vertical reference, units and UTC handling in shared data contracts.
+- [x] Define the meaning of partial/full sunlight and the handling of boundary and unknown states.
+- [x] Set up Graphify and generate the initial graph according to CLAUDE.md.
+- [x] Create the four-service Docker Compose setup, health checks and .env.example.
 - [ ] Pin documented dependencies and provide container-based run, lint and test commands.
 
-**Completion evidence** — A clean checkout starts the services and runs their initial checks using the documented commands.
+**Verification evidence (2026-11-14)** — In the current local checkout, all four Compose services start; backend and frontend respond successfully over HTTP and the ingestion worker connects to RabbitMQ. Backend: 30 tests; ingestion: 2 tests; frontend: 1 test. Both Python Ruff checks, frontend npm ci, npm audit (zero vulnerabilities) and production build pass. Skeleton commit `14a83e2`; frozen test baseline `51bdcc3`. A fresh-checkout run, Python transitive locks and terrain/site inputs remain pending; Step 0 is not fully complete.
 
 ### Step 1 — Obtain and cache real data
 
@@ -65,15 +65,17 @@ Depends on Step 0.
 
 - [ ] Define shared Pydantic ingestion request and ready/failed event schemas with request identifiers.
 - [ ] Implement durable queue processing, retry behavior and idempotent requests.
-- [ ] Query Horizons for Sun (`10`) and Earth (`399`) from a lunar surface observer (`coord@301`).
-- [ ] Preserve raw queries/responses and metadata, parse named CSV columns, and validate semantic errors even on HTTP 200.
-- [ ] Retrieve angular diameter for partial solar disk evaluation.
+- [x] Query Horizons for Sun (`10`) and Earth (`399`) from a lunar surface observer (`coord@301`).
+- [x] Preserve raw queries/responses and metadata, parse named CSV columns, and validate semantic errors even on HTTP 200.
+- [x] Retrieve angular diameter for partial solar disk evaluation.
 - [ ] Download a bounded LOLA terrain product, retaining source/product identifiers and integrity information.
 - [ ] Keep raw and processed data separate and publish completed files atomically before ready events.
-- [ ] Cache by all result-affecting site, time, sampling, source and model parameters.
-- [ ] Verify a documented Horizons reference query and coordinate conventions.
+- [x] Cache by all result-affecting site, time, sampling, source and model parameters.
+- [x] Verify a documented Horizons reference query and coordinate conventions.
 
 **Completion evidence** — One selected site and interval have reproducible Sun/Earth data and terrain coverage. Retried requests leave consistent cached results.
+
+Horizons CLI acquisition and immutable cache verified on 2026-11-14; see [verification details](horizons-ingestion.md). Broker delivery and terrain remain open, so Step 1 is not complete.
 
 ### Step 2 — Compute the terrain horizon
 
