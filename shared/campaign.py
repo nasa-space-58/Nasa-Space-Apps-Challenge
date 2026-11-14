@@ -249,37 +249,188 @@ class CampaignProblem(Contract):
 
 def campaign_fingerprint(problem: CampaignProblem) -> str:
     """SHA-256 of the canonical JSON of the complete campaign input."""
-    raise NotImplementedError
+    checked = CampaignProblem.model_validate(problem.model_dump(mode="python"))
+    text = json.dumps(
+        _normalize(checked.model_dump(mode="json")),
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+    )
+    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
 def load_campaign(path: str | Path) -> CampaignProblem:
     """Load local JSON; ValueError for invalid data, OSError for I/O."""
-    raise NotImplementedError
+
+    def pairs(items):
+        result = {}
+        for key, value in items:
+            if key in result:
+                raise ValueError(f"Duplicate JSON key: {key}")
+            result[key] = value
+        return result
+
+    def invalid_constant(value):
+        raise ValueError(f"Non-finite JSON number: {value}")
+
+    raw = json.loads(
+        Path(path).read_text(encoding="utf-8"),
+        object_pairs_hook=pairs,
+        parse_constant=invalid_constant,
+    )
+    return CampaignProblem.model_validate(raw)
+
+
+def _unique(values, label):
+    if len(values) != len(set(values)):
+        raise ValueError(f"Duplicate {label}")
+
+
+def _inside(inner: TimeWindow, outer: TimeWindow) -> bool:
+    return outer.start_utc <= inner.start_utc and inner.end_utc <= outer.end_utc
 
 
 def _check_intervals(intervals, label):
-    raise NotImplementedError
+    for a, b in zip(intervals, intervals[1:]):
+        if a.window.end_utc > b.window.start_utc:
+            raise ValueError(f"{label} intervals must be ordered and nonoverlapping")
+
+
+def _sort(model, name, key):
+    object.__setattr__(model, name, tuple(sorted(getattr(model, name), key=key)))
 
 
 def _check_site_evidence(evidence):
-    raise NotImplementedError
+    _sort(evidence, "station_geometry", lambda g: g.station_id)
+    _sort(evidence, "descents", lambda d: d.vehicle_id)
+    _check_intervals(evidence.sunlight, "Sunlight")
+    _unique([g.station_id for g in evidence.station_geometry], "station geometry")
+    _unique([d.vehicle_id for d in evidence.descents], "descent vehicle")
+    rows = list(evidence.sunlight)
+    for geometry in evidence.station_geometry:
+        _check_intervals(geometry.intervals, f"Station {geometry.station_id} geometry")
+        rows += geometry.intervals
+    if any(not _inside(row.window, evidence.evidence_window) for row in rows):
+        raise ValueError("Evidence intervals must lie inside the evidence window")
 
 
 def _check_policy(policy):
-    raise NotImplementedError
+    if not policy.cancel_allowed and policy.cancel_penalty_score != 0:
+        raise ValueError("A cancellation penalty requires cancel_allowed")
+    if policy.defer_allowed and policy.max_defer_s <= 0:
+        raise ValueError("defer_allowed requires a positive max_defer_s")
+    if not policy.defer_allowed and (
+        policy.max_defer_s
+        or policy.defer_penalty_score
+        or policy.defer_penalty_score_per_h
+    ):
+        raise ValueError("Deferral limits and penalties require defer_allowed")
 
 
 def _check_mission(mission):
-    raise NotImplementedError
+    if mission.deadline_utc <= mission.landing_window.start_utc:
+        raise ValueError("Mission deadline must follow the landing window start")
+    _unique(mission.site_ids, "mission site IDs")
+    if set(mission.science_score_by_site) != set(mission.site_ids):
+        raise ValueError("science_score_by_site must name exactly the mission sites")
+    predecessors = [d.predecessor_mission_id for d in mission.dependencies]
+    _unique(predecessors, "mission dependencies")
+    if mission.mission_id in predecessors:
+        raise ValueError("A mission cannot depend on itself")
+    _sort(mission, "site_ids", lambda value: value)
+    _sort(mission, "dependencies", lambda d: d.predecessor_mission_id)
 
 
 def _check_station(station):
-    raise NotImplementedError
+    ordered = sorted(station.availability, key=lambda w: w.start_utc)
+    if any(a.end_utc > b.start_utc for a, b in zip(ordered, ordered[1:])):
+        raise ValueError("Station availability windows overlap")
+
+
+def _cited(problem):
+    for item in (*problem.missions, *problem.vehicles, *problem.stations):
+        yield item.source_ids
+    for item in (*problem.link_rates, *problem.relay_geometry):
+        yield item.source_ids
+    for evidence in problem.sites:
+        yield evidence.source_ids
+        yield evidence.terrain.source_ids
+        for descent in evidence.descents:
+            yield descent.source_ids
 
 
 def _check_problem(problem):
-    raise NotImplementedError
-
-
-# Referenced by the implementation; kept importable in the skeleton.
-_UNUSED = (hashlib, json, CycleError, TopologicalSorter, _normalize)
+    # Set-like collections: canonical order in memory and in the fingerprint.
+    _sort(problem, "missions", lambda m: m.mission_id)
+    _sort(problem, "vehicles", lambda v: v.vehicle_id)
+    _sort(problem, "sites", lambda s: s.site.site_id)
+    _sort(problem, "stations", lambda s: s.station_id)
+    _sort(problem, "link_rates", lambda r: (r.mission_id, r.station_id))
+    _sort(problem, "relay_geometry", lambda g: (g.client_site_id, g.relay_site_id))
+    _sort(problem, "sources", lambda s: s.source_id)
+    window = problem.window
+    duration_s = (window.end_utc - window.start_utc).total_seconds()
+    if duration_s % problem.slot_s:
+        raise ValueError("Campaign window must be a whole number of slots")
+    missions = {m.mission_id: m for m in problem.missions}
+    _unique([m.mission_id for m in problem.missions], "mission IDs")
+    _unique([v.vehicle_id for v in problem.vehicles], "vehicle IDs")
+    _unique([s.site.site_id for s in problem.sites], "site IDs")
+    _unique([s.station_id for s in problem.stations], "station IDs")
+    _unique([s.source_id for s in problem.sources], "source IDs")
+    _unique([(r.mission_id, r.station_id) for r in problem.link_rates], "link rates")
+    _unique(
+        [(g.client_site_id, g.relay_site_id) for g in problem.relay_geometry],
+        "relay geometry pairs",
+    )
+    vehicles = {v.vehicle_id for v in problem.vehicles}
+    sites = {s.site.site_id for s in problem.sites}
+    stations = {s.station_id for s in problem.stations}
+    sources = {s.source_id for s in problem.sources}
+    used = [m.vehicle_id for m in problem.missions]
+    if len(used) != len(set(used)):
+        raise ValueError("Each vehicle flies at most one mission")
+    for mission in problem.missions:
+        if mission.vehicle_id not in vehicles:
+            raise ValueError(f"Mission {mission.mission_id} refers to unknown vehicle")
+        if not set(mission.site_ids) <= sites:
+            raise ValueError(f"Mission {mission.mission_id} refers to unknown site")
+        if not _inside(mission.landing_window, window):
+            raise ValueError("Mission landing window lies outside the campaign window")
+        if mission.deadline_utc > window.end_utc:
+            raise ValueError("Mission deadline lies after the campaign window")
+        for dependency in mission.dependencies:
+            if dependency.predecessor_mission_id not in missions:
+                raise ValueError("Dependency refers to unknown mission")
+    graph = {
+        m.mission_id: {d.predecessor_mission_id for d in m.dependencies}
+        for m in problem.missions
+    }
+    try:
+        tuple(TopologicalSorter(graph).static_order())
+    except CycleError as exc:
+        raise ValueError("Cyclic mission dependencies") from exc
+    for station in problem.stations:
+        if any(not _inside(w, window) for w in station.availability):
+            raise ValueError("Station availability lies outside the campaign window")
+    for rate in problem.link_rates:
+        if rate.mission_id not in missions or rate.station_id not in stations:
+            raise ValueError("Link rate refers to unknown mission or station")
+    for geometry in problem.relay_geometry:
+        if not {geometry.client_site_id, geometry.relay_site_id} <= sites:
+            raise ValueError("Relay geometry refers to unknown site")
+    for evidence in problem.sites:
+        if not {g.station_id for g in evidence.station_geometry} <= stations:
+            raise ValueError("Site station geometry refers to unknown station")
+    for cited in _cited(problem):
+        if not set(cited) <= sources:
+            raise ValueError("Unknown source reference")
+    lineage = {s.source_id: set(s.parent_source_ids) for s in problem.sources}
+    for parents in lineage.values():
+        if not parents <= sources:
+            raise ValueError("Unknown source parent")
+    try:
+        tuple(TopologicalSorter(lineage).static_order())
+    except CycleError as exc:
+        raise ValueError("Cyclic source lineage") from exc
