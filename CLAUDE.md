@@ -107,3 +107,7 @@ R2 (DSN ground-station communication) starts from tahakrcc `a37e83c` on `feature
 ### R3 delivery override (user, 2026-11-14)
 
 R3 (explained recommendations) starts from `temel` `fdc4020` on `feature/r3-explained-recommendations`. Push that branch and the same commits to `temel`. Do not merge into or push to tahakrcc or main.
+
+### R4 delivery override (user, 2026-11-14)
+
+R4 (descent trajectories) starts from `temel` `a0b7b8d` on `feature/r4-descent-trajectories`. Push that branch and the same commits to `temel`. Do not merge into or push to tahakrcc or main.

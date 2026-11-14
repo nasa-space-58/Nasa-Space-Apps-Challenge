@@ -200,9 +200,11 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 ### R4 — Descent trajectories
 
-- [ ] Define spacecraft profiles, initial orbit, physical assumptions and tolerances.
-- [ ] Implement and validate S6 descent phases and reachability limits.
-- [ ] Display the trajectory, phase timing and delta-v.
+- [x] Define spacecraft profiles, initial orbit, physical assumptions and tolerances.
+- [x] Implement and validate S6 descent phases and reachability limits.
+- [x] Display the trajectory, phase timing and delta-v.
+
+**R4 delivery** — See [descent trajectories](descent-trajectories.md). Apollo 11 LM profile from the Apollo 11 Mission Report and NASA TN D-6846; planar point-mass model with Hohmann DOI and ZEM/ZEV guidance through the TN D-6846 gates. Total powered delta-v is within 2 % of the Apollo 11 plan (6775 fps). Terrain clearance, mascons, lunar rotation and a 3D view are not included. Frozen tests: `9ed69c8`.
 
 **Completion evidence** — A feasible trajectory reaches its selected target within documented tolerances.
 
