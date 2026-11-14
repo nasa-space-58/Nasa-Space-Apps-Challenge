@@ -190,3 +190,7 @@ H0 adds no service runtime dependency. Local Jupyter execution uses a separate P
 ### H2 local quantum simulation
 
 H2 reuses backend NumPy 2.5.4 for bounded noiseless statevectors (at most eight qubits); no service runtime dependency changes. Optional `notebooks/requirements.txt` now includes that same NumPy version for the existing Jupyter kernel. No provider SDK or hardware connection is used by H2. See `docs/quantum-mapping.md` for execution budgets, encoding limits and gate estimates.
+
+### H7 optional OpenQuantum environment
+
+H7 uses a separate Python 3.12 notebook/experiment environment, pinned with hashes in `quantum/requirements.lock`: OpenQuantum SDK 1.2.1, Qiskit plugin 1.1.2, Qiskit 2.6.2 and Aer 0.18.2, alongside the existing notebook tools. Backend and ingestion images remain unchanged. Provider I/O exists only in `quantum/openquantum_bridge.py`; it is not a backend route or data-ingestion replacement. See [hardware experiment scope and cost controls](openquantum-hardware.md).

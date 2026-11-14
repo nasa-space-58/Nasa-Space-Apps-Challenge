@@ -329,7 +329,7 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 - [x] **H4 — Descent foundation:** share fuel-limited dynamics with R4/R5, restart a bounded planar terminal descent, and screen explicit landing candidates at two resolutions. Synthetic/reference physics validation is complete; real-terrain/3D flight validation remains outside this model.
 - [x] **H5 — Classical self-healing:** deliver bounded planar fault replay, separate synthetic observations from truth, screen candidates under seeded uncertainty, and replan with recoverable/unrecoverable cases. Full sensor fusion, real-time execution and 3D mission validation remain outside this milestone.
 - [x] **H6 — Hybrid recovery:** connect physically screened landing options to downstream scheduling through a bounded local QAOA worker, with acceptance deadlines, stale-result rejection and freshly validated classical fallback. Offline replay is complete; live latency compensation and hardware runs remain outside this milestone.
-- [ ] **H7 — Evidence and demonstration:** run hardware experiments where available, publish reproducible benchmarks, and demonstrate a fault changing both one vehicle's landing plan and subsequent mission schedules.
+- [x] **H7 — Evidence and demonstration:** complete one bounded two-qubit OpenQuantum/Rigetti experiment, publish raw counts and classical/ideal/noisy comparisons, and replay its validated proposal across a fault that changes both landing and downstream scheduling. Repeated hardware trials, larger scaling and live flight latency compensation remain outside this milestone.
 
 **H0 delivery** — Shared Python contracts, five synthetic benchmark cases and an executable Jupyter notebook are available. See [contracts, semantics and verification](hybrid-contracts.md). H1/H2 solvers, physical event execution and quantum hardware runs remain open.
 
@@ -344,6 +344,8 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 **H5 delivery** — Five fault types change physical/navigation/landing-policy constraints at exact UTC boundaries. Classical recovery preserves a valid target or selects a screened backup, retaining baseline comparison, state revisions and explicit infeasibility. Fifty-one frozen tests and a 10-code-cell notebook are documented in [self-healing and replay limits](self-healing.md). H6 integration is documented below.
 
 **H6 delivery** — A two-qubit local QAOA example changes both the post-fault landing target and the selected downstream mission slot. Thirty-seven frozen tests cover the async acceptance boundary and current fallback; the 10-code-cell notebook reports three seeds, raw outcomes, deadline/stale guards and an end-to-end offline replay. See [hybrid recovery and timing limits](hybrid-recovery.md). No hardware jobs or end-to-end quantum advantage are claimed; H7 remains open.
+
+**H7 delivery** — The optional OpenQuantum adapter, pinned separate environment and executed 12-cell notebook are available. Sixty frozen tests pass. One two-qubit Rigetti job completed: 200/256 optimal samples, 247/256 feasible samples and zero best-plan gap to the exact reference. The offline fault replay changes primary/early to remote/late and lands with fuel accounting checked. One free Spark credit was used; 24 Spark and zero Full remain. See [raw counts, provider attribution and limitations](openquantum-hardware.md). No quantum advantage, paid spending or live flight-control guarantee is claimed.
 
 ### Proposed hybrid demonstration features
 

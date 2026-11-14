@@ -154,3 +154,7 @@ Continue on `codex/quantum-hybrid`; push only this branch without tahakrcc/main 
 ### H6 continuation (user, 2026-11-14)
 
 Continue on `codex/quantum-hybrid`; push only this branch, without tahakrcc/main merges. Skeleton `5b9252a`, frozen tests `d872606` and `bfe96d5`; see `docs/hybrid-recovery.md`. H6 connects H5 screened targets and downstream schedules to the local H2 QAOA worker. Classical preparation precedes the quantum acceptance deadline; every resolution rechecks current physical and campaign inputs. Offline flight time is paused during planning, and running Python work is not forcibly killed. Do not present this as live control, hardware execution or quantum advantage. H7 hardware/provider experiments remain separate work.
+
+### H7 continuation (user, 2026-11-14)
+
+Continue on `codex/quantum-hybrid` and push only that branch; do not merge into tahakrcc/main. OpenQuantum free Spark experiments are authorized; ask before paid credit use. SDK dependencies stay in the separate optional quantum environment. Preserve local credentials and submission receipts outside Git. Never retry ambiguous submissions automatically, label simulators as hardware, or infer quantum advantage from this tiny benchmark. Frozen tests: `db20168`, `45f4dc7`, `e85e5e7`, `1b48779`. See `docs/openquantum-hardware.md` for evidence and remaining boundaries.
