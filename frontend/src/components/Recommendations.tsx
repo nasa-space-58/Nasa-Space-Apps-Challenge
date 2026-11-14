@@ -2,13 +2,15 @@ import { useEffect, useRef, useState } from "react";
 import type { Preset } from "../types";
 
 // R3 (S8/S9): renders backend rankings; scores and rescoring come from the API.
-const CRITERIA = ["energy", "darkness", "communication", "terrain_safety"] as const;
+// "fuel" is the opt-in R5 descent criterion; it appears only when the API returns it.
+const CRITERIA = ["energy", "darkness", "communication", "terrain_safety", "fuel"] as const;
 type Criterion = (typeof CRITERIA)[number];
 const CRITERION_LABEL: Record<Criterion, string> = {
   energy: "Energy (sunlight)",
   darkness: "Short darkness",
   communication: "DSN communication",
   terrain_safety: "Terrain safety",
+  fuel: "Descent fuel margin",
 };
 type Weights = Record<Criterion, number>;
 type Score = { score: number | null; value: number | null; unit: string; rule: string };
@@ -16,8 +18,8 @@ type Ranked = {
   candidate_id: string;
   rank: number;
   total_score: number;
-  contributions: Weights;
-  criteria: Record<Criterion, Score>;
+  contributions: Partial<Weights>;
+  criteria: Partial<Record<Criterion, Score>>;
   explanation: string;
 };
 type Ranking = {
@@ -41,6 +43,7 @@ type CandidateState = {
   state: string;
   error: string | null;
   safety: Safety | null;
+  descent?: { feasible: boolean; propellant_margin_kg: number | null; detail?: string } | null;
 };
 type Recommendation = {
   id: string;
@@ -50,6 +53,7 @@ type Recommendation = {
     start_utc: string;
     end_utc: string;
     weights: Weights;
+    include_descent?: boolean;
     constraints: { slope_limit_deg: number; landing_radius_m: number };
   };
   candidates: CandidateState[];
@@ -95,7 +99,7 @@ const STATE: Record<string, string> = {
   failed: "Failed",
 };
 const KEY = "lln.recommendation.id";
-const defaults: Weights = { energy: 1, darkness: 1, communication: 1, terrain_safety: 1 };
+const defaults: Weights = { energy: 1, darkness: 1, communication: 1, terrain_safety: 1, fuel: 0 };
 
 async function call(path: string, init?: RequestInit) {
   const response = await fetch(`/api${path}`, init);
@@ -137,12 +141,13 @@ function RankingTable({
   names: Record<string, string>;
   caption: string;
 }) {
+  const active = CRITERIA.filter((c) => c in ranking.weights);
   return (
     <table className="ranking-table">
       <caption>
         {caption}
         <span className="contribution-legend" aria-hidden="true">
-          {CRITERIA.map((c) => (
+          {active.map((c) => (
             <span key={c}>
               <i className={`contribution ${c}`} /> {CRITERION_LABEL[c]}
             </span>
@@ -167,18 +172,18 @@ function RankingTable({
               <div
                 className="contribution-bar"
                 role="img"
-                aria-label={CRITERIA.map(
-                  (c) => `${CRITERION_LABEL[c]} ${row.contributions[c].toFixed(2)}`,
-                ).join(", ")}
+                aria-label={active
+                  .map((c) => `${CRITERION_LABEL[c]} ${(row.contributions[c] ?? 0).toFixed(2)}`)
+                  .join(", ")}
               >
-                {CRITERIA.map((c) => (
+                {active.map((c) => (
                   <span
                     key={c}
                     className={`contribution ${c}`}
-                    style={{ width: `${row.contributions[c] * 100}%` }}
+                    style={{ width: `${(row.contributions[c] ?? 0) * 100}%` }}
                     title={`${CRITERION_LABEL[c]}: score ${
-                      row.criteria[c].score?.toFixed(2) ?? "—"
-                    } × weight ${ranking.weights[c].toFixed(2)}`}
+                      row.criteria[c]?.score?.toFixed(2) ?? "—"
+                    } × weight ${(ranking.weights[c] ?? 0).toFixed(2)}`}
                   />
                 ))}
               </div>
@@ -201,6 +206,7 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
   const [minSun, setMinSun] = useState("");
   const [minComm, setMinComm] = useState("");
   const [dsnLimit, setDsnLimit] = useState(6);
+  const [includeDescent, setIncludeDescent] = useState(false);
   const [weights, setWeights] = useState<Weights>(defaults);
   const [rec, setRec] = useState<Recommendation | null>(null);
   const [rescored, setRescored] = useState<Rescore | null>(null);
@@ -221,7 +227,8 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
         if (ACTIVE.includes(body.status)) {
           timer.current = window.setTimeout(() => poll(id), 2000);
         } else {
-          setWeights(body.request.weights);
+          setWeights({ ...defaults, ...body.request.weights });
+          setIncludeDescent(Boolean(body.request.include_descent));
         }
       })
       .catch((e: Error) => setError(e.message));
@@ -283,7 +290,8 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
         min_sunlight_percent: minSun === "" ? null : Number(minSun),
         min_communication_h: minComm === "" ? null : Number(minComm),
       },
-      weights,
+      weights: { ...weights, fuel: includeDescent ? weights.fuel : 0 },
+      include_descent: includeDescent,
     });
   };
 
@@ -475,7 +483,20 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
             </label>
           </fieldset>
           <h3>Priorities</h3>
-          {CRITERIA.map((c) => (
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              aria-label="Include descent fuel"
+              checked={includeDescent}
+              disabled={busy || running}
+              onChange={(e) => {
+                setIncludeDescent(e.target.checked);
+                if (e.target.checked && weights.fuel === 0) setWeights({ ...weights, fuel: 1 });
+              }}
+            />
+            Include descent reachability and fuel (Apollo 11 LM, R4/R5)
+          </label>
+          {CRITERIA.filter((c) => c !== "fuel" || includeDescent).map((c) => (
             <label key={c}>
               {CRITERION_LABEL[c]} · {weights[c]}
               <input
@@ -543,6 +564,15 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
                       {c.safety.hazard_distance_m == null
                         ? "none within search radius"
                         : `${c.safety.hazard_distance_m.toFixed(0)} m away`}
+                    </>
+                  )}
+                  {c.descent && (
+                    <>
+                      {" "}
+                      · descent{" "}
+                      {c.descent.feasible
+                        ? `reachable, ${c.descent.propellant_margin_kg?.toFixed(0)} kg propellant margin`
+                        : "not reachable"}
                     </>
                   )}
                   {c.error && <span className="alert"> {c.error}</span>}

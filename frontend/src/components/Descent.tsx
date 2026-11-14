@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import type { Preset } from "../types";
+import RouteOptimizer, { type RouteResult } from "./RouteOptimizer";
 
 // R4 (S6): renders backend descent plans; all physics runs in the API.
 type Sample = {
@@ -240,6 +241,9 @@ export default function Descent({ sites }: { sites: Preset[] }) {
   const [inclination, setInclination] = useState("90");
   const [allowTurn, setAllowTurn] = useState(false);
   const [plan, setPlan] = useState<Plan | null>(null);
+  const [reserveFps, setReserveFps] = useState("145");
+  const [routes, setRoutes] = useState<RouteResult | null>(null);
+  const [optimizing, setOptimizing] = useState(false);
   const [zoom, setZoom] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -249,6 +253,41 @@ export default function Descent({ sites }: { sites: Preset[] }) {
       .then((body) => setProfiles(body.profiles))
       .catch((e: Error) => setError(e.message));
   }, []);
+
+  const vehicle = () =>
+    profileId === "custom"
+      ? {
+          custom_profile: Object.fromEntries(
+            Object.entries(custom).map(([k, v]) => [k, Number(v)]),
+          ),
+        }
+      : { profile_id: profileId };
+
+  const optimize = async () => {
+    setOptimizing(true);
+    setError("");
+    try {
+      setRoutes(
+        await call("/descents/optimize", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            site_id: siteId,
+            latitude_deg: Number(lat),
+            longitude_deg_east: Number(lon),
+            inclination_deg: Number(inclination),
+            allow_plane_change: allowTurn,
+            reserve_delta_v_mps: Number(reserveFps) * 0.3048,
+            ...vehicle(),
+          }),
+        }),
+      );
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Request failed");
+    } finally {
+      setOptimizing(false);
+    }
+  };
 
   const run = async () => {
     setBusy(true);
@@ -260,14 +299,8 @@ export default function Descent({ sites }: { sites: Preset[] }) {
         longitude_deg_east: Number(lon),
         orbit: { altitude_km: Number(altitude), inclination_deg: Number(inclination) },
         allow_plane_change: allowTurn,
+        ...vehicle(),
       };
-      if (profileId === "custom") {
-        body.custom_profile = Object.fromEntries(
-          Object.entries(custom).map(([k, v]) => [k, Number(v)]),
-        );
-      } else {
-        body.profile_id = profileId;
-      }
       setPlan(
         await call("/descents", {
           method: "POST",
@@ -408,6 +441,32 @@ export default function Descent({ sites }: { sites: Preset[] }) {
             <button type="submit" className="primary">
               {busy ? "Computing trajectory…" : "Compute descent ↗"}
             </button>
+            <h3>Fuel optimization</h3>
+            <label>
+              Touchdown reserve · fps
+              <input
+                aria-label="Reserve delta-v fps"
+                type="number"
+                min="0"
+                max="1600"
+                step="5"
+                value={reserveFps}
+                onChange={(e) => setReserveFps(e.target.value)}
+              />
+            </label>
+            <button
+              type="button"
+              className="text-button"
+              disabled={optimizing}
+              onClick={optimize}
+            >
+              {optimizing ? "Optimizing 27 routes…" : "Optimize routes ↗"}
+            </button>
+            <p className="field-help">
+              145 fps = Apollo contingencies for landing-site redesignation (60 fps) and
+              manual hover (85 fps), NASA TN D-6846 Table II. Routes vary the orbit
+              (40/60/80 n.mi.) and the approach and terminal-descent durations.
+            </p>
           </fieldset>
           <p className="field-help">
             Default: 60 n.mi. circular orbit and the Apollo 11 Lunar Module (NASA TN D-6846,
@@ -420,7 +479,9 @@ export default function Descent({ sites }: { sites: Preset[] }) {
               {error}
             </div>
           )}
-          {!plan && !error && <div className="panel search-empty">Choose a site and compute a descent.</div>}
+          {!plan && !routes && !error && (
+            <div className="panel search-empty">Choose a site and compute a descent or optimize routes.</div>
+          )}
           {plan && (
             <>
               <div className={`panel descent-verdict ${plan.feasible ? "ok" : "blocked"}`} role="status">
@@ -546,6 +607,7 @@ export default function Descent({ sites }: { sites: Preset[] }) {
               </details>
             </>
           )}
+          {routes && <RouteOptimizer result={routes} />}
         </div>
       </div>
     </section>
