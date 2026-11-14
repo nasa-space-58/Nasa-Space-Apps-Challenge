@@ -250,15 +250,17 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 ### R9 — Mission simulation and digital-twin prototype
 
-- [ ] Extend S13 with position, velocity, mass, remaining propellant, available thrust, battery state and mission duration, with explicit units and coordinate frames.
+- [x] Extend S13 with position, velocity, mass, remaining propellant, available thrust, battery state and mission duration, with explicit units and coordinate frames.
 - [ ] Define versioned contracts for vehicle state, mission requirements, resource availability, uncertainty, events and plans.
-- [ ] Separate simulated ground truth from sensor observations and the planner's estimated state.
-- [ ] Model sensor health, measurement uncertainty and state-estimation updates.
-- [ ] Implement a simulation clock, deterministic event log and replay with fixed seeds.
-- [ ] Track input dependencies and invalidate affected plans/results when state, observations or resources change.
-- [ ] Compare modified plans against a preserved baseline with numerical differences.
-- [ ] Label simulated telemetry and synthetic hazards separately from sourced observations.
-- [ ] Display predicted versus observed state and explain why a plan was invalidated.
+- [x] Separate simulated ground truth from sensor observations and the planner's estimated state.
+- [x] Model sensor health, measurement uncertainty and state-estimation updates.
+- [x] Implement a simulation clock, deterministic event log and replay with fixed seeds.
+- [x] Track input dependencies and invalidate affected plans/results when state, observations or resources change.
+- [x] Compare modified plans against a preserved baseline with numerical differences.
+- [x] Label simulated telemetry and synthetic hazards separately from sourced observations.
+- [x] Display predicted versus observed state and explain why a plan was invalidated.
+
+**R9 delivery** — See [descent digital twin](descent-twin.md). The R4 descent is flown with separate ground truth, range-scaled noisy observations and a constant-gain estimate, and guidance steers by the estimate. With perfect sensing it reproduces R4 exactly. Timestamped thrust loss, sensor degradation, propellant leaks, comm outages and synthetic obstacles change the model and invalidate only the plans that depend on them, in a hashed, replayable event log. A same-seed no-event baseline gives numerical differences. On Malapert (seed 2026), a navigation sensor lost at 450 s puts the lander 471 m off target while its own expected error stays at a few metres. The contracts item stays open: the twin uses local models whose names match TK's H0 contracts (`record_kind`, `thrust_loss`, `sensor_degradation`), and it is ticked once H0 is merged and an adapter is added. Frozen tests: `ac30279`.
 
 ### R10 — Hybrid quantum-classical optimization
 

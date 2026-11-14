@@ -1,0 +1,44 @@
+/* R9: descent digital twin (kept separate from style.css; reuses risk.css). */
+.twin-error {
+  fill: none;
+  stroke: #e66767;
+  stroke-width: 2;
+}
+.twin-std {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+.twin-event-line {
+  stroke: var(--gold);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.twin-swatch {
+  display: inline-block;
+  width: 18px;
+  height: 0;
+  vertical-align: middle;
+  border-top: 2px solid #e66767;
+}
+.twin-swatch.std {
+  border-top: 2px dashed var(--blue);
+}
+.twin-log {
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  color: #c4ced5;
+}
+.twin-log li.plan_invalidated {
+  color: #f0a3a3;
+}
+.twin-log b {
+  font-family: var(--mono);
+  font-weight: 400;
+  color: var(--gold);
+}
