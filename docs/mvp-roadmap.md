@@ -95,16 +95,18 @@ Step 2 implementation and local verification completed on 2026-11-14 in `feature
 
 Depends on Step 2.
 
-- [ ] Compare Horizons Sun/Earth angles with the terrain horizon at each timestamp.
-- [ ] Calculate the documented partial/full solar disk conditions.
-- [ ] Refine transition intervals and retain known sampling limitations.
-- [ ] Produce sunlight, darkness and Earth-center visibility intervals.
-- [ ] Calculate total visible duration, percentage, longest gap and longest continuous window.
-- [ ] Calculate the next sunset and Earthset relative to the selected instant.
-- [ ] Preserve unknown durations and distinguish no event in range from a confirmed setting event.
-- [ ] Validate time windows, clipped analysis boundaries and polar cases against documented references.
+- [x] Compare Horizons Sun/Earth angles with the terrain horizon at each timestamp.
+- [x] Calculate the documented partial/full solar disk conditions.
+- [x] Refine transition intervals and retain known sampling limitations.
+- [x] Produce sunlight, darkness and Earth-center visibility intervals.
+- [x] Calculate total visible duration, percentage, longest gap and longest continuous window.
+- [x] Calculate the next sunset and Earthset relative to the selected instant.
+- [x] Preserve unknown durations and distinguish no event in range from a confirmed setting event.
+- [x] Validate time windows, clipped analysis boundaries and polar cases against documented references.
 
 **Completion evidence** — One site's analysis can be reproduced from cached data and exposes its uncertainty and coverage.
+
+Step 3 implementation and local verification completed on 2026-11-14 in `feature/task3-visibility-metrics`. The November Malapert case has real queue-driven transition refinement and explicit temporal/spatial limitations. See [visibility metrics](visibility-metrics.md) and its reproducible verification report. Teammate review and manual merge remain separate.
 
 ### Step 4 — Deliver the analysis API and single-site experience
 

@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "request_id": "46711907-f0f4-5d1d-a36b-4c18f6e4d5fd",
+  "analysis": {
+    "site": {
+      "site_id": "malapert-massif-r23",
+      "latitude_deg": -85.9948,
+      "longitude_deg_east": 359.76422,
+      "altitude_km": 4.78662451171875,
+      "reference_frame": "MOON_ME"
+    },
+    "start_utc": "2026-11-01T00:00:00Z",
+    "end_utc": "2026-12-01T00:00:00Z",
+    "step_s": 3600
+  },
+  "terrain_radius_m": 20000
+}

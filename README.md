@@ -4,7 +4,7 @@
 
 ## Mevcut durum
 
-Task 0 tamamlandı: servis kurulumu, bağımlılık kilitleri, temiz kurulum ve başlangıç arazi/nokta kaynakları doğrulandı. Backend sağlık endpoint'i, ortak veri modelleri ve başlangıç arayüzü mevcut. Task 1 bu dalda uygulandı: RabbitMQ istekleri Güneş/Dünya verisi ve kalıcı LOLA arazi kesiti üretir. Ufuk ve görünürlük hesaplamaları sonraki adımlardadır.
+Task 0 tamamlandı: servis kurulumu, bağımlılık kilitleri, temiz kurulum ve başlangıç arazi/nokta kaynakları doğrulandı. Backend sağlık endpoint'i, ortak veri modelleri ve başlangıç arayüzü mevcut. Task 1 bu dalda uygulandı: RabbitMQ istekleri Güneş/Dünya verisi ve kalıcı LOLA arazi kesiti üretir. Task 2 arazi ufkunu, Task 3 görünürlük aralıklarını ve süre metriklerini hesaplar. Kullanıcı arayüzü ve analiz API'si Task 4 kapsamındadır.
 
 ## Kurulum
 
@@ -104,3 +104,25 @@ veya güvenli iniş kararı üretmez. Görünürlük Task 3, arayüz Task 4 kaps
 [Hesaplama ayrıntıları, sınırlamalar ve doğrulama](docs/terrain-horizon.md).
 Task 2 yalnızca `feature/task2-terrain-horizon` branch'ine gönderilir;
 `tahakrcc` ve `main` ile birleştirmeyi kullanıcı yapar.
+
+## Task 3: Görünürlük ve süre metrikleri
+
+Task 1'in `ready` yanıtındaki iki referansla çalıştır:
+
+```bash
+docker compose --env-file .env.example run --rm --no-deps backend \
+  python -m app.analyze_visibility TERRAIN_REFERENCE HORIZONS_REFERENCE --refine \
+  > visibility.json
+```
+
+Güneş için tam/kısmi görünürlük ve karanlık, Dünya için merkez görünürlüğü;
+toplam süre/yüzde, en uzun kesinti ve kesintisiz görünürlük, sonraki batış
+hesaplanır. Eksik veri ayrıca raporlanır. `--refine`, bulunan geçişler için
+RabbitMQ üzerinden 5 dakikalık ve ardından 1 dakikalık veri ister; servisler
+çalışıyor olmalıdır. Bu seçenek olmadan yalnızca yerel veriler okunur.
+
+Süreler örnekler arasındaki modele göre tahmindir. Geçişlerin zaman aralığı ve
+arazi belirsizliği sonuçta korunur. Dünya'nın görünmesi gerçek bir haberleşme
+bağlantısı garantisi değildir. [Model, komutlar ve doğrulama](docs/visibility-metrics.md).
+Task 3 yalnızca `feature/task3-visibility-metrics` branch'ine gönderilir;
+birleştirmeyi kullanıcı yapar.

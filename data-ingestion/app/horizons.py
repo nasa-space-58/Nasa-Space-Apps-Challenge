@@ -22,6 +22,7 @@ from shared.constants import MOON_REFERENCE_RADIUS_KM
 
 ENDPOINT = "https://ssd.jpl.nasa.gov/api/horizons.api"
 CACHE_VERSION = 1
+PARSER_VERSION = 2
 # Horizons reports a spherical lunar reference surface (km), not terrain height.
 TARGETS = {'10': 'sun', '399': 'earth'}
 
@@ -55,7 +56,7 @@ def build_params(request: AnalysisRequest, target: str) -> dict[str, str]:
 def cache_key(request: AnalysisRequest) -> str:
     """Hash request identity, endpoint, all query options and parser version."""
     identity = {'request': request.model_dump(mode='json'), 'endpoint': ENDPOINT,
-                'version': CACHE_VERSION,
+                'version': CACHE_VERSION, 'parser_version': PARSER_VERSION,
                 'params': {t: build_params(request, t) for t in TARGETS}}
     return hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
 
@@ -125,7 +126,13 @@ def parse_response(payload: dict, request: AnalysisRequest, target: str) -> dict
     if len(column_lines) != 1:
         raise HorizonsError('Missing CSV column header')
     columns = [c.strip() for c in next(csv.reader(column_lines))]
-    names = ['Date__(UT)__HR:MN:SS', 'Azimuth_(a-app)', 'Elevation_(a-app)', 'Ang-diam']
+    time_formats = {'Date__(UT)__HR:MN:SS': '%Y-%b-%d %H:%M:%S',
+                    'Date__(UT)__HR:MN': '%Y-%b-%d %H:%M'}
+    time_columns = [name for name in columns if name in time_formats]
+    if len(time_columns) != 1:
+        raise HorizonsError('Missing or ambiguous CSV columns / UTC time scale')
+    time_column = time_columns[0]
+    names = [time_column, 'Azimuth_(a-app)', 'Elevation_(a-app)', 'Ang-diam']
     if any(columns.count(name) != 1 for name in names):
         raise HorizonsError('Missing or ambiguous CSV columns / UTC time scale')
     indexes = [columns.index(name) for name in names]
@@ -138,7 +145,7 @@ def parse_response(payload: dict, request: AnalysisRequest, target: str) -> dict
         if len(row) != len(columns):
             raise HorizonsError('Malformed CSV row')
         try:
-            stamp = datetime.strptime(row[indexes[0]].strip(), '%Y-%b-%d %H:%M:%S').replace(tzinfo=timezone.utc)
+            stamp = datetime.strptime(row[indexes[0]].strip(), time_formats[time_column]).replace(tzinfo=timezone.utc)
         except ValueError as exc:
             raise HorizonsError('Invalid UTC sample timestamp') from exc
         if stamp != request.start_utc + timedelta(seconds=i * request.step_s):
@@ -233,7 +240,7 @@ def download(request: AnalysisRequest, data_dir: Path, client: httpx.Client) -> 
             hashes = {name: hashlib.sha256((stage / name).read_bytes()).hexdigest()
                       for name in ['raw/10.json', 'raw/399.json', 'samples.json']}
             _write_json(stage / 'manifest.json', {
-                'cache_key': key, 'cache_version': CACHE_VERSION,
+                'cache_key': key, 'cache_version': CACHE_VERSION, 'parser_version': PARSER_VERSION,
                 'request': request.model_dump(mode='json'), 'sources': sources,
                 'acquired_at_utc': _utc(datetime.now(timezone.utc)), 'sha256': hashes,
                 'sample_count': len(combined), 'terrain_applied': False,
