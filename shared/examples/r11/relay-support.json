@@ -1,0 +1,339 @@
+{
+  "schema_version": 1,
+  "revision": 0,
+  "window": {
+    "start_utc": "2026-12-01T00:00:00Z",
+    "end_utc": "2026-12-03T00:00:00Z"
+  },
+  "slot_s": 3600,
+  "landing_step_s": 21600,
+  "preferences": {
+    "priority_weights": [
+      5,
+      3,
+      2,
+      1.5,
+      1
+    ],
+    "science_weight": 1,
+    "science_scale_score": 1,
+    "fuel_weight": 0.5,
+    "fuel_scale_kg": 1000,
+    "wait_weight": 0.2,
+    "wait_scale_s": 86400,
+    "reserve_weight": 0.1,
+    "reserve_scale_kg": 1000
+  },
+  "sources": [
+    {
+      "source_id": "synthetic-evidence",
+      "kind": "synthetic",
+      "description": "Synthetic R2/Task 3/R3/R4-shaped evidence for a teaching example; not computed from LOLA or Horizons."
+    },
+    {
+      "source_id": "planning-assumptions",
+      "kind": "assumption",
+      "description": "Assumed vehicle, data-rate, station-calendar and policy values; not NASA or DSN figures."
+    }
+  ],
+  "campaign_id": "r11-relay-support",
+  "description": "Synthetic campaign: a site with no direct station geometry is served through a relay lander only where relay equipment and line-of-sight evidence exist.",
+  "missions": [
+    {
+      "mission_id": "relay-3",
+      "vehicle_id": "relay-lander",
+      "mission_type": "relay_lander",
+      "priority": 2,
+      "landing_window": {
+        "start_utc": "2026-12-01T00:00:00Z",
+        "end_utc": "2026-12-01T06:00:00Z"
+      },
+      "deadline_utc": "2026-12-03T00:00:00Z",
+      "site_ids": [
+        "relay-ridge"
+      ],
+      "science_score_by_site": {
+        "relay-ridge": 1
+      },
+      "requirements": {
+        "surface_duration_s": 86400,
+        "energy_j": 20000000.0,
+        "downlink_bits": 7200000000.0
+      },
+      "policy": {
+        "cancel_allowed": false,
+        "cancel_penalty_score": 0,
+        "defer_allowed": false,
+        "max_defer_s": 0,
+        "defer_penalty_score": 0,
+        "defer_penalty_score_per_h": 0
+      },
+      "dependencies": [],
+      "requires_exclusive_link": false,
+      "relay_terminal": false,
+      "relay_service": {
+        "capacity_links": 1,
+        "max_range_m": 60000,
+        "hop_rate_bps": 500000.0
+      },
+      "source_ids": [
+        "planning-assumptions"
+      ]
+    },
+    {
+      "mission_id": "crater-3",
+      "vehicle_id": "clps-lander",
+      "mission_type": "robotic_lander",
+      "priority": 1,
+      "landing_window": {
+        "start_utc": "2026-12-01T06:00:00Z",
+        "end_utc": "2026-12-01T18:00:00Z"
+      },
+      "deadline_utc": "2026-12-03T00:00:00Z",
+      "site_ids": [
+        "crater-floor"
+      ],
+      "science_score_by_site": {
+        "crater-floor": 6
+      },
+      "requirements": {
+        "surface_duration_s": 43200,
+        "energy_j": 10000000.0,
+        "downlink_bits": 5400000000.0
+      },
+      "policy": {
+        "cancel_allowed": true,
+        "cancel_penalty_score": 3,
+        "defer_allowed": false,
+        "max_defer_s": 0,
+        "defer_penalty_score": 0,
+        "defer_penalty_score_per_h": 0
+      },
+      "dependencies": [
+        {
+          "predecessor_mission_id": "relay-3",
+          "kind": "landed_before_landing",
+          "min_lag_s": 21600
+        }
+      ],
+      "requires_exclusive_link": false,
+      "relay_terminal": true,
+      "relay_service": null,
+      "source_ids": [
+        "planning-assumptions"
+      ]
+    }
+  ],
+  "vehicles": [
+    {
+      "vehicle_id": "relay-lander",
+      "usable_propellant_kg": 1000,
+      "propellant_reserve_kg": 50,
+      "max_landing_slope_deg": 8,
+      "max_unknown_landing_fraction": 0.1,
+      "solar_power_w": 1000,
+      "initial_energy_j": 20000000.0,
+      "energy_reserve_j": 2000000.0,
+      "source_ids": [
+        "planning-assumptions"
+      ]
+    },
+    {
+      "vehicle_id": "clps-lander",
+      "usable_propellant_kg": 1000,
+      "propellant_reserve_kg": 50,
+      "max_landing_slope_deg": 8,
+      "max_unknown_landing_fraction": 0.1,
+      "solar_power_w": 1000,
+      "initial_energy_j": 20000000.0,
+      "energy_reserve_j": 2000000.0,
+      "source_ids": [
+        "planning-assumptions"
+      ]
+    }
+  ],
+  "sites": [
+    {
+      "site": {
+        "site_id": "relay-ridge",
+        "latitude_deg": -88.8,
+        "longitude_deg_east": 10.0
+      },
+      "evidence_window": {
+        "start_utc": "2026-12-01T00:00:00Z",
+        "end_utc": "2026-12-03T00:00:00Z"
+      },
+      "terrain": {
+        "max_landing_slope_deg": 4.0,
+        "unknown_landing_fraction": 0.0,
+        "hazard_distance_m": null,
+        "source_ids": [
+          "synthetic-evidence"
+        ]
+      },
+      "sunlight": [
+        {
+          "window": {
+            "start_utc": "2026-12-01T00:00:00Z",
+            "end_utc": "2026-12-03T00:00:00Z"
+          },
+          "state": "full"
+        }
+      ],
+      "station_geometry": [
+        {
+          "station_id": "dss-alpha",
+          "intervals": [
+            {
+              "window": {
+                "start_utc": "2026-12-01T00:00:00Z",
+                "end_utc": "2026-12-01T12:00:00Z"
+              },
+              "state": "available"
+            },
+            {
+              "window": {
+                "start_utc": "2026-12-01T12:00:00Z",
+                "end_utc": "2026-12-02T00:00:00Z"
+              },
+              "state": "unavailable"
+            },
+            {
+              "window": {
+                "start_utc": "2026-12-02T00:00:00Z",
+                "end_utc": "2026-12-02T12:00:00Z"
+              },
+              "state": "available"
+            },
+            {
+              "window": {
+                "start_utc": "2026-12-02T12:00:00Z",
+                "end_utc": "2026-12-03T00:00:00Z"
+              },
+              "state": "unavailable"
+            }
+          ]
+        }
+      ],
+      "descents": [
+        {
+          "vehicle_id": "relay-lander",
+          "feasible": true,
+          "propellant_used_kg": 870,
+          "source_ids": [
+            "synthetic-evidence"
+          ]
+        }
+      ],
+      "source_ids": [
+        "synthetic-evidence"
+      ]
+    },
+    {
+      "site": {
+        "site_id": "crater-floor",
+        "latitude_deg": -89.3,
+        "longitude_deg_east": 25.0
+      },
+      "evidence_window": {
+        "start_utc": "2026-12-01T00:00:00Z",
+        "end_utc": "2026-12-03T00:00:00Z"
+      },
+      "terrain": {
+        "max_landing_slope_deg": 2.5,
+        "unknown_landing_fraction": 0.0,
+        "hazard_distance_m": null,
+        "source_ids": [
+          "synthetic-evidence"
+        ]
+      },
+      "sunlight": [
+        {
+          "window": {
+            "start_utc": "2026-12-01T00:00:00Z",
+            "end_utc": "2026-12-03T00:00:00Z"
+          },
+          "state": "full"
+        }
+      ],
+      "station_geometry": [
+        {
+          "station_id": "dss-alpha",
+          "intervals": [
+            {
+              "window": {
+                "start_utc": "2026-12-01T00:00:00Z",
+                "end_utc": "2026-12-03T00:00:00Z"
+              },
+              "state": "unavailable"
+            }
+          ]
+        }
+      ],
+      "descents": [
+        {
+          "vehicle_id": "clps-lander",
+          "feasible": true,
+          "propellant_used_kg": 860,
+          "source_ids": [
+            "synthetic-evidence"
+          ]
+        }
+      ],
+      "source_ids": [
+        "synthetic-evidence"
+      ]
+    }
+  ],
+  "stations": [
+    {
+      "station_id": "dss-alpha",
+      "capacity_links": 2,
+      "availability": [
+        {
+          "start_utc": "2026-12-01T00:00:00Z",
+          "end_utc": "2026-12-03T00:00:00Z"
+        }
+      ],
+      "source_ids": [
+        "planning-assumptions"
+      ]
+    }
+  ],
+  "link_rates": [
+    {
+      "mission_id": "relay-3",
+      "station_id": "dss-alpha",
+      "rate_bps": 1000000.0,
+      "source_ids": [
+        "planning-assumptions"
+      ]
+    },
+    {
+      "mission_id": "crater-3",
+      "station_id": "dss-alpha",
+      "rate_bps": 1000000.0,
+      "source_ids": [
+        "planning-assumptions"
+      ]
+    }
+  ],
+  "relay_geometry": [
+    {
+      "client_site_id": "crater-floor",
+      "relay_site_id": "relay-ridge",
+      "intervals": [
+        {
+          "window": {
+            "start_utc": "2026-12-01T00:00:00Z",
+            "end_utc": "2026-12-03T00:00:00Z"
+          },
+          "state": "available"
+        }
+      ],
+      "source_ids": [
+        "synthetic-evidence"
+      ]
+    }
+  ]
+}
