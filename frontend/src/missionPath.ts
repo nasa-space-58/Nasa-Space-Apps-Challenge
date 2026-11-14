@@ -55,6 +55,7 @@ export const SCENE_LAYOUT: SceneLayout = {
 export const COVERAGE_MAX_LATITUDE_DEG = -80;
 
 export type PhaseId =
+  | "launch"
   | "parking_orbit"
   | "translunar_coast"
   | "lunar_orbit"
@@ -73,19 +74,27 @@ export type MissionPhase = {
 
 export const MISSION_PHASES: readonly MissionPhase[] = [
   {
+    id: "launch",
+    label: "Launch",
+    description:
+      "The three-stage launch vehicle lifts off, drops its spent stages and fairing, and reaches a low parking orbit.",
+    start_progress: 0,
+    end_progress: 0.2,
+  },
+  {
     id: "parking_orbit",
     label: "Earth parking orbit",
     description:
       "The spacecraft circles Earth while systems are checked before departure.",
-    start_progress: 0,
-    end_progress: 0.12,
+    start_progress: 0.2,
+    end_progress: 0.26,
   },
   {
     id: "translunar_coast",
     label: "Translunar coast",
     description:
       "After the departure burn the spacecraft coasts towards the Moon for several days.",
-    start_progress: 0.12,
+    start_progress: 0.26,
     end_progress: 0.55,
   },
   {
@@ -120,6 +129,12 @@ export const MISSION_PHASES: readonly MissionPhase[] = [
  */
 export const LANDING_CLOSEUP_START_PROGRESS = 0.84;
 
+/**
+ * Progress at which mission control cuts from the art-directed launch close-up
+ * back to the spacecraft view, shortly before parking-orbit insertion.
+ */
+export const LAUNCH_CLOSEUP_END_PROGRESS = 0.18;
+
 export type SiteSelection = {
   latitude_deg: number;
   longitude_deg_east: number;
@@ -141,6 +156,8 @@ const RAD_PER_DEG = Math.PI / 180;
 const DESCENT_SWEEP_RAD = 0.45;
 const LUNAR_ORBIT_SWEEP_RAD = 1.5 * Math.PI;
 const PARKING_SWEEP_RAD = 1.5 * Math.PI;
+/** Downrange angle flown around Earth during the illustrative ascent. */
+const LAUNCH_SWEEP_RAD = 0.5;
 
 const requireFinite = (value: number, name: string) => {
   if (!Number.isFinite(value))
@@ -261,6 +278,18 @@ export function buildTransferPath(
       Math.cos(angle_rad) * parking_r,
     ]);
   };
+  // Gravity turn: vertical at lift-off (radius grows first), horizontal and
+  // tangent to the parking orbit at insertion (the angle changes last).
+  const earth_r = layout.earth_radius_scene;
+  const launch = (f: number): Vec3 => {
+    const angle_rad = PARKING_SWEEP_RAD + LAUNCH_SWEEP_RAD * (1 - f * f);
+    const radius = earth_r + (parking_r - earth_r) * (1 - (1 - f) * (1 - f));
+    return add(earth, [
+      Math.sin(angle_rad) * radius,
+      0,
+      Math.cos(angle_rad) * radius,
+    ]);
+  };
   const departure = parking(1);
   const departure_heading = unit(sub(parking(1), parking(1 - 1e-6)));
   const capture = orbitPoint(capture_rad, orbit_r);
@@ -298,6 +327,7 @@ export function buildTransferPath(
         );
 
   const evaluate: Record<FlightSegment, (fraction: number) => Vec3> = {
+    launch,
     parking_orbit: parking,
     translunar_coast: coast,
     lunar_orbit,
@@ -311,6 +341,7 @@ export function buildTransferPath(
     layout,
     site_scene,
     segments: {
+      launch: sample(launch),
       parking_orbit: sample(parking),
       translunar_coast: sample(coast),
       lunar_orbit: sample(lunar_orbit),
@@ -337,6 +368,7 @@ export function headingAt(path: TransferPath, progress: number): Vec3 {
 }
 
 const flightOrder: FlightSegment[] = [
+  "launch",
   "parking_orbit",
   "translunar_coast",
   "lunar_orbit",

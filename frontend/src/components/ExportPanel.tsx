@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import type { Result } from "../types";
 import HorizonPlot from "./HorizonPlot";
+import { errorText, useTranslate } from "../i18n";
 
 export default function ExportPanel({
   jobId,
@@ -19,6 +20,7 @@ export default function ExportPanel({
   bFrameIndex?: number;
   cursor?: number;
 }) {
+  const { t } = useTranslate();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -43,7 +45,7 @@ export default function ExportPanel({
       if (!response.ok) {
         const body = await response.json();
         throw Error(
-          typeof body.detail === "string" ? body.detail : "Export unavailable",
+          typeof body.detail === "string" ? body.detail : t("export.unavailable"),
         );
       }
       const blob = await response.blob();
@@ -53,11 +55,11 @@ export default function ExportPanel({
       );
       setMessage(
         kind === "report"
-          ? "Report downloaded. Open it and use Print / Save as PDF."
-          : "Download ready.",
+          ? t("export.reportReady")
+          : t("export.downloadReady"),
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Export failed");
+      setError(errorText(e, t, "export.failed"));
     } finally {
       setBusy(false);
     }
@@ -67,7 +69,7 @@ export default function ExportPanel({
     setBusy(true);
     let url = "";
     try {
-      if (!svg.current) throw Error("Chart is not ready");
+      if (!svg.current) throw Error(t("export.chartNotReady"));
       const original = svg.current;
       const clone = original.cloneNode(true) as SVGSVGElement;
       const nodes = [original, ...Array.from(original.querySelectorAll("*"))];
@@ -99,21 +101,19 @@ export default function ExportPanel({
       canvas.width = 2400;
       canvas.height = (b ? 1060 : 560) * 2;
       const context = canvas.getContext("2d");
-      if (!context) throw Error("PNG export needs canvas support");
+      if (!context) throw Error(t("export.needsCanvas"));
       context.drawImage(img, 0, 0, canvas.width, canvas.height);
       const blob = await new Promise<Blob>((resolve, reject) =>
         canvas.toBlob(
           (value) =>
-            value ? resolve(value) : reject(Error("Unable to encode PNG")),
+            value ? resolve(value) : reject(Error(t("export.encodeFailed"))),
           "image/png",
         ),
       );
       save(blob, "lunar-charts.png");
-      setMessage(
-        "PNG includes the displayed samples, timelines, units and analysis identifiers.",
-      );
+      setMessage(t("export.pngReady"));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "PNG export failed");
+      setError(errorText(e, t, "export.pngFailed"));
     } finally {
       if (url) URL.revokeObjectURL(url);
       setBusy(false);
@@ -130,29 +130,29 @@ export default function ExportPanel({
         aria-expanded={open}
         onClick={() => setOpen(!open)}
       >
-        Export / Share ↗
+        {t("export.toggle")} ↗
       </button>
       {open && (
         <div className="panel export-options">
-          <h3>Keep this observation</h3>
+          <h3>{t("export.title")}</h3>
           <div className="export-actions">
             <button disabled={busy} onClick={() => download("csv")}>
-              Download CSV
+              {t("export.csv")}
             </button>
             <button disabled={busy} onClick={png}>
-              Download chart PNG
+              {t("export.png")}
             </button>
             <button disabled={busy} onClick={() => download("report")}>
-              Download printable report
+              {t("export.report")}
             </button>
             <button disabled={busy} onClick={() => download("scenario")}>
-              Download scenario JSON
+              {t("export.scenario")}
             </button>
           </div>
           <label>
-            Saved result link
+            {t("export.link")}
             <input
-              aria-label="Saved result link"
+              aria-label={t("export.link")}
               readOnly
               value={link}
               onFocus={(e) => e.target.select()}
@@ -163,20 +163,15 @@ export default function ExportPanel({
             onClick={async () => {
               try {
                 await navigator.clipboard.writeText(link);
-                setMessage("Link copied.");
+                setMessage(t("export.copied"));
               } catch {
-                setMessage("Select the link above and copy it manually.");
+                setMessage(t("export.copyManually"));
               }
             }}
           >
-            Copy link
+            {t("export.copy")}
           </button>
-          <p className="field-help">
-            Links open the saved result on this server, including the selected
-            time. A localhost link works only on your computer. Scenario JSON
-            carries inputs and expected dataset/model fingerprints for a new
-            calculation; it does not contain the terrain cache.
-          </p>
+          <p className="field-help">{t("export.linkNote")}</p>
           {message && <p role="status">{message}</p>}
           {error && (
             <p role="alert" className="alert">
@@ -215,15 +210,17 @@ export default function ExportPanel({
                 fontSize="12"
               >
                 <text x="40" y="30">
-                  {label} · {view.analysis.request.site.site_id} · displayed
-                  sample {frame.utc}
+                  {label} · {view.analysis.request.site.site_id} ·{" "}
+                  {t("export.chart.sample", { utc: frame.utc })}
                 </text>
                 <text x="40" y="52">
-                  Window: {view.analysis.request.start_utc} —{" "}
-                  {view.analysis.request.end_utc} · MOON_ME · degrees east
+                  {t("export.chart.window", {
+                    start: view.analysis.request.start_utc,
+                    end: view.analysis.request.end_utc,
+                  })}
                 </text>
                 <text x="40" y="73" fontSize="10">
-                  Analysis: {view.analysis.analysis_id}
+                  {t("app.trace.analysis")}: {view.analysis.analysis_id}
                 </text>
                 <svg x="40" y="90" width="1100" height="280">
                   <HorizonPlot
@@ -235,7 +232,7 @@ export default function ExportPanel({
                 {(["sun", "earth"] as const).map((target, j) => (
                   <g key={target} transform={`translate(0 ${380 + j * 36})`}>
                     <text x="40" y="14">
-                      {target === "sun" ? "Sun" : "Earth"}
+                      {target === "sun" ? t("common.sun") : t("common.earth")}
                     </text>
                     {view.analysis[target].intervals.map((row, k) => (
                       <rect
@@ -258,19 +255,16 @@ export default function ExportPanel({
                   </g>
                 ))}
                 <text x="40" y="460" fontSize="10">
-                  Gold: full Sun · brown: partial · blue: Earth visible · grey:
-                  blocked · purple: unknown · peach: boundary
+                  {t("export.chart.legend")}
                 </text>
                 <text x="40" y="480" fontSize="10">
-                  Timeline spans the UTC window above. Uneven sampled times are
-                  preserved. NASA LOLA / JPL Horizons.
+                  {t("export.chart.timeline")}
                 </text>
               </g>
             );
           })}
           <text x="40" y={b ? 1030 : 530} fill="#abb9c5" fontSize="11">
-            Terrain-relative estimates, not landing safety or a radio link
-            guarantee. Full sources/settings accompany the report and CSV.
+            {t("export.chart.disclaimer")}
           </text>
         </svg>
       </div>

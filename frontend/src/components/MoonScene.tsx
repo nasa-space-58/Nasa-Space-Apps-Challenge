@@ -2,6 +2,7 @@ import { Suspense, useEffect, useMemo, useRef } from "react";
 import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { Dust, Model, Terrain, smooth, noise } from "./LunarSurface";
+import { useTranslate } from "../i18n";
 
 function World({
   progress,
@@ -209,9 +210,10 @@ export default function MoonScene({
   compact?: boolean;
   onFailure: () => void;
 }) {
+  const { t } = useTranslate();
   return (
     <Canvas
-      aria-label="Illustrative NASA Moon, LRO and Apollo 3D scene"
+      aria-label={t("moonScene.label")}
       camera={{ position: [0, 0, 10], fov: 43 }}
       dpr={compact ? 1 : [1, 1.5]}
       shadows={{ type: THREE.PCFShadowMap }}

@@ -1,5 +1,6 @@
 import { useId } from "react";
 import type { Frame, Result } from "../types";
+import { useTranslate } from "../i18n";
 export default function HorizonPlot({
   result,
   frame,
@@ -9,6 +10,7 @@ export default function HorizonPlot({
   frame: Frame;
   scaleResults?: Result[];
 }) {
+  const { t } = useTranslate();
   const clipId = useId();
   const x = (az: number) => 48 + (az / 360) * 820;
   // Display bounds include every returned sample so scrubbing does not rescale.
@@ -59,7 +61,10 @@ export default function HorizonPlot({
       className="horizon-plot"
       viewBox="-60 0 1030 270"
       role="img"
-      aria-label={`Terrain horizon. Sun ${frame.sun.state}, Earth ${frame.earth.state}. Elevation in degrees.`}
+      aria-label={t("horizonPlot.label", {
+        sun: t(`displayState.${frame.sun.state}`),
+        earth: t(`displayState.${frame.earth.state}`),
+      })}
     >
       <defs>
         <clipPath id={clipId}>
@@ -84,15 +89,21 @@ export default function HorizonPlot({
         <g key={az}>
           <line x1={x(az)} x2={x(az)} y1="20" y2="225" className="grid-line" />
           <text x={x(az)} y="252" textAnchor="middle">
-            {["N · 0°", "E · 90°", "S · 180°", "W · 270°", "N · 360°"][i]}
+            {[
+              t("horizonPlot.n0"),
+              t("horizonPlot.e90"),
+              t("horizonPlot.s180"),
+              t("horizonPlot.w270"),
+              t("horizonPlot.n360"),
+            ][i]}
           </text>
         </g>
       ))}
       <text x="-52" y="12" className="axis-title">
-        ELEVATION ABOVE LEVEL ↑
+        {t("horizonPlot.elevation")} ↑
       </text>
       <text x="868" y="268" textAnchor="end" className="axis-title">
-        COMPASS DIRECTION (AZIMUTH) →
+        {t("horizonPlot.azimuth")} →
       </text>
       <g clipPath={`url(#${clipId})`}>
         <path d={fill} className="terrain-fill" />
@@ -123,7 +134,7 @@ export default function HorizonPlot({
                 y={y(item.elevation_deg) - 10}
                 className={target}
               >
-                {target === "sun" ? "SUN" : "EARTH"}
+                {target === "sun" ? t("app.playback.sunTrack") : t("app.playback.earthTrack")}
               </text>
             </g>
           );

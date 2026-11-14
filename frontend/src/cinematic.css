@@ -739,7 +739,7 @@
   }
 }
 
-/* Standalone pages: mission control, time search and classroom sit below the fixed bar. */
+/* Mission control sits below the fixed bar; its modules stack beneath it. */
 .navigation nav button[aria-current="page"] {
   color: #f3eee4;
 }
@@ -751,23 +751,23 @@ main:not([data-view="home"]) {
 main:not([data-view="home"]) > footer {
   margin-top: auto;
 }
-main[data-view="mission"] .mission-section,
-main[data-view="search"] .window-search-section,
-main[data-view="classroom"] .classroom-section {
+main[data-view="mission"] .mission-section {
   padding-top: calc(88px + 56px);
   border-top: 0;
   scroll-margin-top: 88px;
 }
-main[data-view="mission"] .comparison-section {
+main[data-view="mission"] .comparison-section,
+main[data-view="mission"] .window-search-section,
+main[data-view="mission"] .classroom-section {
   scroll-margin-top: 88px;
 }
 @media (max-width: 760px) {
-  main[data-view="mission"] .mission-section,
-  main[data-view="search"] .window-search-section,
-  main[data-view="classroom"] .classroom-section {
+  main[data-view="mission"] .mission-section {
     padding-top: calc(106px + 32px);
   }
-  main[data-view="mission"] .comparison-section {
+  main[data-view="mission"] .comparison-section,
+  main[data-view="mission"] .window-search-section,
+  main[data-view="mission"] .classroom-section {
     scroll-margin-top: 106px;
   }
 }
@@ -804,10 +804,16 @@ main[data-view="mission"] .mission-section {
   gap: 22px;
   align-items: start;
 }
-.stage-viewport {
+.stage-main {
   position: sticky;
   top: 104px;
-  height: max(520px, calc(100vh - 230px));
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+.stage-viewport {
+  position: relative;
+  height: max(460px, calc(100vh - 230px - 74px));
   overflow: hidden;
   border: 1px solid #ffffff16;
   border-radius: 4px;
@@ -1104,6 +1110,10 @@ main[data-view="mission"] .mission-section {
   .mission-stage {
     grid-template-columns: 1fr;
   }
+  .stage-main {
+    position: relative;
+    top: 0;
+  }
   .stage-viewport {
     position: relative;
     top: 0;
@@ -1148,4 +1158,418 @@ main[data-view="mission"] .mission-section {
   .stage-status {
     justify-content: flex-start;
   }
+}
+
+/* Start-date strip under the mission-control scene. */
+.date-scrubber {
+  position: relative;
+  height: 64px;
+  overflow: hidden;
+  border: 1px solid #ffffff16;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #0b1218, #070b0f);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.date-scrubber:active {
+  cursor: grabbing;
+}
+.date-scrubber:focus-visible {
+  outline: 1px solid var(--gold);
+  outline-offset: 2px;
+}
+.date-scrubber.disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+.date-scrubber::before,
+.date-scrubber::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 18%;
+  z-index: 2;
+  pointer-events: none;
+}
+.date-scrubber::before {
+  left: 0;
+  background: linear-gradient(90deg, #070b0f, transparent);
+}
+.date-scrubber::after {
+  right: 0;
+  background: linear-gradient(270deg, #070b0f, transparent);
+}
+.scrubber-ruler {
+  position: absolute;
+  inset: 0;
+}
+.scrubber-day {
+  position: absolute;
+  bottom: 0;
+  height: 22px;
+  border-left: 1px solid #ffffff2a;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 23px,
+    #ffffff10 23px 24px
+  );
+}
+.scrubber-day span {
+  position: absolute;
+  left: 6px;
+  bottom: 5px;
+  font: 9px var(--mono);
+  letter-spacing: 0.08em;
+  color: #8fa0ab;
+  white-space: nowrap;
+}
+.scrubber-day.month-start {
+  height: 30px;
+  border-left-color: var(--gold);
+}
+.scrubber-day.month-start span {
+  color: var(--gold);
+}
+.scrubber-span {
+  position: absolute;
+  bottom: 0;
+  height: 22px;
+  background: #dab78226;
+  border-top: 1px solid #dab78288;
+}
+.scrubber-needle {
+  position: absolute;
+  left: 50%;
+  top: 30px;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--gold);
+  z-index: 3;
+}
+.scrubber-readout {
+  position: absolute;
+  left: 50%;
+  top: 6px;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: grid;
+  justify-items: center;
+  gap: 1px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.scrubber-readout strong {
+  font: 12px var(--mono);
+  letter-spacing: 0.06em;
+  color: #f3eee4;
+}
+.scrubber-readout small {
+  font: 8px var(--mono);
+  letter-spacing: 0.1em;
+  color: #8fa0ab;
+  text-transform: uppercase;
+}
+.date-scrubber.editing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  cursor: default;
+}
+.date-scrubber.editing::before,
+.date-scrubber.editing::after {
+  display: none;
+}
+.date-scrubber.editing label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+}
+.date-scrubber.editing .eyebrow {
+  margin: 0;
+  font: 9px var(--mono);
+  letter-spacing: 0.14em;
+  color: var(--gold);
+}
+.date-scrubber.editing input {
+  width: auto;
+  margin: 0;
+}
+
+/* Mission control: a fixed, non-scrolling workspace. The scene fills the
+   width; the resizable side panel holds the plan, results and modules. */
+main[data-view="mission"] {
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
+}
+main[data-view="mission"] > footer {
+  display: none;
+}
+main[data-view="mission"] .mission-section {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 88px 0 0;
+  background: #03060a;
+}
+main[data-view="mission"] .mission-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--panel-width);
+  gap: 0;
+  align-items: stretch;
+}
+main[data-view="mission"] .mission-stage[data-panel="closed"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+main[data-view="mission"] .stage-main {
+  position: relative;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 0;
+}
+main[data-view="mission"] .stage-viewport {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+}
+main[data-view="mission"] .date-scrubber {
+  flex: none;
+  border-radius: 0;
+  border-width: 1px 0 0;
+}
+main[data-view="mission"] .stage-controls {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  min-height: 0;
+  border-left: 1px solid #ffffff16;
+  background: #0a0f13;
+}
+main[data-view="mission"] .stage-controls[hidden] {
+  display: none;
+}
+.panel-resizer {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -4px;
+  width: 8px;
+  z-index: 3;
+  cursor: col-resize;
+  touch-action: none;
+}
+.panel-resizer:hover,
+.panel-resizer:focus-visible {
+  outline: none;
+  background: linear-gradient(90deg, transparent 3px, var(--gold) 3px, var(--gold) 5px, transparent 5px);
+}
+body.panel-resizing {
+  cursor: col-resize;
+  user-select: none;
+}
+body.panel-resizing canvas {
+  pointer-events: none;
+}
+.panel-bar {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 10px 0;
+  border-bottom: 1px solid #ffffff16;
+}
+.panel-tabs {
+  flex: 1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  min-width: 0;
+}
+.panel-tabs button {
+  padding: 8px 10px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #7f8e98;
+  font: 10px var(--mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+.panel-tabs button:hover {
+  color: #f3eee4;
+}
+.panel-tabs button[aria-selected="true"] {
+  color: #f3eee4;
+  border-bottom-color: var(--gold);
+}
+.panel-bar-end {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-top: 4px;
+}
+.panel-bar-end .connection {
+  font: 9px var(--mono);
+  white-space: nowrap;
+}
+.panel-collapse,
+.panel-reopen {
+  border: 1px solid #ffffff20;
+  background: #0a0f13;
+  color: #a7bac6;
+  font: 12px var(--mono);
+  cursor: pointer;
+}
+.panel-collapse {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+}
+.panel-reopen {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 4;
+  padding: 7px 12px;
+}
+.panel-collapse:hover,
+.panel-reopen:hover {
+  border-color: var(--gold);
+  color: #f3eee4;
+}
+.panel-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 16px;
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  container-type: inline-size;
+}
+.panel-body[hidden] {
+  display: none;
+}
+/* Former page sections become compact panel modules. */
+.panel-body > .analysis-results,
+.panel-body > .window-search-section,
+.panel-body > .classroom-section,
+.panel-body > .comparison-section {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.panel-body .section-heading {
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+.panel-body .section-heading h2 {
+  font-size: 30px;
+}
+.panel-body .analysis-intro h3 {
+  font-size: 24px;
+}
+@container (max-width: 720px) {
+  .panel-body .search-layout,
+  .panel-body .comparison-setup,
+  .panel-body .compare-columns,
+  .panel-body .lesson-stage,
+  .panel-body .lesson-options,
+  .panel-body .event-grid {
+    grid-template-columns: 1fr;
+  }
+  .panel-body .metric-grid,
+  .panel-body .lesson-cards,
+  .panel-body .compare-totals,
+  .panel-body .communication-metrics,
+  .panel-body .compare-deltas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+@container (max-width: 420px) {
+  .panel-body .metric-grid,
+  .panel-body .lesson-cards,
+  .panel-body .compare-totals,
+  .panel-body .communication-metrics,
+  .panel-body .compare-deltas {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 760px) {
+  main[data-view="mission"] .mission-section {
+    padding-top: 106px;
+  }
+}
+@media (max-width: 900px) {
+  main[data-view="mission"] .mission-stage {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  main[data-view="mission"] .mission-stage[data-panel="closed"] {
+    grid-template-rows: minmax(0, 1fr);
+  }
+  main[data-view="mission"] .stage-viewport {
+    height: auto;
+    min-height: 0;
+  }
+  main[data-view="mission"] .stage-controls {
+    border-left: 0;
+    border-top: 1px solid #ffffff16;
+  }
+  .panel-resizer {
+    display: none;
+  }
+}
+
+/* Language switch (TR / EN) */
+.language-toggle {
+  display: inline-flex;
+  border: 1px solid #ffffff2e;
+  border-radius: 999px;
+  padding: 2px;
+  gap: 2px;
+}
+.language-toggle button {
+  min-width: 36px;
+  min-height: 28px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: #ffffffa6;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+.language-toggle button:hover {
+  color: #fff;
+}
+.language-toggle button[aria-pressed="true"] {
+  background: var(--gold);
+  color: #101419;
+}
+.header-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
 }

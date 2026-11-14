@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { errorText, useTranslate } from "../i18n";
 type Manifest = {
   schema_version: number;
   kind: string;
@@ -27,7 +28,7 @@ async function api(path: string, body?: unknown) {
     throw Error(
       typeof data.detail === "string"
         ? data.detail
-        : "Scenario request rejected",
+        : "",
     );
   return data;
 }
@@ -36,6 +37,7 @@ export default function ScenarioTransfer({
 }: {
   onOpen: (id: string, compare: boolean, bId?: string) => Promise<void>;
 }) {
+  const { t } = useTranslate();
   const [manifest, setManifest] = useState<Manifest | null>(null),
     [ids, setIds] = useState<string[]>([]),
     [error, setError] = useState("");
@@ -68,10 +70,8 @@ export default function ScenarioTransfer({
         if (!active) return;
         if (jobs.some((job) => job.status === "failed")) {
           setBusy(false);
-          setError(
-            "A calculation failed. Review the saved jobs, then run the scenario again.",
-          );
-          setProgress("Calculation failed");
+          setError(t("scenario.calcFailedDetail"));
+          setProgress(t("scenario.calcFailed"));
           return;
         }
         if (
@@ -87,20 +87,20 @@ export default function ScenarioTransfer({
             setChecked(verdict);
             setBusy(false);
             setError("");
-            setProgress("Calculation complete");
+            setProgress(t("scenario.calcComplete"));
           }
         } else {
           setBusy(true);
           setProgress(
             jobs
-              .map((job, i) => `${i === 0 ? "A" : "B"}: ${job.status}`)
+              .map((job, i) => `${i === 0 ? "A" : "B"}: ${t(`jobState.${job.status}`)}`)
               .join(" · "),
           );
           timer = setTimeout(poll, 1800);
         }
       } catch (e) {
         if (active) {
-          setError(e instanceof Error ? e.message : "Connection interrupted");
+          setError(errorText(e, t, "scenario.connection"));
           timer = setTimeout(poll, 5000);
         }
       }
@@ -120,16 +120,16 @@ export default function ScenarioTransfer({
     localStorage.removeItem("lunar-import");
     try {
       if (file.size > 1_000_000)
-        throw Error("Scenario file must be at most 1 MB");
+        throw Error(t("scenario.tooLarge"));
       const doc = await api(
         "/scenarios/validate",
         JSON.parse(await file.text()),
       );
       setIds([]);
       setManifest(doc);
-      setProgress("Inputs validated. Nothing has been queued.");
+      setProgress(t("scenario.validated"));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Invalid scenario file");
+      setError(errorText(e, t, "scenario.invalid"));
     } finally {
       setBusy(false);
     }
@@ -147,26 +147,21 @@ export default function ScenarioTransfer({
         next.push(job.id);
         setIds([...next]);
       }
-      setProgress("Calculations queued");
+      setProgress(t("scenario.queued"));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Unable to queue scenario");
-      setProgress(
-        `${next.length} calculation(s) queued; existing jobs remain saved.`,
-      );
+      setError(errorText(e, t, "scenario.queueFailed"));
+      setProgress(t("scenario.partialQueued", { n: next.length }));
       setBusy(false);
     }
   };
   return (
     <details className="panel scenario-transfer">
-      <summary>Import a shared scenario file</summary>
-      <p>
-        Restore one analysis or an A/B pair from JSON. This uses the current
-        data and model; the original fingerprints are checked after calculation.
-      </p>
+      <summary>{t("scenario.summary")}</summary>
+      <p>{t("scenario.intro")}</p>
       <label>
-        Scenario JSON
+        {t("scenario.json")}
         <input
-          aria-label="Import scenario JSON"
+          aria-label={t("scenario.importLabel")}
           disabled={busy}
           type="file"
           accept="application/json,.json"
@@ -182,27 +177,23 @@ export default function ScenarioTransfer({
           <div className="import-scenarios">
             {manifest.scenarios.map((scenario, i) => (
               <div key={i}>
-                <h3>Scenario {i === 0 ? "A" : "B"}</h3>
+                <h3>{t("scenario.title", { name: i === 0 ? "A" : "B" })}</h3>
                 <p>
                   {String(scenario.submission.site_id)} ·{" "}
                   {String(scenario.submission.start_utc)} —{" "}
                   {String(scenario.submission.end_utc)}
                 </p>
                 <p>
-                  Expected model: {scenario.expected.model_version} /{" "}
+                  {t("scenario.expectedModel")}: {scenario.expected.model_version} /{" "}
                   {scenario.expected.horizon_model_version}
                 </p>
               </div>
             ))}
           </div>
           <button className="primary" disabled={busy} onClick={run}>
-            {busy ? "Calculating…" : "Calculate imported scenario"} ↗
+            {busy ? t("scenario.calculating") : t("scenario.calculate")} ↗
           </button>
-          <p className="field-help">
-            Validation alone does not download data or start a job. Fingerprints
-            check exact result contents, not the authenticity of an imported
-            file.
-          </p>
+          <p className="field-help">{t("scenario.validationNote")}</p>
         </>
       )}
       {progress && <p role="status">{progress}</p>}
@@ -210,7 +201,7 @@ export default function ScenarioTransfer({
         <p role="alert" className="alert">
           {error}{" "}
           <button onClick={() => setRetry((n) => n + 1)}>
-            Reconnect import
+            {t("scenario.reconnect")}
           </button>
         </p>
       )}
@@ -218,13 +209,13 @@ export default function ScenarioTransfer({
         <div className="import-verdict" role="status">
           <strong>
             {checked.matches
-              ? "Exact result fingerprint match"
-              : "Results differ from the shared snapshot"}
+              ? t("scenario.match")
+              : t("scenario.differ")}
           </strong>
           <p>
             {checked.matches
-              ? "The calculated contents match the exported result."
-              : "Inputs, acquisition metadata, source data or model versions may differ. These are new results; do not present them as the original snapshot."}
+              ? t("scenario.matchDetail")
+              : t("scenario.differDetail")}
           </p>
           <button
             onClick={() =>
@@ -233,7 +224,7 @@ export default function ScenarioTransfer({
               )
             }
           >
-            Open imported {ids.length === 2 ? "comparison" : "analysis"} ↗
+            {ids.length === 2 ? t("scenario.openComparison") : t("scenario.openAnalysis")} ↗
           </button>
         </div>
       )}
