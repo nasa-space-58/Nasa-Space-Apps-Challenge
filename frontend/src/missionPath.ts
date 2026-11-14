@@ -77,24 +77,24 @@ export const MISSION_PHASES: readonly MissionPhase[] = [
     id: "launch",
     label: "Launch",
     description:
-      "The launch vehicle lifts off from Earth and pitches over into a low parking orbit.",
+      "The three-stage launch vehicle lifts off, drops its spent stages and fairing, and reaches a low parking orbit.",
     start_progress: 0,
-    end_progress: 0.12,
+    end_progress: 0.2,
   },
   {
     id: "parking_orbit",
     label: "Earth parking orbit",
     description:
       "The spacecraft circles Earth while systems are checked before departure.",
-    start_progress: 0.12,
-    end_progress: 0.2,
+    start_progress: 0.2,
+    end_progress: 0.26,
   },
   {
     id: "translunar_coast",
     label: "Translunar coast",
     description:
       "After the departure burn the spacecraft coasts towards the Moon for several days.",
-    start_progress: 0.2,
+    start_progress: 0.26,
     end_progress: 0.55,
   },
   {
@@ -133,7 +133,7 @@ export const LANDING_CLOSEUP_START_PROGRESS = 0.84;
  * Progress at which mission control cuts from the art-directed launch close-up
  * back to the spacecraft view, shortly before parking-orbit insertion.
  */
-export const LAUNCH_CLOSEUP_END_PROGRESS = 0.1;
+export const LAUNCH_CLOSEUP_END_PROGRESS = 0.18;
 
 export type SiteSelection = {
   latitude_deg: number;

@@ -22,7 +22,7 @@ import type { CameraMode, CameraView, SiteCondition } from "./MissionScene";
 
 const MissionScene = lazy(() => import("./MissionScene"));
 /** Wall-clock length of one illustrative flight playback. */
-const FLIGHT_PLAYBACK_S = 40;
+const FLIGHT_PLAYBACK_S = 45;
 const TICK_MS = 50;
 const lockedNotice =
   "An analysis is running. The landing site is locked until it finishes.";

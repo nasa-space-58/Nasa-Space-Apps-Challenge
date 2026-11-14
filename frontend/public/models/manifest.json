@@ -1,0 +1,18 @@
+{
+  "retrieved_utc": "2026-11-14",
+  "purpose": "Illustrative mission-control launch close-up only; not a trajectory simulation",
+  "assets": [
+    {
+      "file": "rocket-in-stages.glb",
+      "name": "Rocket Launch Site - Rocket in Stages",
+      "publisher": "StoicSoft / 1DesignTool",
+      "source_page": "https://1designtool.com/3d/models/rocket-launch-site-rocket-in-stages",
+      "download_url": "https://assets.stoicsoft.com/1designtool/3d/models/rocket-launch-site-rocket-in-stages/68555f2560/model.glb",
+      "license_page": "https://1designtool.com/3d/license",
+      "license_summary": "Free 1DesignTool 3D library license: use and modification allowed in apps and websites, no attribution required; the file must not be redistributed on its own or as part of a model pack.",
+      "bytes": 440132,
+      "sha256": "cc98851da697255729a4e85e2345d5d23a0f1b18ad06d90c9fde43eaf226a47a",
+      "usage": "Three-stage launch vehicle with separable stages and fairing halves"
+    }
+  ]
+}

@@ -39,12 +39,22 @@
     {
       "file": "earth.jpg",
       "name": "Blue Marble Next Generation, January 2004 (resized to 2048x1024)",
-      "credit": "NASA Earth Observatory / Reto Stöckli",
+      "credit": "NASA Earth Observatory / Reto St\u00f6ckli",
       "source_page": "https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/",
       "download_url": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-base/january/world.200401.3x5400x2700.jpg",
       "bytes": 235450,
       "sha256": "010735df677b502111e5bea43f14e537fcde3def00763eeeffc131399cd64bc4",
       "usage": "Decorative Earth globe in the mission-control scene only"
+    },
+    {
+      "file": "mobile-launcher.glb",
+      "name": "Mobile Launcher (assembled)",
+      "credit": "NASA / Samuel H. Neblett",
+      "source_page": "https://science.nasa.gov/3d-resources/mobile-launcher/",
+      "download_url": "https://assets.science.nasa.gov/content/dam/science/cds/3d/resources/model/mobile-launcher/Mobile%20Launcher%20(assembled).glb",
+      "bytes": 198480,
+      "sha256": "411ad36727a4290123431e77ca7a4622dcd534e2e76eb1134dc19fc07dd5be65",
+      "usage": "Decorative launch pad in the mission-control launch close-up only"
     }
   ]
 }
