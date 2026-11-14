@@ -244,3 +244,8 @@ def register_arena_routes(app):
             raise HTTPException(409, str(exc)) from exc
         finally:
             _RUN_LOCK.release()
+
+
+def compare_scenario(scenario: Scenario, request: ArenaRequest) -> dict:
+    """Compare a supplied immutable snapshot with the same H8 traces and validator."""
+    raise NotImplementedError
