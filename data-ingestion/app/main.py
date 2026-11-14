@@ -5,7 +5,7 @@ import logging
 import os
 from pathlib import Path
 
-from app.consumer import serve, serve_dsn
+from app.consumer import serve, serve_dsn, serve_space_weather
 
 import aio_pika
 
@@ -19,9 +19,11 @@ async def main() -> None:
     connection = await aio_pika.connect_robust(os.environ["RABBITMQ_URL"])
     try:
         data_dir = Path(os.environ.get("DATA_DIR", "/data"))
-        # Analysis ingestion and DSN station requests use separate queues/channels.
+        # Analysis ingestion, DSN and space weather requests use separate channels.
         await asyncio.gather(
-            serve(connection, data_dir), serve_dsn(connection, data_dir)
+            serve(connection, data_dir),
+            serve_dsn(connection, data_dir),
+            serve_space_weather(connection, data_dir),
         )
     finally:
         await connection.close()

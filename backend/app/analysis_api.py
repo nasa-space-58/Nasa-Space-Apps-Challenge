@@ -346,6 +346,13 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     )
 
     recommendations = RecommendationStore(store, communications)
+    from app.space_weather import (
+        SpaceWeatherStore,
+        execute_space_weather,
+        register_space_weather_routes,
+    )
+
+    space_weather = SpaceWeatherStore(store)
 
     async def worker():
         while True:
@@ -353,6 +360,7 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
             await asyncio.to_thread(recommendations.tick, data_dir)
             jobs = store.pending()
             links = [] if jobs else communications.pending()
+            weather = [] if jobs or links else space_weather.pending()
             if jobs:
                 await asyncio.to_thread(
                     lambda: asyncio.run(
@@ -367,6 +375,14 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
                         )
                     )
                 )
+            elif weather:
+                await asyncio.to_thread(
+                    lambda: asyncio.run(
+                        execute_space_weather(
+                            space_weather, store, weather[0], data_dir, broker_url
+                        )
+                    )
+                )
             else:
                 await asyncio.sleep(0.5)
 
@@ -374,6 +390,7 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     async def lifespan(app):
         store.recover()
         communications.recover()
+        space_weather.recover()
         task = asyncio.create_task(worker()) if start_worker else None
         yield
         if task:
@@ -388,8 +405,10 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     app.state.searches = searches
     app.state.communications = communications
     app.state.recommendations = recommendations
+    app.state.space_weather = space_weather
     register_search_routes(app, searches)
     register_communication_routes(app, store, communications)
+    register_space_weather_routes(app, store, space_weather)
     register_recommendation_routes(app, recommendations)
     from app.descent import register_descent_routes
 

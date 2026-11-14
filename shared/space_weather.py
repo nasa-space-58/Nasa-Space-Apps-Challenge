@@ -47,21 +47,31 @@ class SpaceWeatherEvent(BaseModel):
     @model_validator(mode="after")
     def validate_status(self) -> "SpaceWeatherEvent":
         """Ready requires a reference only; failed requires an error only."""
-        raise NotImplementedError
+        has_error = bool(self.error_code) or bool(self.error_message)
+        if self.status == "ready":
+            if not self.snapshot_path or has_error:
+                raise ValueError(
+                    "Ready events require a snapshot reference and no error"
+                )
+        elif not self.error_code or not self.error_message or self.snapshot_path:
+            raise ValueError("Failed events require an error and no reference")
+        return self
 
 
 async def declare_space_weather_topology(channel):
     """Declare durable request/dead-letter queues and the shared event exchange."""
-    raise NotImplementedError
+    import aio_pika
 
-
-__all__ = [
-    "EVENT_EXCHANGE",
-    "PRODUCTS",
-    "SPACE_WEATHER_DEAD_QUEUE",
-    "SPACE_WEATHER_REQUEST_QUEUE",
-    "SWPC_BASE_URL",
-    "SpaceWeatherEvent",
-    "SpaceWeatherRequest",
-    "declare_space_weather_topology",
-]
+    await channel.declare_queue(SPACE_WEATHER_DEAD_QUEUE, durable=True)
+    queue = await channel.declare_queue(
+        SPACE_WEATHER_REQUEST_QUEUE,
+        durable=True,
+        arguments={
+            "x-dead-letter-exchange": "",
+            "x-dead-letter-routing-key": SPACE_WEATHER_DEAD_QUEUE,
+        },
+    )
+    exchange = await channel.declare_exchange(
+        EVENT_EXCHANGE, aio_pika.ExchangeType.TOPIC, durable=True
+    )
+    return queue, exchange
