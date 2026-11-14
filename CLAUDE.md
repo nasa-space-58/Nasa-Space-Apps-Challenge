@@ -182,3 +182,7 @@ R11 (multi-mission planning) starts from `feature/r10-hybrid-optimization` `5f9a
 ### R10/R11 main push exception (user, 2026-11-15)
 
 At the user's explicit request, `feature/r11-multi-mission-planning` (which contains R10) was fast-forwarded directly onto `main` from `a5171d4` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### R12 completion and main push exception (user, 2026-11-15)
+
+R12's last item (visual event panel) was built from `main` `90d6561` on `feature/r12-event-panel`. Skeleton `e9600d0`, frozen tests `7332c3e`; see `docs/r12-event-panel.md`. The panel is built on H5/H6; the conflicting `feature/r12-self-healing` branch was not merged. At the user's explicit request, the branch was fast-forwarded directly onto `main` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.

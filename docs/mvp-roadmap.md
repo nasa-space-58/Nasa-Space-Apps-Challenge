@@ -347,10 +347,10 @@ The R10 decision applies: the classical MILP is retained, and QAOA covers only H
 - [x] Run the quantum path asynchronously with a time budget; use a currently validated classical plan when no valid quantum result arrives in time.
 - [x] Propagate changed landing time/location and lost resources into the R11 multi-mission schedule.
 - [x] Replay identical events under the original plan, classical replanning and hybrid replanning, comparing feasibility, reserves, delays and mission value.
-- [ ] Add a visual event panel, original/replanned trajectories, uncertainty display, decision explanations and solver timing.
+- [x] Add a visual event panel, original/replanned trajectories, uncertainty display, decision explanations and solver timing.
 - [x] Validate both recoverable and unrecoverable scenarios, including combinations of faults, without assuming every event has a safe solution.
 
-**R12 status (audited 2026-11-14)** — Ticked items are delivered on `main` by H4–H6 as backend modules and notebooks ([descent foundation](descent-foundation.md), [self-healing](self-healing.md), [hybrid recovery](hybrid-recovery.md)). The visual event panel item remains open on `main`: a classical self-healing panel exists on the unmerged `feature/r12-self-healing` branch, which conflicts with H5 in `backend/app/self_healing.py`, its tests and `docs/self-healing.md`.
+**R12 status (completed 2026-11-15)** — All items are delivered on `main`. H4–H6 provide the backend models and notebooks ([descent foundation](descent-foundation.md), [self-healing](self-healing.md), [hybrid recovery](hybrid-recovery.md)); the event panel, replay API and solver timing are described in [R12 event panel](r12-event-panel.md). The older `feature/r12-self-healing` branch was not merged because its backend conflicts with H5; the new panel is built on H5/H6 instead.
 
 ### R13 — Additional quantum application benchmarks
 
