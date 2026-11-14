@@ -51,3 +51,11 @@ Rows are unchanged; the files were trimmed and re-serialized as compact JSON.
 The SWPC 3-day forecast text issued 2026 Nov 14 1230 UTC lists the same
 R1-R2 25 %, R3+ 5 % and S1+ 5 % for Nov 14-16, which fixes the meaning of the
 probability `date` as the first forecast UTC day.
+## Flight ephemeris vectors
+
+`flight_vectors_301.json` (Moon) and `flight_vectors_10.json` (Sun) were
+captured verbatim from https://ssd.jpl.nasa.gov/api/horizons.api on
+2026-11-15 with EPHEM_TYPE=VECTORS, CENTER='500@399', REF_PLANE=ECLIPTIC,
+REF_SYSTEM=ICRF, VEC_TABLE=1, VEC_LABELS=NO, OUT_UNITS=KM-S, CSV_FORMAT=YES,
+TIME_TYPE=UT, START_TIME='2026-11-03 22:00:00', STOP_TIME='2026-11-04
+00:00:00', STEP_SIZE='30 m'. Public NASA/JPL output (DE441).

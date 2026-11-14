@@ -74,3 +74,16 @@ This shows the trade-off R8 is meant to expose: on this date, the sunlit route l
 - Rocks, craters and slopes below the 80 m cell. Wheel–soil interaction, rover power and thermal budgets.
 - Sunlight and Earth between sampled points. Eclipses, and radio links beyond geometric Earth-centre visibility.
 - Sun/Earth directions computed separately for each route point. The landing site's ephemeris is reused within the stated bound.
+
+## Mission control: post-landing view
+
+After the touchdown close-up finishes, mission control shows a surface-operations panel and a rover in the landing scene:
+
+- The rover drives the first reachable route of the three example targets above. The route comes from `POST /surface/routes`, with the current analysis when one exists.
+  - The route geometry is laid on the illustrative terrain with one uniform scale. The 3D terrain is not the DEM.
+  - Playback runs at ×60, ×600 or ×3600 simulated time and can be scrubbed.
+- The panel shows backend values only:
+  - route length, time, speed assumption, steepest slope, climb and detour;
+  - the Sun/Earth state at the last sampled waypoint the rover has passed (no interpolation between samples);
+  - the lander profile from `GET /vehicle-profiles`;
+  - the NOAA SWPC solar activity snapshot and forecast ([space weather](space-weather.md)), sharing the job of the Solar activity panel.

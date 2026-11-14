@@ -2,7 +2,7 @@
 
 This closes the last open R12 item: a visual event panel with original and replanned trajectories, an uncertainty display, decision explanations and solver timing. The panel is built on the H5 fault replay ([self-healing](self-healing.md)) and the H6 guarded hybrid recovery ([hybrid recovery](hybrid-recovery.md)). It adds no new physics, estimator or solver.
 
-Branch: `feature/r12-event-panel`, started from `main` `90d6561`. Test-first history: skeleton `e9600d0`, frozen tests `7332c3e` (`backend/tests/test_recovery_api.py`), implementation `251e81d`, UI `1daceff`.
+Branch: `feature/r12-event-panel`, started from `main` `90d6561`, with `main` `8c3dff5` (PR #18) merged in before delivery. Test-first history: skeleton `e9600d0`, frozen tests `7332c3e` (`backend/tests/test_recovery_api.py`), implementation `251e81d`, UI `1daceff`.
 
 The older `feature/r12-self-healing` branch was not merged. Its backend is a separate twin-based implementation that conflicts with H5 in `backend/app/self_healing.py`, its tests and `docs/self-healing.md`.
 

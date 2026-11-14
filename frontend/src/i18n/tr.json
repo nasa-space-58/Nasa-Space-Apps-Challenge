@@ -510,7 +510,17 @@
     "simulate": "Uçuşu simüle et",
     "restart": "Yeniden başlat",
     "progress": "Görev ilerlemesi",
-    "phasesNote": "Yalnızca görev aşamalarının sırasını gösterir. Bölgedeki Güneş ve Dünya görünürlüğü Sonuçlar sekmesinden gelir."
+    "phasesNote": "Yalnızca görev aşamalarının sırasını gösterir. Bölgedeki Güneş ve Dünya görünürlüğü Sonuçlar sekmesinden gelir.",
+    "flightData": {
+      "utc": "Tarih (UTC)",
+      "met": "Görev zamanı",
+      "days": "g",
+      "earthMoon": "Dünya–Ay (JPL Horizons)",
+      "craftEarth": "Araç–Dünya (temsili rota)",
+      "craftMoon": "Araç–Ay (temsili rota)",
+      "loading": "Gerçek Ay/Güneş konumları JPL Horizons'tan alınıyor…",
+      "failed": "Gerçek konumlar alınamadı; sabit temsili düzen gösteriliyor."
+    }
   },
   "missionPhases": {
     "launch": {
@@ -1147,5 +1157,63 @@
     "dispersionTitle": "{target}: {pass}/{count} örnek geçti, σ {std} m",
     "trajectoryAria": "Her yeniden oynatma dalı için menzile göre irtifa",
     "timelineAria": "Her yeniden oynatma dalı için olay ve karar zaman çizelgesi"
+  },
+  "surfaceOps": {
+    "label": "İniş sonrası yüzey operasyonları",
+    "eyebrow": "YÜZEY OPERASYONLARI",
+    "title": "Rover, iniş aracı ve uzay havası",
+    "hoursUnit": "sa",
+    "loading": "Yükleniyor…",
+    "source": "NASA kaynağı",
+    "rover": {
+      "title": "Rover",
+      "outside": "Rota yalnızca 80–90° G arazi kapsamı içinde hesaplanabilir.",
+      "loading": "Gerçek LOLA arazisinde rota hesaplanıyor (analiz varsa ≈20 sn)…",
+      "none": "Örnek hedeflerin hiçbirine eğim sınırı içinde ulaşılamıyor.",
+      "target": "Hedef",
+      "play": "▶ Sür",
+      "pause": "❚❚ Durdur",
+      "rate": "Simülasyon hızı",
+      "scrub": "Rover sürüş zamanı",
+      "distance": "Gidilen yol",
+      "time": "Süre",
+      "speed": "Hız (planlama varsayımı)",
+      "maxSlope": "Rotadaki en büyük eğim",
+      "climb": "Toplam tırmanış",
+      "detour": "Dolanma oranı",
+      "sample": "Son ölçüm noktası: {km} km · {utc}",
+      "noSample": "Henüz ölçüm noktasına varılmadı",
+      "noAnalysis": "Güneş/Dünya durumu için önce Analizi çalıştırın.",
+      "note": "Rota NASA LOLA 80 m arazisinde backend tarafından hesaplanır; 3B arazi temsilidir, rota gerçektir. Güneş/Dünya durumu yalnızca örneklenen noktalarda değerlendirilir."
+    },
+    "sun": {
+      "full": "Tam güneşte",
+      "partial": "Kısmen güneşte",
+      "dark": "Gölgede",
+      "unknown": "Güneş bilinmiyor"
+    },
+    "earth": {
+      "visible": "Dünya görünüyor",
+      "blocked": "Dünya engelli",
+      "unknown": "Dünya bilinmiyor",
+      "boundary": "Dünya ufuk sınırında"
+    },
+    "lander": {
+      "title": "İniş aracı",
+      "mass": "PDI'da kütle",
+      "propellant": "Kullanılabilir yakıt",
+      "thrust": "Azami itki",
+      "isp": "Özgül itki (Isp)"
+    },
+    "weather": {
+      "title": "Güneş aktivitesi · NOAA SWPC",
+      "needsAnalysis": "Güneş aktivitesi analiz penceresine göre değerlendirilir; önce Analizi çalıştırın.",
+      "loading": "Güncel veri NOAA SWPC'den veri servisi üzerinden çekiliyor…",
+      "xray": "X-ışını (şu an)",
+      "protons": "Proton ≥10 MeV",
+      "forecast": "Tahmin (günlük en yüksek)",
+      "acquired": "Veri çekilme zamanı: {utc}",
+      "note": "Ayrıntılar ve sınırlar Sonuçlar sekmesindeki Güneş aktivitesi panelinde. Ay'ın manyetik alanı olmadığından S seviyesi yüzeydeki ekip için önemlidir."
+    }
   }
 }

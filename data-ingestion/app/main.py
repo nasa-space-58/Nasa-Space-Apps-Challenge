@@ -5,7 +5,12 @@ import logging
 import os
 from pathlib import Path
 
-from app.consumer import serve, serve_dsn, serve_space_weather
+from app.consumer import (
+    serve,
+    serve_dsn,
+    serve_flight_ephemeris,
+    serve_space_weather,
+)
 
 import aio_pika
 
@@ -24,6 +29,7 @@ async def main() -> None:
             serve(connection, data_dir),
             serve_dsn(connection, data_dir),
             serve_space_weather(connection, data_dir),
+            serve_flight_ephemeris(connection, data_dir),
         )
     finally:
         await connection.close()
