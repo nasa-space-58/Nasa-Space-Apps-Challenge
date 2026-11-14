@@ -423,3 +423,15 @@ def evaluate_targets(
         recommended_target_id=best["target_id"] if best else None,
         scope="Explicit candidates only; sampled planar terrain clearance, no global reachability proof",
     )
+
+
+def propagate_terminal(
+    job_request: TerminalRequest,
+    *,
+    stop_after_s: float | None = None,
+    position_bias_m=(0.0, 0.0),
+    velocity_bias_mps=(0.0, 0.0),
+    thrust_limit_n: float | None = None,
+) -> dict:
+    """H5 propagation with persistent navigation bias, thrust cap and exact pause time."""
+    raise NotImplementedError
