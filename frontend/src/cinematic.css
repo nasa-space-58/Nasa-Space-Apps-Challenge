@@ -64,7 +64,7 @@
   transition: right 0.25s ease;
 }
 .navigation nav button:hover::after,
-.navigation nav button[aria-pressed="true"]::after {
+.navigation nav button[aria-current="page"]::after {
   right: 0;
 }
 .team-label {
@@ -736,5 +736,416 @@
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+/* Standalone pages: mission control, time search and classroom sit below the fixed bar. */
+.navigation nav button[aria-current="page"] {
+  color: #f3eee4;
+}
+main:not([data-view="home"]) {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+main:not([data-view="home"]) > footer {
+  margin-top: auto;
+}
+main[data-view="mission"] .mission-section,
+main[data-view="search"] .window-search-section,
+main[data-view="classroom"] .classroom-section {
+  padding-top: calc(88px + 56px);
+  border-top: 0;
+  scroll-margin-top: 88px;
+}
+main[data-view="mission"] .comparison-section {
+  scroll-margin-top: 88px;
+}
+@media (max-width: 760px) {
+  main[data-view="mission"] .mission-section,
+  main[data-view="search"] .window-search-section,
+  main[data-view="classroom"] .classroom-section {
+    padding-top: calc(106px + 32px);
+  }
+  main[data-view="mission"] .comparison-section {
+    scroll-margin-top: 106px;
+  }
+}
+
+/* Mission control: Earth–Moon–Sun stage with a parameter column, results below. */
+main[data-view="mission"] .mission-section {
+  padding-top: calc(88px + 28px);
+}
+.mission-title {
+  align-items: flex-end;
+  gap: 32px;
+  margin-bottom: 18px;
+}
+.mission-title .eyebrow {
+  margin: 0;
+  font: 9px var(--mono);
+  letter-spacing: 0.14em;
+  color: var(--gold);
+}
+.mission-title h2 {
+  margin: 6px 0 0;
+  font-size: clamp(32px, 3vw, 42px);
+  white-space: nowrap;
+}
+.mission-title .workspace-description {
+  margin: 0 0 4px auto;
+  max-width: 520px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+.mission-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 22px;
+  align-items: start;
+}
+.stage-viewport {
+  position: sticky;
+  top: 104px;
+  height: max(520px, calc(100vh - 230px));
+  overflow: hidden;
+  border: 1px solid #ffffff16;
+  border-radius: 4px;
+  background: radial-gradient(circle at 30% 40%, #0d1620, #03060a 70%);
+  user-select: none;
+}
+.stage-viewport canvas {
+  display: block;
+  touch-action: none;
+}
+.stage-loading,
+.stage-fallback {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  font: 11px var(--mono);
+  color: #8fa0ab;
+  text-align: center;
+  padding: 90px 30px 120px;
+}
+.stage-fallback .polar-map {
+  width: min(460px, 100%);
+}
+.stage-fallback p {
+  max-width: 420px;
+  line-height: 1.7;
+}
+.stage-hud {
+  position: absolute;
+  z-index: 2;
+  background: #060b10c4;
+  border: 1px solid #ffffff14;
+  border-radius: 3px;
+  backdrop-filter: blur(6px);
+  padding: 12px 14px;
+  font-size: 12px;
+  color: #c8d0d4;
+}
+.stage-hud .eyebrow {
+  display: block;
+  margin: 0 0 4px;
+  font: 9px var(--mono);
+  letter-spacing: 0.12em;
+  color: var(--gold);
+}
+.stage-phase {
+  top: 16px;
+  left: 16px;
+  max-width: 300px;
+}
+.stage-phase strong {
+  font-size: 17px;
+  font-weight: 500;
+  color: #f3eee4;
+}
+.stage-phase p {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #a5b0b6;
+}
+.stage-cameras {
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+}
+.stage-cameras button {
+  background: transparent;
+  padding: 8px 11px;
+  font: 10px var(--mono);
+  color: #a9b5bc;
+  border-radius: 2px;
+  min-height: 34px;
+}
+.stage-cameras button[aria-pressed="true"] {
+  background: #e6ddcb;
+  color: #11191e;
+}
+.stage-legend {
+  bottom: 16px;
+  left: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  max-width: 420px;
+  font: 10px var(--mono);
+}
+.stage-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.stage-legend small {
+  flex-basis: 100%;
+  color: #7e8f9a;
+  font-size: 9px;
+}
+.stage-legend i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+.legend-sun {
+  background: #ffe7a8;
+  box-shadow: 0 0 8px #ffcf6b;
+}
+.legend-earth {
+  background: #3f7fc4;
+}
+.legend-trail {
+  border-radius: 0 !important;
+  height: 2px !important;
+  width: 16px !important;
+  background: var(--gold);
+}
+.legend-ring {
+  border: 1px dashed var(--blue);
+  background: transparent;
+}
+.stage-target {
+  bottom: 16px;
+  right: 16px;
+  text-align: right;
+  max-width: 330px;
+}
+.stage-target strong {
+  display: block;
+  font: 13px var(--mono);
+  color: #f3eee4;
+}
+.stage-target small {
+  display: block;
+  margin-top: 6px;
+  font-size: 10px;
+  color: #7e8f9a;
+}
+.stage-status {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px 12px;
+  margin-top: 8px;
+  font-size: 11px;
+}
+.stage-status span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.stage-status small {
+  flex-basis: 100%;
+  margin-top: 2px;
+}
+.stage-notice {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 380px;
+  padding: 14px 18px;
+  background: #1b130a;
+  border: 1px solid #edbb6680;
+  border-radius: 3px;
+  color: #f0dcb4;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+.stage-controls {
+  display: grid;
+  gap: 16px;
+}
+.stage-controls .parameters {
+  margin-top: 0;
+}
+.stage-controls .alert,
+.stage-controls .job-progress {
+  margin: 0;
+}
+.flight-body {
+  padding: 18px 20px 20px;
+  display: grid;
+  gap: 14px;
+}
+.flight-actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.flight-actions .primary {
+  flex: 1;
+}
+.flight-body input[type="range"] {
+  width: 100%;
+  accent-color: var(--gold);
+}
+.phase-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 2px;
+}
+.phase-list button {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: #7f8e98;
+  border-left: 2px solid #ffffff14;
+}
+.phase-list b {
+  font: 9px var(--mono);
+  margin-right: 8px;
+  color: inherit;
+}
+.phase-list .done button {
+  color: #b9c2c7;
+  border-left-color: #edbb6670;
+}
+.phase-list .active button {
+  color: #f3eee4;
+  background: #ffffff08;
+  border-left-color: var(--gold);
+}
+.flight-body .field-help {
+  margin: 0;
+}
+.analysis-results {
+  margin-top: 46px;
+  padding-top: 36px;
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 22px;
+}
+.analysis-intro h3 {
+  font-size: 30px;
+  font-weight: 500;
+  margin: 6px 0 8px;
+}
+.analysis-intro p:not(.eyebrow) {
+  color: #a2adb4;
+  max-width: 680px;
+  margin: 0;
+  line-height: 1.6;
+}
+.analysis-results .result-heading,
+.analysis-results .metric-grid,
+.analysis-results .panel,
+.analysis-results .event-grid {
+  margin: 0;
+}
+.panel-help {
+  margin: 0;
+  padding: 14px 22px 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #94a0a8;
+}
+.horizon-plot .terrain-fill {
+  fill: #2a3238;
+  opacity: 0.55;
+}
+.horizon-plot .axis-title {
+  font-size: 9px;
+  fill: #73838d;
+  letter-spacing: 0.08em;
+}
+.time-cursor::after {
+  content: "";
+  position: absolute;
+  top: -5px;
+  left: -4px;
+  border: 4px solid transparent;
+  border-top-color: #fff;
+}
+.timeline-legend .cursor-key {
+  color: #f3eee4;
+}
+@media (max-width: 1100px) {
+  .mission-stage {
+    grid-template-columns: minmax(0, 1fr) 320px;
+  }
+}
+@media (max-width: 900px) {
+  .mission-stage {
+    grid-template-columns: 1fr;
+  }
+  .stage-viewport {
+    position: relative;
+    top: 0;
+    height: 68vh;
+    min-height: 460px;
+  }
+}
+@media (max-width: 760px) {
+  main[data-view="mission"] .mission-section {
+    padding-top: calc(106px + 20px);
+  }
+  .mission-title {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mission-title .workspace-description {
+    margin: 0;
+  }
+  .stage-phase {
+    max-width: calc(100% - 32px);
+  }
+  .stage-phase p,
+  .stage-legend {
+    display: none;
+  }
+  .stage-cameras {
+    top: 86px;
+    left: 16px;
+    right: 16px;
+    flex-wrap: wrap;
+  }
+  .stage-cameras button {
+    padding: 6px 8px;
+    min-height: 30px;
+  }
+  .stage-target {
+    left: 16px;
+    text-align: left;
+    max-width: none;
+  }
+  .stage-status {
+    justify-content: flex-start;
   }
 }

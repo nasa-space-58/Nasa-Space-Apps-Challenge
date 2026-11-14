@@ -44,11 +44,16 @@ Develop and push Task 1 only on `feature/task1-ingestion-cache`. Do not merge it
 docker compose up --build                       # run everything
 docker compose run --rm backend pytest          # backend tests
 docker compose run --rm data-ingestion pytest
-docker compose run --rm frontend npm test
 docker compose run --rm backend pytest path/to/test_file.py::test_name   # single test
 ```
 
-Linting/formatting for Python is Ruff; frontend tests are Vitest + React Testing Library.
+Linting/formatting for Python is Ruff.
+
+## Frontend: no tests, no screenshots (user, 2026-11-14)
+
+- Never write, run, restore or plan frontend tests (no Vitest, React Testing Library or any other frontend test). The test-first rule in docs/coding-conventions.md applies to backend and data-ingestion code only; frontend code, including non-UI helpers such as `frontend/src/missionPath.ts`, is exempt.
+- Verify frontend changes with `docker compose run --rm frontend npm run build` (TypeScript check + Vite build) only.
+- Do not take or inspect screenshots or other images of the app to verify changes; the user checks visuals personally.
 
 ## Key conventions (see docs/coding-conventions.md)
 

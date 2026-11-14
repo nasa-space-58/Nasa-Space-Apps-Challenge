@@ -32,15 +32,28 @@ export default function HorizonPlot({
   );
   const points = result.horizon.directions;
   let path = "";
+  let fill = "";
   let open = false;
+  let runStart = 0;
+  let lastX = 0;
+  const closeRun = () => {
+    if (open) fill += `L${lastX},225 L${runStart},225 Z `;
+  };
   for (const point of [...points, { ...points[0], azimuth_deg: 360 }]) {
     if (point.elevation_deg === null) {
+      closeRun();
       open = false;
       continue;
     }
-    path += `${open ? "L" : "M"}${x(point.azimuth_deg)},${y(point.elevation_deg)} `;
+    const px = x(point.azimuth_deg),
+      py = y(point.elevation_deg);
+    path += `${open ? "L" : "M"}${px},${py} `;
+    fill += open ? `L${px},${py} ` : `M${px},225 L${px},${py} `;
+    if (!open) runStart = px;
+    lastX = px;
     open = true;
   }
+  closeRun();
   return (
     <svg
       className="horizon-plot"
@@ -75,7 +88,14 @@ export default function HorizonPlot({
           </text>
         </g>
       ))}
+      <text x="-52" y="12" className="axis-title">
+        ELEVATION ABOVE LEVEL ↑
+      </text>
+      <text x="868" y="268" textAnchor="end" className="axis-title">
+        COMPASS DIRECTION (AZIMUTH) →
+      </text>
       <g clipPath={`url(#${clipId})`}>
+        <path d={fill} className="terrain-fill" />
         <path d={path} fill="none" stroke="#9aa5a9" strokeWidth="2" />
         {(["sun", "earth"] as const).map((target) => {
           const item = frame[target];

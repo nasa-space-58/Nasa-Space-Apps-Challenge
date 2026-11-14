@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import HorizonPlot from "./components/HorizonPlot";
-import PolarMap from "./components/PolarMap";
+import MissionStage from "./components/MissionStage";
 import Comparison from "./components/Comparison";
 import WindowSearch from "./components/WindowSearch";
 import ExportPanel from "./components/ExportPanel";
@@ -50,6 +50,25 @@ const utcLabel = (value: string) =>
     minute: "2-digit",
     hour12: false,
   });
+type View =
+  | "home"
+  | "mission"
+  | "search"
+  | "recommend"
+  | "descent"
+  | "classroom";
+const routes: Record<View, string> = {
+  home: "",
+  mission: "#/mission-control",
+  search: "#/time-search",
+  recommend: "#/recommendations",
+  descent: "#/descent",
+  classroom: "#/classroom",
+};
+const viewFromHash = (hash: string): View =>
+  (Object.keys(routes) as View[]).find(
+    (view) => view !== "home" && routes[view] === hash,
+  ) ?? "home";
 const jump = (id: string) =>
   document.getElementById(id)?.scrollIntoView({
     behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
@@ -154,6 +173,7 @@ function Timeline({
         ))}
         <i
           className="time-cursor"
+          title="Selected observation time"
           style={{
             left: `${((Date.parse(current) - from) / duration) * 100}%`,
           }}
@@ -184,6 +204,7 @@ export default function App() {
   const [start, setStart] = useState("2026-11-04T00:00");
   const [duration, setDuration] = useState("24");
   const [refine, setRefine] = useState(true);
+  const [launchKey, setLaunchKey] = useState(0);
   const [job, setJob] = useState<Job | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [comparisonBase, setComparisonBase] = useState<{
@@ -196,12 +217,21 @@ export default function App() {
   const [apiError, setApiError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sources, setSources] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [classroomOpen, setClassroomOpen] = useState(false);
-  const [recommendOpen, setRecommendOpen] = useState(false);
-  const [descentOpen, setDescentOpen] = useState(false);
   const [sharedB, setSharedB] = useState<string | undefined>(undefined);
   const shared = useRef(new URLSearchParams(location.search));
+  const [view, setView] = useState<View>(() =>
+    shared.current.has("analysis") ? "mission" : viewFromHash(location.hash),
+  );
+  const searchOpen = view === "search";
+  const classroomOpen = view === "classroom";
+  const recommendOpen = view === "recommend";
+  const descentOpen = view === "descent";
+  const goTo = (next: View) => {
+    if (window.scrollY) window.scrollTo({ top: 0, behavior: "auto" });
+    const url = `${location.pathname}${location.search}${routes[next]}`;
+    if (location.hash !== routes[next]) window.history.pushState({}, "", url);
+    setView(next);
+  };
   const [resolved, setResolved] = useState("");
   const busy = submitting || (!!job && activeStates.includes(job.status));
   const frame = result?.frames[frameIndex];
@@ -361,6 +391,19 @@ export default function App() {
   useEffect(() => {
     if (reduced) setPlaying(false);
   }, [reduced]);
+  useEffect(() => {
+    const follow = () => setView(viewFromHash(location.hash));
+    window.addEventListener("popstate", follow);
+    window.addEventListener("hashchange", follow);
+    return () => {
+      window.removeEventListener("popstate", follow);
+      window.removeEventListener("hashchange", follow);
+    };
+  }, []);
+  useEffect(() => {
+    if (view !== "mission") setPlaying(false);
+    if (view === "home") window.dispatchEvent(new Event("scroll"));
+  }, [view]);
 
   useEffect(() => {
     if (!sources) return;
@@ -421,6 +464,7 @@ export default function App() {
     setSubmitting(true);
     setPlaying(false);
     setResult(null);
+    setLaunchKey((key) => key + 1);
     jump("mission");
     try {
       let body: ReturnType<typeof makeBody>;
@@ -461,7 +505,11 @@ export default function App() {
   };
   const clearSharedLink = () => {
     shared.current = new URLSearchParams();
-    window.history.replaceState({}, "", window.location.pathname);
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}${window.location.hash}`,
+    );
   };
   const openSearchResult = async (
     id: string,
@@ -486,10 +534,7 @@ export default function App() {
       ),
     );
     setRefine(submitted.refine);
-    setSearchOpen(false);
-    setClassroomOpen(false);
-    setRecommendOpen(false);
-    setDescentOpen(false);
+    goTo("mission");
     setSharedB(otherId);
     setPlaying(false);
     setJob(selected);
@@ -520,16 +565,12 @@ export default function App() {
   };
 
   return (
-    <main>
+    <main data-view={view}>
       <button
         className="skip-link"
         onClick={() => {
-          setSearchOpen(false);
-          setClassroomOpen(false);
-          setRecommendOpen(false);
-          setDescentOpen(false);
+          goTo("mission");
           setTimeout(() => {
-            jump("mission");
             document.getElementById("mission")?.focus({ preventScroll: true });
           }, 0);
         }}
@@ -540,7 +581,12 @@ export default function App() {
         <button
           className="brand"
           onClick={() =>
-            window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" })
+            view === "home"
+              ? window.scrollTo({
+                  top: 0,
+                  behavior: reduced ? "auto" : "smooth",
+                })
+              : goTo("home")
           }
           aria-label="Back to introduction"
         >
@@ -551,65 +597,32 @@ export default function App() {
         </button>
         <nav aria-label="Main navigation">
           <button
-            aria-pressed={!searchOpen && !classroomOpen && !recommendOpen && !descentOpen}
-            onClick={() => {
-              setSearchOpen(false);
-              setClassroomOpen(false);
-              setRecommendOpen(false);
-              setDescentOpen(false);
-              setTimeout(() => jump("mission"), 0);
-            }}
+            aria-current={view === "mission" ? "page" : undefined}
+            onClick={() => goTo("mission")}
           >
             Mission control
           </button>
           <button
-            aria-pressed={searchOpen}
-            onClick={() => {
-              setClassroomOpen(false);
-              setRecommendOpen(false);
-              setDescentOpen(false);
-              setSearchOpen(true);
-              setTimeout(() => jump("window-search"), 0);
-            }}
+            aria-current={searchOpen ? "page" : undefined}
+            onClick={() => goTo("search")}
           >
             Time search
           </button>
           <button
-            aria-pressed={recommendOpen}
-            onClick={() => {
-              setSearchOpen(false);
-              setClassroomOpen(false);
-              setRecommendOpen(true);
-              setDescentOpen(false);
-              setPlaying(false);
-              setTimeout(() => jump("recommendations"), 0);
-            }}
+            aria-current={recommendOpen ? "page" : undefined}
+            onClick={() => goTo("recommend")}
           >
             Recommend
           </button>
           <button
-            aria-pressed={descentOpen}
-            onClick={() => {
-              setSearchOpen(false);
-              setClassroomOpen(false);
-              setRecommendOpen(false);
-              setDescentOpen(true);
-              setPlaying(false);
-              setTimeout(() => jump("descent"), 0);
-            }}
+            aria-current={descentOpen ? "page" : undefined}
+            onClick={() => goTo("descent")}
           >
             Descent
           </button>
           <button
-            aria-pressed={classroomOpen}
-            onClick={() => {
-              setSearchOpen(false);
-              setRecommendOpen(false);
-              setDescentOpen(false);
-              setClassroomOpen(true);
-              setPlaying(false);
-              setTimeout(() => jump("classroom"), 0);
-            }}
+            aria-current={classroomOpen ? "page" : undefined}
+            onClick={() => goTo("classroom")}
           >
             Classroom
           </button>
@@ -623,6 +636,7 @@ export default function App() {
       </header>
       <section
         className="introduction"
+        hidden={view !== "home"}
         ref={intro}
         aria-label="From orbit to the lunar surface"
       >
@@ -637,7 +651,7 @@ export default function App() {
                 <MoonScene
                   progress={progress}
                   reduced={reduced || motionPaused}
-                  visible={sceneVisible && pageVisible}
+                  visible={view === "home" && sceneVisible && pageVisible}
                   compact={compactScene}
                   onFailure={() => setWebgl(false)}
                 />
@@ -741,13 +755,7 @@ export default function App() {
             <div className="hero-actions">
               <button
                 className="primary"
-                onClick={() => {
-                  setSearchOpen(false);
-                  setClassroomOpen(false);
-                  setRecommendOpen(false);
-                  setDescentOpen(false);
-                  setTimeout(() => jump("mission"), 0);
-                }}
+                onClick={() => goTo("mission")}
               >
                 Plan your observation <span>↗</span>
               </button>
@@ -826,13 +834,7 @@ export default function App() {
             </p>
             <button
               className="primary"
-              onClick={() => {
-                setSearchOpen(false);
-                setClassroomOpen(false);
-                setRecommendOpen(false);
-                setDescentOpen(false);
-                setTimeout(() => jump("mission"), 0);
-              }}
+              onClick={() => goTo("mission")}
             >
               Enter mission control <span>↓</span>
             </button>
@@ -847,509 +849,536 @@ export default function App() {
         id="mission"
         tabIndex={-1}
         className="mission-section"
-        hidden={searchOpen || classroomOpen || recommendOpen || descentOpen}
+        hidden={view !== "mission"}
       >
-        <div className="workspace-kicker">
-          <span>OBSERVATION WORKSPACE</span>
-          <span>01 — LOCATION / 02 — TIME / 03 — PERSPECTIVE</span>
-        </div>
-        <div className="section-heading">
+        <div className="section-heading mission-title">
           <div>
-            <p className="eyebrow">04 / YOUR OBSERVATION WINDOW</p>
+            <p className="eyebrow">
+              01 CHOOSE A SITE · 02 FLY THERE · 03 ANALYZE THE SKY
+            </p>
             <h2>
               Mission control<span>.</span>
             </h2>
           </div>
+          <p className="workspace-description">
+            Pick a landing site on the Moon's south polar cap, watch the
+            illustrative flight from Earth, then see how Sun and Earth move
+            above that horizon.
+          </p>
           <div className={`connection ${busy ? "working" : ""}`}>
             <i /> {job ? stateLabel[job.status] : "Ready to plan"}
           </div>
         </div>
-        <p className="workspace-description">
-          One location. One window in time. Explore the horizon before comparing
-          your next possibility.
-        </p>
-        <ScenarioTransfer onOpen={openSearchResult} />
         {apiError && (
           <div className="alert" role="alert">
             The API is unavailable. {apiError}{" "}
             <button onClick={loadSites}>Reconnect</button>
           </div>
         )}
-        <div className="mission-layout">
-          <aside className="mission-sidebar">
-            <div className="panel map-panel">
-              <div className="panel-heading">
-                <span>SOUTH POLE</span>
-                <small>Coordinate selector</small>
-              </div>
-              <PolarMap
-                lat={Number(lat)}
-                lon={Number(lon)}
-                sites={sites}
-                onPreset={(site) => !busy && selectSite(site)}
-                onSelect={(latitude, longitude) => {
-                  if (!busy) {
-                    setLat(String(latitude));
-                    setLon(String(longitude));
-                    setSiteId("custom");
-                    setResolved("");
-                  }
-                }}
-              />
-              <p className="map-caption">
-                80–90° S · schematic polar grid
-                <br />
-                Click to select, or enter coordinates below.
-              </p>
+        <MissionStage
+          lat={Number(lat)}
+          lon={Number(lon)}
+          sites={sites}
+          busy={busy}
+          webgl={webgl}
+          reduced={reduced}
+          visible={view === "mission" && pageVisible}
+          compact={compactScene}
+          launchKey={launchKey}
+          condition={
+            frame && result
+              ? frame.sun.state === "full" || frame.sun.state === "partial"
+                ? "sunlit"
+                : frame.sun.state === "dark"
+                  ? "dark"
+                  : "unknown"
+              : "unknown"
+          }
+          siteStatus={
+            frame && result ? (
+              <>
+                <span>
+                  <i className="sun-dot" /> {displayState[frame.sun.state]}
+                </span>
+                <span>
+                  <i className="earth-dot" /> {displayState[frame.earth.state]}
+                </span>
+                <small>{utcLabel(frame.utc)} UTC · analyzed site</small>
+              </>
+            ) : undefined
+          }
+          onPreset={selectSite}
+          onSelect={(latitude, longitude) => {
+            setLat(String(latitude));
+            setLon(String(longitude));
+            setSiteId("custom");
+            setResolved("");
+          }}
+          onSceneFailure={() => setWebgl(false)}
+        >
+          <form
+            className="panel parameters"
+            onSubmit={(e) => {
+              e.preventDefault();
+              launch();
+            }}
+          >
+            <div className="panel-heading">
+              <span>LANDING SITE & OBSERVATION</span>
+              <small>Parameters</small>
             </div>
-            <form
-              className="panel parameters"
-              onSubmit={(e) => {
-                e.preventDefault();
-                launch();
-              }}
-            >
-              <div className="panel-heading">
-                <span>OBSERVATION SETUP</span>
-                <span>01</span>
-              </div>
-              <fieldset disabled={busy}>
-                <label>
-                  Landing region
-                  <select
-                    value={siteId}
-                    onChange={(e) => {
-                      const site = sites.find(
-                        (s) => s.site_id === e.target.value,
-                      );
-                      if (site) selectSite(site);
-                      else setSiteId("custom");
-                    }}
-                  >
-                    <option value="custom">Custom coordinates</option>
-                    {sites.length ? (
-                      sites.map((site) => (
-                        <option key={site.site_id} value={site.site_id}>
-                          {site.display_name}
-                        </option>
-                      ))
-                    ) : (
-                      <option value="malapert-massif-r23">
-                        Malapert Massif — R23
+            <fieldset disabled={busy}>
+              <label>
+                Landing region
+                <select
+                  value={siteId}
+                  onChange={(e) => {
+                    const site = sites.find(
+                      (s) => s.site_id === e.target.value,
+                    );
+                    if (site) selectSite(site);
+                    else setSiteId("custom");
+                  }}
+                >
+                  <option value="custom">Custom coordinates</option>
+                  {sites.length ? (
+                    sites.map((site) => (
+                      <option key={site.site_id} value={site.site_id}>
+                        {site.display_name}
                       </option>
-                    )}
-                  </select>
-                </label>
-                <div className="field-pair">
-                  <label>
-                    Latitude · °
-                    <input
-                      aria-label="Latitude"
-                      type="number"
-                      min="-90"
-                      max="-80"
-                      step="any"
-                      required
-                      value={lat}
-                      onChange={(e) => {
-                        setLat(e.target.value);
-                        setSiteId("custom");
-                        setResolved("");
-                      }}
-                    />
-                  </label>
-                  <label>
-                    Longitude · °E
-                    <input
-                      aria-label="Longitude"
-                      type="number"
-                      min="0"
-                      max="359.999999"
-                      step="any"
-                      required
-                      value={lon}
-                      onChange={(e) => {
-                        setLon(e.target.value);
-                        setSiteId("custom");
-                        setResolved("");
-                      }}
-                    />
-                  </label>
-                </div>
+                    ))
+                  ) : (
+                    <option value="malapert-massif-r23">
+                      Malapert Massif — R23
+                    </option>
+                  )}
+                </select>
+              </label>
+              <div className="field-pair">
                 <label>
-                  Observer height above terrain · m
+                  Latitude · °
                   <input
+                    aria-label="Latitude"
                     type="number"
-                    min="0.1"
-                    max="100"
-                    step="0.1"
+                    min="-90"
+                    max="-80"
+                    step="any"
                     required
-                    value={height}
+                    value={lat}
                     onChange={(e) => {
-                      setHeight(e.target.value);
+                      setLat(e.target.value);
+                      setSiteId("custom");
                       setResolved("");
                     }}
                   />
                 </label>
-                <button
-                  type="button"
-                  className="text-button height-check"
-                  onClick={resolve}
-                >
-                  Check terrain height ↗
-                </button>
-                {resolved && (
-                  <p className="field-help" role="status">
-                    {resolved}
-                  </p>
-                )}
                 <label>
-                  Start date & time · UTC
+                  Longitude · °E
                   <input
-                    type="datetime-local"
-                    min="2026-01-01T00:00"
-                    max="2027-12-31T23:59"
+                    aria-label="Longitude"
+                    type="number"
+                    min="0"
+                    max="359.999999"
+                    step="any"
                     required
-                    value={start}
-                    onChange={(e) => setStart(e.target.value)}
+                    value={lon}
+                    onChange={(e) => {
+                      setLon(e.target.value);
+                      setSiteId("custom");
+                      setResolved("");
+                    }}
                   />
                 </label>
-                <label>
-                  Observation duration
-                  <select
-                    value={duration}
-                    onChange={(e) => setDuration(e.target.value)}
-                  >
-                    <option value="24">24 hours</option>
-                    <option value="72">3 days</option>
-                    <option value="168">7 days</option>
-                    <option value="720">30 days</option>
-                    {!["24", "72", "168", "720"].includes(duration) && (
-                      <option value={duration}>{duration} hours</option>
-                    )}
-                  </select>
-                </label>
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    checked={refine}
-                    onChange={(e) => setRefine(e.target.checked)}
-                  />
-                  <span>
-                    Refine detected transitions
-                    <small>5-minute → 1-minute samples</small>
-                  </span>
-                </label>
-                <button className="primary run-button" type="submit">
-                  {busy ? "Analysis in progress" : "Run analysis"}{" "}
-                  <span>{busy ? "◌" : "↗"}</span>
-                </button>
-                <p className="field-help">
-                  NASA source data · estimated geometric visibility
-                </p>
-              </fieldset>
-            </form>
-          </aside>
-          <div className="mission-results">
-            {error && (
-              <div className="alert" role="alert">
-                {error}
               </div>
-            )}
-            {busy && (
-              <div className="job-progress" role="status">
-                <span className="pulse" />
-                <div>
-                  <strong>{stateLabel[job?.status || "pending"]}</strong>
-                  <p>
-                    You can leave this page. Your analysis ID is saved on this
-                    device.
-                  </p>
-                </div>
-                <span className="mono">{job?.id.slice(0, 8)}</span>
-              </div>
-            )}
-            <div className="result-heading">
-              <div>
-                <p className="eyebrow">TERRAIN-RELATIVE VIEW</p>
-                <h3>
-                  {result
-                    ? result.analysis.request.site.site_id.replaceAll("-", " ")
-                    : "Your window to the surface"}
-                </h3>
-              </div>
-              <span className="outline-tag">MOON_ME / UTC</span>
-            </div>
-            <div className="metric-grid">
-              <div className="metric-card">
-                <span className="metric-label">
-                  <i className="sun-dot" /> SUNLIGHT AVAILABILITY
-                </span>
-                <strong>
-                  {result
-                    ? `${result.analysis.sun.metrics.visible_percent_of_interval.toFixed(1)}%`
-                    : "—"}
-                </strong>
-                <small>
-                  {result
-                    ? `${hours(result.analysis.sun.metrics.visible_duration_s)} · full + partial disk`
-                    : "of the observation window"}
-                </small>
-              </div>
-              <div className="metric-card">
-                <span className="metric-label">
-                  <i className="earth-dot" /> EARTH VISIBILITY
-                </span>
-                <strong>
-                  {result
-                    ? `${result.analysis.earth.metrics.visible_percent_of_interval.toFixed(1)}%`
-                    : "—"}
-                </strong>
-                <small>
-                  {result
-                    ? `${hours(result.analysis.earth.metrics.visible_duration_s)} · center visibility`
-                    : "geometric center visibility"}
-                </small>
-              </div>
-              <div className="metric-card">
-                <span className="metric-label">LONGEST DARKNESS</span>
-                <strong>
-                  {hours(result?.analysis.sun.metrics.longest_blocked_s)}
-                </strong>
-                <small>continuous terrain-blocked sunlight</small>
-              </div>
-            </div>
-            <div className="panel horizon-panel">
-              <div className="panel-heading">
-                <span>LOCAL HORIZON</span>
-                <div className="legend">
-                  <span>
-                    <i className="sun-dot" /> Sun
-                  </span>
-                  <span>
-                    <i className="earth-dot" /> Earth
-                  </span>
-                  <span>
-                    <i className="terrain-dot" /> Terrain
-                  </span>
-                </div>
-              </div>
-              {result && frame ? (
-                <>
-                  <HorizonPlot result={result} frame={frame} />
-                  <div className="body-readouts">
-                    <span>
-                      <i className="sun-dot" /> Sun{" "}
-                      {frame.sun.elevation_deg?.toFixed(2) ?? "—"}°{" "}
-                      <b>{displayState[frame.sun.state]}</b>
-                    </span>
-                    <span>
-                      <i className="earth-dot" /> Earth{" "}
-                      {frame.earth.elevation_deg?.toFixed(2) ?? "—"}°{" "}
-                      <b>{displayState[frame.earth.state]}</b>
-                    </span>
-                  </div>
-                </>
-              ) : (
-                <div className="empty-horizon">
-                  <div className="empty-orbit">
-                    <i />
-                  </div>
-                  <h3>
-                    {busy
-                      ? "Tracing your horizon…"
-                      : "A new perspective awaits."}
-                  </h3>
-                  <p>
-                    {busy
-                      ? "Checking terrain, observer height and Sun / Earth positions."
-                      : "Choose a region and time to reveal the terrain, light and visibility."}
-                  </p>
-                  {!busy && (
-                    <button
-                      className="text-button"
-                      onClick={() => launch(true)}
-                    >
-                      Run the Malapert example ↗
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-            <div className="panel playback-panel">
-              <div className="playback-heading">
-                <div>
-                  <p className="eyebrow">OBSERVATION TIME</p>
-                  <strong>
-                    {frame ? `${utcLabel(frame.utc)} UTC` : "Select a moment"}
-                  </strong>
-                </div>
-                <button
-                  className="play-button"
-                  disabled={!result?.frames.length}
-                  onClick={() => {
-                    if (result && frameIndex === result.frames.length - 1)
-                      setFrameIndex(0);
-                    setPlaying(!playing);
+              <label>
+                Observer height above terrain · m
+                <input
+                  type="number"
+                  min="0.1"
+                  max="100"
+                  step="0.1"
+                  required
+                  value={height}
+                  onChange={(e) => {
+                    setHeight(e.target.value);
+                    setResolved("");
                   }}
-                  aria-label={playing ? "Pause playback" : "Play observation"}
-                >
-                  {playing ? "Ⅱ" : "▷"}
-                </button>
-              </div>
-              <input
-                aria-label="Observation time"
-                aria-valuetext={
-                  frame ? `${utcLabel(frame.utc)} UTC` : undefined
-                }
-                type="range"
-                min="0"
-                max={Math.max(0, (result?.frames.length || 1) - 1)}
-                value={frameIndex}
-                disabled={!result?.frames.length}
-                onChange={(e) => {
-                  setPlaying(false);
-                  setFrameIndex(Number(e.target.value));
-                }}
-              />
-              <div className="range-labels">
-                <span>
-                  {result
-                    ? `${utcLabel(result.analysis.request.start_utc)} UTC`
-                    : "START"}
-                </span>
-                <span>Sample-by-sample playback</span>
-                <span>
-                  {result
-                    ? `${utcLabel(result.analysis.request.end_utc)} UTC`
-                    : "END"}
-                </span>
-              </div>
-              {result && frame && (
-                <div className="timelines">
-                  <Timeline
-                    title="SUN"
-                    intervals={result.analysis.sun.intervals}
-                    start={result.analysis.request.start_utc}
-                    end={result.analysis.request.end_utc}
-                    current={frame.utc}
-                  />
-                  <Timeline
-                    title="EARTH"
-                    intervals={result.analysis.earth.intervals}
-                    start={result.analysis.request.start_utc}
-                    end={result.analysis.request.end_utc}
-                    current={frame.utc}
-                  />
-                  <div className="timeline-legend">
-                    <span>▰ Full / visible</span>
-                    <span>▧ Partial</span>
-                    <span>▰ Blocked</span>
-                    <span>▨ Unknown</span>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="event-grid">
-              <div className="panel event-card">
-                <span className="metric-label">NEXT SUNSET · LAST LIMB</span>
-                <strong>
-                  <SettingText value={frame?.sun.next_setting} />
-                </strong>
-              </div>
-              <div className="panel event-card">
-                <span className="metric-label">NEXT EARTHSET · CENTER</span>
-                <strong>
-                  <SettingText value={frame?.earth.next_setting} />
-                </strong>
-              </div>
-            </div>
-            {result && job && (
-              <Communication key={job.id} jobId={job.id} current={frame?.utc} />
-            )}
-            {result && (
-              <div className="panel trace-panel">
-                <details>
-                  <summary>
-                    Observation details & model limits <span>+</span>
-                  </summary>
-                  <div className="trace-content">
-                    <p>
-                      <b>Sun:</b> longest continuous visibility{" "}
-                      {hours(result.analysis.sun.metrics.longest_visible_s)} ·
-                      unknown{" "}
-                      {hours(result.analysis.sun.metrics.unknown_duration_s)}.
-                    </p>
-                    <p>
-                      <b>Earth:</b> longest continuous visibility{" "}
-                      {hours(result.analysis.earth.metrics.longest_visible_s)} ·
-                      longest blocked period{" "}
-                      {hours(result.analysis.earth.metrics.longest_blocked_s)} ·
-                      unknown{" "}
-                      {hours(result.analysis.earth.metrics.unknown_duration_s)}.
-                    </p>
-                    <p>
-                      80 m terrain grid ·{" "}
-                      {(
-                        result.horizon.settings.search_distance_m / 1000
-                      ).toFixed(0)}{" "}
-                      km search radius ·{" "}
-                      {result.horizon.settings.azimuth_step_deg}° horizon
-                      spacing. Ground height uses the containing pixel; observer{" "}
-                      {result.horizon.observer_height_above_terrain_m.toFixed(
-                        1,
-                      )}{" "}
-                      m above it.
-                    </p>
-                    <p>
-                      Durations are estimates. Fine time sampling does not
-                      remove terrain uncertainty. The ±
-                      {result.analysis.spatial_sensitivity.offset_deg}°
-                      sensitivity scenarios are not error bounds. No eclipse,
-                      link-budget or landing-safety model.
-                    </p>
-                    <p>
-                      Refinement:{" "}
-                      {result.analysis.refinement.status.replaceAll("_", " ")} ·{" "}
-                      {result.analysis.provenance.ephemerides.length} source
-                      bundles.
-                    </p>
-                    <code>Analysis {result.analysis.analysis_id}</code>
-                    <button className="text-button" onClick={openSources}>
-                      View NASA sources ↗
-                    </button>
-                  </div>
-                </details>
-              </div>
-            )}
-            {result && job && (
-              <ExportPanel
-                jobId={job.id}
-                result={result}
-                frameIndex={frameIndex}
-              />
-            )}
-            {result && job && (
+                />
+              </label>
               <button
-                className="primary add-comparison"
-                onClick={() => {
-                  setPlaying(false);
-                  setSharedB(undefined);
-                  setComparisonBase({ id: job.id, result });
-                  setTimeout(() => jump("comparison"), 0);
-                }}
+                type="button"
+                className="text-button height-check"
+                onClick={resolve}
               >
-                Add comparison ↗
+                Check terrain height ↗
               </button>
-            )}
-            <p className="results-footnote">
-              A horizon is a perspective, not a promise. Results describe the
-              sampled terrain and observation window.
+              {resolved && (
+                <p className="field-help" role="status">
+                  {resolved}
+                </p>
+              )}
+              <label>
+                Start date & time · UTC
+                <input
+                  type="datetime-local"
+                  min="2026-01-01T00:00"
+                  max="2027-12-31T23:59"
+                  required
+                  value={start}
+                  onChange={(e) => setStart(e.target.value)}
+                />
+              </label>
+              <label>
+                Observation duration
+                <select
+                  value={duration}
+                  onChange={(e) => setDuration(e.target.value)}
+                >
+                  <option value="24">24 hours</option>
+                  <option value="72">3 days</option>
+                  <option value="168">7 days</option>
+                  <option value="720">30 days</option>
+                  {!["24", "72", "168", "720"].includes(duration) && (
+                    <option value={duration}>{duration} hours</option>
+                  )}
+                </select>
+              </label>
+              <label className="checkbox-label">
+                <input
+                  type="checkbox"
+                  checked={refine}
+                  onChange={(e) => setRefine(e.target.checked)}
+                />
+                <span>
+                  Refine detected transitions
+                  <small>5-minute → 1-minute samples</small>
+                </span>
+              </label>
+              <button className="primary run-button" type="submit">
+                {busy ? "Analysis in progress" : "Run analysis"}{" "}
+                <span>{busy ? "◌" : "↗"}</span>
+              </button>
+              <p className="field-help">
+                NASA source data · estimated geometric visibility
+              </p>
+            </fieldset>
+          </form>
+          {error && (
+            <div className="alert" role="alert">
+              {error}
+            </div>
+          )}
+          {busy && (
+            <div className="job-progress" role="status">
+              <span className="pulse" />
+              <div>
+                <strong>{stateLabel[job?.status || "pending"]}</strong>
+                <p>
+                  You can leave this page. Your analysis ID is saved on this
+                  device.
+                </p>
+              </div>
+              <span className="mono">{job?.id.slice(0, 8)}</span>
+            </div>
+          )}
+        </MissionStage>
+        <section className="analysis-results" aria-labelledby="analysis-title">
+          <div className="analysis-intro">
+            <p className="eyebrow">SURFACE ANALYSIS</p>
+            <h3 id="analysis-title">What the site sees</h3>
+            <p>
+              After landing, the analysis traces the terrain horizon around the
+              site and follows Sun and Earth through your observation window.
+              Move the observation time to see each sample.
             </p>
           </div>
-        </div>
+          <div className="result-heading">
+            <div>
+              <p className="eyebrow">TERRAIN-RELATIVE VIEW</p>
+              <h3>
+                {result
+                  ? result.analysis.request.site.site_id.replaceAll("-", " ")
+                  : "Your window to the surface"}
+              </h3>
+            </div>
+            <span className="outline-tag">MOON_ME / UTC</span>
+          </div>
+          <div className="metric-grid">
+            <div className="metric-card">
+              <span className="metric-label">
+                <i className="sun-dot" /> SUNLIGHT AVAILABILITY
+              </span>
+              <strong>
+                {result
+                  ? `${result.analysis.sun.metrics.visible_percent_of_interval.toFixed(1)}%`
+                  : "—"}
+              </strong>
+              <small>
+                {result
+                  ? `${hours(result.analysis.sun.metrics.visible_duration_s)} · full + partial disk`
+                  : "of the observation window"}
+              </small>
+            </div>
+            <div className="metric-card">
+              <span className="metric-label">
+                <i className="earth-dot" /> EARTH VISIBILITY
+              </span>
+              <strong>
+                {result
+                  ? `${result.analysis.earth.metrics.visible_percent_of_interval.toFixed(1)}%`
+                  : "—"}
+              </strong>
+              <small>
+                {result
+                  ? `${hours(result.analysis.earth.metrics.visible_duration_s)} · center visibility`
+                  : "geometric center visibility"}
+              </small>
+            </div>
+            <div className="metric-card">
+              <span className="metric-label">LONGEST DARKNESS</span>
+              <strong>
+                {hours(result?.analysis.sun.metrics.longest_blocked_s)}
+              </strong>
+              <small>continuous terrain-blocked sunlight</small>
+            </div>
+          </div>
+          <div className="panel horizon-panel">
+            <div className="panel-heading">
+              <span>LOCAL HORIZON</span>
+              <div className="legend">
+                <span>
+                  <i className="sun-dot" /> Sun
+                </span>
+                <span>
+                  <i className="earth-dot" /> Earth
+                </span>
+                <span>
+                  <i className="terrain-dot" /> Terrain
+                </span>
+              </div>
+            </div>
+            <p className="panel-help">
+              The grey skyline is the terrain seen from the site in every
+              compass direction. Sun and Earth are visible when their dot is
+              above it; below it the terrain blocks them.
+            </p>
+            {result && frame ? (
+              <>
+                <HorizonPlot result={result} frame={frame} />
+                <div className="body-readouts">
+                  <span>
+                    <i className="sun-dot" /> Sun{" "}
+                    {frame.sun.elevation_deg?.toFixed(2) ?? "—"}°{" "}
+                    <b>{displayState[frame.sun.state]}</b>
+                  </span>
+                  <span>
+                    <i className="earth-dot" /> Earth{" "}
+                    {frame.earth.elevation_deg?.toFixed(2) ?? "—"}°{" "}
+                    <b>{displayState[frame.earth.state]}</b>
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className="empty-horizon">
+                <div className="empty-orbit">
+                  <i />
+                </div>
+                <h3>
+                  {busy
+                    ? "Tracing your horizon…"
+                    : "A new perspective awaits."}
+                </h3>
+                <p>
+                  {busy
+                    ? "Checking terrain, observer height and Sun / Earth positions."
+                    : "Choose a region and time to reveal the terrain, light and visibility."}
+                </p>
+                {!busy && (
+                  <button
+                    className="text-button"
+                    onClick={() => launch(true)}
+                  >
+                    Run the Malapert example ↗
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+          <div className="panel playback-panel">
+            <div className="playback-heading">
+              <div>
+                <p className="eyebrow">OBSERVATION TIME</p>
+                <strong>
+                  {frame ? `${utcLabel(frame.utc)} UTC` : "Select a moment"}
+                </strong>
+              </div>
+              <button
+                className="play-button"
+                disabled={!result?.frames.length}
+                onClick={() => {
+                  if (result && frameIndex === result.frames.length - 1)
+                    setFrameIndex(0);
+                  setPlaying(!playing);
+                }}
+                aria-label={playing ? "Pause playback" : "Play observation"}
+              >
+                {playing ? "Ⅱ" : "▷"}
+              </button>
+            </div>
+            <input
+              aria-label="Observation time"
+              aria-valuetext={
+                frame ? `${utcLabel(frame.utc)} UTC` : undefined
+              }
+              type="range"
+              min="0"
+              max={Math.max(0, (result?.frames.length || 1) - 1)}
+              value={frameIndex}
+              disabled={!result?.frames.length}
+              onChange={(e) => {
+                setPlaying(false);
+                setFrameIndex(Number(e.target.value));
+              }}
+            />
+            <div className="range-labels">
+              <span>
+                {result
+                  ? `${utcLabel(result.analysis.request.start_utc)} UTC`
+                  : "START"}
+              </span>
+              <span>Drag to move through the analysis samples</span>
+              <span>
+                {result
+                  ? `${utcLabel(result.analysis.request.end_utc)} UTC`
+                  : "END"}
+              </span>
+            </div>
+            {result && frame && (
+              <div className="timelines">
+                <Timeline
+                  title="SUN"
+                  intervals={result.analysis.sun.intervals}
+                  start={result.analysis.request.start_utc}
+                  end={result.analysis.request.end_utc}
+                  current={frame.utc}
+                />
+                <Timeline
+                  title="EARTH"
+                  intervals={result.analysis.earth.intervals}
+                  start={result.analysis.request.start_utc}
+                  end={result.analysis.request.end_utc}
+                  current={frame.utc}
+                />
+                <div className="timeline-legend">
+                  <span className="cursor-key">│ Selected time</span>
+                  <span>▰ Full / visible</span>
+                  <span>▧ Partial</span>
+                  <span>▰ Blocked</span>
+                  <span>▨ Unknown</span>
+                </div>
+              </div>
+            )}
+          </div>
+          <div className="event-grid">
+            <div className="panel event-card">
+              <span className="metric-label">NEXT SUNSET · LAST LIMB</span>
+              <strong>
+                <SettingText value={frame?.sun.next_setting} />
+              </strong>
+            </div>
+            <div className="panel event-card">
+              <span className="metric-label">NEXT EARTHSET · CENTER</span>
+              <strong>
+                <SettingText value={frame?.earth.next_setting} />
+              </strong>
+            </div>
+          </div>
+          {result && job && (
+            <Communication key={job.id} jobId={job.id} current={frame?.utc} />
+          )}
+          {result && (
+            <div className="panel trace-panel">
+              <details>
+                <summary>
+                  Observation details & model limits <span>+</span>
+                </summary>
+                <div className="trace-content">
+                  <p>
+                    <b>Sun:</b> longest continuous visibility{" "}
+                    {hours(result.analysis.sun.metrics.longest_visible_s)} ·
+                    unknown{" "}
+                    {hours(result.analysis.sun.metrics.unknown_duration_s)}.
+                  </p>
+                  <p>
+                    <b>Earth:</b> longest continuous visibility{" "}
+                    {hours(result.analysis.earth.metrics.longest_visible_s)} ·
+                    longest blocked period{" "}
+                    {hours(result.analysis.earth.metrics.longest_blocked_s)} ·
+                    unknown{" "}
+                    {hours(result.analysis.earth.metrics.unknown_duration_s)}.
+                  </p>
+                  <p>
+                    80 m terrain grid ·{" "}
+                    {(
+                      result.horizon.settings.search_distance_m / 1000
+                    ).toFixed(0)}{" "}
+                    km search radius ·{" "}
+                    {result.horizon.settings.azimuth_step_deg}° horizon
+                    spacing. Ground height uses the containing pixel; observer{" "}
+                    {result.horizon.observer_height_above_terrain_m.toFixed(
+                      1,
+                    )}{" "}
+                    m above it.
+                  </p>
+                  <p>
+                    Durations are estimates. Fine time sampling does not
+                    remove terrain uncertainty. The ±
+                    {result.analysis.spatial_sensitivity.offset_deg}°
+                    sensitivity scenarios are not error bounds. No eclipse,
+                    link-budget or landing-safety model.
+                  </p>
+                  <p>
+                    Refinement:{" "}
+                    {result.analysis.refinement.status.replaceAll("_", " ")} ·{" "}
+                    {result.analysis.provenance.ephemerides.length} source
+                    bundles.
+                  </p>
+                  <code>Analysis {result.analysis.analysis_id}</code>
+                  <button className="text-button" onClick={openSources}>
+                    View NASA sources ↗
+                  </button>
+                </div>
+              </details>
+            </div>
+          )}
+          {result && job && (
+            <ExportPanel
+              jobId={job.id}
+              result={result}
+              frameIndex={frameIndex}
+            />
+          )}
+          {result && job && (
+            <button
+              className="primary add-comparison"
+              onClick={() => {
+                setPlaying(false);
+                setSharedB(undefined);
+                setComparisonBase({ id: job.id, result });
+                setTimeout(() => jump("comparison"), 0);
+              }}
+            >
+              Add comparison ↗
+            </button>
+          )}
+          <p className="results-footnote">
+            A horizon is a perspective, not a promise. Results describe the
+            sampled terrain and observation window.
+          </p>
+          <ScenarioTransfer onOpen={openSearchResult} />
+        </section>
       </section>
-      {comparisonBase && !searchOpen && !classroomOpen && !recommendOpen && !descentOpen && (
+      {comparisonBase && view === "mission" && (
         <Comparison
           key={comparisonBase.id}
           aId={comparisonBase.id}
@@ -1398,7 +1427,10 @@ export default function App() {
             <p>
               NASA models illustrate the journey. The introductory crater
               terrain is original decorative geometry, not the selected
-              location. Scientific results use cached Horizons ephemerides and
+              location. The mission-control flight from Earth to the Moon is
+              illustrative: Earth, the Moon and their distance are to scale,
+              the spacecraft are enlarged and the Sun is shown closer at its
+              true apparent size; it is not a computed trajectory. Scientific results use cached Horizons ephemerides and
               the verified LOLA terrain product.
             </p>
             <ul>
@@ -1431,6 +1463,16 @@ export default function App() {
                   CGI Moon Kit
                 </a>{" "}
                 · NASA / Goddard / Scientific Visualization Studio
+              </li>
+              <li>
+                <a
+                  href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Blue Marble Next Generation
+                </a>{" "}
+                · NASA Earth Observatory / Reto Stöckli
               </li>
               <li>
                 <a

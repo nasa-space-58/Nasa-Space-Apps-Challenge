@@ -1,6 +1,6 @@
 {
   "retrieved_utc": "2026-11-14",
-  "purpose": "Illustrative introductory scene only; not terrain analysis or trajectory simulation",
+  "purpose": "Illustrative introductory and mission-control scenes only; not terrain analysis or trajectory simulation",
   "assets": [
     {
       "file": "lro.glb",
@@ -35,6 +35,16 @@
       "bytes": 111552,
       "sha256": "6d93f887e7d8bedfe35ab89ba785e5e3ca12381bd092a5e6abe2c707dda8bb98",
       "usage": "Decorative globe bump map only; never used for elevation analysis"
+    },
+    {
+      "file": "earth.jpg",
+      "name": "Blue Marble Next Generation, January 2004 (resized to 2048x1024)",
+      "credit": "NASA Earth Observatory / Reto Stöckli",
+      "source_page": "https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/",
+      "download_url": "https://assets.science.nasa.gov/content/dam/science/esd/eo/images/bmng/bmng-base/january/world.200401.3x5400x2700.jpg",
+      "bytes": 235450,
+      "sha256": "010735df677b502111e5bea43f14e537fcde3def00763eeeffc131399cd64bc4",
+      "usage": "Decorative Earth globe in the mission-control scene only"
     }
   ]
 }
