@@ -892,7 +892,12 @@
     "Enable 'include descent' to add R4/R5 reachability and fuel.": "R4/R5 ulaşılabilirlik ve yakıtı eklemek için 'inişi dahil et' seçeneğini etkinleştirin.",
     "No validated science-value dataset is integrated yet.": "Henüz doğrulanmış bir bilimsel değer veri kümesi entegre edilmedi.",
     "Only sampled candidate starts are evaluated; shorter windows between starts may be missed.": "Yalnızca örneklenen aday başlangıçlar değerlendirilir; başlangıçlar arasındaki daha kısa pencereler kaçırılabilir.",
-    "Lower is closer: mean of sunlight shortfall / 100 percentage points, excess darkness / mission hours, and Earth shortfall / mission hours. Equal weights; ties by UTC start then job ID. Not a safety ranking.": "Düşük değer daha yakındır: güneş ışığı açığı / 100 yüzde puan, fazla karanlık / görev saati ve Dünya açığı / görev saatinin ortalaması. Eşit ağırlıklar; eşitlikte önce UTC başlangıcı, sonra iş kimliği. Bir güvenlik sıralaması değildir."
+    "Lower is closer: mean of sunlight shortfall / 100 percentage points, excess darkness / mission hours, and Earth shortfall / mission hours. Equal weights; ties by UTC start then job ID. Not a safety ranking.": "Düşük değer daha yakındır: güneş ışığı açığı / 100 yüzde puan, fazla karanlık / görev saati ve Dünya açığı / görev saatinin ortalaması. Eşit ağırlıklar; eşitlikte önce UTC başlangıcı, sonra iş kimliği. Bir güvenlik sıralaması değildir.",
+    "Solar flares cannot be predicted with certainty; SWPC gives daily probabilities for at most 3 days.": "Güneş patlamaları kesin olarak öngörülemez; SWPC en fazla 3 gün için günlük olasılık verir.",
+    "Analysis time outside the SWPC forecast days has no forecast; nothing is extrapolated.": "SWPC tahmin günleri dışındaki analiz zamanı için tahmin yoktur; hiçbir değer ileriye taşınmaz.",
+    "Current conditions describe the Sun when the snapshot was fetched, not at the landing time.": "Güncel koşullar inişin değil, verinin çekildiği andaki Güneş'i anlatır.",
+    "GOES measures near Earth; proton flux is a proxy for the lunar surface, not a dose estimate.": "GOES Dünya yakınında ölçer; proton akısı Ay yüzeyi için yaklaşık bir göstergedir, doz tahmini değildir.",
+    "The radio blackout scale describes HF radio on Earth's sunlit side, not DSN links.": "Radyo kesintisi ölçeği Dünya'nın gündüz yüzündeki HF radyoyu anlatır, DSN bağlantılarını değil."
   },
   "arena": {
     "tab": "Çözücü arenası",
@@ -1048,5 +1053,44 @@
     "archiveNote": "Yalnızca kayıtlı deneme. Spark maliyeti geçmiş denemeye aittir; sonucu açmak kredi harcamaz. Kuantum üstünlüğü kanıtı değildir.",
     "arena": "Bu görev için H8 çözücü ayrıntılarını aç",
     "arenaIntro": "H8 karşılaştırması bu H9 girdisine uygulanır: gerçek hesap adımları, ham sayımlar ve bağımsız doğrulama."
+  },
+  "spaceWeather": {
+    "title": "GÜNEŞ AKTİVİTESİ",
+    "subtitle": "NOAA SWPC · TAHMİN",
+    "intro": "NOAA Uzay Havası Tahmin Merkezi'nden güneş patlamaları ve proton fırtınaları: güncel GOES ölçümleri ve analiz pencereniz için resmi 3 günlük tahmin.",
+    "check": "Güneş aktivitesini kontrol et",
+    "refresh": "Yeni veri çek",
+    "requestFailed": "İstek başarısız oldu",
+    "status": {
+      "pending": "Kuyrukta bekliyor",
+      "acquiring": "Güncel veri NOAA SWPC'den çekiliyor",
+      "computing": "Tahmin analiz penceresiyle karşılaştırılıyor",
+      "ready": "Güneş aktivitesi hazır",
+      "failed": "Güneş aktivitesi alınamadı"
+    },
+    "xrayNow": "ŞU AN X-IŞINI",
+    "protonsNow": "PROTON ≥10 MeV",
+    "forecast": "TAHMİN",
+    "radio": "R{level} radyo kesintisi",
+    "radiation": "S{level} radyasyon fırtınası",
+    "peak": "24 sa tepe {value}",
+    "noData": "Ölçüm yok",
+    "pfu": "{value} pfu",
+    "forecastValue": "M %{m} · X %{x}",
+    "noForecast": "Tahmin yok",
+    "coverage": {
+      "full": "Pencerenin tamamı SWPC tahmini içinde ({start} – {end} UTC).",
+      "partial": "Pencerenin yalnızca {hours} kadarı SWPC tahmini içinde ({start} – {end} UTC); kalan kısım için tahmin yok.",
+      "none": "Bu pencere SWPC tahmininin dışında ({start} – {end} UTC). Patlamalar bu kadar önceden tahmin edilemez; yalnızca güncel koşullar gösteriliyor."
+    },
+    "daysTitle": "Günlük olasılıklar (SWPC)",
+    "day": "{date}: C %{c} · M %{m} · X %{x} · proton olayı %{p}",
+    "regionsTitle": "Patlamaya en yatkın aktif bölgeler ({date}, toplam {count})",
+    "region": "AR {region} {location} {spot} · C %{c} · M %{m} · X %{x}",
+    "unknownPercent": "?",
+    "noRegions": "Numaralı aktif bölge bildirilmedi.",
+    "acquired": "Veri çekilme zamanı {time} UTC",
+    "limits": "Model sınırları ve kaynaklar",
+    "scales": "NOAA Uzay Havası Ölçekleri"
   }
 }

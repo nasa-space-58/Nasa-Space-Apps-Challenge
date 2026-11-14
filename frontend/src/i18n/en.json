@@ -892,7 +892,12 @@
     "Enable 'include descent' to add R4/R5 reachability and fuel.": "Enable 'include descent' to add R4/R5 reachability and fuel.",
     "No validated science-value dataset is integrated yet.": "No validated science-value dataset is integrated yet.",
     "Only sampled candidate starts are evaluated; shorter windows between starts may be missed.": "Only sampled candidate starts are evaluated; shorter windows between starts may be missed.",
-    "Lower is closer: mean of sunlight shortfall / 100 percentage points, excess darkness / mission hours, and Earth shortfall / mission hours. Equal weights; ties by UTC start then job ID. Not a safety ranking.": "Lower is closer: mean of sunlight shortfall / 100 percentage points, excess darkness / mission hours, and Earth shortfall / mission hours. Equal weights; ties by UTC start then job ID. Not a safety ranking."
+    "Lower is closer: mean of sunlight shortfall / 100 percentage points, excess darkness / mission hours, and Earth shortfall / mission hours. Equal weights; ties by UTC start then job ID. Not a safety ranking.": "Lower is closer: mean of sunlight shortfall / 100 percentage points, excess darkness / mission hours, and Earth shortfall / mission hours. Equal weights; ties by UTC start then job ID. Not a safety ranking.",
+    "Solar flares cannot be predicted with certainty; SWPC gives daily probabilities for at most 3 days.": "Solar flares cannot be predicted with certainty; SWPC gives daily probabilities for at most 3 days.",
+    "Analysis time outside the SWPC forecast days has no forecast; nothing is extrapolated.": "Analysis time outside the SWPC forecast days has no forecast; nothing is extrapolated.",
+    "Current conditions describe the Sun when the snapshot was fetched, not at the landing time.": "Current conditions describe the Sun when the snapshot was fetched, not at the landing time.",
+    "GOES measures near Earth; proton flux is a proxy for the lunar surface, not a dose estimate.": "GOES measures near Earth; proton flux is a proxy for the lunar surface, not a dose estimate.",
+    "The radio blackout scale describes HF radio on Earth's sunlit side, not DSN links.": "The radio blackout scale describes HF radio on Earth's sunlit side, not DSN links."
   },
   "arena": {
     "tab": "Solver arena",
@@ -1048,5 +1053,44 @@
     "archiveNote": "Recorded trial only. Historical Spark cost; opening this result spends nothing. This is not evidence of quantum advantage.",
     "arena": "Open H8 solver details for this campaign",
     "arenaIntro": "H8 comparison tools applied to this exact H9 input: real recorded optimizer steps, raw counts and independent validation."
+  },
+  "spaceWeather": {
+    "title": "SOLAR ACTIVITY",
+    "subtitle": "NOAA SWPC · FORECAST",
+    "intro": "Solar flares and proton storms from NOAA's Space Weather Prediction Center: current GOES measurements and the official 3-day forecast for your analysis window.",
+    "check": "Check solar activity",
+    "refresh": "Fetch a new snapshot",
+    "requestFailed": "Request failed",
+    "status": {
+      "pending": "Waiting in queue",
+      "acquiring": "Fetching the current snapshot from NOAA SWPC",
+      "computing": "Comparing the forecast with the analysis window",
+      "ready": "Solar activity ready",
+      "failed": "Solar activity could not be fetched"
+    },
+    "xrayNow": "X-RAY NOW",
+    "protonsNow": "PROTONS ≥10 MeV",
+    "forecast": "FORECAST",
+    "radio": "R{level} radio blackout",
+    "radiation": "S{level} radiation storm",
+    "peak": "24 h peak {value}",
+    "noData": "No measurement",
+    "pfu": "{value} pfu",
+    "forecastValue": "M {m}% · X {x}%",
+    "noForecast": "No forecast",
+    "coverage": {
+      "full": "The whole window is inside the SWPC forecast ({start} – {end} UTC).",
+      "partial": "Only {hours} of the window is inside the SWPC forecast ({start} – {end} UTC); the rest has no forecast.",
+      "none": "This window is outside the SWPC forecast ({start} – {end} UTC). Flares cannot be forecast that far ahead; only current conditions are shown."
+    },
+    "daysTitle": "Daily probabilities (SWPC)",
+    "day": "{date}: C {c}% · M {m}% · X {x}% · proton event {p}%",
+    "regionsTitle": "Most flare-prone active regions ({date}, {count} total)",
+    "region": "AR {region} {location} {spot} · C {c}% · M {m}% · X {x}%",
+    "unknownPercent": "?",
+    "noRegions": "No numbered active regions reported.",
+    "acquired": "Snapshot fetched {time} UTC",
+    "limits": "Model limits & sources",
+    "scales": "NOAA Space Weather Scales"
   }
 }

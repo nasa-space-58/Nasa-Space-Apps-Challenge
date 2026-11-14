@@ -174,3 +174,6 @@ Start from current main `cb17bdd` on `codex/h8-solver-arena`. Push only this new
 ### H9 delivery (user, 2026-11-15)
 
 H9 proceeds from completed H8 `74bcfba` on `codex/h9-shared-antenna`; push only the new branch for the user's manual merge. Current main `cb17bdd` is already an ancestor. Campaign skeleton `071e1fa`, frozen tests `945a718`; optional physical-layout skeleton `84dac54`, frozen tests `a366a5c` and user-approved reader-only correction `d66685f`. Preserve the user's local H6 notebook changes. The user authorized one free-credit hardware trial capped at 1 Spark; no paid credits or automatic retries. H9 uses actual archived R2/Sun evidence with explicit synthetic mission/calendar preferences, and distinguishes scheduling feasibility from landing/energy certification. See `docs/shared-antenna-campaign.md`.
+### Space weather main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/space-weather-noaa` (NOAA SWPC solar activity; frozen tests `be593c9`, see docs/space-weather.md) was fast-forwarded directly onto `main` and `temel` from `cb17bdd` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.

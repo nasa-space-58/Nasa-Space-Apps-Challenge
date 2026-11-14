@@ -18,6 +18,7 @@ import ExportPanel from "./components/ExportPanel";
 import ScenarioTransfer from "./components/ScenarioTransfer";
 import Classroom from "./components/Classroom";
 import Communication from "./components/Communication";
+import SpaceWeather from "./components/SpaceWeather";
 import Recommendations from "./components/Recommendations";
 import Descent from "./components/Descent";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
@@ -768,6 +769,7 @@ export default function App() {
       {result && job && (
         <Communication key={job.id} jobId={job.id} current={frame?.utc} />
       )}
+      {result && job && <SpaceWeather key={`sw-${job.id}`} jobId={job.id} />}
       {result && (
         <div className="panel trace-panel">
           <details>

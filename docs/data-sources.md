@@ -46,6 +46,7 @@ This requires three kinds of data:
 | 9 | NASA SVS CGI Moon Kit | Texture + elevation for a 3D globe | ⭐⭐⭐ | No |
 | 10 | Other high-resolution DEMs (PGDA 78/81/104, LROC NAC DTM) | Close-up of a single site | ⭐⭐ | No |
 | 11 | CSA Moon Exploration | Presentation / background content | ⭐ | ✅ Yes |
+| 12 | NOAA SWPC space weather JSON | Solar flare / proton storm forecasts and current conditions | ⭐⭐⭐ | No (NOAA, not NASA) |
 
 ---
 
@@ -207,6 +208,34 @@ For looking very closely at a single landing site. Files are large — only wort
 - **What:** The Canadian Space Agency's Moon exploration portal: its contributions to Artemis, past and future missions.
 - **Link:** https://www.asc-csa.gc.ca/eng/astronomy/moon-exploration/
 - **Role in the project:** Not technical data; context for the presentation and a "we used a partner agency resource" point.
+
+## 12. NOAA SWPC space weather JSON ⭐⭐⭐ 🧪
+
+- **What:** The NOAA Space Weather Prediction Center (SWPC), the official US space weather forecast office, publishes forecasts and GOES satellite measurements as public JSON files. No API key or account is needed.
+- **Links:**
+  - Data service index: https://services.swpc.noaa.gov/
+  - NOAA Space Weather Scales (R/S/G thresholds): https://www.swpc.noaa.gov/noaa-scales-explanation
+  - Product descriptions: https://www.swpc.noaa.gov/products-and-data
+- **Products used** (🧪 fetched live on 14 November 2026, all `application/json`):
+
+  | Product | Path | Content | Time scale |
+  |---|---|---|---|
+  | Flare and proton probabilities | `/json/solar_probabilities.json` | Newest-first list of daily forecast issues. Each issue gives C-, M- and X-class flare probabilities and the ≥10 MeV proton event probability, in percent, for 1, 2 and 3 days after the issue date. | `date` is printed without an offset (`2026-11-14T00:00:00`); SWPC forecast days are UTC days. |
+  | GOES X-ray flux | `/json/goes/primary/xrays-1-day.json` | 1-minute flux in W/m² for the 0.05–0.4 nm and 0.1–0.8 nm channels. Flare classes use the 0.1–0.8 nm channel. | `time_tag` in UTC (`Z`). |
+  | GOES integral protons | `/json/goes/primary/integral-protons-1-day.json` | 5-minute integral proton flux in pfu (particles cm⁻² s⁻¹ sr⁻¹) for ≥1 … ≥500 MeV. The radiation storm scale uses ≥10 MeV. | `time_tag` in UTC (`Z`). |
+  | Active regions | `/json/solar_regions.json` | Daily sunspot region reports with per-region C/M/X flare and proton probabilities in percent. | `observed_date` is a UTC day. |
+
+- **Thresholds** (NOAA Space Weather Scales):
+  - Flare class from 0.1–0.8 nm peak flux: A < 10⁻⁷, B ≥ 10⁻⁷, C ≥ 10⁻⁶, M ≥ 10⁻⁵, X ≥ 10⁻⁴ W/m².
+  - Radio blackout: R1 ≥ M1, R2 ≥ M5, R3 ≥ X1, R4 ≥ X10, R5 ≥ X20.
+  - Solar radiation storm: S1 ≥ 10, S2 ≥ 10², S3 ≥ 10³, S4 ≥ 10⁴, S5 ≥ 10⁵ pfu at ≥10 MeV.
+- **Caveats:**
+  - **Flares cannot be predicted with certainty.** SWPC gives probabilities for at most 3 days ahead. An analysis interval beyond that horizon has no forecast. The system reports this case explicitly and never extrapolates.
+  - The values are a snapshot taken when the worker fetched them. They describe the Sun at that moment, not at a future landing date.
+  - GOES flies in geostationary orbit inside Earth's magnetosphere. The Moon has no magnetosphere, so near-Earth proton flux is only a proxy for the lunar surface environment. It is not a lunar dose measurement.
+  - The radio blackout scale (R) describes HF radio on Earth's sunlit side. It does not model DSN links.
+  - Not on the challenge's official Resources list, and not a NASA source. JPL Horizons remains the required NASA source.
+- **Role in the project:** The ingestion worker fetches the four products into a checksummed snapshot. The backend reports current conditions and any forecast days that overlap a saved analysis. See [space-weather.md](space-weather.md).
 
 ---
 
