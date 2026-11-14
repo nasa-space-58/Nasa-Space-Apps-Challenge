@@ -22,11 +22,17 @@ services:
       RABBITMQ_URL: amqp://${RABBITMQ_USER:?Set user}:${RABBITMQ_PASSWORD:?Set password}@rabbitmq:5672/
       DATA_DIR: /data
       STATE_DIR: /state
+      DOCS_DIR: /workspace/docs
+      # Optional Q&A assistant; off unless enabled and a key is provided.
+      ASSISTANT_ENABLED: ${ASSISTANT_ENABLED:-false}
+      ASSISTANT_MODEL: ${ASSISTANT_MODEL:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
       - ./backend:/workspace/backend
       - ./shared:/workspace/shared:ro
+      - ./docs:/workspace/docs:ro
       - lunar-data:/data:ro
       - analysis-state:/state
     depends_on:
