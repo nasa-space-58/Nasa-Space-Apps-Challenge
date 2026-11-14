@@ -435,6 +435,9 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     from app.shared_antenna import register_campaign_routes
 
     register_campaign_routes(app)
+    from app.research_api import register_research_routes
+
+    register_research_routes(app)
 
     @app.get("/health")
     def health():
