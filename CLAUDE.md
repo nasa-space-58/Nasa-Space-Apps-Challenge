@@ -16,6 +16,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 The first release focuses on site/date comparison, terrain-relative Sun/Earth visibility and understandable energy/communication metrics. Extended mission planning follows the phased roadmap.
 
+## Latest verified extension
+
+R1 adds explained candidate deficits, CSV/PNG/printable reports, saved-result links, portable input manifests with expected result fingerprints, and two bounded observer-based classroom lessons. See docs/release-r1.md. Surface-wide shadow visualization and human MVP acceptance remain open.
+
 ## Planned architecture (see docs/technologies.md)
 
 Four Docker Compose services; the only host requirement is Docker:

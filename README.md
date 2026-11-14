@@ -192,3 +192,14 @@ bu üç adayın hiçbiri uygun çıkmaz. Aradaki bütün anlar taranmaz; kısa f
 
 **243 test**, Ruff, derleme ve npm audit geçti. [Kullanım ve API](docs/window-search.md).
 Task 7 yalnızca `feature/task7-window-search` dalına gönderilir; tahakrcc/main ile birleştirilmez.
+
+## R1: Dışa aktarma, paylaşım ve sınıf modu
+
+- Sonuçların yanındaki **Export / Share** panelinden CSV, grafik PNG, yazdırılabilir HTML raporu ve senaryo JSON dosyası indirilir. HTML raporunu açıp tarayıcıdan **Yazdır / PDF olarak kaydet** seçilebilir.
+- Bağlantı, aynı sunucudaki kayıtlı analizi ve seçili zamanı açar; A/B karşılaştırması da paylaşılabilir. `localhost` bağlantısı başka bilgisayardan senin sunucuna erişim sağlamaz.
+- **Mission control → Import a shared scenario file** girdileri ve beklenen veri/model kimliklerini yükler. **Calculate imported scenario** yeniden hesaplar; sonuç eski parmak iziyle eşleşmiyorsa açıkça uyarılır. JSON dosyası NASA veri önbelleğini içermez.
+- Zaman aramasında hiç uygun sonuç yoksa en yakın üç değerlendirilebilir aday ve her koşuldaki eksik/fazla miktar gösterilir. Eksik verili adaylar sıralanmaz.
+- **Classroom → Start lesson** iki tıkla Malapert örneği açar. 4 ve 6 Kasım örnekleri; hız seçimi, oynatma/durdurma, zaman çubuğu ve açıklama kartları bulunur. Bu mod bir gözlemcinin ufuk/görünürlüğünü öğretir; yüzey geneli hareketli gölge simülasyonu veya kalıcı gölge doğrulaması yapmaz.
+
+**263 test** ve derleme kontrolleri geçti. [R1 kullanım, API ve kapsam](docs/release-r1.md).
+Yalnızca `feature/r1-exports-sharing-classroom` dalına gönderilir; tahakrcc/main ile birleştirme kullanıcıya aittir. Takım arkadaşı MVP kabulü hâlâ bekliyor.

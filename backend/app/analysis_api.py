@@ -408,4 +408,7 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     from app.comparison import register_comparison_routes
 
     register_comparison_routes(app, store)
+    from app.release_r1 import register_r1_routes
+
+    register_r1_routes(app, store, searches)
     return app

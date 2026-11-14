@@ -166,10 +166,12 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 - [x] Task 7: implement bounded S3 candidate-start searches using sunlight and Earth-visibility constraints (see [window search](window-search.md)).
 - [x] Task 7: show satisfied/unmet/unknown constraints for every evaluated candidate.
-- [ ] Rank closest results when none qualify (Task 7 retains chronological order).
-- [ ] Implement S14 CSV, chart export and reports with units and provenance.
-- [ ] Add shareable scenarios that retain input parameters and dataset/model versions.
-- [ ] Complete S15 guided teaching presets and explanation cards.
+- [x] R1: rank closest fully evaluated results with explicit normalized deficits; exclude unknown/failed candidates.
+- [x] R1: implement S14 CSV, chart PNG and printable HTML reports with units and provenance.
+- [x] R1: add saved-result links and portable scenario manifests retaining inputs and dataset/model fingerprints.
+- [x] R1: add S15 guided observer-based teaching presets, state explanations, two-click start and controllable playback.
+
+**R1 delivery** — See [release details](release-r1.md). The original S15 terrain-wide moving-shadow/crater-floor visualization is not implemented; the delivered classroom mode uses validated single-observer horizon/visibility results. No permanent-shadow claim is made. Human teammate acceptance from Step 6 remains open.
 
 **Completion evidence** — Search results satisfy their stated constraints and a shared/exported scenario can be reproduced.
 

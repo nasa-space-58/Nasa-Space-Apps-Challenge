@@ -620,6 +620,8 @@ flowchart LR
 
 ### S15 — Classroom Demonstration Mode
 
+**R1 implementation note:** guided lessons, two-click start, speed/pause and explanation cards are delivered using real single-observer sky/horizon results (see [R1](release-r1.md)). The broader surface-wide moving-shadow and crater-rim/floor visualization in the design below is not implemented. Short-window results do not establish permanent shadow or illumination.
+
 **Release assignment — MVP basic preset; full scope in R1**
 
 - **Actor:** P3
