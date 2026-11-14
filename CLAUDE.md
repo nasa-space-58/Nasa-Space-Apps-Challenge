@@ -86,3 +86,7 @@ Task 5 starts from current tahakrcc (`c29086d`) on `feature/task5-scenario-compa
 ### Task 6 delivery override (user, 2026-11-14)
 
 Task 6 starts from Task 5 (`c1d6348`) on `feature/task6-demo-verification`. Push only this new branch; do not merge into or push to tahakrcc or main. Verification uses an isolated fresh clone and new Docker volumes. Teammate acceptance must be recorded by a human, not inferred from automated checks.
+
+### Task 7 delivery override (user, 2026-11-14)
+
+Start from Task 6 on `feature/task7-window-search`. Push only this new branch; do not merge into or push to tahakrcc/main. Time search is a bounded candidate-grid exploration, not a guarantee of all feasible windows or landing safety.
