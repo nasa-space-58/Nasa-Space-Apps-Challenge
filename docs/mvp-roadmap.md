@@ -220,9 +220,11 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 ### R6 — Risk and uncertainty
 
-- [ ] Source or label sensor, engine, landing-position and terrain uncertainty assumptions.
-- [ ] Implement seeded S10 Monte Carlo runs and failure-cause tracking.
-- [ ] Display dispersion, fuel distributions and sensitivity results.
+- [x] Source or label sensor, engine, landing-position and terrain uncertainty assumptions.
+- [x] Implement seeded S10 Monte Carlo runs and failure-cause tracking.
+- [x] Display dispersion, fuel distributions and sensitivity results.
+
+**R6 delivery** — See [risk and uncertainty](risk-uncertainty.md). Seeded Monte Carlo over the R4 descent with independent Gaussian errors in thrust, Isp, PDI state, DEM height and navigation (all labelled planning assumptions). Success requires the R4 touchdown tolerances, the R5 reserve and a known landing cell within the R3 slope limit. The output gives a Wilson 95 % interval, failure causes, 1σ/3σ dispersion ellipses with the steep DEM cells inside them, a propellant histogram and rank-correlation sensitivity. On Malapert (200 runs, seed 2026), 52 % of landings succeed, and terrain-height error dominates because no landing radar is modelled. Frozen tests: `9e0b58d`.
 
 **Completion evidence** — Fixed inputs and seed reproduce results, with assumptions and success criteria visible.
 
