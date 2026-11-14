@@ -481,7 +481,8 @@
       "pole": "Güney kutbu",
       "spacecraft": "Uzay aracı",
       "launch": "Fırlatma",
-      "landing": "İniş"
+      "landing": "İniş",
+      "solar": "Güneş sistemi"
     },
     "flownPath": "Uçulan yol",
     "coverage": "Arazi kapsamı 80–90° G",
@@ -491,7 +492,8 @@
       "picking": "Seçmek için kesikli halkanın içine tıklayın · döndürmek için sürükleyin · yakınlaştırmak için kaydırın",
       "landing": "Temsili iniş yakın çekimi · döndürmek için sürükleyin · başka bölge seçmek için Güney kutbu'nu kullanın",
       "launch": "Temsili fırlatma yakın çekimi · döndürmek için sürükleyin · yakınlaştırmak için kaydırın",
-      "default": "Yakınlaşıp bölge seçmek için Ay'a tıklayın · döndürmek için sürükleyin"
+      "default": "Yakınlaşıp bölge seçmek için Ay'a tıklayın · döndürmek için sürükleyin",
+      "solar": "Temsili Güneş–Dünya–Ay sistemi · ölçeksiz · hızlandırılmış: 1 yıl = 60 sn, Ay yılda 13,4 tur atar · döndürmek için sürükleyin, yakınlaştırmak için kaydırın"
     },
     "showPanel": "Görev kontrol panelini göster",
     "panel": "Panel",

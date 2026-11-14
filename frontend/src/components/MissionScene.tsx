@@ -16,6 +16,7 @@ import * as THREE from "three";
 import { Dust, Model, Terrain, smooth } from "./LunarSurface";
 import LaunchSite from "./LaunchSite";
 import Rover, { type RoutePoint } from "./Rover";
+import SolarSystem from "./SolarSystem";
 import type { Preset } from "../types";
 import { useTranslate } from "../i18n";
 import {
@@ -82,7 +83,8 @@ export type CameraMode =
   | "pole"
   | "spacecraft"
   | "launch"
-  | "landing";
+  | "landing"
+  | "solar";
 export type CameraView = Exclude<CameraMode, "auto">;
 export type SiteCondition = "sunlit" | "dark" | "unknown";
 
@@ -1075,6 +1077,12 @@ function LaunchCloseup({
   );
 }
 
+/** Illustrative Sun–Earth–Moon orrery with drag-to-orbit camera input. */
+function SolarCloseup({ reduced, compact }: { reduced: boolean; compact: boolean }) {
+  const user = useOrbitInput("solar");
+  return <SolarSystem reduced={reduced} compact={compact} user={user} />;
+}
+
 type SceneProps = {
   lat: number;
   lon: number;
@@ -1166,7 +1174,9 @@ export default function MissionScene(
         snap={!animate}
       />
       <Suspense fallback={null}>
-        {scene.cameraMode === "launch" ? (
+        {scene.cameraMode === "solar" ? (
+          <SolarCloseup reduced={scene.reduced} compact={compact} />
+        ) : scene.cameraMode === "launch" ? (
           <LaunchCloseup
             progress={progress}
             reduced={scene.reduced}
