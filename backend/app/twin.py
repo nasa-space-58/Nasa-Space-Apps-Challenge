@@ -63,10 +63,14 @@ class TwinError(ValueError):
 
 
 class SensorSettings(BaseModel):
-    """Navigation sensor and estimator (planning assumptions, editable)."""
+    """Navigation sensor and estimator (planning assumptions, editable).
+
+    thrust_noise_fraction is the standard deviation of a constant engine
+    performance bias drawn once per run and unknown to the estimator.
+    """
 
     model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
-    position_sigma_m: float = Field(default=20.0, ge=0, le=5000)
+    position_sigma_m: float = Field(default=5.0, ge=0, le=5000)
     speed_sigma_mps: float = Field(default=0.5, ge=0, le=50)
     gain: float = Field(default=0.3, gt=0, le=1)
     thrust_noise_fraction: float = Field(default=0.005, ge=0, le=0.1)
