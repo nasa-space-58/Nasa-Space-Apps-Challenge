@@ -1,0 +1,12 @@
+{
+  "site": {
+    "site_id": "south-pole-reference",
+    "longitude_deg_east": 0.0,
+    "latitude_deg": -89.5,
+    "altitude_km": 0.0,
+    "reference_frame": "MOON_ME"
+  },
+  "start_utc": "2026-11-14T00:00:00Z",
+  "end_utc": "2026-11-15T00:00:00Z",
+  "step_s": 3600
+}
