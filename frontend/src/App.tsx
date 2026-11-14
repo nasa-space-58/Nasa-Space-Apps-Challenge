@@ -16,6 +16,7 @@ import ScenarioTransfer from "./components/ScenarioTransfer";
 import Classroom from "./components/Classroom";
 import Communication from "./components/Communication";
 import Recommendations from "./components/Recommendations";
+import Descent from "./components/Descent";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
 
 const MoonScene = lazy(() => import("./components/MoonScene"));
@@ -198,6 +199,7 @@ export default function App() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [classroomOpen, setClassroomOpen] = useState(false);
   const [recommendOpen, setRecommendOpen] = useState(false);
+  const [descentOpen, setDescentOpen] = useState(false);
   const [sharedB, setSharedB] = useState<string | undefined>(undefined);
   const shared = useRef(new URLSearchParams(location.search));
   const [resolved, setResolved] = useState("");
@@ -487,6 +489,7 @@ export default function App() {
     setSearchOpen(false);
     setClassroomOpen(false);
     setRecommendOpen(false);
+    setDescentOpen(false);
     setSharedB(otherId);
     setPlaying(false);
     setJob(selected);
@@ -523,6 +526,8 @@ export default function App() {
         onClick={() => {
           setSearchOpen(false);
           setClassroomOpen(false);
+          setRecommendOpen(false);
+          setDescentOpen(false);
           setTimeout(() => {
             jump("mission");
             document.getElementById("mission")?.focus({ preventScroll: true });
@@ -546,11 +551,12 @@ export default function App() {
         </button>
         <nav aria-label="Main navigation">
           <button
-            aria-pressed={!searchOpen && !classroomOpen && !recommendOpen}
+            aria-pressed={!searchOpen && !classroomOpen && !recommendOpen && !descentOpen}
             onClick={() => {
               setSearchOpen(false);
               setClassroomOpen(false);
               setRecommendOpen(false);
+              setDescentOpen(false);
               setTimeout(() => jump("mission"), 0);
             }}
           >
@@ -561,6 +567,7 @@ export default function App() {
             onClick={() => {
               setClassroomOpen(false);
               setRecommendOpen(false);
+              setDescentOpen(false);
               setSearchOpen(true);
               setTimeout(() => jump("window-search"), 0);
             }}
@@ -573,6 +580,7 @@ export default function App() {
               setSearchOpen(false);
               setClassroomOpen(false);
               setRecommendOpen(true);
+              setDescentOpen(false);
               setPlaying(false);
               setTimeout(() => jump("recommendations"), 0);
             }}
@@ -580,10 +588,24 @@ export default function App() {
             Recommend
           </button>
           <button
+            aria-pressed={descentOpen}
+            onClick={() => {
+              setSearchOpen(false);
+              setClassroomOpen(false);
+              setRecommendOpen(false);
+              setDescentOpen(true);
+              setPlaying(false);
+              setTimeout(() => jump("descent"), 0);
+            }}
+          >
+            Descent
+          </button>
+          <button
             aria-pressed={classroomOpen}
             onClick={() => {
               setSearchOpen(false);
               setRecommendOpen(false);
+              setDescentOpen(false);
               setClassroomOpen(true);
               setPlaying(false);
               setTimeout(() => jump("classroom"), 0);
@@ -723,6 +745,7 @@ export default function App() {
                   setSearchOpen(false);
                   setClassroomOpen(false);
                   setRecommendOpen(false);
+                  setDescentOpen(false);
                   setTimeout(() => jump("mission"), 0);
                 }}
               >
@@ -807,6 +830,7 @@ export default function App() {
                 setSearchOpen(false);
                 setClassroomOpen(false);
                 setRecommendOpen(false);
+                setDescentOpen(false);
                 setTimeout(() => jump("mission"), 0);
               }}
             >
@@ -823,7 +847,7 @@ export default function App() {
         id="mission"
         tabIndex={-1}
         className="mission-section"
-        hidden={searchOpen || classroomOpen || recommendOpen}
+        hidden={searchOpen || classroomOpen || recommendOpen || descentOpen}
       >
         <div className="workspace-kicker">
           <span>OBSERVATION WORKSPACE</span>
@@ -1325,7 +1349,7 @@ export default function App() {
           </div>
         </div>
       </section>
-      {comparisonBase && !searchOpen && !classroomOpen && !recommendOpen && (
+      {comparisonBase && !searchOpen && !classroomOpen && !recommendOpen && !descentOpen && (
         <Comparison
           key={comparisonBase.id}
           aId={comparisonBase.id}
@@ -1339,6 +1363,7 @@ export default function App() {
       {searchOpen && <WindowSearch sites={sites} onChoose={openSearchResult} />}
       {classroomOpen && <Classroom onOpen={openSearchResult} />}
       {recommendOpen && <Recommendations sites={sites} />}
+      {descentOpen && <Descent sites={sites} />}
       <footer>
         <span>
           2GBRAM <i> / </i> LUNAR LANDING NAVIGATOR
