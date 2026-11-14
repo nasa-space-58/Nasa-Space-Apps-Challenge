@@ -15,6 +15,7 @@ import ExportPanel from "./components/ExportPanel";
 import ScenarioTransfer from "./components/ScenarioTransfer";
 import Classroom from "./components/Classroom";
 import Communication from "./components/Communication";
+import Recommendations from "./components/Recommendations";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
 
 const MoonScene = lazy(() => import("./components/MoonScene"));
@@ -193,6 +194,7 @@ export default function App() {
   const [sources, setSources] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [classroomOpen, setClassroomOpen] = useState(false);
+  const [recommendOpen, setRecommendOpen] = useState(false);
   const [sharedB, setSharedB] = useState<string | undefined>(undefined);
   const shared = useRef(new URLSearchParams(location.search));
   const [resolved, setResolved] = useState("");
@@ -468,6 +470,7 @@ export default function App() {
     setRefine(submitted.refine);
     setSearchOpen(false);
     setClassroomOpen(false);
+    setRecommendOpen(false);
     setSharedB(otherId);
     setPlaying(false);
     setJob(selected);
@@ -514,10 +517,11 @@ export default function App() {
         </button>
         <nav aria-label="Main navigation">
           <button
-            aria-pressed={!searchOpen && !classroomOpen}
+            aria-pressed={!searchOpen && !classroomOpen && !recommendOpen}
             onClick={() => {
               setSearchOpen(false);
               setClassroomOpen(false);
+              setRecommendOpen(false);
               setTimeout(() => jump("mission"), 0);
             }}
           >
@@ -527,6 +531,7 @@ export default function App() {
             aria-pressed={searchOpen}
             onClick={() => {
               setClassroomOpen(false);
+              setRecommendOpen(false);
               setSearchOpen(true);
               setTimeout(() => jump("window-search"), 0);
             }}
@@ -534,9 +539,22 @@ export default function App() {
             Time search
           </button>
           <button
+            aria-pressed={recommendOpen}
+            onClick={() => {
+              setSearchOpen(false);
+              setClassroomOpen(false);
+              setRecommendOpen(true);
+              setPlaying(false);
+              setTimeout(() => jump("recommendations"), 0);
+            }}
+          >
+            Recommend
+          </button>
+          <button
             aria-pressed={classroomOpen}
             onClick={() => {
               setSearchOpen(false);
+              setRecommendOpen(false);
               setClassroomOpen(true);
               setPlaying(false);
               setTimeout(() => jump("classroom"), 0);
@@ -618,6 +636,7 @@ export default function App() {
                 onClick={() => {
                   setSearchOpen(false);
                   setClassroomOpen(false);
+                  setRecommendOpen(false);
                   setTimeout(() => jump("mission"), 0);
                 }}
               >
@@ -682,6 +701,7 @@ export default function App() {
               onClick={() => {
                 setSearchOpen(false);
                 setClassroomOpen(false);
+                setRecommendOpen(false);
                 setTimeout(() => jump("mission"), 0);
               }}
             >
@@ -697,7 +717,7 @@ export default function App() {
       <section
         id="mission"
         className="mission-section"
-        hidden={searchOpen || classroomOpen}
+        hidden={searchOpen || classroomOpen || recommendOpen}
       >
         <ScenarioTransfer onOpen={openSearchResult} />
         <div className="section-heading">
@@ -1191,7 +1211,7 @@ export default function App() {
           </div>
         </div>
       </section>
-      {comparisonBase && !searchOpen && !classroomOpen && (
+      {comparisonBase && !searchOpen && !classroomOpen && !recommendOpen && (
         <Comparison
           key={comparisonBase.id}
           aId={comparisonBase.id}
@@ -1204,6 +1224,7 @@ export default function App() {
       )}
       {searchOpen && <WindowSearch sites={sites} onChoose={openSearchResult} />}
       {classroomOpen && <Classroom onOpen={openSearchResult} />}
+      {recommendOpen && <Recommendations sites={sites} />}
       <footer>
         <span>
           2GBRAM <i> / </i> LUNAR LANDING NAVIGATOR
