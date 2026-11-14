@@ -59,6 +59,17 @@ const TOUCHDOWN_PROGRESS = MISSION_PHASES.find(
 )!.start_progress;
 /** Radius of the ambient LRO orbit (≈ 200 km altitude). */
 const SCIENCE_ORBIT_RADIUS_SCENE = 1.12;
+/**
+ * Earth–Moon view framing: the Moon-to-Earth distance plus Earth's diameter
+ * and a small margin must span the viewport width.
+ */
+const SYSTEM_VIEW_SPAN_SCENE =
+  (SCENE_LAYOUT.earth_center_scene[0] + SCENE_LAYOUT.earth_radius_scene * 2) *
+  1.1;
+const SYSTEM_VIEW_YAW = 0.12;
+const SYSTEM_VIEW_PITCH = 0.42;
+/** Earth's atmosphere shell (display thickness ≈ 100 km). */
+const EARTH_ATMOSPHERE_RADIUS_SCENE = SCENE_LAYOUT.earth_radius_scene * 1.016;
 
 export type CameraMode =
   | "auto"
@@ -90,6 +101,128 @@ function glowTexture(inner: string, outer: string) {
   const texture = new THREE.CanvasTexture(canvas);
   texture.colorSpace = THREE.SRGBColorSpace;
   return texture;
+}
+
+/** Radial falloff without a hard core, for bloom around distant bodies. */
+function softGlowTexture(rgb: string) {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 128;
+  const context = canvas.getContext("2d")!;
+  const gradient = context.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gradient.addColorStop(0, `rgba(${rgb}, 0.32)`);
+  gradient.addColorStop(0.3, `rgba(${rgb}, 0.2)`);
+  gradient.addColorStop(0.6, `rgba(${rgb}, 0.06)`);
+  gradient.addColorStop(1, `rgba(${rgb}, 0)`);
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, 128, 128);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+/**
+ * Thin fresnel rim for Earth's atmosphere, brightest on the day-side limb.
+ * Supports the logarithmic depth buffer used by the mission canvas.
+ */
+function Atmosphere({
+  radius,
+  sunDirection,
+}: {
+  radius: number;
+  sunDirection: THREE.Vector3;
+}) {
+  const material = useMemo(
+    () =>
+      new THREE.ShaderMaterial({
+        uniforms: {
+          sunDirection: { value: sunDirection.clone().normalize() },
+          dayColor: { value: new THREE.Color("#7fb8ff") },
+          twilightColor: { value: new THREE.Color("#ffb37a") },
+        },
+        vertexShader: /* glsl */ `
+          #include <common>
+          #include <logdepthbuf_pars_vertex>
+          varying vec3 vNormal;
+          varying vec3 vView;
+          varying vec3 vWorldNormal;
+          void main() {
+            vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+            vNormal = normalize(normalMatrix * normal);
+            vView = normalize(-mvPosition.xyz);
+            vWorldNormal = normalize(mat3(modelMatrix) * normal);
+            gl_Position = projectionMatrix * mvPosition;
+            #include <logdepthbuf_vertex>
+          }
+        `,
+        fragmentShader: /* glsl */ `
+          #include <common>
+          #include <logdepthbuf_pars_fragment>
+          uniform vec3 sunDirection;
+          uniform vec3 dayColor;
+          uniform vec3 twilightColor;
+          varying vec3 vNormal;
+          varying vec3 vView;
+          varying vec3 vWorldNormal;
+          void main() {
+            #include <logdepthbuf_fragment>
+            float rim = pow(1.0 - abs(dot(normalize(vNormal), normalize(vView))), 2.6);
+            float sun = dot(normalize(vWorldNormal), sunDirection);
+            float day = smoothstep(-0.25, 0.35, sun);
+            float twilight = (1.0 - abs(sun) * 2.2);
+            vec3 color = mix(dayColor, twilightColor, clamp(twilight, 0.0, 1.0) * 0.45);
+            gl_FragColor = vec4(color, rim * day * 0.95);
+          }
+        `,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      }),
+    [sunDirection],
+  );
+  useEffect(() => () => material.dispose(), [material]);
+  return (
+    <mesh material={material}>
+      <sphereGeometry args={[radius, 96, 64]} />
+    </mesh>
+  );
+}
+
+/**
+ * Soft light bloom that keeps a distant body readable, like an overexposed
+ * point in a wide-field photo. It never changes the body's true size and
+ * fades out once the body itself covers enough of the view.
+ */
+function DistantGlow({
+  radius,
+  texture,
+  strength,
+}: {
+  radius: number;
+  texture: THREE.Texture;
+  strength: number;
+}) {
+  const sprite = useRef<THREE.Sprite>(null!);
+  const world = useMemo(() => new THREE.Vector3(), []);
+  useFrame(({ camera }) => {
+    sprite.current.getWorldPosition(world);
+    const distance = camera.position.distanceTo(world);
+    const apparent = radius / distance;
+    const material = sprite.current.material as THREE.SpriteMaterial;
+    material.opacity =
+      strength * (1 - THREE.MathUtils.smoothstep(apparent, 0.012, 0.05));
+    sprite.current.visible = material.opacity > 0.01;
+    sprite.current.scale.setScalar(Math.max(radius * 3, distance * 0.12));
+  });
+  return (
+    <sprite ref={sprite}>
+      <spriteMaterial
+        map={texture}
+        transparent
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+      />
+    </sprite>
+  );
 }
 
 function Line({
@@ -433,8 +566,18 @@ function CameraRig({
     };
     if (mode === "system") {
       desiredTarget.set(SCENE_LAYOUT.earth_center_scene[0] / 2, 0, 0);
-      // Narrow viewports need a longer distance to keep Sun, Moon and Earth in frame.
-      distance *= Math.max(1, 1.3 / Math.max(0.3, size.width / size.height));
+      // Fit the true-scale Earth–Moon line to the viewport width instead of a
+      // fixed distance, so both bodies appear as large as the frame allows
+      // without changing their sizes or separation.
+      yaw = SYSTEM_VIEW_YAW;
+      pitch = SYSTEM_VIEW_PITCH;
+      const perspective = camera as THREE.PerspectiveCamera;
+      const halfHeight = Math.tan(
+        THREE.MathUtils.degToRad(perspective.fov ?? 50) / 2,
+      );
+      const halfWidth = halfHeight * Math.max(0.3, size.width / size.height);
+      distance =
+        (SYSTEM_VIEW_SPAN_SCENE / 2 / halfWidth) * Math.cos(SYSTEM_VIEW_YAW);
     } else if (mode === "pole") {
       desiredTarget.set(0, -SCENE_LAYOUT.moon_radius_scene, 0);
       yaw = siteYaw();
@@ -530,13 +673,16 @@ function System({
   const earth = useRef<THREE.Mesh>(null!);
   const spacecraft = useRef(new THREE.Vector3());
   const sunGlow = useMemo(() => glowTexture("#fff4cf", "#ffb54700"), []);
-  const atmosphere = useMemo(() => glowTexture("#8fc6ff55", "#8fc6ff00"), []);
+  const earthGlow = useMemo(() => softGlowTexture("159, 203, 255"), []);
+  const moonGlow = useMemo(() => softGlowTexture("230, 226, 216"), []);
+  const sunDirection = useMemo(() => v3(SUN_SCENE).normalize(), []);
   useEffect(
     () => () => {
       sunGlow.dispose();
-      atmosphere.dispose();
+      earthGlow.dispose();
+      moonGlow.dispose();
     },
-    [sunGlow, atmosphere],
+    [sunGlow, earthGlow, moonGlow],
   );
   const stars = useMemo(() => {
     const values = new Float32Array(2400 * 3);
@@ -632,21 +778,21 @@ function System({
             <meshStandardMaterial map={earthMap} roughness={0.85} />
           </mesh>
         </group>
-        <sprite
-          scale={[
-            SCENE_LAYOUT.earth_radius_scene * 2.7,
-            SCENE_LAYOUT.earth_radius_scene * 2.7,
-            1,
-          ]}
-        >
-          <spriteMaterial
-            map={atmosphere}
-            transparent
-            depthWrite={false}
-            blending={THREE.AdditiveBlending}
-          />
-        </sprite>
+        <Atmosphere
+          radius={EARTH_ATMOSPHERE_RADIUS_SCENE}
+          sunDirection={sunDirection}
+        />
+        <DistantGlow
+          radius={SCENE_LAYOUT.earth_radius_scene}
+          texture={earthGlow}
+          strength={0.55}
+        />
       </group>
+      <DistantGlow
+        radius={SCENE_LAYOUT.moon_radius_scene}
+        texture={moonGlow}
+        strength={0.4}
+      />
       <Line points={parkingRing} color="#9ac9e5" opacity={0.18} />
       <mesh
         onClick={pick}
@@ -728,16 +874,15 @@ function System({
 /**
  * Close-up of the final descent and touchdown, staged like the introduction
  * page. Art-directed local terrain in its own scene units (not metres, not the
- * analysed DEM); only the lighting follows the site's analysed Sun condition.
+ * analysed DEM). The touchdown is always staged on the sunlit side; the
+ * analysed Sun condition is reported by the HUD, not by this illustration.
  */
 function LandingSite({
   progress,
-  condition,
   reduced,
   compact,
 }: {
   progress: MutableRefObject<number>;
-  condition: SiteCondition;
   reduced: boolean;
   compact: boolean;
 }) {
@@ -756,7 +901,6 @@ function LandingSite({
     }
     return values;
   }, []);
-  const dark = condition === "dark";
   const descentAt = (p: number) =>
     smooth(LANDING_CLOSEUP_START_PROGRESS, TOUCHDOWN_PROGRESS, p);
   useFrame(({ camera, clock }, delta) => {
@@ -799,11 +943,13 @@ function LandingSite({
     <>
       <color attach="background" args={["#05080b"]} />
       <fog attach="fog" args={["#05080b", 28, 65]} />
-      <ambientLight intensity={dark ? 0.12 : 0.2} />
+      <ambientLight intensity={0.32} />
+      {/* Regolith-bounce sky/ground fill so shadowed slopes keep their relief. */}
+      <hemisphereLight args={["#9fb4c8", "#4a4640", 0.45]} />
       {/* Low polar Sun: long shadows across the art-directed terrain. */}
       <directionalLight
-        position={[-14, 3.6, 7]}
-        intensity={dark ? 0.2 : 3.2}
+        position={[-12, 5.4, 7]}
+        intensity={3.6}
         color="#fff1dc"
         castShadow
         shadow-mapSize={[compact ? 1024 : 2048, compact ? 1024 : 2048]}
@@ -814,9 +960,10 @@ function LandingSite({
         shadow-normalBias={0.04}
         shadow-bias={-0.0001}
       />
+      {/* Earthshine fill from the opposite side of the Sun. */}
       <directionalLight
-        position={[5, 3, -4]}
-        intensity={dark ? 0.5 : 0.35}
+        position={[5, 4, -4]}
+        intensity={0.6}
         color="#a9bfd1"
       />
       <points>
@@ -965,7 +1112,6 @@ export default function MissionScene(
         ) : scene.cameraMode === "landing" ? (
           <LandingSite
             progress={progress}
-            condition={scene.condition}
             reduced={scene.reduced}
             compact={compact}
           />
