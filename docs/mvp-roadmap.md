@@ -323,7 +323,7 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 ## Hybrid development sequence
 
 - [x] **H0 — Shared contracts:** define the R9 state/event/plan model, constraint semantics, data provenance and benchmark scenario formats.
-- [ ] **H1 — Classical multi-mission baseline:** deliver R11 candidate generation, joint planning, small exact solutions and an independent validator.
+- [x] **H1 — Classical multi-mission baseline:** prepare explicitly supplied R11 site/time candidates, jointly plan small static problems by exact enumeration, and independently validate selections. Real-data candidate integration continues in H3/H4.
 - [ ] **H2 — Quantum mapping:** deliver the small R10 QUBO/QAOA experiment and prove mapping consistency against enumeration.
 - [ ] **H3 — Resource integration:** connect communication windows and energy/activity models, then benchmark classical and hybrid scheduling on identical inputs.
 - [ ] **H4 — Descent foundation:** deliver the validated R4/R5 terminal-descent, fuel and reachability model; this can progress alongside H1–H3.
@@ -332,6 +332,8 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 - [ ] **H7 — Evidence and demonstration:** run hardware experiments where available, publish reproducible benchmarks, and demonstrate a fault changing both one vehicle's landing plan and subsequent mission schedules.
 
 **H0 delivery** — Shared Python contracts, five synthetic benchmark cases and an executable Jupyter notebook are available. See [contracts, semantics and verification](hybrid-contracts.md). H1/H2 solvers, physical event execution and quantum hardware runs remain open.
+
+**H1 delivery** — Deterministic candidate preparation, independent-choice comparison, bounded exact joint planning, explained constraint validation and a 12-code-cell notebook are available. See [classical planning, semantics and verification](classical-planning.md). Unknown inputs and unapplied events are reported explicitly; no quantum execution is included.
 
 ### Proposed hybrid demonstration features
 

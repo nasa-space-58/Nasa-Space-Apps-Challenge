@@ -240,3 +240,10 @@ Varsayılan temas rezervi 145 fps'dir. Bu değer NASA TN D-6846 Tablo II'deki in
 ## H0: Hibrit planlama için ortak veri temeli
 
 Jupyter notebook: [`notebooks/H0_shared_contracts.ipynb`](notebooks/H0_shared_contracts.ipynb). Ortak modeller, beş örnek senaryo, veri doğrulama ve girdi parmak izi kontrollerini hücre hücre çalıştırır. Kurulum ve alan açıklamaları: [H0 sözleşmeleri](docs/hybrid-contracts.md). Bu aşamada kuantum çözücü çalıştırılmaz; klasik referans H1, QUBO/QAOA deneyi H2 kapsamında geliştirilir.
+
+
+## H1: Klasik çoklu görev planlaması
+
+[`notebooks/H1_classical_planning.ipynb`](notebooks/H1_classical_planning.ipynb), aynı Jupyter çekirdeğiyle bağımsız seçimleri ortak planlamayla karşılaştırır. Üç görev ve dört seçenek için 64 birleşimi değerlendirir; kapasite, zaman ve enerji ihlallerini açıklar. Tek kanallı örnekte 24 geçerli plan arasından 26 ham bilim puanlı planı seçer. Eksik bilgi, çözümsüzlük ve yarıda kalan arama ayrı gösterilir.
+
+[Yöntem, sınırlar ve testler](docs/classical-planning.md). Bu aşama statik klasik referanstır; kuantum devresi veya gerçek iniş güvenliği değerlendirmesi çalıştırmaz. Hibrit geliştirme `codex/quantum-hybrid` branch'inde sürdürülür.

@@ -124,3 +124,8 @@ R5 (fuel optimization) starts from `temel` `f497f21` on `feature/r5-fuel-optimiz
 ### H0 delivery override (user, 2026-11-14)
 
 H0 starts from current tahakrcc `d67a32f` on `codex/h0-hybrid-contracts`. Push only the new branch; do not merge into or push to tahakrcc/main. The user merges manually. Shared contracts are in `shared/hybrid.py`, synthetic cases in `shared/examples/hybrid/`, and the runnable notebook in `notebooks/H0_shared_contracts.ipynb`. See `docs/hybrid-contracts.md`; skeleton `a4437db`, frozen tests `774a50f`. H0 does not implement an optimizer or physical simulator.
+
+
+### H1 and continuing hybrid delivery override (user, 2026-11-14)
+
+H1 starts from H0 `ac14ec8`. The user requested one continuing quantum-development branch: `codex/quantum-hybrid`. Push only that branch; do not merge into or push to tahakrcc/main. The user merges manually. H1 is the tested classical reference, with no quantum calls. See `docs/classical-planning.md`; skeleton `33901c3`, frozen tests `1bc2ce8`. For later quantum experiments, start with a small circuit and bounded execution budget; keep unsuccessful experimental implementations uncommitted and preserve their evidence locally. Agree on measurable success criteria before quantum experiments; do not equate a successful hardware invocation with a useful optimization result.
