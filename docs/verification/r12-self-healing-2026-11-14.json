@@ -1,0 +1,216 @@
+{
+  "verified_on": "2026-11-14",
+  "branch": "feature/r12-self-healing",
+  "refactor": "517c9b4",
+  "skeleton": "dbbd828",
+  "frozen_tests": "1b87714",
+  "environment": "Docker Compose nasa-task4 preview; Malapert R23, cached LOLA DEM; seed 2026; default sensor",
+  "scenarios": {
+    "boulder_field_560s": {
+      "result_id": "c80fe81cf3fc59cb561eb3f9cdf2ceb1ba203640ffd6e6efca458945029dd09c",
+      "original": {
+        "success": false,
+        "abort_required": false,
+        "position_error_m": 0.09,
+        "target_offset_m": {
+          "down_m": 0.0,
+          "cross_m": 0.0
+        },
+        "target_safety_score": 0.292,
+        "reasons": [
+          "obstacle"
+        ]
+      },
+      "replanned": {
+        "success": true,
+        "abort_required": false,
+        "position_error_m": 0.09,
+        "target_offset_m": {
+          "down_m": -460.5,
+          "cross_m": 18.1
+        },
+        "target_safety_score": 0.504,
+        "reasons": []
+      },
+      "decisions": [
+        {
+          "t_s": 559.9999999999903,
+          "action": "retarget",
+          "chosen": "B1",
+          "evaluations": 9,
+          "margin_m": 0.4,
+          "validation": [
+            [
+              "B1",
+              true
+            ]
+          ]
+        }
+      ],
+      "backups_over_time": [
+        [
+          "high_gate",
+          506,
+          8,
+          8
+        ],
+        [
+          "decision",
+          560,
+          7,
+          8
+        ],
+        [
+          "low_gate",
+          606,
+          7,
+          7
+        ]
+      ]
+    },
+    "engine_minus_25pct_520s": {
+      "result_id": "e3a681232f1d5aed4b39d41dd9ec5854e52b4d053435a5b3f056c8dd0b9db992",
+      "original": {
+        "success": true,
+        "abort_required": false,
+        "position_error_m": 0.09,
+        "target_offset_m": {
+          "down_m": 0.0,
+          "cross_m": 0.0
+        },
+        "target_safety_score": 0.292,
+        "reasons": []
+      },
+      "replanned": {
+        "success": true,
+        "abort_required": false,
+        "position_error_m": 0.09,
+        "target_offset_m": {
+          "down_m": 0.0,
+          "cross_m": 0.0
+        },
+        "target_safety_score": 0.292,
+        "reasons": []
+      },
+      "decisions": [
+        {
+          "t_s": 519.9999999999812,
+          "action": "continue",
+          "chosen": null,
+          "evaluations": 1,
+          "margin_m": 1.3,
+          "validation": []
+        }
+      ],
+      "backups_over_time": [
+        [
+          "high_gate",
+          506,
+          8,
+          8
+        ],
+        [
+          "decision",
+          520,
+          0,
+          0
+        ],
+        [
+          "low_gate",
+          606,
+          8,
+          8
+        ]
+      ]
+    },
+    "engine_half_and_1500kg_leak_550s": {
+      "result_id": "611ccf7108718ebe1e0ac6d64c3f0f36584dbbd0968de4dce800aab10b94a52c",
+      "original": {
+        "success": false,
+        "abort_required": false,
+        "position_error_m": 19849.38,
+        "target_offset_m": {
+          "down_m": 0.0,
+          "cross_m": 0.0
+        },
+        "target_safety_score": 0.292,
+        "reasons": [
+          "propellant",
+          "position",
+          "vertical_speed",
+          "horizontal_speed"
+        ]
+      },
+      "replanned": {
+        "success": false,
+        "abort_required": true,
+        "position_error_m": 19849.38,
+        "target_offset_m": {
+          "down_m": 0.0,
+          "cross_m": 0.0
+        },
+        "target_safety_score": 0.292,
+        "reasons": [
+          "propellant",
+          "position",
+          "vertical_speed",
+          "horizontal_speed"
+        ]
+      },
+      "decisions": [
+        {
+          "t_s": 549.9999999999881,
+          "action": "abort_required",
+          "chosen": null,
+          "evaluations": 9,
+          "margin_m": 0.6,
+          "validation": []
+        }
+      ],
+      "backups_over_time": [
+        [
+          "high_gate",
+          506,
+          8,
+          8
+        ],
+        [
+          "decision",
+          550,
+          0,
+          8
+        ],
+        [
+          "low_gate",
+          606,
+          0,
+          8
+        ]
+      ]
+    },
+    "sensor_lost_450s": {
+      "result_id": "2c7f753390e234d9408d4e54c302c605f8a1f4dce5509285ab75659ccfbd456f",
+      "action": "abort_required",
+      "estimate_std_m": 784,
+      "margin_m": 2353,
+      "first_reasons": [
+        "Steep terrain 288 m away; 3 sigma of navigation error is 2353 m.",
+        "Steep terrain 684 m away; 3 sigma of navigation error is 2353 m."
+      ],
+      "replanned_abort_required": true
+    }
+  },
+  "repeat_result_id_identical": true,
+  "runtime_s_approx": 5,
+  "twin_refactor_check": "R9 lost-sensor log_hash a0cdb05e unchanged after TwinFlight refactor",
+  "tests": {
+    "backend": 625,
+    "self_healing": 26,
+    "frontend": 6
+  },
+  "browser": {
+    "page": "Descent > Self-healing landing",
+    "scenario": "boulder field",
+    "console_errors_from_app": 0
+  }
+}

@@ -300,23 +300,25 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 ### R12 — Self-healing landing and event-driven replanning
 
-- [ ] Define a bounded terminal-descent scenario with an explicit initial position/velocity, vehicle model and touchdown tolerances, building on R4/R5.
-- [ ] Validate classical gravity, thrust, mass-flow and propellant calculations with reference cases, limiting cases and time-step convergence checks.
-- [ ] Generate reachable alternative landing targets and trajectories under current thrust, fuel reserve and maneuver constraints.
-- [ ] Independently validate candidate trajectories at finer time resolution, including touchdown speed, terrain clearance and reserve limits.
-- [ ] Inject timestamped sensor degradation, thrust loss, newly observed obstacles, communication outages and propellant shortfalls.
-- [ ] Make each event alter the relevant physical/state-estimation/resource model rather than only the visualization.
-- [ ] Propagate sensor uncertainty into landing dispersion and candidate acceptance margins.
-- [ ] Implement event-triggered classical replanning with an explicit deadline and updated state/version identifiers.
-- [ ] Define policies for continuing, retargeting, deferring or aborting where the vehicle and mission model permit those actions.
-- [ ] Revalidate fallback plans against the current state; reject stale solver outputs and report when no feasible continuation exists.
-- [ ] Evaluate preservation of reachable backup targets during descent, alongside fuel and primary-goal performance.
+- [x] Define a bounded terminal-descent scenario with an explicit initial position/velocity, vehicle model and touchdown tolerances, building on R4/R5.
+- [x] Validate classical gravity, thrust, mass-flow and propellant calculations with reference cases, limiting cases and time-step convergence checks.
+- [x] Generate reachable alternative landing targets and trajectories under current thrust, fuel reserve and maneuver constraints.
+- [x] Independently validate candidate trajectories at finer time resolution, including touchdown speed, terrain clearance and reserve limits.
+- [x] Inject timestamped sensor degradation, thrust loss, newly observed obstacles, communication outages and propellant shortfalls.
+- [x] Make each event alter the relevant physical/state-estimation/resource model rather than only the visualization.
+- [x] Propagate sensor uncertainty into landing dispersion and candidate acceptance margins.
+- [x] Implement event-triggered classical replanning with an explicit deadline and updated state/version identifiers.
+- [x] Define policies for continuing, retargeting, deferring or aborting where the vehicle and mission model permit those actions.
+- [x] Revalidate fallback plans against the current state; reject stale solver outputs and report when no feasible continuation exists.
+- [x] Evaluate preservation of reachable backup targets during descent, alongside fuel and primary-goal performance.
 - [ ] Use hybrid optimization for discrete candidate-plan selection and downstream mission rescheduling, while keeping immediate flight control classical.
 - [ ] Run the quantum path asynchronously with a time budget; use a currently validated classical plan when no valid quantum result arrives in time.
 - [ ] Propagate changed landing time/location and lost resources into the R11 multi-mission schedule.
 - [ ] Replay identical events under the original plan, classical replanning and hybrid replanning, comparing feasibility, reserves, delays and mission value.
-- [ ] Add a visual event panel, original/replanned trajectories, uncertainty display, decision explanations and solver timing.
-- [ ] Validate both recoverable and unrecoverable scenarios, including combinations of faults, without assuming every event has a safe solution.
+- [x] Add a visual event panel, original/replanned trajectories, uncertainty display, decision explanations and solver timing.
+- [x] Validate both recoverable and unrecoverable scenarios, including combinations of faults, without assuming every event has a safe solution.
+
+**R12 delivery (classical part)** — See [self-healing landing](self-healing.md). The R9 twin replans in flight when an event invalidates the plan. It works from the estimated state, within a count-based evaluation budget and a decision deadline. It evaluates continuing, then R7-style backups flown with R4 guidance plus the analytic lateral divert, with k-σ clearance from obstacles and R3 hazards and a correction reserve. The selected option is validated from the true state at 0.05 s before it is flown, stale results under solver latency are rejected, and when nothing is feasible the result is reported honestly as `abort_required`. On Malapert, a boulder field on the target leads to a validated retarget 461 m away (safety score 0.29 → 0.50); a lost navigation sensor leads to `abort_required` because the projected 3σ error (2.35 km) exceeds the hazard clearance. The four hybrid items stay open: the selector interface is the plug-in point for TK's H6, and the R11 schedule propagation follows the H-line merge. Deferring/hovering is stated as not modelled. Frozen tests: `1b87714`.
 
 ### R13 — Additional quantum application benchmarks
 
