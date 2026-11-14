@@ -318,7 +318,7 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 ## Hybrid development sequence
 
-- [ ] **H0 — Shared contracts:** define the R9 state/event/plan model, constraint semantics, data provenance and benchmark scenario formats.
+- [x] **H0 — Shared contracts:** define the R9 state/event/plan model, constraint semantics, data provenance and benchmark scenario formats.
 - [ ] **H1 — Classical multi-mission baseline:** deliver R11 candidate generation, joint planning, small exact solutions and an independent validator.
 - [ ] **H2 — Quantum mapping:** deliver the small R10 QUBO/QAOA experiment and prove mapping consistency against enumeration.
 - [ ] **H3 — Resource integration:** connect communication windows and energy/activity models, then benchmark classical and hybrid scheduling on identical inputs.
@@ -326,6 +326,8 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 - [ ] **H5 — Classical self-healing:** add R6/R9 uncertainty, event replay and R12 classical replanning with feasible and infeasible recovery cases.
 - [ ] **H6 — Hybrid recovery:** connect candidate-plan selection to downstream multi-mission scheduling, with deadlines, stale-result rejection and validated fallback behavior.
 - [ ] **H7 — Evidence and demonstration:** run hardware experiments where available, publish reproducible benchmarks, and demonstrate a fault changing both one vehicle's landing plan and subsequent mission schedules.
+
+**H0 delivery** — Shared Python contracts, five synthetic benchmark cases and an executable Jupyter notebook are available. See [contracts, semantics and verification](hybrid-contracts.md). H1/H2 solvers, physical event execution and quantum hardware runs remain open.
 
 ### Proposed hybrid demonstration features
 

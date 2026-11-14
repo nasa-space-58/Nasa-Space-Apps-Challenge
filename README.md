@@ -220,3 +220,7 @@ Gezinmedeki **Recommend** bölümü 2–6 aday noktayı aynı UTC zaman aralığ
 Ağırlık kaydırıcıları değişince sıralama, analizler tekrar çalışmadan yeniden hesaplanır; eski ve yeni sıralama yan yana gösterilir. Takvim kaydığında (örneğin 48 saat) aynı adaylar yeni tarih için yeniden sıralanır ve en iyi alternatif önerilir.
 
 Eğim, önbellekteki 80 m LOLA verisinden Horn yöntemiyle hesaplanır. Varsayılan 10° iniş alanı sınırı bir planlama varsayımıdır; NASA sayısal bir değer yayımlamamıştır. 80 m çözünürlük küçük krater ve kayaları göremez; yakıt ve bilim değeri henüz modellenmez. [Yöntem, kaynaklar ve API](docs/recommendations.md).
+
+## H0: Hibrit planlama için ortak veri temeli
+
+Jupyter notebook: [`notebooks/H0_shared_contracts.ipynb`](notebooks/H0_shared_contracts.ipynb). Ortak modeller, beş örnek senaryo, veri doğrulama ve girdi parmak izi kontrollerini hücre hücre çalıştırır. Kurulum ve alan açıklamaları: [H0 sözleşmeleri](docs/hybrid-contracts.md). Bu aşamada kuantum çözücü çalıştırılmaz; klasik referans H1, QUBO/QAOA deneyi H2 kapsamında geliştirilir.

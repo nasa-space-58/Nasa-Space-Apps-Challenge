@@ -181,3 +181,7 @@ The ingestion image now includes Rasterio 1.5.2 (GDAL wheel, with libexpat1) and
 ### Task 2 terrain horizon implementation
 
 The backend activates the previously selected Rasterio/GDAL and NumPy stack, pinned to Rasterio 1.5.2 and NumPy 2.5.4 with hashed transitive locks. It reads the existing terrain cache only; no external data acquisition moves into the backend. The image installs libexpat1 for the GDAL wheel.
+
+## Optional H0 notebook environment
+
+H0 adds no service runtime dependency. Local Jupyter execution uses a separate Python 3.12 environment with `notebooks/requirements.txt`: Pydantic 2.12.5 (matching services), ipykernel 6.30.1, nbformat 5.10.4 and nbclient 0.10.2. The latter three are optional notebook development/execution tools. They are not installed in backend or ingestion images. Qiskit and quantum-provider SDKs are not required by H0.
