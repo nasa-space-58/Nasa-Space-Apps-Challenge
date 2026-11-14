@@ -114,6 +114,12 @@ export const MISSION_PHASES: readonly MissionPhase[] = [
   },
 ];
 
+/**
+ * Progress at which mission control cuts from the orbital scene to the
+ * art-directed landing close-up (a quarter of the way into powered descent).
+ */
+export const LANDING_CLOSEUP_START_PROGRESS = 0.84;
+
 export type SiteSelection = {
   latitude_deg: number;
   longitude_deg_east: number;

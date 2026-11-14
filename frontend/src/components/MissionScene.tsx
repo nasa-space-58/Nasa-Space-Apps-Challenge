@@ -13,12 +13,13 @@ import {
   type ThreeEvent,
 } from "@react-three/fiber";
 import * as THREE from "three";
-import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { Dust, Model, Terrain, smooth } from "./LunarSurface";
 import type { Preset } from "../types";
 import {
   ASTRONOMICAL_UNIT_KM,
   COVERAGE_MAX_LATITUDE_DEG,
+  LANDING_CLOSEUP_START_PROGRESS,
+  MISSION_PHASES,
   SCENE_LAYOUT,
   SUN_NOMINAL_RADIUS_KM,
   allPathPoints,
@@ -50,10 +51,20 @@ const STAR_SPHERE_RADIUS_SCENE = 3200;
 // 1737 km lunar radius) so they remain visible in close-up views.
 const LANDER_SIZE_SCENE = 0.03;
 const ORBITER_SIZE_SCENE = 0.04;
+/** Progress at which the lander touches down in the landing close-up. */
+const TOUCHDOWN_PROGRESS = MISSION_PHASES.find(
+  (phase) => phase.id === "landed",
+)!.start_progress;
 /** Radius of the ambient LRO orbit (≈ 200 km altitude). */
 const SCIENCE_ORBIT_RADIUS_SCENE = 1.12;
 
-export type CameraMode = "auto" | "system" | "moon" | "pole" | "spacecraft";
+export type CameraMode =
+  | "auto"
+  | "system"
+  | "moon"
+  | "pole"
+  | "spacecraft"
+  | "landing";
 export type CameraView = Exclude<CameraMode, "auto">;
 export type SiteCondition = "sunlit" | "dark" | "unknown";
 
@@ -62,27 +73,6 @@ const onSurface = (lat: number, lon: number, lift = 1.004) =>
   v3(surfaceUnitVector(lat, lon)).multiplyScalar(
     SCENE_LAYOUT.moon_radius_scene * lift,
   );
-
-function Model({ path, size }: { path: string; size: number }) {
-  const gltf = useLoader(GLTFLoader, path, (loader) => {
-    loader.setDRACOLoader(new DRACOLoader().setDecoderPath("/draco/"));
-  });
-  const { model, scale, center } = useMemo(() => {
-    const model = gltf.scene.clone(true);
-    const box = new THREE.Box3().setFromObject(model);
-    const dimensions = box.getSize(new THREE.Vector3());
-    return {
-      model,
-      scale: size / Math.max(dimensions.x, dimensions.y, dimensions.z),
-      center: box.getCenter(new THREE.Vector3()).negate(),
-    };
-  }, [gltf, size]);
-  return (
-    <group scale={scale}>
-      <primitive object={model} position={center} />
-    </group>
-  );
-}
 
 function glowTexture(inner: string, outer: string) {
   const canvas = document.createElement("canvas");
@@ -353,31 +343,14 @@ function SiteMarker({
   );
 }
 
-function CameraRig({
-  mode,
-  lat,
-  lon,
-  spacecraft,
-  progress,
-  reduced,
-}: {
-  mode: CameraView;
-  lat: number;
-  lon: number;
-  spacecraft: MutableRefObject<THREE.Vector3>;
-  progress: MutableRefObject<number>;
-  reduced: boolean;
-}) {
-  const { camera, gl, invalidate, size } = useThree();
+/** Drag to orbit and wheel to zoom; offsets reset whenever `resetKey` changes. */
+function useOrbitInput(resetKey: unknown) {
+  const { gl, invalidate } = useThree();
   const user = useRef({ yaw: 0, pitch: 0, zoom: 1 });
-  const target = useMemo(() => new THREE.Vector3(7, 0, 0), []);
-  const desiredTarget = useMemo(() => new THREE.Vector3(), []);
-  const desiredPosition = useMemo(() => new THREE.Vector3(), []);
-  const first = useRef(true);
   useEffect(() => {
     user.current = { yaw: 0, pitch: 0, zoom: 1 };
     invalidate();
-  }, [mode, invalidate]);
+  }, [resetKey, invalidate]);
   useEffect(() => {
     const canvas = gl.domElement;
     let dragging: { x: number; y: number } | null = null;
@@ -418,6 +391,30 @@ function CameraRig({
       canvas.removeEventListener("wheel", wheel);
     };
   }, [gl, invalidate]);
+  return user;
+}
+
+function CameraRig({
+  mode,
+  lat,
+  lon,
+  spacecraft,
+  progress,
+  reduced,
+}: {
+  mode: Exclude<CameraView, "landing">;
+  lat: number;
+  lon: number;
+  spacecraft: MutableRefObject<THREE.Vector3>;
+  progress: MutableRefObject<number>;
+  reduced: boolean;
+}) {
+  const { camera, size } = useThree();
+  const user = useOrbitInput(mode);
+  const target = useMemo(() => new THREE.Vector3(7, 0, 0), []);
+  const desiredTarget = useMemo(() => new THREE.Vector3(), []);
+  const desiredPosition = useMemo(() => new THREE.Vector3(), []);
+  const first = useRef(true);
   useFrame((_, delta) => {
     const phase = phaseAt(progress.current).phase.id;
     // Camera direction from yaw (around +Y) and pitch (positive = above).
@@ -708,13 +705,148 @@ function System({
         </>
       )}
       <CameraRig
-        mode={cameraMode}
+        mode={cameraMode === "landing" ? "pole" : cameraMode}
         lat={lat}
         lon={lon}
         spacecraft={spacecraft}
         progress={progress}
         reduced={reduced}
       />
+    </>
+  );
+}
+
+/**
+ * Close-up of the final descent and touchdown, staged like the introduction
+ * page. Art-directed local terrain in its own scene units (not metres, not the
+ * analysed DEM); only the lighting follows the site's analysed Sun condition.
+ */
+function LandingSite({
+  progress,
+  condition,
+  reduced,
+  compact,
+}: {
+  progress: MutableRefObject<number>;
+  condition: SiteCondition;
+  reduced: boolean;
+  compact: boolean;
+}) {
+  const lander = useRef<THREE.Group>(null!);
+  const plume = useRef<THREE.Mesh>(null!);
+  const user = useOrbitInput("landing");
+  const look = useMemo(() => new THREE.Vector3(), []);
+  const offset = useMemo(() => new THREE.Vector3(), []);
+  const spherical = useMemo(() => new THREE.Spherical(), []);
+  const settledTime = useRef(0);
+  const stars = useMemo(() => {
+    const values = new Float32Array(1500 * 3);
+    for (let i = 0; i < values.length; i++) {
+      const a = Math.sin((i + 80) * 127.1 + 311.7) * 43758.5453;
+      values[i] = (a - Math.floor(a) - 0.5) * 100;
+    }
+    return values;
+  }, []);
+  const dark = condition === "dark";
+  const descentAt = (p: number) =>
+    smooth(LANDING_CLOSEUP_START_PROGRESS, TOUCHDOWN_PROGRESS, p);
+  useFrame(({ camera, clock }, delta) => {
+    const p = progress.current;
+    const descent = descentAt(p);
+    const height = (1 - descent) * 5;
+    const landerX = (1 - descent) * -1.6;
+    lander.current.position.set(landerX, height, 0);
+    lander.current.rotation.set(0, -0.4 + descent * 0.35, (1 - descent) * 0.12);
+    plume.current.visible = descent < 1;
+    plume.current.position.set(landerX, height + 0.2, 0);
+    plume.current.scale.set(
+      1,
+      0.8 + (reduced ? 0 : Math.sin(clock.elapsedTime * 24) * 0.08),
+      1,
+    );
+    // After touchdown the camera drifts slowly around the lander.
+    if (descent >= 1 && !reduced) settledTime.current += Math.min(delta, 0.05);
+    else if (descent < 1) settledTime.current = 0;
+    look.set(landerX * 0.5, 0.9 + height * 0.75, 0);
+    offset.set(
+      4.2 - descent * 1.6,
+      5.8 - descent * 3.4 + height * 0.5,
+      10.5 - descent * 2.8,
+    );
+    spherical.setFromVector3(offset);
+    spherical.theta += user.current.yaw + settledTime.current * 0.06;
+    spherical.phi = THREE.MathUtils.clamp(
+      spherical.phi - user.current.pitch,
+      0.2,
+      1.5,
+    );
+    spherical.radius *=
+      (compact ? 1.25 : 1) *
+      THREE.MathUtils.clamp(user.current.zoom, 0.35, 2.4);
+    camera.position.setFromSpherical(spherical).add(look);
+    camera.lookAt(look);
+  });
+  return (
+    <>
+      <color attach="background" args={["#05080b"]} />
+      <fog attach="fog" args={["#05080b", 28, 65]} />
+      <ambientLight intensity={dark ? 0.12 : 0.2} />
+      {/* Low polar Sun: long shadows across the art-directed terrain. */}
+      <directionalLight
+        position={[-14, 3.6, 7]}
+        intensity={dark ? 0.2 : 3.2}
+        color="#fff1dc"
+        castShadow
+        shadow-mapSize={[compact ? 1024 : 2048, compact ? 1024 : 2048]}
+        shadow-camera-left={-18}
+        shadow-camera-right={18}
+        shadow-camera-top={18}
+        shadow-camera-bottom={-18}
+        shadow-normalBias={0.04}
+        shadow-bias={-0.0001}
+      />
+      <directionalLight
+        position={[5, 3, -4]}
+        intensity={dark ? 0.5 : 0.35}
+        color="#a9bfd1"
+      />
+      <points>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[stars, 3]} />
+        </bufferGeometry>
+        <pointsMaterial
+          color="#a5b5c4"
+          size={0.028}
+          transparent
+          opacity={0.65}
+          sizeAttenuation
+        />
+      </points>
+      <Terrain />
+      <group ref={lander}>
+        <Model path="/nasa/apollo.glb" size={2.3} grounded />
+      </group>
+      <mesh ref={plume} rotation={[Math.PI, 0, 0]}>
+        <coneGeometry args={[0.13, 0.65, 24]} />
+        <meshBasicMaterial
+          color="#ead5aa"
+          transparent
+          opacity={0.36}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
+      {!reduced && (
+        <Dust
+          amount={() => {
+            const p = progress.current;
+            return (
+              smooth(0.6, 0.95, descentAt(p)) *
+              (1 - smooth(TOUCHDOWN_PROGRESS, 1, p))
+            );
+          }}
+        />
+      )}
     </>
   );
 }
@@ -769,9 +901,10 @@ export default function MissionScene(
   const progress = useRef(progressValue);
   return (
     <Canvas
-      aria-label="Illustrative Earth, Moon and Sun scene. Click the south polar cap to choose a landing site; the latitude and longitude fields offer keyboard input."
+      aria-label="Illustrative Earth, Moon and Sun scene with a landing close-up. Click the south polar cap to choose a landing site; the latitude and longitude fields offer keyboard input."
       camera={{ position: [150, 190, 175], fov: 50, near: 0.001, far: 8000 }}
       dpr={compact ? 1 : [1, 1.75]}
+      shadows={{ type: THREE.PCFShadowMap }}
       frameloop={visible && animate ? "always" : "demand"}
       gl={{ antialias: true, alpha: false, logarithmicDepthBuffer: true }}
     >
@@ -792,7 +925,16 @@ export default function MissionScene(
         snap={!animate}
       />
       <Suspense fallback={null}>
-        <System {...scene} progress={progress} />
+        {scene.cameraMode === "landing" ? (
+          <LandingSite
+            progress={progress}
+            condition={scene.condition}
+            reduced={scene.reduced}
+            compact={compact}
+          />
+        ) : (
+          <System {...scene} progress={progress} />
+        )}
       </Suspense>
     </Canvas>
   );
