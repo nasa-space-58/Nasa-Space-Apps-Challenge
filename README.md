@@ -254,3 +254,10 @@ Jupyter notebook: [`notebooks/H0_shared_contracts.ipynb`](notebooks/H0_shared_co
 [`notebooks/H2_quantum_mapping.ipynb`](notebooks/H2_quantum_mapping.ipynb), 12 seçim değişkenli QUBO modelini klasik referansla doğrular ve aynı üç görevli problemi 6 kubitlik QAOA simülatöründe dener. Tek katman düşük kapı sayılı varsayılandır; iki katmanla sonuç ve kapı ihtiyacını karşılaştırır. Ham geçersiz örnekler gizlenmez, klasik onarım yapılmaz.
 
 [Yöntem, ölçümler ve sınırlar](docs/quantum-mapping.md). Gerçek kuantum servisine iş göndermez; bu küçük örnek klasik yöntemle zaten kolayca çözülür. Simülatörde örnek başına olasılığın artması, klasik çözücüye göre hız veya maliyet üstünlüğü anlamına gelmez.
+
+
+## H3: İletişim takvimi ve enerji entegrasyonu
+
+[`notebooks/H3_resource_integration.ipynb`](notebooks/H3_resource_integration.ipynb), geometrik görüşü istasyon tahsisinden ayırır; faaliyet tüketimini başlangıç enerjisi, kapasite, rezerv ve üretimle birlikte değerlendirir. Dolu bataryada depolanamayan üretim ve sonradan gelen enerji yanlışlıkla kullanılabilir sayılmaz. Desteklenen örnekte klasik ve kuantum çözücü aynı girdiyi kullanır; kuantum kodlamasına sığmayan kısıtlar açıkça bildirilir.
+
+[Varsayımlar, yöntem ve doğrulama](docs/resource-integration.md). Notebook verileri sentetiktir; gerçek DSN tahsisi, radyo bağlantı garantisi veya fiziksel batarya doğrulaması değildir.

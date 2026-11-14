@@ -134,3 +134,8 @@ H1 starts from H0 `ac14ec8`. The user requested one continuing quantum-developme
 ### H2 continuation (user, 2026-11-14)
 
 The user authorized continuing later H stages on `codex/quantum-hybrid`. H2 uses a bounded local simulator only; no paid/provider job is authorized by a local simulation run. Skeleton `00c6801`, frozen tests `7c26cfc`; see `docs/quantum-mapping.md`. Low-qubit encoding must report its gate/locality tradeoff. Do not label simulator expectations as hardware observations or per-sample gains as end-to-end advantage.
+
+
+### H3 continuation (user, 2026-11-14)
+
+H3 remains on `codex/quantum-hybrid`; no tahakrcc/main merge or push. Skeleton `839c167`, frozen tests `87d7d95`; see `docs/resource-integration.md`. Geometry is not a station booking or radio-link guarantee. Storage is an explicitly ideal constant-power model. Unsupported quantum mappings retain the classical answer and report the limit, never silently remove constraints.
