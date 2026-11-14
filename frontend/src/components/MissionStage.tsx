@@ -12,6 +12,7 @@ import {
 } from "react";
 import PolarMap from "./PolarMap";
 import SurfaceOps from "./SurfaceOps";
+import "./flight-readout.css";
 import type { RoutePoint } from "./Rover";
 import type { Preset } from "../types";
 import {
@@ -19,8 +20,11 @@ import {
   LANDING_CLOSEUP_START_PROGRESS,
   LAUNCH_CLOSEUP_END_PROGRESS,
   MISSION_PHASES,
+  MOON_MEAN_RADIUS_KM,
   buildTransferPath,
+  liveFlightView,
   phaseAt,
+  type FlightEphemeris,
   type SiteSelection,
 } from "../missionPath";
 import type { CameraMode, CameraView, SiteCondition } from "./MissionScene";
@@ -29,6 +33,58 @@ import { useTranslate, type Translate } from "../i18n";
 const MissionScene = lazy(() => import("./MissionScene"));
 /** Wall-clock length of one illustrative flight playback. */
 const FLIGHT_PLAYBACK_S = 45;
+/** Wait for the date to settle before requesting dated flight positions. */
+const FLIGHT_REQUEST_DELAY_MS = 600;
+const FLIGHT_POLL_MS = 1500;
+const LANDING_UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+
+type FlightJob = { id: string; status: string; result: FlightEphemeris | null; error: string | null };
+
+/**
+ * Dated Moon/Sun/Earth-rotation samples for a flight landing at landingUtc,
+ * from the backend's JPL Horizons job. Null while loading or on failure.
+ */
+function useFlightEphemeris(landingUtc: string | undefined) {
+  const [flight, setFlight] = useState<FlightEphemeris | null>(null);
+  const [state, setState] = useState<"off" | "loading" | "ready" | "failed">("off");
+  useEffect(() => {
+    setFlight(null);
+    if (!landingUtc || !LANDING_UTC.test(landingUtc)) {
+      setState("off");
+      return;
+    }
+    setState("loading");
+    let live = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const settle = (job: FlightJob) => {
+      if (!live) return;
+      if (job.status === "ready" && job.result) {
+        setFlight(job.result);
+        setState("ready");
+      } else if (job.status === "failed") setState("failed");
+      else timer = setTimeout(() => poll(job.id), FLIGHT_POLL_MS);
+    };
+    const fail = () => live && setState("failed");
+    const poll = (id: string) =>
+      fetch(`/api/flight-ephemeris/${encodeURIComponent(id)}`)
+        .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+        .then(settle, fail);
+    timer = setTimeout(() => {
+      fetch("/api/flight-ephemeris", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ landing_utc: landingUtc }),
+      })
+        .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+        .then(settle, fail);
+    }, FLIGHT_REQUEST_DELAY_MS);
+    return () => {
+      live = false;
+      if (timer) clearTimeout(timer);
+    };
+  }, [landingUtc]);
+  return { flight, state };
+}
 const TICK_MS = 50;
 const cameraModes: CameraMode[] = [
   "auto",
@@ -85,6 +141,7 @@ export default function MissionStage({
   visible,
   compact,
   launchKey,
+  landingUtc,
   analysisId,
   condition,
   siteStatus,
@@ -107,6 +164,8 @@ export default function MissionStage({
   visible: boolean;
   compact: boolean;
   launchKey: number;
+  /** Landing time of the flight (observation start), "YYYY-MM-DDTHH:MM:SSZ". */
+  landingUtc?: string;
   /** Completed analysis used for post-landing sky checks and space weather. */
   analysisId?: string;
   condition: SiteCondition;
@@ -125,7 +184,7 @@ export default function MissionStage({
   /** Content of the "Plan" tab, above the flight simulation controls. */
   children: ReactNode;
 }) {
-  const { t } = useTranslate();
+  const { t, locale } = useTranslate();
   const lockedNotice = t("missionStage.locked");
   const phaseLabel = (id: string) => t(`missionPhases.${id}.label`);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -176,6 +235,44 @@ export default function MissionStage({
     return buildTransferPath(lat, lon);
   }, [lat, lon]);
   const active = phaseAt(progress);
+  const { flight, state: flightState } = useFlightEphemeris(landingUtc);
+  const flightView = useMemo(() => {
+    if (!path || !flight) return null;
+    try {
+      return liveFlightView(path, flight);
+    } catch {
+      return null;
+    }
+  }, [path, flight]);
+  // Display-only readouts: backend positions converted back to km, and the
+  // illustrative spacecraft's distances (labelled as such).
+  const readout = (() => {
+    if (!flightView) return null;
+    const utc = flightView.utcAt(progress);
+    if (utc === null) return null;
+    const km = (a: readonly number[], b: readonly number[]) =>
+      Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]) * MOON_MEAN_RADIUS_KM;
+    const earth = flightView.earthCenter(progress);
+    const moon = flightView.moonPose(progress).position;
+    const craft = flightView.positionAt(progress);
+    const elapsed_s = Math.max(0, (utc - Date.parse(flight!.window.launch_utc)) / 1000);
+    const days = Math.floor(elapsed_s / 86400);
+    const clock = new Date((elapsed_s % 86400) * 1000).toISOString().slice(11, 19);
+    return {
+      utc: new Date(utc).toLocaleString(locale, {
+        timeZone: "UTC",
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      met: `T+ ${days} ${t("missionStage.flightData.days")} ${clock}`,
+      earthMoon: Math.round(km(earth, moon)).toLocaleString(locale),
+      craftEarth: Math.round(km(craft, earth)).toLocaleString(locale),
+      craftMoon: Math.round(km(craft, moon)).toLocaleString(locale),
+    };
+  })();
   // Auto camera: with true-scale distances the wide Earth–Moon view only
   // suits the coast, so the spacecraft close-up covers Earth orbit and early
   // descent; lift-off opens on the launch close-up and the final descent and
@@ -316,6 +413,7 @@ export default function MissionStage({
                   else onPreset(site);
                 }}
                 onFailure={onSceneFailure}
+                flight={flight}
                 roverPath={landed ? (rover?.path ?? null) : null}
                 roverDrive={rover?.drive ?? 0}
               />
@@ -342,6 +440,27 @@ export default function MissionStage({
               <strong>{phaseLabel(active.phase.id)}</strong>
               <p>{t(`missionPhases.${active.phase.id}.description`)}</p>
             </>
+          )}
+          {readout ? (
+            <dl className="flight-readout">
+              <dt>{t("missionStage.flightData.utc")}</dt>
+              <dd>{readout.utc} UTC</dd>
+              <dt>{t("missionStage.flightData.met")}</dt>
+              <dd>{readout.met}</dd>
+              <dt>{t("missionStage.flightData.earthMoon")}</dt>
+              <dd>{readout.earthMoon} km</dd>
+              <dt>{t("missionStage.flightData.craftEarth")}</dt>
+              <dd>{readout.craftEarth} km</dd>
+              <dt>{t("missionStage.flightData.craftMoon")}</dt>
+              <dd>{readout.craftMoon} km</dd>
+            </dl>
+          ) : (
+            flightState !== "off" &&
+            flightState !== "ready" && (
+              <small className="flight-note">
+                {t(`missionStage.flightData.${flightState}`)}
+              </small>
+            )
           )}
         </div>
         {webgl && (

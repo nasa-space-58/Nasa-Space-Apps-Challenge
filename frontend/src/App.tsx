@@ -1154,6 +1154,7 @@ export default function App() {
           visible={view === "mission" && pageVisible}
           compact={compactScene}
           launchKey={launchKey}
+          landingUtc={`${start}:00Z`}
           analysisId={
             job && (job.status === "ready" || job.status === "insufficient_data")
               ? job.id

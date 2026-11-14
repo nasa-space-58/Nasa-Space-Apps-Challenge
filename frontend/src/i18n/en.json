@@ -508,7 +508,17 @@
     "simulate": "Simulate flight",
     "restart": "Restart",
     "progress": "Mission progress",
-    "phasesNote": "Shows the order of mission phases only. Sun and Earth visibility at the site come from the Results tab."
+    "phasesNote": "Shows the order of mission phases only. Sun and Earth visibility at the site come from the Results tab.",
+    "flightData": {
+      "utc": "Date (UTC)",
+      "met": "Mission time",
+      "days": "d",
+      "earthMoon": "Earth–Moon (JPL Horizons)",
+      "craftEarth": "Craft–Earth (illustrative path)",
+      "craftMoon": "Craft–Moon (illustrative path)",
+      "loading": "Fetching real Moon/Sun positions from JPL Horizons…",
+      "failed": "Real positions unavailable; showing the fixed illustrative layout."
+    }
   },
   "missionPhases": {
     "launch": {

@@ -508,7 +508,17 @@
     "simulate": "Uçuşu simüle et",
     "restart": "Yeniden başlat",
     "progress": "Görev ilerlemesi",
-    "phasesNote": "Yalnızca görev aşamalarının sırasını gösterir. Bölgedeki Güneş ve Dünya görünürlüğü Sonuçlar sekmesinden gelir."
+    "phasesNote": "Yalnızca görev aşamalarının sırasını gösterir. Bölgedeki Güneş ve Dünya görünürlüğü Sonuçlar sekmesinden gelir.",
+    "flightData": {
+      "utc": "Tarih (UTC)",
+      "met": "Görev zamanı",
+      "days": "g",
+      "earthMoon": "Dünya–Ay (JPL Horizons)",
+      "craftEarth": "Araç–Dünya (temsili rota)",
+      "craftMoon": "Araç–Ay (temsili rota)",
+      "loading": "Gerçek Ay/Güneş konumları JPL Horizons'tan alınıyor…",
+      "failed": "Gerçek konumlar alınamadı; sabit temsili düzen gösteriliyor."
+    }
   },
   "missionPhases": {
     "launch": {
