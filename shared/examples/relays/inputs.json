@@ -1534,1460 +1534,1460 @@
       ]
     },
     {
-      "analysis_id": "c817a988-79c8-4cfe-9a19-71b5a9424838",
-      "result_sha256": "42a6bbfa8df44f8cdbe858db3c96466bbd4eca971fd21b200142a3100d18ddb8",
+      "analysis_id": "c88ce319-e99f-44fd-97b2-1c427121773a",
+      "result_sha256": "912fc9b85e576076e8606f7d5d27a0485fcf336e03c6a3cd1ea98a4e228990b7",
       "site": {
-        "site_id": "custom",
-        "longitude_deg_east": 21.95459,
-        "latitude_deg": -84.40115,
-        "altitude_km": 3.817825439453125,
+        "site_id": "malapert-massif-r23",
+        "longitude_deg_east": 359.76422,
+        "latitude_deg": -85.9948,
+        "altitude_km": 4.78662451171875,
         "reference_frame": "MOON_ME"
       },
-      "surface_height_m": 3815.825439453125,
+      "surface_height_m": 4784.62451171875,
       "observer_height_above_terrain_m": 2.0,
-      "profile_id": "1ca992b41f6e77f9ec4091451d316faf2a04b40760b575a4d82e4b70ebd9501a",
+      "profile_id": "0db8b71d945ebd7601746a3b4501ef843c17df2ba4cccdd4f7776f52e23ae5c2",
       "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_80MPP_ADJ.TIF",
       "source_sha256": "82030dcbdd7c4bb0c7d858e9b4b293b9f2cda5a543ba31ec0f42784bd6beee5a",
       "directions": [
         {
           "azimuth_deg": 0.0,
-          "elevation_deg": 0.6038952758327726
+          "elevation_deg": 4.711139612883288
         },
         {
           "azimuth_deg": 1.0,
-          "elevation_deg": 0.8145068445520512
+          "elevation_deg": 4.711139612883288
         },
         {
           "azimuth_deg": 2.0,
-          "elevation_deg": 1.104059789679091
+          "elevation_deg": 4.711139612883288
         },
         {
           "azimuth_deg": 3.0,
-          "elevation_deg": 1.3275168939973183
+          "elevation_deg": 4.711139612883288
         },
         {
           "azimuth_deg": 4.0,
-          "elevation_deg": 1.683920914089859
+          "elevation_deg": 4.711139612883288
         },
         {
           "azimuth_deg": 5.0,
-          "elevation_deg": 2.0356943545977
+          "elevation_deg": 4.40811188552045
         },
         {
           "azimuth_deg": 6.0,
-          "elevation_deg": 2.2834789824365083
+          "elevation_deg": 4.383953476995895
         },
         {
           "azimuth_deg": 7.0,
-          "elevation_deg": 2.533549838808824
+          "elevation_deg": 4.31730831455822
         },
         {
           "azimuth_deg": 8.0,
-          "elevation_deg": 2.9775838552719627
+          "elevation_deg": 4.300921677698157
         },
         {
           "azimuth_deg": 9.0,
-          "elevation_deg": 3.1015943208105323
+          "elevation_deg": 4.284658360836982
         },
         {
           "azimuth_deg": 10.0,
-          "elevation_deg": 3.5662281494166246
+          "elevation_deg": 4.284658360836982
         },
         {
           "azimuth_deg": 11.0,
-          "elevation_deg": 3.798765229611601
+          "elevation_deg": 4.268516978291339
         },
         {
           "azimuth_deg": 12.0,
-          "elevation_deg": 4.210008230483126
+          "elevation_deg": 4.252496165022276
         },
         {
           "azimuth_deg": 13.0,
-          "elevation_deg": 4.5958362663009975
+          "elevation_deg": 4.236594576252913
         },
         {
           "azimuth_deg": 14.0,
-          "elevation_deg": 4.819434304506158
+          "elevation_deg": 4.220810887094575
         },
         {
           "azimuth_deg": 15.0,
-          "elevation_deg": 5.183528438389287
+          "elevation_deg": 4.228077513899974
         },
         {
           "azimuth_deg": 16.0,
-          "elevation_deg": 5.402101623201021
+          "elevation_deg": 4.503534509205339
         },
         {
           "azimuth_deg": 17.0,
-          "elevation_deg": 5.7638157376492964
+          "elevation_deg": 4.655082551939542
         },
         {
           "azimuth_deg": 18.0,
-          "elevation_deg": 5.881384211964847
+          "elevation_deg": 4.629124503299561
         },
         {
           "azimuth_deg": 19.0,
-          "elevation_deg": 6.309948088810804
+          "elevation_deg": 4.6034526403421
         },
         {
           "azimuth_deg": 20.0,
-          "elevation_deg": 6.646736646622271
+          "elevation_deg": 4.64025010520531
         },
         {
           "azimuth_deg": 21.0,
-          "elevation_deg": 6.812386899590026
+          "elevation_deg": 4.870005151138364
         },
         {
           "azimuth_deg": 22.0,
-          "elevation_deg": 7.154490698711169
+          "elevation_deg": 4.8872851317101205
         },
         {
           "azimuth_deg": 23.0,
-          "elevation_deg": 7.481382927255532
+          "elevation_deg": 4.852846296143001
         },
         {
           "azimuth_deg": 24.0,
-          "elevation_deg": 7.6039119345339135
+          "elevation_deg": 4.818886911320965
         },
         {
           "azimuth_deg": 25.0,
-          "elevation_deg": 7.916812750125106
+          "elevation_deg": 4.785397048063375
         },
         {
           "azimuth_deg": 26.0,
-          "elevation_deg": 8.22258761347286
+          "elevation_deg": 4.752367048847671
         },
         {
           "azimuth_deg": 27.0,
-          "elevation_deg": 8.508073516454564
+          "elevation_deg": 4.817482700224085
         },
         {
           "azimuth_deg": 28.0,
-          "elevation_deg": 8.690515438551074
+          "elevation_deg": 4.991809206566053
         },
         {
           "azimuth_deg": 29.0,
-          "elevation_deg": 8.92213843206397
+          "elevation_deg": 4.9661419513127685
         },
         {
           "azimuth_deg": 30.0,
-          "elevation_deg": 9.077334252639963
+          "elevation_deg": 4.965734177210716
         },
         {
           "azimuth_deg": 31.0,
-          "elevation_deg": 9.274293993929339
+          "elevation_deg": 4.918609432205732
         },
         {
           "azimuth_deg": 32.0,
-          "elevation_deg": 9.328079467132193
+          "elevation_deg": 4.872366730873986
         },
         {
           "azimuth_deg": 33.0,
-          "elevation_deg": 9.513167403042006
+          "elevation_deg": 4.826118779276702
         },
         {
           "azimuth_deg": 34.0,
-          "elevation_deg": 9.601076590383405
+          "elevation_deg": 4.959816640214645
         },
         {
           "azimuth_deg": 35.0,
-          "elevation_deg": 9.725913393841694
+          "elevation_deg": 5.069006538563659
         },
         {
           "azimuth_deg": 36.0,
-          "elevation_deg": 9.774420260545032
+          "elevation_deg": 5.006034253476228
         },
         {
           "azimuth_deg": 37.0,
-          "elevation_deg": 9.851570095991413
+          "elevation_deg": 4.944598759473187
         },
         {
           "azimuth_deg": 38.0,
-          "elevation_deg": 9.923371406704382
+          "elevation_deg": 4.9616719656048405
         },
         {
           "azimuth_deg": 39.0,
-          "elevation_deg": 9.957803617406864
+          "elevation_deg": 5.064706358067444
         },
         {
           "azimuth_deg": 40.0,
-          "elevation_deg": 10.108395279711027
+          "elevation_deg": 5.172086049813694
         },
         {
           "azimuth_deg": 41.0,
-          "elevation_deg": 10.073919501615299
+          "elevation_deg": 5.2840913188444265
         },
         {
           "azimuth_deg": 42.0,
-          "elevation_deg": 10.222114538892791
+          "elevation_deg": 5.401027003204218
         },
         {
           "azimuth_deg": 43.0,
-          "elevation_deg": 10.325615363993881
+          "elevation_deg": 5.502478428103234
         },
         {
           "azimuth_deg": 44.0,
-          "elevation_deg": 10.325615363993881
+          "elevation_deg": 5.6077920623964745
         },
         {
           "azimuth_deg": 45.0,
-          "elevation_deg": 10.552860729176793
+          "elevation_deg": 5.694973885754616
         },
         {
           "azimuth_deg": 46.0,
-          "elevation_deg": 10.579666647185558
+          "elevation_deg": 5.629337689537702
         },
         {
           "azimuth_deg": 47.0,
-          "elevation_deg": 10.664693899483284
+          "elevation_deg": 5.523225242656009
         },
         {
           "azimuth_deg": 48.0,
-          "elevation_deg": 10.78371069378075
+          "elevation_deg": 5.421018524315593
         },
         {
           "azimuth_deg": 49.0,
-          "elevation_deg": 10.855834559894278
+          "elevation_deg": 5.32250624438174
         },
         {
           "azimuth_deg": 50.0,
-          "elevation_deg": 10.988502140256879
+          "elevation_deg": 5.258787397576993
         },
         {
           "azimuth_deg": 51.0,
-          "elevation_deg": 11.02739383917062
+          "elevation_deg": 5.336759314195862
         },
         {
           "azimuth_deg": 52.0,
-          "elevation_deg": 11.049570332957726
+          "elevation_deg": 5.417063679900808
         },
         {
           "azimuth_deg": 53.0,
-          "elevation_deg": 11.107330346138998
+          "elevation_deg": 5.483057575595786
         },
         {
           "azimuth_deg": 54.0,
-          "elevation_deg": 11.124369348004537
+          "elevation_deg": 5.5678319084362
         },
         {
           "azimuth_deg": 55.0,
-          "elevation_deg": 11.042504177492802
+          "elevation_deg": 5.637550632425658
         },
         {
           "azimuth_deg": 56.0,
-          "elevation_deg": 10.999407136680885
+          "elevation_deg": 5.585100396932435
         },
         {
           "azimuth_deg": 57.0,
-          "elevation_deg": 11.133258685486851
+          "elevation_deg": 5.449862050052395
         },
         {
           "azimuth_deg": 58.0,
-          "elevation_deg": 11.030758035544139
+          "elevation_deg": 5.43112851784274
         },
         {
           "azimuth_deg": 59.0,
-          "elevation_deg": 11.030758035544139
+          "elevation_deg": 5.4823618909716965
         },
         {
           "azimuth_deg": 60.0,
-          "elevation_deg": 10.999983205802351
+          "elevation_deg": 5.534566134804678
         },
         {
           "azimuth_deg": 61.0,
-          "elevation_deg": 10.999983205802351
+          "elevation_deg": 5.587769039363088
         },
         {
           "azimuth_deg": 62.0,
-          "elevation_deg": 10.9972949696079
+          "elevation_deg": 5.443430673124423
         },
         {
           "azimuth_deg": 63.0,
-          "elevation_deg": 11.158709691223288
+          "elevation_deg": 5.4804273173212845
         },
         {
           "azimuth_deg": 64.0,
-          "elevation_deg": 11.158709691223288
+          "elevation_deg": 5.536869405646226
         },
         {
           "azimuth_deg": 65.0,
-          "elevation_deg": 11.172935136416816
+          "elevation_deg": 5.57514403493259
         },
         {
           "azimuth_deg": 66.0,
-          "elevation_deg": 11.172935136416816
+          "elevation_deg": 5.633552712893244
         },
         {
           "azimuth_deg": 67.0,
-          "elevation_deg": 11.197295781171196
+          "elevation_deg": 5.673172545100407
         },
         {
           "azimuth_deg": 68.0,
-          "elevation_deg": 11.207461278698943
+          "elevation_deg": 5.7133503364588325
         },
         {
           "azimuth_deg": 69.0,
-          "elevation_deg": 11.207461278698943
+          "elevation_deg": 5.7540979267071375
         },
         {
           "azimuth_deg": 70.0,
-          "elevation_deg": 11.222059061976307
+          "elevation_deg": 5.5179273787662675
         },
         {
           "azimuth_deg": 71.0,
-          "elevation_deg": 11.222059061976307
+          "elevation_deg": 5.276660884242234
         },
         {
           "azimuth_deg": 72.0,
-          "elevation_deg": 11.258586411487036
+          "elevation_deg": 5.306037223978235
         },
         {
           "azimuth_deg": 73.0,
-          "elevation_deg": 11.298802644933835
+          "elevation_deg": 5.335740422844853
         },
         {
           "azimuth_deg": 74.0,
-          "elevation_deg": 11.142414092238239
+          "elevation_deg": 5.291308534257265
         },
         {
           "azimuth_deg": 75.0,
-          "elevation_deg": 11.152352235728706
+          "elevation_deg": 5.079855431204061
         },
         {
           "azimuth_deg": 76.0,
-          "elevation_deg": 11.152352235728706
+          "elevation_deg": 5.1032609390964625
         },
         {
           "azimuth_deg": 77.0,
-          "elevation_deg": 11.219753702649411
+          "elevation_deg": 5.033678329862093
         },
         {
           "azimuth_deg": 78.0,
-          "elevation_deg": 11.234641732450935
+          "elevation_deg": 4.9269107622436215
         },
         {
           "azimuth_deg": 79.0,
-          "elevation_deg": 11.234641732450935
+          "elevation_deg": 4.9269107622436215
         },
         {
           "azimuth_deg": 80.0,
-          "elevation_deg": 11.299815335045981
+          "elevation_deg": 4.9537329875427405
         },
         {
           "azimuth_deg": 81.0,
-          "elevation_deg": 11.299815335045981
+          "elevation_deg": 4.9537329875427405
         },
         {
           "azimuth_deg": 82.0,
-          "elevation_deg": 11.335776805282242
+          "elevation_deg": 4.980847570204294
         },
         {
           "azimuth_deg": 83.0,
-          "elevation_deg": 11.180101273043878
+          "elevation_deg": 4.980847570204294
         },
         {
           "azimuth_deg": 84.0,
-          "elevation_deg": 11.189542245840826
+          "elevation_deg": 4.886818963868937
         },
         {
           "azimuth_deg": 85.0,
-          "elevation_deg": 11.190803978108669
+          "elevation_deg": 4.9054840174757395
         },
         {
           "azimuth_deg": 86.0,
-          "elevation_deg": 11.071056992955938
+          "elevation_deg": 4.6228914683576114
         },
         {
           "azimuth_deg": 87.0,
-          "elevation_deg": 11.078421243574178
+          "elevation_deg": 4.613214120299019
         },
         {
           "azimuth_deg": 88.0,
-          "elevation_deg": 10.98494537088478
+          "elevation_deg": 4.664531617779114
         },
         {
           "azimuth_deg": 89.0,
-          "elevation_deg": 10.953747419333576
+          "elevation_deg": 4.687117271886525
         },
         {
           "azimuth_deg": 90.0,
-          "elevation_deg": 10.88745948275121
+          "elevation_deg": 4.671429840648696
         },
         {
           "azimuth_deg": 91.0,
-          "elevation_deg": 10.739385922028578
+          "elevation_deg": 4.671429840648696
         },
         {
           "azimuth_deg": 92.0,
-          "elevation_deg": 10.650053180696606
+          "elevation_deg": 4.616963449311926
         },
         {
           "azimuth_deg": 93.0,
-          "elevation_deg": 10.546924667717134
+          "elevation_deg": 4.576131088857979
         },
         {
           "azimuth_deg": 94.0,
-          "elevation_deg": 10.524792534359364
+          "elevation_deg": 4.5316318560617574
         },
         {
           "azimuth_deg": 95.0,
-          "elevation_deg": 10.470824190401638
+          "elevation_deg": 4.397867455680744
         },
         {
           "azimuth_deg": 96.0,
-          "elevation_deg": 10.422312378902799
+          "elevation_deg": 4.319252367648205
         },
         {
           "azimuth_deg": 97.0,
-          "elevation_deg": 10.493903298576559
+          "elevation_deg": 4.139300330318663
         },
         {
           "azimuth_deg": 98.0,
-          "elevation_deg": 10.439482073047134
+          "elevation_deg": 3.9360221889702163
         },
         {
           "azimuth_deg": 99.0,
-          "elevation_deg": 10.454796946561734
+          "elevation_deg": 3.915659183117148
         },
         {
           "azimuth_deg": 100.0,
-          "elevation_deg": 10.361080366342266
+          "elevation_deg": 3.7923210046434925
         },
         {
           "azimuth_deg": 101.0,
-          "elevation_deg": 10.291651272151753
+          "elevation_deg": 3.613845670547385
         },
         {
           "azimuth_deg": 102.0,
-          "elevation_deg": 10.21511079348018
+          "elevation_deg": 3.4833829903990794
         },
         {
           "azimuth_deg": 103.0,
-          "elevation_deg": 10.10494659264461
+          "elevation_deg": 3.4287501503242104
         },
         {
           "azimuth_deg": 104.0,
-          "elevation_deg": 10.014681285110317
+          "elevation_deg": 3.3192266161095576
         },
         {
           "azimuth_deg": 105.0,
-          "elevation_deg": 9.88326814052295
+          "elevation_deg": 3.187495907345605
         },
         {
           "azimuth_deg": 106.0,
-          "elevation_deg": 9.810124748877383
+          "elevation_deg": 3.050223201838349
         },
         {
           "azimuth_deg": 107.0,
-          "elevation_deg": 9.802273176252283
+          "elevation_deg": 2.8589402774116213
         },
         {
           "azimuth_deg": 108.0,
-          "elevation_deg": 9.724924398176704
+          "elevation_deg": 2.6641847182464
         },
         {
           "azimuth_deg": 109.0,
-          "elevation_deg": 9.668227674294531
+          "elevation_deg": 2.4307195158734487
         },
         {
           "azimuth_deg": 110.0,
-          "elevation_deg": 9.644633839986392
+          "elevation_deg": 2.2008093292575457
         },
         {
           "azimuth_deg": 111.0,
-          "elevation_deg": 9.60672266365866
+          "elevation_deg": 2.001721374630014
         },
         {
           "azimuth_deg": 112.0,
-          "elevation_deg": 9.581669754354444
+          "elevation_deg": 1.7867315071485854
         },
         {
           "azimuth_deg": 113.0,
-          "elevation_deg": 9.652528714614142
+          "elevation_deg": 1.53137453683097
         },
         {
           "azimuth_deg": 114.0,
-          "elevation_deg": 9.633467273248236
+          "elevation_deg": 1.2983712918411066
         },
         {
           "azimuth_deg": 115.0,
-          "elevation_deg": 9.663291546611404
+          "elevation_deg": 1.1053309685555113
         },
         {
           "azimuth_deg": 116.0,
-          "elevation_deg": 9.656384667741245
+          "elevation_deg": 0.9611048044753636
         },
         {
           "azimuth_deg": 117.0,
-          "elevation_deg": 9.601858577798538
+          "elevation_deg": 0.9544347886595418
         },
         {
           "azimuth_deg": 118.0,
-          "elevation_deg": 9.560824670004031
+          "elevation_deg": 0.9445990302113777
         },
         {
           "azimuth_deg": 119.0,
-          "elevation_deg": 9.560487091368254
+          "elevation_deg": 0.8722391536232221
         },
         {
           "azimuth_deg": 120.0,
-          "elevation_deg": 9.434004982960477
+          "elevation_deg": 0.8571374386516393
         },
         {
           "azimuth_deg": 121.0,
-          "elevation_deg": 9.27967665190812
+          "elevation_deg": -0.22445149516585078
         },
         {
           "azimuth_deg": 122.0,
-          "elevation_deg": 9.130350618099136
+          "elevation_deg": -0.2305245524282431
         },
         {
           "azimuth_deg": 123.0,
-          "elevation_deg": 9.047479650167684
+          "elevation_deg": -0.23641796584151398
         },
         {
           "azimuth_deg": 124.0,
-          "elevation_deg": 8.983100333989762
+          "elevation_deg": -0.41267711700031445
         },
         {
           "azimuth_deg": 125.0,
-          "elevation_deg": 8.88076681557184
+          "elevation_deg": -0.4226242616751835
         },
         {
           "azimuth_deg": 126.0,
-          "elevation_deg": 8.763921602916621
+          "elevation_deg": -0.4330779035780965
         },
         {
           "azimuth_deg": 127.0,
-          "elevation_deg": 8.685804398542823
+          "elevation_deg": -0.44407733692749907
         },
         {
           "azimuth_deg": 128.0,
-          "elevation_deg": 8.691044375573972
+          "elevation_deg": -1.4344904349712582
         },
         {
           "azimuth_deg": 129.0,
-          "elevation_deg": 8.600480825388246
+          "elevation_deg": -1.4669979508669537
         },
         {
           "azimuth_deg": 130.0,
-          "elevation_deg": 8.52650592395001
+          "elevation_deg": -1.5010314409883136
         },
         {
           "azimuth_deg": 131.0,
-          "elevation_deg": 8.443414389156226
+          "elevation_deg": -1.7080308341862334
         },
         {
           "azimuth_deg": 132.0,
-          "elevation_deg": 8.44289545731499
+          "elevation_deg": -1.7405674457086495
         },
         {
           "azimuth_deg": 133.0,
-          "elevation_deg": 8.270962273000857
+          "elevation_deg": -1.774375160307658
         },
         {
           "azimuth_deg": 134.0,
-          "elevation_deg": 8.241932575426606
+          "elevation_deg": -1.8095297670798116
         },
         {
           "azimuth_deg": 135.0,
-          "elevation_deg": 8.061283427461008
+          "elevation_deg": -1.846113200376451
         },
         {
           "azimuth_deg": 136.0,
-          "elevation_deg": 7.981726976726704
+          "elevation_deg": -1.8745415358292454
         },
         {
           "azimuth_deg": 137.0,
-          "elevation_deg": 7.916747601734366
+          "elevation_deg": -1.9038634928445541
         },
         {
           "azimuth_deg": 138.0,
-          "elevation_deg": 7.909663619683067
+          "elevation_deg": -1.934121787906514
         },
         {
           "azimuth_deg": 139.0,
-          "elevation_deg": 7.926359512618089
+          "elevation_deg": -1.9653619030502
         },
         {
           "azimuth_deg": 140.0,
-          "elevation_deg": 7.906915023604457
+          "elevation_deg": -1.9976323132606297
         },
         {
           "azimuth_deg": 141.0,
-          "elevation_deg": 7.872209577900785
+          "elevation_deg": -2.0309847366749603
         },
         {
           "azimuth_deg": 142.0,
-          "elevation_deg": 7.816035895438048
+          "elevation_deg": -2.05384792781224
         },
         {
           "azimuth_deg": 143.0,
-          "elevation_deg": 7.781099844316091
+          "elevation_deg": -2.0772337819686464
         },
         {
           "azimuth_deg": 144.0,
-          "elevation_deg": 7.716159355898035
+          "elevation_deg": -2.113332369208351
         },
         {
           "azimuth_deg": 145.0,
-          "elevation_deg": 7.6184052379403955
+          "elevation_deg": -3.2758081192919057
         },
         {
           "azimuth_deg": 146.0,
-          "elevation_deg": 7.6301257349872795
+          "elevation_deg": -3.2621007261592063
         },
         {
           "azimuth_deg": 147.0,
-          "elevation_deg": 7.61243673441115
+          "elevation_deg": -3.1717068703896696
         },
         {
           "azimuth_deg": 148.0,
-          "elevation_deg": 7.655074779427729
+          "elevation_deg": -3.0861855009961925
         },
         {
           "azimuth_deg": 149.0,
-          "elevation_deg": 7.6855587642952
+          "elevation_deg": -3.005153416252812
         },
         {
           "azimuth_deg": 150.0,
-          "elevation_deg": 7.6053028241686516
+          "elevation_deg": -2.92826653673787
         },
         {
           "azimuth_deg": 151.0,
-          "elevation_deg": 7.542273933635039
+          "elevation_deg": -2.8552150410035955
         },
         {
           "azimuth_deg": 152.0,
-          "elevation_deg": 7.397477203930492
+          "elevation_deg": -2.7195258550217916
         },
         {
           "azimuth_deg": 153.0,
-          "elevation_deg": 7.247943632896603
+          "elevation_deg": -2.6564052578890895
         },
         {
           "azimuth_deg": 154.0,
-          "elevation_deg": 7.15014295045471
+          "elevation_deg": -2.538565189204418
         },
         {
           "azimuth_deg": 155.0,
-          "elevation_deg": 7.080364722659615
+          "elevation_deg": -2.4834814079181413
         },
         {
           "azimuth_deg": 156.0,
-          "elevation_deg": 7.002937402550596
+          "elevation_deg": -2.3801890726350567
         },
         {
           "azimuth_deg": 157.0,
-          "elevation_deg": 6.888085189576044
+          "elevation_deg": -2.285149068146294
         },
         {
           "azimuth_deg": 158.0,
-          "elevation_deg": 6.790502893003589
+          "elevation_deg": -2.1974111856753735
         },
         {
           "azimuth_deg": 159.0,
-          "elevation_deg": 6.70761016791618
+          "elevation_deg": -2.07775657162752
         },
         {
           "azimuth_deg": 160.0,
-          "elevation_deg": 6.635419221230228
+          "elevation_deg": -2.0049781293685194
         },
         {
           "azimuth_deg": 161.0,
-          "elevation_deg": 6.595227465024736
+          "elevation_deg": -1.904901367278907
         },
         {
           "azimuth_deg": 162.0,
-          "elevation_deg": 6.617440461634668
+          "elevation_deg": -1.8435608670632977
         },
         {
           "azimuth_deg": 163.0,
-          "elevation_deg": 6.807570712398
+          "elevation_deg": -1.8435608670632977
         },
         {
           "azimuth_deg": 164.0,
-          "elevation_deg": 7.046520591586442
+          "elevation_deg": -1.8737285932108414
         },
         {
           "azimuth_deg": 165.0,
-          "elevation_deg": 7.31477864002587
+          "elevation_deg": -1.8737285932108414
         },
         {
           "azimuth_deg": 166.0,
-          "elevation_deg": 7.568569298203098
+          "elevation_deg": -1.8737285932108414
         },
         {
           "azimuth_deg": 167.0,
-          "elevation_deg": 7.783026896593455
+          "elevation_deg": -1.8737285932108414
         },
         {
           "azimuth_deg": 168.0,
-          "elevation_deg": 7.929854866583319
+          "elevation_deg": -1.904901367278907
         },
         {
           "azimuth_deg": 169.0,
-          "elevation_deg": 8.106184926749787
+          "elevation_deg": -1.904901367278907
         },
         {
           "azimuth_deg": 170.0,
-          "elevation_deg": 8.26173465572543
+          "elevation_deg": -1.904901367278907
         },
         {
           "azimuth_deg": 171.0,
-          "elevation_deg": 8.407320415370176
+          "elevation_deg": -1.904901367278907
         },
         {
           "azimuth_deg": 172.0,
-          "elevation_deg": 8.590098449549528
+          "elevation_deg": -1.904901367278907
         },
         {
           "azimuth_deg": 173.0,
-          "elevation_deg": 8.73472462371158
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 174.0,
-          "elevation_deg": 8.90214975786019
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 175.0,
-          "elevation_deg": 9.098996814588856
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 176.0,
-          "elevation_deg": 9.235141894396833
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 177.0,
-          "elevation_deg": 9.314684014055208
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 178.0,
-          "elevation_deg": 9.472675592939014
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 179.0,
-          "elevation_deg": 9.566030319331269
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 180.0,
-          "elevation_deg": 9.686726989672387
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 181.0,
-          "elevation_deg": 9.736695394707496
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 182.0,
-          "elevation_deg": 9.791474264350676
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 183.0,
-          "elevation_deg": 9.799112727344859
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 184.0,
-          "elevation_deg": 9.787459478686676
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 185.0,
-          "elevation_deg": 9.772021427003583
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 186.0,
-          "elevation_deg": 9.754345541825135
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 187.0,
-          "elevation_deg": 9.724301872478096
+          "elevation_deg": -1.93713021752059
         },
         {
           "azimuth_deg": 188.0,
-          "elevation_deg": 9.714766942698168
+          "elevation_deg": -1.904901367278907
         },
         {
           "azimuth_deg": 189.0,
-          "elevation_deg": 9.661793867769086
+          "elevation_deg": -1.904901367278907
         },
         {
           "azimuth_deg": 190.0,
-          "elevation_deg": 9.609520659341277
+          "elevation_deg": -1.904901367278907
         },
         {
           "azimuth_deg": 191.0,
-          "elevation_deg": 9.529475801654264
+          "elevation_deg": -1.904901367278907
         },
         {
           "azimuth_deg": 192.0,
-          "elevation_deg": 9.491682508269808
+          "elevation_deg": -1.904901367278907
         },
         {
           "azimuth_deg": 193.0,
-          "elevation_deg": 9.432810090317988
+          "elevation_deg": -1.904901367278907
         },
         {
           "azimuth_deg": 194.0,
-          "elevation_deg": 9.374927225915853
+          "elevation_deg": -1.8737285932108414
         },
         {
           "azimuth_deg": 195.0,
-          "elevation_deg": 9.267520461668637
+          "elevation_deg": -1.8737285932108414
         },
         {
           "azimuth_deg": 196.0,
-          "elevation_deg": 9.167552554620606
+          "elevation_deg": -1.8737285932108414
         },
         {
           "azimuth_deg": 197.0,
-          "elevation_deg": 9.030068485706716
+          "elevation_deg": -1.8435608670632977
         },
         {
           "azimuth_deg": 198.0,
-          "elevation_deg": 8.919935658942462
+          "elevation_deg": -1.8435608670632977
         },
         {
           "azimuth_deg": 199.0,
-          "elevation_deg": 8.780541415566814
+          "elevation_deg": -1.8435608670632977
         },
         {
           "azimuth_deg": 200.0,
-          "elevation_deg": 8.585931233597856
+          "elevation_deg": -1.814350394884541
         },
         {
           "azimuth_deg": 201.0,
-          "elevation_deg": 8.424918350061604
+          "elevation_deg": -1.814350394884541
         },
         {
           "azimuth_deg": 202.0,
-          "elevation_deg": 8.252459447153118
+          "elevation_deg": -1.7860523648552769
         },
         {
           "azimuth_deg": 203.0,
-          "elevation_deg": 8.092069547313425
+          "elevation_deg": -1.7860523648552769
         },
         {
           "azimuth_deg": 204.0,
-          "elevation_deg": 8.002106049829786
+          "elevation_deg": -1.7860523648552769
         },
         {
           "azimuth_deg": 205.0,
-          "elevation_deg": 7.931482610575731
+          "elevation_deg": -1.7586247183431993
         },
         {
           "azimuth_deg": 206.0,
-          "elevation_deg": 7.874733075630835
+          "elevation_deg": -1.7320279417242532
         },
         {
           "azimuth_deg": 207.0,
-          "elevation_deg": 7.791233860159755
+          "elevation_deg": -1.7320279417242532
         },
         {
           "azimuth_deg": 208.0,
-          "elevation_deg": 7.824071651707356
+          "elevation_deg": -1.7062248768063792
         },
         {
           "azimuth_deg": 209.0,
-          "elevation_deg": 7.815566804202847
+          "elevation_deg": -1.7062248768063792
         },
         {
           "azimuth_deg": 210.0,
-          "elevation_deg": 7.857625930757125
+          "elevation_deg": -1.681180547945418
         },
         {
           "azimuth_deg": 211.0,
-          "elevation_deg": 7.8816957846120905
+          "elevation_deg": -1.6568620041637465
         },
         {
           "azimuth_deg": 212.0,
-          "elevation_deg": 7.9454160219790015
+          "elevation_deg": -1.6568620041637465
         },
         {
           "azimuth_deg": 213.0,
-          "elevation_deg": 7.934330176029867
+          "elevation_deg": -1.6332381747747964
         },
         {
           "azimuth_deg": 214.0,
-          "elevation_deg": 7.915608609392104
+          "elevation_deg": -1.6102797371848436
         },
         {
           "azimuth_deg": 215.0,
-          "elevation_deg": 7.819523831351975
+          "elevation_deg": -1.587958995690718
         },
         {
           "azimuth_deg": 216.0,
-          "elevation_deg": 7.760771835074384
+          "elevation_deg": -1.5662497702212352
         },
         {
           "azimuth_deg": 217.0,
-          "elevation_deg": 7.683928641910166
+          "elevation_deg": -1.5451272940836434
         },
         {
           "azimuth_deg": 218.0,
-          "elevation_deg": 7.571369212743784
+          "elevation_deg": -1.5245681198762866
         },
         {
           "azimuth_deg": 219.0,
-          "elevation_deg": 7.463254391433994
+          "elevation_deg": -1.5045500328167785
         },
         {
           "azimuth_deg": 220.0,
-          "elevation_deg": 7.338566730568257
+          "elevation_deg": -1.4850519708128143
         },
         {
           "azimuth_deg": 221.0,
-          "elevation_deg": 7.184024808996743
+          "elevation_deg": -1.466053950671624
         },
         {
           "azimuth_deg": 222.0,
-          "elevation_deg": 7.056492160812162
+          "elevation_deg": -1.447536999905096
         },
         {
           "azimuth_deg": 223.0,
-          "elevation_deg": 6.850319733892417
+          "elevation_deg": -1.4294830936418108
         },
         {
           "azimuth_deg": 224.0,
-          "elevation_deg": 6.68963979033807
+          "elevation_deg": -1.3946967069614273
         },
         {
           "azimuth_deg": 225.0,
-          "elevation_deg": 6.525829817087529
+          "elevation_deg": -1.3779324100737436
         },
         {
           "azimuth_deg": 226.0,
-          "elevation_deg": 6.382524430068919
+          "elevation_deg": 0.11619160172313352
         },
         {
           "azimuth_deg": 227.0,
-          "elevation_deg": 6.2002622383428925
+          "elevation_deg": 0.1176246730387095
         },
         {
           "azimuth_deg": 228.0,
-          "elevation_deg": 6.123865108695044
+          "elevation_deg": 0.12059574723168776
         },
         {
           "azimuth_deg": 229.0,
-          "elevation_deg": 6.003525224106938
+          "elevation_deg": 0.12213637338228686
         },
         {
           "azimuth_deg": 230.0,
-          "elevation_deg": 5.811430662454451
+          "elevation_deg": 0.12371558510353704
         },
         {
           "azimuth_deg": 231.0,
-          "elevation_deg": 5.576797906574406
+          "elevation_deg": 0.1253348664463645
         },
         {
           "azimuth_deg": 232.0,
-          "elevation_deg": 5.471231202212826
+          "elevation_deg": 0.1269957785546221
         },
         {
           "azimuth_deg": 233.0,
-          "elevation_deg": 5.560422098336815
+          "elevation_deg": 0.12869996473694217
         },
         {
           "azimuth_deg": 234.0,
-          "elevation_deg": 5.563306103305747
+          "elevation_deg": 0.13044915594433204
         },
         {
           "azimuth_deg": 235.0,
-          "elevation_deg": 5.425466458428393
+          "elevation_deg": 0.13224517669189437
         },
         {
           "azimuth_deg": 236.0,
-          "elevation_deg": 5.303461290962959
+          "elevation_deg": 0.1340899514672574
         },
         {
           "azimuth_deg": 237.0,
-          "elevation_deg": 5.15526405859875
+          "elevation_deg": 0.13598551167303463
         },
         {
           "azimuth_deg": 238.0,
-          "elevation_deg": 4.9903022305355895
+          "elevation_deg": 0.13793400315596333
         },
         {
           "azimuth_deg": 239.0,
-          "elevation_deg": 4.904058184442066
+          "elevation_deg": 0.13793400315596333
         },
         {
           "azimuth_deg": 240.0,
-          "elevation_deg": 4.886335048797578
+          "elevation_deg": 0.13993769438138895
         },
         {
           "azimuth_deg": 241.0,
-          "elevation_deg": 4.945391528492205
+          "elevation_deg": 0.14199898531856453
         },
         {
           "azimuth_deg": 242.0,
-          "elevation_deg": 4.9720358478614
+          "elevation_deg": 0.14199898531856453
         },
         {
           "azimuth_deg": 243.0,
-          "elevation_deg": 5.058758618559221
+          "elevation_deg": 0.14412041710993564
         },
         {
           "azimuth_deg": 244.0,
-          "elevation_deg": 5.12343259056844
+          "elevation_deg": 0.14630468260631885
         },
         {
           "azimuth_deg": 245.0,
-          "elevation_deg": 5.270270616000461
+          "elevation_deg": 0.14630468260631885
         },
         {
           "azimuth_deg": 246.0,
-          "elevation_deg": 5.365979595452668
+          "elevation_deg": 0.1485546378598088
         },
         {
           "azimuth_deg": 247.0,
-          "elevation_deg": 5.5272349678393216
+          "elevation_deg": 0.1485546378598088
         },
         {
           "azimuth_deg": 248.0,
-          "elevation_deg": 5.570154897161114
+          "elevation_deg": 0.15087331467755266
         },
         {
           "azimuth_deg": 249.0,
-          "elevation_deg": 5.701611310704041
+          "elevation_deg": 0.15087331467755266
         },
         {
           "azimuth_deg": 250.0,
-          "elevation_deg": 5.74320572280002
+          "elevation_deg": 0.1532639343524217
         },
         {
           "azimuth_deg": 251.0,
-          "elevation_deg": 5.754506101473227
+          "elevation_deg": 0.1532639343524217
         },
         {
           "azimuth_deg": 252.0,
-          "elevation_deg": 5.724737427520648
+          "elevation_deg": 0.1532639343524217
         },
         {
           "azimuth_deg": 253.0,
-          "elevation_deg": 5.692539147819986
+          "elevation_deg": 0.15572992270134403
         },
         {
           "azimuth_deg": 254.0,
-          "elevation_deg": 5.705652081893593
+          "elevation_deg": 0.15572992270134403
         },
         {
           "azimuth_deg": 255.0,
-          "elevation_deg": 5.616957991363047
+          "elevation_deg": 0.15572992270134403
         },
         {
           "azimuth_deg": 256.0,
-          "elevation_deg": 5.603065267636406
+          "elevation_deg": 0.1582749265589351
         },
         {
           "azimuth_deg": 257.0,
-          "elevation_deg": 5.548357510760042
+          "elevation_deg": 0.22851187038978563
         },
         {
           "azimuth_deg": 258.0,
-          "elevation_deg": 5.54288769338493
+          "elevation_deg": 0.29256734378146626
         },
         {
           "azimuth_deg": 259.0,
-          "elevation_deg": 5.498127268523074
+          "elevation_deg": 0.4459666826096396
         },
         {
           "azimuth_deg": 260.0,
-          "elevation_deg": 5.486026840191274
+          "elevation_deg": 0.6525517924463519
         },
         {
           "azimuth_deg": 261.0,
-          "elevation_deg": 5.421749466342864
+          "elevation_deg": 0.8200246912489702
         },
         {
           "azimuth_deg": 262.0,
-          "elevation_deg": 5.36358444029937
+          "elevation_deg": 1.1252681396659954
         },
         {
           "azimuth_deg": 263.0,
-          "elevation_deg": 5.307136528721341
+          "elevation_deg": 1.3181242082544142
         },
         {
           "azimuth_deg": 264.0,
-          "elevation_deg": 5.211252552282923
+          "elevation_deg": 1.4354065200199233
         },
         {
           "azimuth_deg": 265.0,
-          "elevation_deg": 5.122948614931383
+          "elevation_deg": 1.7570549440210488
         },
         {
           "azimuth_deg": 266.0,
-          "elevation_deg": 4.996284241233514
+          "elevation_deg": 1.7719118576714168
         },
         {
           "azimuth_deg": 267.0,
-          "elevation_deg": 4.918154270958161
+          "elevation_deg": 2.0781717820847474
         },
         {
           "azimuth_deg": 268.0,
-          "elevation_deg": 4.950536679982334
+          "elevation_deg": 2.08363158084977
         },
         {
           "azimuth_deg": 269.0,
-          "elevation_deg": 4.962119913199412
+          "elevation_deg": 2.3476998237074
         },
         {
           "azimuth_deg": 270.0,
-          "elevation_deg": 4.980214680326361
+          "elevation_deg": 2.3476998237074
         },
         {
           "azimuth_deg": 271.0,
-          "elevation_deg": 5.037191932393495
+          "elevation_deg": 2.522905242281765
         },
         {
           "azimuth_deg": 272.0,
-          "elevation_deg": 5.096955535834978
+          "elevation_deg": 2.522905242281765
         },
         {
           "azimuth_deg": 273.0,
-          "elevation_deg": 5.093784779704131
+          "elevation_deg": 2.5694013368938604
         },
         {
           "azimuth_deg": 274.0,
-          "elevation_deg": 5.207756037822268
+          "elevation_deg": 2.5694013368938604
         },
         {
           "azimuth_deg": 275.0,
-          "elevation_deg": 5.38073077945934
+          "elevation_deg": 2.6649602111400608
         },
         {
           "azimuth_deg": 276.0,
-          "elevation_deg": 5.493839449835518
+          "elevation_deg": 2.723416352338228
         },
         {
           "azimuth_deg": 277.0,
-          "elevation_deg": 5.638665215799216
+          "elevation_deg": 2.7240923455336876
         },
         {
           "azimuth_deg": 278.0,
-          "elevation_deg": 5.779979911795883
+          "elevation_deg": 3.118415833696087
         },
         {
           "azimuth_deg": 279.0,
-          "elevation_deg": 5.9085395452622755
+          "elevation_deg": 3.3378826492507314
         },
         {
           "azimuth_deg": 280.0,
-          "elevation_deg": 5.966954866679023
+          "elevation_deg": 3.4632302163494213
         },
         {
           "azimuth_deg": 281.0,
-          "elevation_deg": 6.027941368441081
+          "elevation_deg": 3.8089593175948653
         },
         {
           "azimuth_deg": 282.0,
-          "elevation_deg": 6.020073269494585
+          "elevation_deg": 4.147543858926815
         },
         {
           "azimuth_deg": 283.0,
-          "elevation_deg": 5.9661925339264545
+          "elevation_deg": 4.503185779941955
         },
         {
           "azimuth_deg": 284.0,
-          "elevation_deg": 5.876535002881913
+          "elevation_deg": 4.8682670683312095
         },
         {
           "azimuth_deg": 285.0,
-          "elevation_deg": 5.763354966418928
+          "elevation_deg": 5.167366113548714
         },
         {
           "azimuth_deg": 286.0,
-          "elevation_deg": 5.591720302758363
+          "elevation_deg": 5.5054684532570874
         },
         {
           "azimuth_deg": 287.0,
-          "elevation_deg": 5.327230103642848
+          "elevation_deg": 5.890708908506145
         },
         {
           "azimuth_deg": 288.0,
-          "elevation_deg": 5.088914562021223
+          "elevation_deg": 6.239830437196772
         },
         {
           "azimuth_deg": 289.0,
-          "elevation_deg": 4.807279039037988
+          "elevation_deg": 6.529952109488072
         },
         {
           "azimuth_deg": 290.0,
-          "elevation_deg": 4.479769782532712
+          "elevation_deg": 6.529952109488072
         },
         {
           "azimuth_deg": 291.0,
-          "elevation_deg": 4.14806861184175
+          "elevation_deg": 6.43030693930899
         },
         {
           "azimuth_deg": 292.0,
-          "elevation_deg": 3.8507746743222526
+          "elevation_deg": 6.43030693930899
         },
         {
           "azimuth_deg": 293.0,
-          "elevation_deg": 3.5172065243685937
+          "elevation_deg": 6.43030693930899
         },
         {
           "azimuth_deg": 294.0,
-          "elevation_deg": 3.1489793908049073
+          "elevation_deg": 6.333643501298763
         },
         {
           "azimuth_deg": 295.0,
-          "elevation_deg": 2.7554874864774934
+          "elevation_deg": 6.239830437196772
         },
         {
           "azimuth_deg": 296.0,
-          "elevation_deg": 2.2972002641073916
+          "elevation_deg": 6.239830437196772
         },
         {
           "azimuth_deg": 297.0,
-          "elevation_deg": 1.956381717698792
+          "elevation_deg": 6.148743963116239
         },
         {
           "azimuth_deg": 298.0,
-          "elevation_deg": 1.6163560394874994
+          "elevation_deg": 6.148743963116239
         },
         {
           "azimuth_deg": 299.0,
-          "elevation_deg": 1.1941039602150632
+          "elevation_deg": 6.060267333447664
         },
         {
           "azimuth_deg": 300.0,
-          "elevation_deg": 0.7743509252585601
+          "elevation_deg": 5.974290349486194
         },
         {
           "azimuth_deg": 301.0,
-          "elevation_deg": 0.4110456049580477
+          "elevation_deg": 5.974290349486194
         },
         {
           "azimuth_deg": 302.0,
-          "elevation_deg": 0.05431856729705386
+          "elevation_deg": 5.890708908506145
         },
         {
           "azimuth_deg": 303.0,
-          "elevation_deg": -0.40130542379904005
+          "elevation_deg": 5.809424589465281
         },
         {
           "azimuth_deg": 304.0,
-          "elevation_deg": -0.6954520450266188
+          "elevation_deg": 5.730344271926168
         },
         {
           "azimuth_deg": 305.0,
-          "elevation_deg": -1.0240455500316001
+          "elevation_deg": 5.730344271926168
         },
         {
           "azimuth_deg": 306.0,
-          "elevation_deg": -1.424331684376233
+          "elevation_deg": 5.653379785139223
         },
         {
           "azimuth_deg": 307.0,
-          "elevation_deg": -1.8137409984078325
+          "elevation_deg": 5.5784475845480195
         },
         {
           "azimuth_deg": 308.0,
-          "elevation_deg": -1.9836492526541414
+          "elevation_deg": 5.5054684532570874
         },
         {
           "azimuth_deg": 309.0,
-          "elevation_deg": -2.227341999025882
+          "elevation_deg": 5.434367226250689
         },
         {
           "azimuth_deg": 310.0,
-          "elevation_deg": -2.3278655424622716
+          "elevation_deg": 5.365072535371352
         },
         {
           "azimuth_deg": 311.0,
-          "elevation_deg": -2.575414161004057
+          "elevation_deg": 5.231634874659067
         },
         {
           "azimuth_deg": 312.0,
-          "elevation_deg": -2.717862736194417
+          "elevation_deg": 5.167366113548714
         },
         {
           "azimuth_deg": 313.0,
-          "elevation_deg": -2.954580728583676
+          "elevation_deg": 5.1046519148997875
         },
         {
           "azimuth_deg": 314.0,
-          "elevation_deg": -3.046349267715859
+          "elevation_deg": 5.04343667973384
         },
         {
           "azimuth_deg": 315.0,
-          "elevation_deg": -3.0577677716666085
+          "elevation_deg": 4.925293619523117
         },
         {
           "azimuth_deg": 316.0,
-          "elevation_deg": -3.0136800566047466
+          "elevation_deg": 4.8682670683312095
         },
         {
           "azimuth_deg": 317.0,
-          "elevation_deg": -2.8191480060332097
+          "elevation_deg": 4.758073736035145
         },
         {
           "azimuth_deg": 318.0,
-          "elevation_deg": -2.700125038569955
+          "elevation_deg": 4.6852598886191466
         },
         {
           "azimuth_deg": 319.0,
-          "elevation_deg": -2.5919981113407595
+          "elevation_deg": 4.754936844369742
         },
         {
           "azimuth_deg": 320.0,
-          "elevation_deg": -2.498472397517401
+          "elevation_deg": 4.826709488070173
         },
         {
           "azimuth_deg": 321.0,
-          "elevation_deg": -2.3076623876375724
+          "elevation_deg": 4.9006736226509755
         },
         {
           "azimuth_deg": 322.0,
-          "elevation_deg": -2.126602610328661
+          "elevation_deg": 4.976930965722489
         },
         {
           "azimuth_deg": 323.0,
-          "elevation_deg": -2.141979580532744
+          "elevation_deg": 5.015953107398216
         },
         {
           "azimuth_deg": 324.0,
-          "elevation_deg": -2.14201361288646
+          "elevation_deg": 5.095855070680042
         },
         {
           "azimuth_deg": 325.0,
-          "elevation_deg": -2.21998522951149
+          "elevation_deg": 5.1783335568822615
         },
         {
           "azimuth_deg": 326.0,
-          "elevation_deg": -2.1703655801165915
+          "elevation_deg": 5.220578164597572
         },
         {
           "azimuth_deg": 327.0,
-          "elevation_deg": -2.331723812291675
+          "elevation_deg": 5.307160952446641
         },
         {
           "azimuth_deg": 328.0,
-          "elevation_deg": -2.23322434303674
+          "elevation_deg": 5.351533916925158
         },
         {
           "azimuth_deg": 329.0,
-          "elevation_deg": -2.2822378097499993
+          "elevation_deg": 5.396652086383507
         },
         {
           "azimuth_deg": 330.0,
-          "elevation_deg": -2.3649258677160114
+          "elevation_deg": 5.307160952446641
         },
         {
           "azimuth_deg": 331.0,
-          "elevation_deg": -2.345878505267872
+          "elevation_deg": 5.1783335568822615
         },
         {
           "azimuth_deg": 332.0,
-          "elevation_deg": -2.233080306612628
+          "elevation_deg": 5.015953107398216
         },
         {
           "azimuth_deg": 333.0,
-          "elevation_deg": -2.10293401860508
+          "elevation_deg": 4.865243502163208
         },
         {
           "azimuth_deg": 334.0,
-          "elevation_deg": -2.0627866520440494
+          "elevation_deg": 4.913483850752237
         },
         {
           "azimuth_deg": 335.0,
-          "elevation_deg": -1.9529277173383368
+          "elevation_deg": 4.9379629154319185
         },
         {
           "azimuth_deg": 336.0,
-          "elevation_deg": -1.8246412617408707
+          "elevation_deg": 4.987656770677059
         },
         {
           "azimuth_deg": 337.0,
-          "elevation_deg": -1.4823054752577607
+          "elevation_deg": 5.012878955159646
         },
         {
           "azimuth_deg": 338.0,
-          "elevation_deg": -1.4823054752577607
+          "elevation_deg": 5.0640928841160555
         },
         {
           "azimuth_deg": 339.0,
-          "elevation_deg": -1.4823054752577607
+          "elevation_deg": 5.090092479667643
         },
         {
           "azimuth_deg": 340.0,
-          "elevation_deg": -1.4823054752577607
+          "elevation_deg": 5.1163591971376805
         },
         {
           "azimuth_deg": 341.0,
-          "elevation_deg": -1.4823054752577607
+          "elevation_deg": 5.1697106005583295
         },
         {
           "azimuth_deg": 342.0,
-          "elevation_deg": -1.4823054752577607
+          "elevation_deg": 5.14289716587804
         },
         {
           "azimuth_deg": 343.0,
-          "elevation_deg": -1.4823054752577607
+          "elevation_deg": 5.047181098643707
         },
         {
           "azimuth_deg": 344.0,
-          "elevation_deg": -1.473673715514704
+          "elevation_deg": 5.0843008285388205
         },
         {
           "azimuth_deg": 345.0,
-          "elevation_deg": -1.473673715514704
+          "elevation_deg": 5.103065105985146
         },
         {
           "azimuth_deg": 346.0,
-          "elevation_deg": -1.4651424509297977
+          "elevation_deg": 5.121967663391083
         },
         {
           "azimuth_deg": 347.0,
-          "elevation_deg": -1.4651424509297977
+          "elevation_deg": 5.141010032158006
         },
         {
           "azimuth_deg": 348.0,
-          "elevation_deg": -1.3696082996376298
+          "elevation_deg": 4.967221531652802
         },
         {
           "azimuth_deg": 349.0,
-          "elevation_deg": -1.3519642203015276
+          "elevation_deg": 4.981497141366709
         },
         {
           "azimuth_deg": 350.0,
-          "elevation_deg": -1.3095850117684629
+          "elevation_deg": 4.9958545490496755
         },
         {
           "azimuth_deg": 351.0,
-          "elevation_deg": -1.0200346885859248
+          "elevation_deg": 4.6577431174270965
         },
         {
           "azimuth_deg": 352.0,
-          "elevation_deg": -1.0141014823821293
+          "elevation_deg": 4.67540762357016
         },
         {
           "azimuth_deg": 353.0,
-          "elevation_deg": -1.0111611153774491
+          "elevation_deg": 4.67540762357016
         },
         {
           "azimuth_deg": 354.0,
-          "elevation_deg": -1.005332088974456
+          "elevation_deg": 4.6932059472716166
         },
         {
           "azimuth_deg": 355.0,
-          "elevation_deg": 0.016997377473532877
+          "elevation_deg": 4.6932059472716166
         },
         {
           "azimuth_deg": 356.0,
-          "elevation_deg": 0.018451640262920333
+          "elevation_deg": 4.711139612883288
         },
         {
           "azimuth_deg": 357.0,
-          "elevation_deg": 0.019816180360840544
+          "elevation_deg": 4.711139612883288
         },
         {
           "azimuth_deg": 358.0,
-          "elevation_deg": 0.02117881490527284
+          "elevation_deg": 4.711139612883288
         },
         {
           "azimuth_deg": 359.0,
-          "elevation_deg": 0.35434719901899064
+          "elevation_deg": 4.711139612883288
         }
       ]
     }

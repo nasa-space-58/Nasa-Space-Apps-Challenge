@@ -163,12 +163,25 @@ def contact_geometry(position_nd, site, system, horizon):
     elevation = math.degrees(math.atan2(u, math.hypot(n, e)))
     azimuth = math.degrees(math.atan2(e, n)) % 360
     terrain = interpolate_horizon(horizon, azimuth)
-    clear = segment_clear(pos, [-mu, 0, 0], moon, radius / length)
+    earth = np.array([-mu, 0.0, 0.0])
+    clear = bool(np.array_equal(pos, earth)) or segment_clear(
+        pos, earth, moon, radius / length
+    )
+    # Surface endpoints are allowed only for an outward ray; interior/tangent
+    # trajectories remain blocked. Real terrain observers are above the sphere.
+    surface_outward = (
+        abs(np.linalg.norm(observer - moon) - radius / length) < 1e-14 and u > 0
+    )
+    site_clear = surface_outward or segment_clear(observer, pos, moon, radius / length)
     # Strict boundary rule matches R2: equality is not an available link.
     state = (
         "unknown"
         if terrain is None
-        else ("available" if elevation > terrain and clear else "unavailable")
+        else (
+            "available"
+            if elevation > terrain and clear and site_clear
+            else "unavailable"
+        )
     )
     return dict(
         state=state,

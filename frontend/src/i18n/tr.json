@@ -1141,6 +1141,10 @@
     "unknown": "Bilinmeyen",
     "feasible": "Koşulları sağlıyor",
     "infeasible": "Koşulları sağlamıyor",
-    "incomplete": "Eksik veri"
+    "incomplete": "Eksik veri",
+    "directEarth": "Bu modelde doğrudan Dünya görüşü",
+    "elevation": "Yükselim",
+    "horizon": "Arazi ufku",
+    "rejected": "Reddedilen katalog adayı"
   }
 }

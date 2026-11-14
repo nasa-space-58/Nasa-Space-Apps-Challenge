@@ -1141,6 +1141,10 @@
     "unknown": "Unknown",
     "feasible": "Feasible",
     "infeasible": "Infeasible",
-    "incomplete": "Incomplete evidence"
+    "incomplete": "Incomplete evidence",
+    "directEarth": "Direct Earth visibility in this model",
+    "elevation": "Elevation",
+    "horizon": "Terrain horizon",
+    "rejected": "Rejected catalog candidate"
   }
 }
