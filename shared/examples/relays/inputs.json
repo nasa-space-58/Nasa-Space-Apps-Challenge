@@ -59,19 +59,19 @@
       "stability": 1.43357190445172
     },
     {
-      "orbit_id": "jpl-l2-s-286",
-      "catalog_row": 286,
+      "orbit_id": "jpl-l2-s-240",
+      "catalog_row": 240,
       "state_nd": [
-        1.0103798476493229,
-        2.887473724726642e-27,
-        -0.17250118762565506,
-        -6.906147693280354e-13,
-        -0.07642012279949668,
-        -9.66302812886131e-12
+        1.0178270574627255,
+        6.828597577528545e-27,
+        -0.17903580854685885,
+        -3.0189270062767214e-13,
+        -0.09393474707702551,
+        -4.5876692854850765e-12
       ],
-      "period_tu": 1.3539402995723187,
-      "jacobi": 3.05996139190004,
-      "stability": 1.00000000040975
+      "period_tu": 1.4556436750150945,
+      "jacobi": 3.05087533467605,
+      "stability": 1.19990411818932
     }
   ],
   "sites": [
@@ -2993,5 +2993,24 @@
     }
   ],
   "orientation_assumption": "Ideal synchronous Moon: MOON_ME terrain directions mapped by diag(-1,-1,1) to synodic axes; no epoch-dependent libration/NAIF transform.",
-  "epoch_label_utc": "2026-11-04T00:00:00Z"
+  "epoch_label_utc": "2026-11-04T00:00:00Z",
+  "rejected_orbits": [
+    {
+      "orbit_id": "jpl-l2-s-286",
+      "catalog_row": 286,
+      "state_nd": [
+        1.0103798476493229,
+        2.887473724726642e-27,
+        -0.17250118762565506,
+        -6.906147693280354e-13,
+        -0.07642012279949668,
+        -9.66302812886131e-12
+      ],
+      "period_tu": 1.3539402995723187,
+      "jacobi": 3.05996139190004,
+      "stability": 1.00000000040975,
+      "reason": "Propagated trajectory intersects the lunar reference sphere",
+      "sampled_minimum_radius_km": 1682.3051475658874
+    }
+  ]
 }
