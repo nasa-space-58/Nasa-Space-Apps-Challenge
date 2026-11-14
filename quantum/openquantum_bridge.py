@@ -376,8 +376,18 @@ class OpenQuantumGateway:
         return p
 
     def prepare(
-        self, scenario, circuit, *, backend_code, organization_id, shots, trial
+        self,
+        scenario,
+        circuit,
+        *,
+        backend_code,
+        organization_id,
+        shots,
+        trial,
+        initial_layout=None,
     ):
+        if initial_layout is not None:
+            raise NotImplementedError("Explicit initial layout")
         _shots(shots)
         if not isinstance(trial, str) or not re.fullmatch(
             r"[A-Za-z0-9_-]{1,64}", trial
