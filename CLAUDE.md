@@ -78,3 +78,7 @@ Task 3 starts from Task 2 on `feature/task3-visibility-metrics`. Push only this 
 ### Task 4 delivery override (user, 2026-11-14)
 
 Task 4 starts from Task 3 on `feature/task4-mission-interface`. Push only this new branch; the user manually merges. Do not merge into or push to tahakrcc or main.
+
+### Task 5 delivery override (user, 2026-11-14)
+
+Task 5 starts from current tahakrcc (`c29086d`) on `feature/task5-scenario-comparison`. Push only this new branch. Do not merge into or push to tahakrcc or main. Task 4 was merged into tahakrcc separately at the user's explicit request.
