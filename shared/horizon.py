@@ -1,5 +1,6 @@
 """Bounded settings for a MOON_ME, spherical lunar terrain horizon."""
 
+import math
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
@@ -17,4 +18,17 @@ class HorizonSettings(BaseModel):
     @model_validator(mode="after")
     def bounded_grid(self):
         """Require a closed azimuth grid and at most five million ray samples."""
-        raise NotImplementedError
+        count = 360 / self.azimuth_step_deg
+        if not math.isclose(count, round(count), abs_tol=1e-9):
+            raise ValueError("azimuth_step_deg must divide 360 evenly")
+        if (
+            count
+            * (
+                math.ceil(self.search_distance_m / self.radial_step_m)
+                + min(1000, self.search_distance_m)
+                + 1
+            )
+            > 5_000_000
+        ):
+            raise ValueError("Horizon request exceeds five million samples")
+        return self

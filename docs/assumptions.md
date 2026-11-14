@@ -17,7 +17,7 @@ These limits are implementation defaults selected for the initial setup and can 
 | Altitude | km relative to the 1737.4 km reference sphere reported by the existing Horizons query |
 | Observer height | Proposed 2 m above local terrain for the first terrain demonstration; this is a team assumption |
 
-`altitude_km` is distinct from height above terrain. Product 90 heights in meters are relative to the 1737.4 km sphere. The frame/reference match and provisional pixel-based observer altitudes are documented in terrain-and-sites.md. Two research windows were downloaded and checked; production terrain ingestion remains Step 1 work.
+`altitude_km` is distinct from height above terrain. Product 90 heights in meters are relative to the 1737.4 km sphere. The frame/reference match and provisional pixel-based observer altitudes are documented in terrain-and-sites.md. Task 1 now caches the full raw source and processed windows. Task 2 computes a bounded sampled horizon; see terrain-horizon.md for radius and sampling limitations.
 
 ## Terrain and initial sites
 
@@ -38,4 +38,4 @@ See [terrain verification and sources](terrain-and-sites.md), [machine-readable 
 
 ## Current verification status
 
-Local Docker services and the full test suite passed on 2026-11-14. Horizons CLI acquisition returned 25 samples per target and cache reuse passed; see horizons-ingestion.md. Python transitive dependency locks and a fresh-clone Docker installation were verified; see clean-install-verification.md. Step 0 terrain/source definition is complete for the two documented initial observers. Production DEM ingestion and horizon calculations remain open. The CLI accepts only whole-second UTC timestamps.
+Local Docker services and the full test suite passed on 2026-11-14. Horizons CLI acquisition returned 25 samples per target and cache reuse passed; see horizons-ingestion.md. Python transitive dependency locks and a fresh-clone Docker installation were verified; see clean-install-verification.md. Step 0 terrain/source definition is complete for the two documented initial observers. Task 1 ingestion and Task 2 bounded horizon calculation are now locally verified; see ingestion-pipeline.md and terrain-horizon.md. Visibility metrics remain Task 3. The CLI accepts only whole-second UTC timestamps.
