@@ -6,10 +6,11 @@ from pathlib import Path
 from copy import deepcopy
 import pytest
 
-ROOT = Path(__file__).resolve().parents[2]
-sys.path[:0] = [str(ROOT), str(ROOT / "backend")]
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "backend"))
 from quantum.relay_evidence import build_geometry
 
+ROOT = Path(__file__).resolve().parents[2]
 INPUTS = json.loads((ROOT / "shared/examples/relays/inputs.json").read_text())
 
 
