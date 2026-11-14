@@ -27,6 +27,7 @@ from .quantum_applications import (
 )
 
 SUMMARY_SCHEMA = "r13-application-summary-v1"
+OPTIMUM_HIT_TOLERANCE = 1e-6  # objective units; absorbs HiGHS float near-ties
 # Pre-registered per-seed family sizes; held-out instances are not tuned on.
 FAMILY_SIZES: dict[str, dict[int, dict]] = {
     "comm_slots": {
@@ -129,7 +130,8 @@ def summarize(report: BenchmarkReport, *, full_report_sha256: str) -> dict:
                     "runs": len(runs),
                     "feasible_runs": sum(r.status == "feasible" for r in runs),
                     "optimum_hits": sum(
-                        r.optimum_gap_value is not None and r.optimum_gap_value <= 1e-9
+                        r.optimum_gap_value is not None
+                        and r.optimum_gap_value <= OPTIMUM_HIT_TOLERANCE
                         for r in runs
                     ),
                     "mean_gap": _mean([r.optimum_gap_value for r in runs]),

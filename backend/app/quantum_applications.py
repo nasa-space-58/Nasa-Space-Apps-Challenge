@@ -64,6 +64,7 @@ Probability = Annotated[float, Field(strict=True, ge=0, le=1)]
 Seed = Annotated[int, Field(strict=True, ge=0, le=2**32 - 1)]
 SUBPROBLEM_MAX_QUBITS = 8  # Statevector cap shared with H2 qaoa_statevector.
 EXACT_MAX_VARIABLES = 16
+MILP_AGREEMENT_TOLERANCE = Fraction(1, 10**6)  # relative, HiGHS float tolerances
 UNBALANCED_LAMBDA_1 = 0.96  # Montanez-Barrera et al. 2023, unbalanced penalization.
 UNBALANCED_LAMBDA_2 = 0.0371
 NO_ADVANTAGE_STATEMENT = (
@@ -644,7 +645,7 @@ def audit_qubo(
         feasible[index] = evaluation.feasible
         objectives[index] = Fraction(evaluation.objective)
     scale = 1.0 + float(np.max(np.abs(energies)))
-    tolerance = 1e-9 * scale
+    tolerance = 1e-12 * scale  # float rounding only; near-ties stay distinct
     if not feasible.any():
         return QuboAudit(
             variables=n,
@@ -1005,8 +1006,11 @@ def run_instance(
         audit = audit_qubo(instance, max_variables=config.exact_max_variables)
         if (exact_ref.status == "optimal") != (milp_ref.status == "optimal") or (
             exact_ref.status == "optimal"
-            and Fraction(exact_ref.objective) != Fraction(milp_ref.objective)
+            and abs(Fraction(exact_ref.objective) - Fraction(milp_ref.objective))
+            > MILP_AGREEMENT_TOLERANCE * (1 + abs(Fraction(exact_ref.objective)))
         ):
+            # HiGHS works in floating point; near-ties within the tolerance are
+            # kept and reported as a (tiny) MILP optimum gap, never hidden.
             raise RuntimeError(
                 f"MILP and exact enumeration disagree on {instance.instance_id}"
             )
