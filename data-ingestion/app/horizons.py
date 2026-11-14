@@ -18,11 +18,11 @@ from pathlib import Path
 
 import httpx
 from shared.contracts import AnalysisRequest
+from shared.constants import MOON_REFERENCE_RADIUS_KM
 
 ENDPOINT = "https://ssd.jpl.nasa.gov/api/horizons.api"
 CACHE_VERSION = 1
 # Horizons reports a spherical lunar reference surface (km), not terrain height.
-MOON_REFERENCE_RADIUS_KM = 1737.4
 TARGETS = {'10': 'sun', '399': 'earth'}
 
 

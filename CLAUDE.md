@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo contains Step 0 service skeletons, shared input contracts, Docker Compose configuration and initial tests. Local Docker runtime verification and frontend lock generation passed on 2026-11-14; Python transitive locks and a clean-clone Docker test also passed; terrain/site input definitions were also verified against NASA/USGS sources; Step 0 is complete; see docs/mvp-roadmap.md. The README is in Turkish; everything else (code, comments, commits, docs) must be in English.
+**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo contains the completed Step 0 foundation and Task 1 RabbitMQ ingestion, persistent terrain/Horizons caches and tests. Local Docker runtime verification and frontend lock generation passed on 2026-11-14; Python transitive locks and a clean-clone Docker test also passed; terrain/site input definitions were also verified against NASA/USGS sources; Step 0 is complete; see docs/mvp-roadmap.md. The README is in Turkish; everything else (code, comments, commits, docs) must be in English.
 
 `docs/` is the source of truth. Read the relevant file before working:
 - `docs/mvp-roadmap.md`: first-release scope, release order, task checklist and acceptance criteria.
@@ -29,6 +29,10 @@ Data files are never committed to Git. Config via `.env` (commit `.env.example` 
 ## Delivery instruction (user, 2026-11-14)
 
 After completing each task, commit the verified work and push it to `origin/tahakrcc`. Integrate task branches into `tahakrcc` as needed, preserving remote work. Do not merge into or push to `main`. Continue to synchronize before pushing and run the required checks.
+
+### Task 1 delivery override (user, 2026-11-14)
+
+Develop and push Task 1 only on `feature/task1-ingestion-cache`. Do not merge it into `tahakrcc` or `main`; those branches are being tested independently. This explicit task instruction overrides the default delivery paragraph above.
 
 ## Commands (planned, per docs/technologies.md)
 

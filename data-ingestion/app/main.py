@@ -1,7 +1,11 @@
 """Worker lifecycle and broker connection."""
+
 import asyncio
 import logging
 import os
+from pathlib import Path
+
+from app.consumer import serve
 
 import aio_pika
 
@@ -10,12 +14,14 @@ async def main() -> None:
     """Maintain the worker connection and close it on cancellation.
 
     RABBITMQ_URL is required. Startup errors propagate to the container runtime.
-    Ingestion consumers are implemented in Step 1.
+    The consumer publishes confirmed results before acknowledging requests.
     """
     connection = await aio_pika.connect_robust(os.environ["RABBITMQ_URL"])
     try:
-        logging.info("Broker connected; ingestion processing is pending Step 1")
-        await asyncio.Future()
+        consumer = asyncio.create_task(
+            serve(connection, Path(os.environ.get("DATA_DIR", "/data")))
+        )
+        await consumer
     finally:
         await connection.close()
 

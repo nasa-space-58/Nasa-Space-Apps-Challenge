@@ -19,6 +19,7 @@ services:
       context: .
       dockerfile: backend/Dockerfile
     environment:
+      RABBITMQ_URL: amqp://${RABBITMQ_USER:?Set user}:${RABBITMQ_PASSWORD:?Set password}@rabbitmq:5672/
       DATA_DIR: /data
     ports:
       - "127.0.0.1:8000:8000"
@@ -35,6 +36,7 @@ services:
       timeout: 5s
       retries: 6
   data-ingestion:
+    restart: on-failure
     build:
       context: .
       dockerfile: data-ingestion/Dockerfile

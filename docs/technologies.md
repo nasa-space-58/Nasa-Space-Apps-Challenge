@@ -170,3 +170,7 @@ Shared Pydantic input contracts live in `shared/contracts.py`, mounted into both
 ### Frontend audit remediation
 
 Vite 7.3.8 and Vitest 4.1.12 are pinned in package.json. The earlier Vitest 3.2.7 selection still triggered three npm audit findings. Updating with npm 11 worked around an npm 10.9.4 resolver error (`edgesOut`). The regenerated lockfile then passed npm ci with the image's original npm version, npm audit (zero vulnerabilities), the existing frontend test and the production build on 2026-11-14. No test files were changed.
+
+### Task 1 ingestion implementation
+
+The ingestion image now includes Rasterio 1.5.2 (GDAL wheel, with libexpat1) and its locked NumPy dependency. Backend messaging uses aio-pika 9.5.7. Durable queues, persisted job state and bounded full-source terrain acquisition are documented in [ingestion-pipeline.md](ingestion-pipeline.md). UI and analysis endpoints remain Step 4.

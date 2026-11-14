@@ -1,0 +1,7 @@
+services:
+  rabbitmq:
+    ports: !reset []
+  backend:
+    ports: !reset []
+  frontend:
+    ports: !reset []

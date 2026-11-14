@@ -8,7 +8,7 @@ at image build time. Python and bundled pip come from the base image.
 
 Locks target Python 3.12 on Linux (the Docker runtime), not native macOS Python.
 They were initially constrained to the previously tested container versions:
-22 backend packages and 23 ingestion packages. Generating hashes for multiple
+22 backend packages and 23 ingestion packages at the Step 0 baseline. Task 1 adds the planned messaging/terrain dependencies; current package counts are represented by the checked-in locks. Generating hashes for multiple
 wheels does not establish that other platforms have been tested.
 
 Regenerate after editing direct requirements:
