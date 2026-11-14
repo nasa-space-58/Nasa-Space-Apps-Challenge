@@ -82,3 +82,7 @@ Task 4 starts from Task 3 on `feature/task4-mission-interface`. Push only this n
 ### Task 5 delivery override (user, 2026-11-14)
 
 Task 5 starts from current tahakrcc (`c29086d`) on `feature/task5-scenario-comparison`. Push only this new branch. Do not merge into or push to tahakrcc or main. Task 4 was merged into tahakrcc separately at the user's explicit request.
+
+### Task 6 delivery override (user, 2026-11-14)
+
+Task 6 starts from Task 5 (`c1d6348`) on `feature/task6-demo-verification`. Push only this new branch; do not merge into or push to tahakrcc or main. Verification uses an isolated fresh clone and new Docker volumes. Teammate acceptance must be recorded by a human, not inferred from automated checks.
