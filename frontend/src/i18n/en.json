@@ -481,8 +481,7 @@
       "pole": "South pole",
       "spacecraft": "Spacecraft",
       "launch": "Launch",
-      "landing": "Landing",
-      "solar": "Solar system"
+      "landing": "Landing"
     },
     "flownPath": "Flown path",
     "coverage": "Terrain coverage 80–90° S",
@@ -492,8 +491,7 @@
       "picking": "Click inside the dashed ring to choose · drag to rotate · scroll to zoom",
       "landing": "Illustrative landing close-up · drag to rotate · use South pole to choose another site",
       "launch": "Illustrative launch close-up · drag to rotate · scroll to zoom",
-      "default": "Click the Moon to zoom in and choose a site · drag to rotate",
-      "solar": "Illustrative Sun–Earth–Moon system · not to scale · accelerated: 1 year = 60 s, the Moon circles Earth 13.4 times a year · drag to rotate, scroll to zoom"
+      "default": "Click the Moon to zoom in and choose a site · drag to rotate"
     },
     "showPanel": "Show mission control panel",
     "panel": "Panel",

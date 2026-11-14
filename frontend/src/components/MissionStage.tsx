@@ -38,7 +38,6 @@ const cameraModes: CameraMode[] = [
   "spacecraft",
   "launch",
   "landing",
-  "solar",
 ];
 
 /** Width limits of the resizable mission-control side panel, in CSS pixels. */
@@ -386,8 +385,6 @@ export default function MissionStage({
                   ? t("missionStage.hint.landing")
                   : cameraView === "launch"
                     ? t("missionStage.hint.launch")
-                  : cameraView === "solar"
-                    ? t("missionStage.hint.solar")
                   : t("missionStage.hint.default")}
             </small>
           )}
