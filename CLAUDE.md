@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo contains the completed Step 0 foundation and Task 1 RabbitMQ ingestion, persistent terrain/Horizons caches and tests. Local Docker runtime verification and frontend lock generation passed on 2026-11-14; Python transitive locks and a clean-clone Docker test also passed; terrain/site input definitions were also verified against NASA/USGS sources; Step 0 is complete; see docs/mvp-roadmap.md. The README is in Turkish; everything else (code, comments, commits, docs) must be in English.
+**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo contains the completed Step 0 foundation and Task 1 RabbitMQ ingestion, persistent terrain/Horizons caches, Task 2 bounded terrain horizon computation and tests. Local Docker runtime verification and frontend lock generation passed on 2026-11-14; Python transitive locks and a clean-clone Docker test also passed; terrain/site input definitions were also verified against NASA/USGS sources; Step 0 is complete; see docs/mvp-roadmap.md. The README is in Turkish; everything else (code, comments, commits, docs) must be in English.
 
 `docs/` is the source of truth. Read the relevant file before working:
 - `docs/mvp-roadmap.md`: first-release scope, release order, task checklist and acceptance criteria.
@@ -66,3 +66,7 @@ Rules:
 - ALWAYS read graphify output (graphify-out/GRAPH_REPORT.md, then `graphify query`) FIRST, before looking at any other file or source in this project.
 - ALWAYS update the graphify output after EVERY code change: run `graphify update .` right after writing or editing code, before moving on.
 - ALWAYS follow the documents under docs/ (docs/coding-conventions.md, docs/user-scenarios.md, and any others added there). Act according to them in every task; if a request conflicts with them, point out the conflict before proceeding.
+
+### Task 2 delivery override (user, 2026-11-14)
+
+Task 2 starts from Task 1 on `feature/task2-terrain-horizon`. Push only this new branch. Do not merge into or push to `tahakrcc` or `main`; the user performs merges manually.

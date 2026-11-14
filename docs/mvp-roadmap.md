@@ -81,13 +81,15 @@ Step 1 implementation and local verification completed on 2026-11-14 in `feature
 
 Depends on Step 1.
 
-- [ ] Align DEM coordinates and height reference with the observer definition.
-- [ ] Compute a 360-degree horizon with lunar curvature and observer height.
-- [ ] Document azimuth spacing, search distance, terrain resolution and numerical approximations.
-- [ ] Handle azimuth wrap-around and missing/out-of-coverage terrain explicitly.
-- [ ] Verify reference geometry, boundary conditions and at least one real terrain profile.
+- [x] Align DEM coordinates and height reference with the observer definition.
+- [x] Compute a 360-degree horizon with lunar curvature and observer height.
+- [x] Document azimuth spacing, search distance, terrain resolution and numerical approximations.
+- [x] Handle azimuth wrap-around and missing/out-of-coverage terrain explicitly.
+- [x] Verify reference geometry, boundary conditions and at least one real terrain profile.
 
 **Completion evidence** — A site has a reproducible horizon profile with coverage and quality metadata.
+
+Step 2 implementation and local verification completed on 2026-11-14 in `feature/task2-terrain-horizon`. The full cached source produces a bounded 360-degree Malapert horizon with explicit coverage and approximation metadata. Radius and sampling sensitivity, independent Cartesian checks and reproducible commands are documented in [terrain horizon](terrain-horizon.md). This does not certify global horizon accuracy or landing safety. Peer review and manual branch integration remain separate.
 
 ### Step 3 — Derive visibility and metrics
 

@@ -80,3 +80,27 @@ Bu çalışma yalnızca `feature/task1-ingestion-cache` dalına gönderilir; `ta
 - [Kodlama kuralları](docs/coding-conventions.md)
 
 Graphify çıktıları `graphify-out/` altında yerel tutulur ve Git tarafından yok sayılır.
+
+## Task 2: Arazi ufku
+
+Task 2, önbellekteki tam NASA arazi dosyasından Ay eğriliğini ve gözlemci
+yüksekliğini içeren 360° ufuk profili hesaplar. Backend veriyi salt okunur kullanır.
+Eksik yönler `null` olarak raporlanır; arama mesafesinin dışı değerlendirilmez.
+
+```bash
+docker compose --env-file .env.example build backend
+docker compose --env-file .env.example run --rm --no-deps backend \
+  python -m app.compute_horizon \
+  terrain/processed/2d16e4a91f72903dc821c84342efe7350bb308b479b41e2b7a6ae62669ecbd29 \
+  > horizon.json
+```
+
+Örnekteki referans Task 1'in Malapert isteğine aittir; farklıysa kendi `ready`
+yanıtındaki `terrain_path` değerini kullan. Varsayılanlar 1° yön aralığı, 100 km
+arama mesafesi ve uzakta 40 m örneklemedir; ilk 1 km her metrede örneklenir.
+80 m arazi çözünürlüğü değişmez. Bu profil henüz Güneş/Dünya görünürlük süresi
+veya güvenli iniş kararı üretmez. Görünürlük Task 3, arayüz Task 4 kapsamındadır.
+
+[Hesaplama ayrıntıları, sınırlamalar ve doğrulama](docs/terrain-horizon.md).
+Task 2 yalnızca `feature/task2-terrain-horizon` branch'ine gönderilir;
+`tahakrcc` ve `main` ile birleştirmeyi kullanıcı yapar.

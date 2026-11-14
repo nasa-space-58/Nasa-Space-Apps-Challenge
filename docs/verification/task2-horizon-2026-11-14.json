@@ -1,0 +1,169 @@
+{
+  "verified_on": "2026-11-14",
+  "terrain_reference": "terrain/processed/2d16e4a91f72903dc821c84342efe7350bb308b479b41e2b7a6ae62669ecbd29",
+  "source_sha256": "82030dcbdd7c4bb0c7d858e9b4b293b9f2cda5a543ba31ec0f42784bd6beee5a",
+  "site": {
+    "site_id": "malapert-massif-r23",
+    "longitude_deg_east": 359.76422,
+    "latitude_deg": -85.9948,
+    "altitude_km": 4.78662451171875,
+    "reference_frame": "MOON_ME"
+  },
+  "model_version": "spherical-ray-nearest-v1",
+  "software": {
+    "numpy": "2.5.4",
+    "rasterio": "1.5.2",
+    "gdal": "3.12.2"
+  },
+  "observer_height_above_terrain_m": 2.0,
+  "profiles": {
+    "20km": {
+      "profile_id": "0976cd8072379cc49595dadaa1e665f65668f86f0e19a6b4f8c4ca95147ea016",
+      "settings": {
+        "azimuth_step_deg": 1.0,
+        "search_distance_m": 20000,
+        "radial_step_m": 40,
+        "source_extent": "raw"
+      },
+      "complete_directions": 360,
+      "total_directions": 360,
+      "min_elevation_deg": -3.2758081192919057,
+      "max_elevation_deg": 6.529952109488072,
+      "elapsed_s": 1.214
+    },
+    "50km": {
+      "profile_id": "3bb0112692df2f13dfc64cc49f3a8ba655b0e489b89ccf3409fa292cc6b8c79e",
+      "settings": {
+        "azimuth_step_deg": 1.0,
+        "search_distance_m": 50000,
+        "radial_step_m": 40,
+        "source_extent": "raw"
+      },
+      "complete_directions": 360,
+      "total_directions": 360,
+      "min_elevation_deg": -3.2758081192919057,
+      "max_elevation_deg": 6.529952109488072,
+      "elapsed_s": 1.264
+    },
+    "100km": {
+      "profile_id": "0db8b71d945ebd7601746a3b4501ef843c17df2ba4cccdd4f7776f52e23ae5c2",
+      "settings": {
+        "azimuth_step_deg": 1.0,
+        "search_distance_m": 100000,
+        "radial_step_m": 40,
+        "source_extent": "raw"
+      },
+      "complete_directions": 360,
+      "total_directions": 360,
+      "min_elevation_deg": -3.2758081192919057,
+      "max_elevation_deg": 6.529952109488072,
+      "elapsed_s": 1.312
+    },
+    "150km": {
+      "profile_id": "054b8be0772ecd2aa981d77061cb7b274ba78d593de40d5ca2c38c1ba9eec2c6",
+      "settings": {
+        "azimuth_step_deg": 1.0,
+        "search_distance_m": 150000,
+        "radial_step_m": 40,
+        "source_extent": "raw"
+      },
+      "complete_directions": 360,
+      "total_directions": 360,
+      "min_elevation_deg": -3.2758081192919057,
+      "max_elevation_deg": 6.529952109488072,
+      "elapsed_s": 1.363
+    },
+    "100km-20m": {
+      "profile_id": "bdcd6df51bfb6659266c1f7345108f6fa1c36ef3ec5a97f848ebe4c01d2c658b",
+      "settings": {
+        "azimuth_step_deg": 1.0,
+        "search_distance_m": 100000,
+        "radial_step_m": 20,
+        "source_extent": "raw"
+      },
+      "complete_directions": 360,
+      "total_directions": 360,
+      "min_elevation_deg": -3.2758081192919057,
+      "max_elevation_deg": 6.529952109488072,
+      "elapsed_s": 1.42
+    },
+    "100km-half-degree": {
+      "profile_id": "13e760f59811ed45fe413839b24f8b0d104b215aeba733d96969d13c4937d2a3",
+      "settings": {
+        "azimuth_step_deg": 0.5,
+        "search_distance_m": 100000,
+        "radial_step_m": 40,
+        "source_extent": "raw"
+      },
+      "complete_directions": 720,
+      "total_directions": 720,
+      "min_elevation_deg": -3.2758081192919057,
+      "max_elevation_deg": 6.529952109488072,
+      "elapsed_s": 2.04
+    },
+    "crop-100km": {
+      "profile_id": "c765f5a3e0c376731440221059caf698e6094de1c81e86f1e3f0b9ffb238e2ee",
+      "settings": {
+        "azimuth_step_deg": 1.0,
+        "search_distance_m": 100000,
+        "radial_step_m": 40,
+        "source_extent": "crop"
+      },
+      "complete_directions": 0,
+      "total_directions": 360,
+      "min_elevation_deg": null,
+      "max_elevation_deg": null,
+      "elapsed_s": 0.797
+    }
+  },
+  "comparisons_to_100km": {
+    "20km": {
+      "common_complete_directions": 360,
+      "max_absolute_delta_deg": 0.0
+    },
+    "50km": {
+      "common_complete_directions": 360,
+      "max_absolute_delta_deg": 0.0
+    },
+    "150km": {
+      "common_complete_directions": 360,
+      "max_absolute_delta_deg": 0.0
+    },
+    "100km-20m": {
+      "common_complete_directions": 360,
+      "max_absolute_delta_deg": 0.11347673338481057
+    },
+    "half_degree_vs_interpolated_midpoints": {
+      "common_complete_directions": 360,
+      "max_absolute_delta_deg": 0.7306970236691157
+    }
+  },
+  "independent_cartesian_checks": [
+    {
+      "azimuth_deg": 0,
+      "reference_elevation_deg": 4.711139612883134,
+      "computed_elevation_deg": 4.711139612883288,
+      "absolute_delta_deg": 1.545430450278218e-13
+    },
+    {
+      "azimuth_deg": 90,
+      "reference_elevation_deg": 4.671429840650456,
+      "computed_elevation_deg": 4.671429840648696,
+      "absolute_delta_deg": 1.759481449425948e-12
+    },
+    {
+      "azimuth_deg": 180,
+      "reference_elevation_deg": -1.937130217564526,
+      "computed_elevation_deg": -1.93713021752059,
+      "absolute_delta_deg": 4.3935965976515945e-11
+    },
+    {
+      "azimuth_deg": 270,
+      "reference_elevation_deg": 2.3476998237100855,
+      "computed_elevation_deg": 2.3476998237074,
+      "absolute_delta_deg": 2.6854074519633286e-12
+    }
+  ],
+  "repeat_identical": true,
+  "limitations": "Finite sampled horizon only; convergence here does not bound unseen terrain or subpixel peaks."
+}

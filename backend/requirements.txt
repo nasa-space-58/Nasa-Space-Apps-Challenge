@@ -6,3 +6,6 @@ pytest==8.4.2
 ruff==0.14.5
 
 aio-pika==9.5.7
+
+rasterio==1.5.2
+numpy==2.5.4
