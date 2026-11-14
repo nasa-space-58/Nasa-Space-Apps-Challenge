@@ -120,3 +120,45 @@ R4 (descent trajectories) starts from `temel` `a0b7b8d` on `feature/r4-descent-t
 ### R5 delivery override (user, 2026-11-14)
 
 R5 (fuel optimization) starts from `temel` `f497f21` on `feature/r5-fuel-optimization`. Push that branch and the same commits to `temel`. Do not merge into or push to tahakrcc or main.
+
+### H0 delivery override (user, 2026-11-14)
+
+H0 starts from current tahakrcc `d67a32f` on `codex/h0-hybrid-contracts`. Push only the new branch; do not merge into or push to tahakrcc/main. The user merges manually. Shared contracts are in `shared/hybrid.py`, synthetic cases in `shared/examples/hybrid/`, and the runnable notebook in `notebooks/H0_shared_contracts.ipynb`. See `docs/hybrid-contracts.md`; skeleton `a4437db`, frozen tests `774a50f`. H0 does not implement an optimizer or physical simulator.
+
+
+### H1 and continuing hybrid delivery override (user, 2026-11-14)
+
+H1 starts from H0 `ac14ec8`. The user requested one continuing quantum-development branch: `codex/quantum-hybrid`. Push only that branch; do not merge into or push to tahakrcc/main. The user merges manually. H1 is the tested classical reference, with no quantum calls. See `docs/classical-planning.md`; skeleton `33901c3`, frozen tests `1bc2ce8`. For later quantum experiments, start with a small circuit and bounded execution budget; keep unsuccessful experimental implementations uncommitted and preserve their evidence locally. Agree on measurable success criteria before quantum experiments; do not equate a successful hardware invocation with a useful optimization result.
+
+
+### H2 continuation (user, 2026-11-14)
+
+The user authorized continuing later H stages on `codex/quantum-hybrid`. H2 uses a bounded local simulator only; no paid/provider job is authorized by a local simulation run. Skeleton `00c6801`, frozen tests `7c26cfc`; see `docs/quantum-mapping.md`. Low-qubit encoding must report its gate/locality tradeoff. Do not label simulator expectations as hardware observations or per-sample gains as end-to-end advantage.
+
+
+### H3 continuation (user, 2026-11-14)
+
+H3 remains on `codex/quantum-hybrid`; no tahakrcc/main merge or push. Skeleton `839c167`, frozen tests `87d7d95`; see `docs/resource-integration.md`. Geometry is not a station booking or radio-link guarantee. Storage is an explicitly ideal constant-power model. Unsupported quantum mappings retain the classical answer and report the limit, never silently remove constraints.
+
+
+### H4 continuation (user, 2026-11-14)
+
+Continue on `codex/quantum-hybrid`; push only that branch, without tahakrcc/main merges. Skeleton `6292085`, frozen tests `3436c14` and `aa07539`; see `docs/descent-foundation.md`. Shared R4/H4 integration must stop thrust exactly at fuel depletion. H4's restartable terminal model uses an explicit nonrotating planar frame, sampled corridor clearance and two-resolution candidate screening. Never imply automatic MOON_ME conversion, continuous collision certification, a global reachability envelope or quantum execution from these checks.
+
+
+### H5 continuation (user, 2026-11-14)
+
+Continue on `codex/quantum-hybrid`; push only this branch without tahakrcc/main merges. Skeleton `9fd35a7`, frozen tests `9c9a6d1`, `1a4fc36` and `432cd67`; see `docs/self-healing.md`. H5 uses exact-time planar fault replay, explicit truth/observation/estimate separation, seeded shared uncertainty draws and classical retargeting. Never present finite Monte Carlo passes as certified probabilities, a landing exclusion as volumetric obstacle geometry, infeasibility as a safe abort, or synchronous planning as a real-time/hardware guarantee. H6 async quantum/fallback integration remains open.
+
+
+### H6 continuation (user, 2026-11-14)
+
+Continue on `codex/quantum-hybrid`; push only this branch, without tahakrcc/main merges. Skeleton `5b9252a`, frozen tests `d872606` and `bfe96d5`; see `docs/hybrid-recovery.md`. H6 connects H5 screened targets and downstream schedules to the local H2 QAOA worker. Classical preparation precedes the quantum acceptance deadline; every resolution rechecks current physical and campaign inputs. Offline flight time is paused during planning, and running Python work is not forcibly killed. Do not present this as live control, hardware execution or quantum advantage. H7 hardware/provider experiments remain separate work.
+
+### H7 continuation (user, 2026-11-14)
+
+Continue on `codex/quantum-hybrid` and push only that branch; do not merge into tahakrcc/main. OpenQuantum free Spark experiments are authorized; ask before paid credit use. SDK dependencies stay in the separate optional quantum environment. Preserve local credentials and submission receipts outside Git. Never retry ambiguous submissions automatically, label simulators as hardware, or infer quantum advantage from this tiny benchmark. Frozen tests: `db20168`, `45f4dc7`, `e85e5e7`, `1b48779`. See `docs/openquantum-hardware.md` for evidence and remaining boundaries.
+
+### H0–H7 integration authorization (user, 2026-11-14)
+
+The user explicitly authorized merging `codex/quantum-hybrid` into current `tahakrcc`, preserving collaborator changes, resolving conflicts and pushing only `tahakrcc` after tests pass. This one-time integration overrides the preceding no-merge delivery instructions for H0–H7. Keep `main` untouched, update local checkouts, and explain H8 before implementation. See `docs/verification/quantum-hybrid-merge-2026-11-14.md`.

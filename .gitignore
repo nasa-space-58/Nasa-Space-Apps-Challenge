@@ -23,3 +23,9 @@ frontend/.vite/
 
 # Browser verification artifacts
 .playwright-cli/
+
+# Local Jupyter autosave checkpoints
+.ipynb_checkpoints/
+
+# Optional local H7 environment
+.venv-h7/

@@ -236,3 +236,28 @@ Arazi engelleri, Ay'ın kütle konsantrasyonları (mascon) ve dönüşü modelle
 Varsayılan temas rezervi 145 fps'dir. Bu değer NASA TN D-6846 Tablo II'deki iniş noktası değiştirme (60 fps) ve elle hover (85 fps) paylarının toplamıdır. Rezervi, yakıtı ya da R4 sınırlarını aşan rotalar nedeniyle birlikte elenir. Grafik, harcanan yakıtı inceleme süresine (yaklaşma + son iniş) karşı gösterir; Pareto cephesi ve en az yakıt harcayan rota işaretlidir.
 
 **Recommend** bölümünde "include descent" seçeneği açılırsa, her aday için R4 inişi hesaplanır. Ulaşılamayan nokta elenir; yakıt payı 5. kriter olarak sıralamaya eklenir. Seçenek kapalıyken R3 sonuçları değişmez. [Yöntem, kaynaklar ve doğrulama](docs/fuel-optimization.md).
+
+## H0: Hibrit planlama için ortak veri temeli
+
+Jupyter notebook: [`notebooks/H0_shared_contracts.ipynb`](notebooks/H0_shared_contracts.ipynb). Ortak modeller, beş örnek senaryo, veri doğrulama ve girdi parmak izi kontrollerini hücre hücre çalıştırır. Kurulum ve alan açıklamaları: [H0 sözleşmeleri](docs/hybrid-contracts.md). Bu aşamada kuantum çözücü çalıştırılmaz; klasik referans H1, QUBO/QAOA deneyi H2 kapsamında geliştirilir.
+
+
+## H1: Klasik çoklu görev planlaması
+
+[`notebooks/H1_classical_planning.ipynb`](notebooks/H1_classical_planning.ipynb), aynı Jupyter çekirdeğiyle bağımsız seçimleri ortak planlamayla karşılaştırır. Üç görev ve dört seçenek için 64 birleşimi değerlendirir; kapasite, zaman ve enerji ihlallerini açıklar. Tek kanallı örnekte 24 geçerli plan arasından 26 ham bilim puanlı planı seçer. Eksik bilgi, çözümsüzlük ve yarıda kalan arama ayrı gösterilir.
+
+[Yöntem, sınırlar ve testler](docs/classical-planning.md). Bu aşama statik klasik referanstır; kuantum devresi veya gerçek iniş güvenliği değerlendirmesi çalıştırmaz. Hibrit geliştirme `codex/quantum-hybrid` branch'inde sürdürülür.
+
+
+## H2: Küçük kuantum simülatörü deneyi
+
+[`notebooks/H2_quantum_mapping.ipynb`](notebooks/H2_quantum_mapping.ipynb), 12 seçim değişkenli QUBO modelini klasik referansla doğrular ve aynı üç görevli problemi 6 kubitlik QAOA simülatöründe dener. Tek katman düşük kapı sayılı varsayılandır; iki katmanla sonuç ve kapı ihtiyacını karşılaştırır. Ham geçersiz örnekler gizlenmez, klasik onarım yapılmaz.
+
+[Yöntem, ölçümler ve sınırlar](docs/quantum-mapping.md). Gerçek kuantum servisine iş göndermez; bu küçük örnek klasik yöntemle zaten kolayca çözülür. Simülatörde örnek başına olasılığın artması, klasik çözücüye göre hız veya maliyet üstünlüğü anlamına gelmez.
+
+
+## H3: İletişim takvimi ve enerji entegrasyonu
+
+[`notebooks/H3_resource_integration.ipynb`](notebooks/H3_resource_integration.ipynb), geometrik görüşü istasyon tahsisinden ayırır; faaliyet tüketimini başlangıç enerjisi, kapasite, rezerv ve üretimle birlikte değerlendirir. Dolu bataryada depolanamayan üretim ve sonradan gelen enerji yanlışlıkla kullanılabilir sayılmaz. Desteklenen örnekte klasik ve kuantum çözücü aynı girdiyi kullanır; kuantum kodlamasına sığmayan kısıtlar açıkça bildirilir.
+
+[Varsayımlar, yöntem ve doğrulama](docs/resource-integration.md). Notebook verileri sentetiktir; gerçek DSN tahsisi, radyo bağlantı garantisi veya fiziksel batarya doğrulaması değildir.

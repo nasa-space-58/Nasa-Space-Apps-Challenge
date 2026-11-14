@@ -181,3 +181,16 @@ The ingestion image now includes Rasterio 1.5.2 (GDAL wheel, with libexpat1) and
 ### Task 2 terrain horizon implementation
 
 The backend activates the previously selected Rasterio/GDAL and NumPy stack, pinned to Rasterio 1.5.2 and NumPy 2.5.4 with hashed transitive locks. It reads the existing terrain cache only; no external data acquisition moves into the backend. The image installs libexpat1 for the GDAL wheel.
+
+## Optional H0 notebook environment
+
+H0 adds no service runtime dependency. Local Jupyter execution uses a separate Python 3.12 environment with `notebooks/requirements.txt`: Pydantic 2.12.5 (matching services), ipykernel 6.30.1, nbformat 5.10.4 and nbclient 0.10.2. The latter three are optional notebook development/execution tools. They are not installed in backend or ingestion images. Qiskit and quantum-provider SDKs are not required by H0.
+
+
+### H2 local quantum simulation
+
+H2 reuses backend NumPy 2.5.4 for bounded noiseless statevectors (at most eight qubits); no service runtime dependency changes. Optional `notebooks/requirements.txt` now includes that same NumPy version for the existing Jupyter kernel. No provider SDK or hardware connection is used by H2. See `docs/quantum-mapping.md` for execution budgets, encoding limits and gate estimates.
+
+### H7 optional OpenQuantum environment
+
+H7 uses a separate Python 3.12 notebook/experiment environment, pinned with hashes in `quantum/requirements.lock`: OpenQuantum SDK 1.2.1, Qiskit plugin 1.1.2, Qiskit 2.6.2 and Aer 0.18.2, alongside the existing notebook tools. Backend and ingestion images remain unchanged. Provider I/O exists only in `quantum/openquantum_bridge.py`; it is not a backend route or data-ingestion replacement. See [hardware experiment scope and cost controls](openquantum-hardware.md).

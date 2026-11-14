@@ -22,6 +22,7 @@ from fastapi import HTTPException
 from pydantic import BaseModel, ConfigDict, Field
 from rasterio.warp import transform
 
+from app.descent_dynamics import advance_burn, zem_zev_acceleration
 from app.horizon import _validate_dataset
 from app.terrain_safety import _cached_dem
 from shared.constants import (
@@ -182,29 +183,6 @@ def engine_thrust(command_n: float, profile: VehicleProfile) -> tuple[float, boo
     return command_n, False
 
 
-def zem_zev_acceleration(
-    position_m: np.ndarray,
-    velocity_mps: np.ndarray,
-    target_position_m: np.ndarray,
-    target_velocity_mps: np.ndarray,
-    time_to_go_s: float,
-    gravity_mps2: np.ndarray,
-) -> np.ndarray:
-    """Commanded thrust acceleration: 6 ZEM / t^2 - 2 ZEV / t.
-
-    ZEM and ZEV are the zero-effort position and velocity misses under constant
-    gravity (Ebrahimi et al. 2008, J. Guid. Control Dyn. 31(2)).
-    """
-    if not time_to_go_s > 0:
-        raise ValueError("Time to go must be positive")
-    t = time_to_go_s
-    zem = target_position_m - (
-        position_m + velocity_mps * t + 0.5 * gravity_mps2 * t**2
-    )
-    zev = target_velocity_mps - (velocity_mps + gravity_mps2 * t)
-    return 6 * zem / t**2 - 2 * zev / t
-
-
 def _state(site_radius_m, downrange_m, altitude_m, horizontal_mps, vertical_mps):
     angle = downrange_m / site_radius_m
     radius = site_radius_m + altitude_m
@@ -310,7 +288,8 @@ def simulate_powered_descent(
     """Integrate braking, approach and terminal phases with RK4.
 
     Thrust magnitude and direction are held over each step. Delta-v per step is
-    the rocket-equation value ve ln(m0 / m1). Propellant below zero cuts thrust.
+    the rocket-equation value ve ln(m0 / m1). Each fuel-limited step is split
+    at exhaustion, with unpowered coast over the remainder.
     """
     position, velocity = _state(
         site_radius_m, -pdi_range_m, PDI_ALTITUDE_M, periapsis_speed_mps, 0.0
@@ -344,7 +323,6 @@ def fly_gates(
     Returns phases, samples, the touchdown summary, exhaustion and the final
     planar position (m) and velocity (m/s).
     """
-    ve = profile.isp_s * STANDARD_GRAVITY_M_S2
     dry_kg = profile.mass_at_pdi_kg - profile.usable_propellant_kg
     position = np.asarray(position_m, dtype=float)
     velocity = np.asarray(velocity_mps, dtype=float)
@@ -392,34 +370,23 @@ def fly_gates(
             direction = command / norm if norm > 0 else np.array([0.0, 1.0])
             if record:
                 sample(gate["name"], thrust)
-            flow = thrust / ve
-
-            def rate(p, v, m):
-                return v, _gravity(p) + thrust * direction / m, -flow
-
-            k1 = rate(position, velocity, mass)
-            k2 = rate(
-                position + step / 2 * k1[0],
-                velocity + step / 2 * k1[1],
-                mass + step / 2 * k1[2],
+            advanced = advance_burn(
+                position,
+                velocity,
+                mass,
+                dry_kg,
+                thrust * direction,
+                profile.isp_s,
+                step,
             )
-            k3 = rate(
-                position + step / 2 * k2[0],
-                velocity + step / 2 * k2[1],
-                mass + step / 2 * k2[2],
+            position, velocity, mass = (
+                advanced.position_m,
+                advanced.velocity_mps,
+                advanced.mass_kg,
             )
-            k4 = rate(
-                position + step * k3[0], velocity + step * k3[1], mass + step * k3[2]
-            )
-            position = position + step / 6 * (k1[0] + 2 * k2[0] + 2 * k3[0] + k4[0])
-            velocity = velocity + step / 6 * (k1[1] + 2 * k2[1] + 2 * k3[1] + k4[1])
-            new_mass = mass - flow * step
-            if new_mass < dry_kg:
-                new_mass, exhausted = dry_kg, True
-            if new_mass < mass:
-                phase_dv += ve * math.log(mass / new_mass)
-            mass = new_mass
-            saturated_s += step if saturated else 0.0
+            exhausted = exhausted or advanced.propellant_exhausted
+            phase_dv += advanced.delta_v_mps
+            saturated_s += advanced.burn_s if saturated else 0.0
             elapsed += step
             clock += step
         end = _describe(position, velocity, site_radius_m)
@@ -444,7 +411,7 @@ def fly_gates(
         )
     if record:
         # Touchdown state; the engine is still at the last applied thrust at contact.
-        sample("landed", thrust)
+        sample("landed", 0.0 if mass <= dry_kg else thrust)
     final = _describe(position, velocity, site_radius_m)
     site = np.array([0.0, site_radius_m])
     return {
