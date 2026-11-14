@@ -10,6 +10,7 @@ import {
 import HorizonPlot from "./components/HorizonPlot";
 import PolarMap from "./components/PolarMap";
 import Comparison from "./components/Comparison";
+import WindowSearch from "./components/WindowSearch";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
 
 const MoonScene = lazy(() => import("./components/MoonScene"));
@@ -186,6 +187,7 @@ export default function App() {
   const [apiError, setApiError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sources, setSources] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [resolved, setResolved] = useState("");
   const busy = submitting || (!!job && activeStates.includes(job.status));
   const frame = result?.frames[frameIndex];
@@ -405,6 +407,35 @@ export default function App() {
       setSubmitting(false);
     }
   };
+  const openSearchResult = async (id: string, compare: boolean) => {
+    const [selected, view] = await Promise.all([
+      api(`/analyses/${id}`),
+      api(`/analyses/${id}/result`),
+    ]);
+    const submitted = selected.submission;
+    setSiteId(submitted.site_id);
+    setLat(String(submitted.latitude_deg));
+    setLon(String(submitted.longitude_deg_east));
+    setHeight(String(submitted.observer_height_m));
+    setStart(new Date(submitted.start_utc).toISOString().slice(0, 16));
+    setDuration(
+      String(
+        (Date.parse(submitted.end_utc) - Date.parse(submitted.start_utc)) /
+          3600000,
+      ),
+    );
+    setRefine(submitted.refine);
+    setSearchOpen(false);
+    setPlaying(false);
+    setJob(selected);
+    setResult(view);
+    setFrameIndex(0);
+    setError("");
+    localStorage.setItem("lunar-analysis-id", id);
+    setComparisonBase(compare ? { id, result: view } : null);
+    setTimeout(() => jump(compare ? "comparison" : "mission"), 0);
+  };
+
   const resolve = async () => {
     setResolved("Checking cached terrain…");
     try {
@@ -439,7 +470,24 @@ export default function App() {
           </span>
         </button>
         <nav aria-label="Main navigation">
-          <button onClick={() => jump("mission")}>Mission control</button>
+          <button
+            aria-pressed={!searchOpen}
+            onClick={() => {
+              setSearchOpen(false);
+              setTimeout(() => jump("mission"), 0);
+            }}
+          >
+            Mission control
+          </button>
+          <button
+            aria-pressed={searchOpen}
+            onClick={() => {
+              setSearchOpen(true);
+              setTimeout(() => jump("window-search"), 0);
+            }}
+          >
+            Time search
+          </button>
           <button onClick={openSources}>
             Sources <span>↗</span>
           </button>
@@ -509,7 +557,13 @@ export default function App() {
               Plan around the terrain that shapes your mission.
             </p>
             <div className="hero-actions">
-              <button className="primary" onClick={() => jump("mission")}>
+              <button
+                className="primary"
+                onClick={() => {
+                  setSearchOpen(false);
+                  setTimeout(() => jump("mission"), 0);
+                }}
+              >
                 Plan your observation <span>↗</span>
               </button>
               <button
@@ -566,7 +620,13 @@ export default function App() {
               Set your location and observation window. See when sunlight
               reaches your horizon—and when Earth slips behind it.
             </p>
-            <button className="primary" onClick={() => jump("mission")}>
+            <button
+              className="primary"
+              onClick={() => {
+                setSearchOpen(false);
+                setTimeout(() => jump("mission"), 0);
+              }}
+            >
               Enter mission control <span>↓</span>
             </button>
             <div className="story-note">
@@ -576,7 +636,7 @@ export default function App() {
         </section>
       </section>
 
-      <section id="mission" className="mission-section">
+      <section id="mission" className="mission-section" hidden={searchOpen}>
         <div className="section-heading">
           <div>
             <p className="eyebrow">03 / YOUR OBSERVATION WINDOW</p>
@@ -743,6 +803,9 @@ export default function App() {
                     <option value="72">3 days</option>
                     <option value="168">7 days</option>
                     <option value="720">30 days</option>
+                    {!["24", "72", "168", "720"].includes(duration) && (
+                      <option value={duration}>{duration} hours</option>
+                    )}
                   </select>
                 </label>
                 <label className="checkbox-label">
@@ -1054,7 +1117,7 @@ export default function App() {
           </div>
         </div>
       </section>
-      {comparisonBase && (
+      {comparisonBase && !searchOpen && (
         <Comparison
           key={comparisonBase.id}
           aId={comparisonBase.id}
@@ -1063,6 +1126,7 @@ export default function App() {
           onClose={() => setComparisonBase(null)}
         />
       )}
+      {searchOpen && <WindowSearch sites={sites} onChoose={openSearchResult} />}
       <footer>
         <span>
           2GBRAM <i> / </i> LUNAR LANDING NAVIGATOR

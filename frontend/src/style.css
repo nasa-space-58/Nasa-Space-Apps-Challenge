@@ -155,6 +155,7 @@ p {
   pointer-events: none;
 }
 .scene-pin canvas {
+  pointer-events: none;
   display: block;
 }
 .scene-vignette {
@@ -1575,5 +1576,219 @@ footer a {
   }
   .comparison-setup .primary {
     width: 100%;
+  }
+}
+
+.window-search-section {
+  position: relative;
+  padding: 100px 5%;
+  border-top: 1px solid #29363f;
+  background: #0c1319;
+  scroll-margin-top: 80px;
+}
+.window-search-section .muted {
+  font-size: 14px;
+  line-height: 1.7;
+}
+.search-layout {
+  display: grid;
+  grid-template-columns: 320px minmax(0, 1fr);
+  gap: 28px;
+  margin-top: 35px;
+}
+.search-form {
+  padding: 24px;
+  height: fit-content;
+}
+.search-form label {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 18px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.search-form select,
+.search-form input:not([type="checkbox"]) {
+  width: 100%;
+  height: 42px;
+  padding: 8px;
+  background: #080e13;
+  border: 1px solid #35434d;
+  color: #e5e9e8;
+  font: inherit;
+}
+.search-form .checkbox-label {
+  display: flex;
+}
+.search-form .primary {
+  width: 100%;
+  font-size: 12px;
+}
+.search-form .text-button {
+  line-height: 1.7;
+  margin: 15px 0;
+}
+.search-form h3 {
+  font-size: 16px;
+  margin: 28px 0 18px;
+}
+.search-form .field-help {
+  line-height: 1.8;
+  font-size: 11px;
+}
+.search-results {
+  min-width: 0;
+}
+.search-limitation {
+  margin: 0 0 25px;
+  color: #a8b7bf;
+  font-size: 13px;
+  line-height: 1.8;
+  border-left: 2px solid #edbb66;
+  padding-left: 18px;
+}
+.search-progress {
+  padding: 24px;
+}
+.search-progress > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  font-size: 14px;
+}
+.search-progress progress {
+  width: 100%;
+  height: 12px;
+  margin: 20px 0;
+  accent-color: #edbb66;
+}
+.search-progress small {
+  font: 10px var(--mono);
+  color: #a8b7bf;
+}
+.search-empty {
+  padding: 28px;
+  font-size: 14px;
+  line-height: 1.8;
+  margin: 20px 0;
+}
+.search-empty h3 {
+  font-weight: 400;
+}
+.search-filter {
+  margin: 22px 0;
+  font-size: 12px;
+  display: flex;
+  gap: 10px;
+}
+.search-grid-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0;
+}
+.search-grid-strip button {
+  min-width: 36px;
+  min-height: 36px;
+  border: 1px solid #35434d;
+  background: #17232b;
+  color: #d9e1e3;
+  font: 12px var(--mono);
+}
+.search-grid-strip button.match {
+  border-color: #a5c8ae;
+  color: #a5c8ae;
+}
+.search-grid-strip button.unknown,
+.search-grid-strip button.failed {
+  border-style: dashed;
+}
+.search-candidate {
+  margin-bottom: 18px;
+  scroll-margin-top: 90px;
+}
+.search-candidate.match {
+  border-left: 3px solid #a5c8ae;
+}
+.search-candidate-content {
+  padding: 22px;
+}
+.search-candidate h3 {
+  font: 15px var(--mono);
+  line-height: 1.8;
+  margin: 0;
+}
+.search-candidate p {
+  font-size: 12px;
+  color: #a8b7bf;
+  line-height: 1.7;
+}
+.search-candidate ul {
+  list-style: none;
+  padding: 0;
+  margin: 22px 0;
+}
+.search-candidate li {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 12px 0;
+  border-bottom: 1px solid #29363f;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.search-candidate li b {
+  font-weight: 400;
+}
+.search-candidate li small {
+  color: #a8b7bf;
+}
+.search-actions {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.search-actions button {
+  font-size: 12px;
+}
+@media (max-width: 760px) {
+  .window-search-section {
+  position: relative;
+    padding: 60px 20px;
+  }
+  .window-search-section .section-heading {
+    display: block;
+  }
+  .window-search-section .section-heading h2 {
+    font-size: 34px;
+  }
+  .window-search-section .outline-tag {
+    display: inline-block;
+    margin-top: 15px;
+  }
+  .search-layout {
+    grid-template-columns: 1fr;
+  }
+  .search-progress > div {
+    display: grid;
+  }
+  .search-candidate li {
+    display: grid;
+    gap: 5px;
+  }
+  .search-candidate h3 {
+    font-size: 12px;
+  }
+  .navigation nav {
+    gap: 12px;
+  }
+  .navigation nav button {
+    font-size: 9px;
+  }
+  .brand {
+    gap: 8px;
+  }
+  .brand-sub {
+    font-size: 6px;
   }
 }

@@ -330,9 +330,13 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     data_dir = Path(data_dir or os.environ.get("DATA_DIR", "/data"))
     broker_url = broker_url or os.environ.get("RABBITMQ_URL", "")
     store = JobStore(state_dir / "jobs.sqlite")
+    from app.window_search import SearchStore, register_search_routes
+
+    searches = SearchStore(store)
 
     async def worker():
         while True:
+            searches.tick()
             jobs = store.pending()
             if jobs:
                 await asyncio.to_thread(
@@ -357,6 +361,8 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
 
     app = FastAPI(title="Lunar Landing Navigator", lifespan=lifespan)
     app.state.store = store
+    app.state.searches = searches
+    register_search_routes(app, searches)
 
     @app.get("/health")
     def health():
