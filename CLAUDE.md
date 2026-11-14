@@ -90,3 +90,8 @@ Task 6 starts from Task 5 (`c1d6348`) on `feature/task6-demo-verification`. Push
 ### Task 7 delivery override (user, 2026-11-14)
 
 Start from Task 6 on `feature/task7-window-search`. Push only this new branch; do not merge into or push to tahakrcc/main. Time search is a bounded candidate-grid exploration, not a guarantee of all feasible windows or landing safety.
+
+### R1 delivery override (user, 2026-11-14)
+
+Complete remaining R1 work from Task 7 (`28554ff`) on `feature/r1-exports-sharing-classroom`.
+Push only this new branch. Do not merge into or push to tahakrcc/main. The user merges manually.
