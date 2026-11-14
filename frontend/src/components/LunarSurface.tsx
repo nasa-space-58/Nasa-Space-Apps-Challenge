@@ -50,6 +50,42 @@ export function Model({
   );
 }
 
+/** Art-directed crater field of the illustrative landing terrain (scene units). */
+const CRATERS = Array.from({ length: 52 }, (_, i) => ({
+  x: (noise(i + 20) - 0.5) * 58,
+  z: (noise(i + 100) - 0.5) * 58,
+  radius: 0.6 + noise(i + 300) * 2.8,
+})).filter(({ x, z }) => Math.hypot(x, z) > 4);
+
+/**
+ * Height of the illustrative landing terrain at scene (x, z). Shared by the
+ * mesh and by objects that must sit on it; it is not the analysed DEM.
+ */
+export function terrainHeight(x: number, z: number) {
+  const landing = smooth(1.5, 6, Math.hypot(x, z));
+  let y =
+    (Math.sin(x * 0.32) * Math.cos(z * 0.27) * 0.3 +
+      Math.sin(x * 1.6 + z * 0.8) * 0.035) *
+    landing;
+  y +=
+    Math.exp(-((z + 16) ** 2) / 30) *
+    (1.4 + Math.sin(x * 0.4) * 0.8 + Math.cos(x * 0.9) * 0.35);
+  for (const crater of CRATERS) {
+    const d = Math.hypot(x - crater.x, z - crater.z) / crater.radius;
+    if (d < 1.6)
+      y +=
+        (-Math.exp(-d * d * 3.5) * 0.48 +
+          Math.exp(-((d - 0.96) ** 2) * 35) * 0.2) *
+        crater.radius *
+        landing;
+  }
+  y +=
+    (Math.sin(x * 4.3 + z * 1.2) * Math.sin(z * 3.8 - x) * 0.045 +
+      Math.sin(x * 9.1 + z * 6.2) * 0.015) *
+    landing;
+  return y;
+}
+
 export function Terrain() {
   const grain = useMemo(() => {
     const pixels = new Uint8Array(256 * 256 * 4);
@@ -72,35 +108,8 @@ export function Terrain() {
     mesh.rotateX(-Math.PI / 2);
     const positions = mesh.attributes.position;
     const colors = new Float32Array(positions.count * 3);
-    const craters = Array.from({ length: 52 }, (_, i) => ({
-      x: (noise(i + 20) - 0.5) * 58,
-      z: (noise(i + 100) - 0.5) * 58,
-      radius: 0.6 + noise(i + 300) * 2.8,
-    })).filter(({ x, z }) => Math.hypot(x, z) > 4);
     for (let i = 0; i < positions.count; i++) {
-      const x = positions.getX(i),
-        z = positions.getZ(i);
-      const landing = smooth(1.5, 6, Math.hypot(x, z));
-      let y =
-        (Math.sin(x * 0.32) * Math.cos(z * 0.27) * 0.3 +
-          Math.sin(x * 1.6 + z * 0.8) * 0.035) *
-        landing;
-      y +=
-        Math.exp(-((z + 16) ** 2) / 30) *
-        (1.4 + Math.sin(x * 0.4) * 0.8 + Math.cos(x * 0.9) * 0.35);
-      for (const crater of craters) {
-        const d = Math.hypot(x - crater.x, z - crater.z) / crater.radius;
-        if (d < 1.6)
-          y +=
-            (-Math.exp(-d * d * 3.5) * 0.48 +
-              Math.exp(-((d - 0.96) ** 2) * 35) * 0.2) *
-            crater.radius *
-            landing;
-      }
-      y +=
-        (Math.sin(x * 4.3 + z * 1.2) * Math.sin(z * 3.8 - x) * 0.045 +
-          Math.sin(x * 9.1 + z * 6.2) * 0.015) *
-        landing;
+      const y = terrainHeight(positions.getX(i), positions.getZ(i));
       positions.setY(i, y);
       const shade = 0.48 + noise(i + 6) * 0.1 + Math.min(y, 1) * 0.025;
       colors.set([shade, shade * 0.99, shade * 0.97], i * 3);

@@ -15,6 +15,7 @@ import {
 import * as THREE from "three";
 import { Dust, Model, Terrain, smooth } from "./LunarSurface";
 import LaunchSite from "./LaunchSite";
+import Rover, { type RoutePoint } from "./Rover";
 import type { Preset } from "../types";
 import { useTranslate } from "../i18n";
 import {
@@ -901,12 +902,21 @@ function LandingSite({
   progress,
   reduced,
   compact,
+  roverPath,
+  roverDrive,
 }: {
   progress: MutableRefObject<number>;
   reduced: boolean;
   compact: boolean;
+  roverPath: RoutePoint[] | null;
+  roverDrive: MutableRefObject<number>;
 }) {
   const lander = useRef<THREE.Group>(null!);
+  // After touchdown the camera eases from the lander to the driving rover.
+  const roverFocus = useMemo(() => new THREE.Vector3(), []);
+  const roverLook = useMemo(() => new THREE.Vector3(), []);
+  const cameraLook = useRef<THREE.Vector3 | null>(null);
+  const follow = useRef(0);
   const plume = useRef<THREE.Mesh>(null!);
   const user = useOrbitInput("landing");
   const look = useMemo(() => new THREE.Vector3(), []);
@@ -941,6 +951,19 @@ function LandingSite({
     if (descent >= 1 && !reduced) settledTime.current += Math.min(delta, 0.05);
     else if (descent < 1) settledTime.current = 0;
     look.set(landerX * 0.5, 0.9 + height * 0.75, 0);
+    const driving = descent >= 1 && roverPath !== null;
+    follow.current = THREE.MathUtils.clamp(
+      follow.current + (driving ? 1 : -1) * Math.min(delta, 0.05) * 0.8,
+      0,
+      1,
+    );
+    if (follow.current > 0) {
+      const weight = smooth(0, 1, follow.current);
+      roverLook.copy(roverFocus).setY(roverFocus.y + 0.45);
+      look.lerp(roverLook, weight);
+    }
+    if (!cameraLook.current) cameraLook.current = look.clone();
+    else cameraLook.current.lerp(look, 1 - Math.exp(-Math.min(delta, 0.05) * 6));
     offset.set(
       4.2 - descent * 1.6,
       5.8 - descent * 3.4 + height * 0.5,
@@ -955,9 +978,10 @@ function LandingSite({
     );
     spherical.radius *=
       (compact ? 1.25 : 1) *
-      THREE.MathUtils.clamp(user.current.zoom, 0.35, 2.4);
-    camera.position.setFromSpherical(spherical).add(look);
-    camera.lookAt(look);
+      THREE.MathUtils.clamp(user.current.zoom, 0.35, 2.4) *
+      (1 - 0.25 * smooth(0, 1, follow.current));
+    camera.position.setFromSpherical(spherical).add(cameraLook.current);
+    camera.lookAt(cameraLook.current);
   });
   return (
     <>
@@ -1002,6 +1026,9 @@ function LandingSite({
       <group ref={lander}>
         <Model path="/nasa/apollo.glb" size={2.3} grounded />
       </group>
+      {roverPath && (
+        <Rover path={roverPath} drive={roverDrive} focus={roverFocus} />
+      )}
       <mesh ref={plume} rotation={[Math.PI, 0, 0]}>
         <coneGeometry args={[0.13, 0.65, 24]} />
         <meshBasicMaterial
@@ -1091,11 +1118,25 @@ export default function MissionScene(
     compact: boolean;
     progressValue: number;
     onFailure: () => void;
+    /** Backend surface route driven after touchdown, if any. */
+    roverPath?: RoutePoint[] | null;
+    /** Travelled share of the rover route, 0–1. */
+    roverDrive?: number;
   },
 ) {
-  const { visible, animate, compact, onFailure, progressValue, ...scene } =
-    props;
+  const {
+    visible,
+    animate,
+    compact,
+    onFailure,
+    progressValue,
+    roverPath = null,
+    roverDrive = 0,
+    ...scene
+  } = props;
   const progress = useRef(progressValue);
+  const drive = useRef(roverDrive);
+  drive.current = roverDrive;
   const { t } = useTranslate();
   return (
     <Canvas
@@ -1115,6 +1156,8 @@ export default function MissionScene(
           scene.cameraMode,
           scene.condition,
           visible,
+          roverPath,
+          roverDrive,
         ]}
       />
       <ProgressEaser
@@ -1134,6 +1177,8 @@ export default function MissionScene(
             progress={progress}
             reduced={scene.reduced}
             compact={compact}
+            roverPath={roverPath}
+            roverDrive={drive}
           />
         ) : (
           <System {...scene} progress={progress} />

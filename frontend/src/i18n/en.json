@@ -937,5 +937,63 @@
     "Current conditions describe the Sun when the snapshot was fetched, not at the landing time.": "Current conditions describe the Sun when the snapshot was fetched, not at the landing time.",
     "GOES measures near Earth; proton flux is a proxy for the lunar surface, not a dose estimate.": "GOES measures near Earth; proton flux is a proxy for the lunar surface, not a dose estimate.",
     "The radio blackout scale describes HF radio on Earth's sunlit side, not DSN links.": "The radio blackout scale describes HF radio on Earth's sunlit side, not DSN links."
+  },
+  "surfaceOps": {
+    "label": "Post-landing surface operations",
+    "eyebrow": "SURFACE OPERATIONS",
+    "title": "Rover, lander and space weather",
+    "hoursUnit": "h",
+    "loading": "Loading…",
+    "source": "NASA source",
+    "rover": {
+      "title": "Rover",
+      "outside": "Routes can only be computed inside the 80–90° S terrain coverage.",
+      "loading": "Computing a route on real LOLA terrain (≈20 s with an analysis)…",
+      "none": "None of the example targets is reachable within the slope limit.",
+      "target": "Target",
+      "play": "▶ Drive",
+      "pause": "❚❚ Pause",
+      "rate": "Simulation speed",
+      "scrub": "Rover drive time",
+      "distance": "Distance driven",
+      "time": "Time",
+      "speed": "Speed (planning assumption)",
+      "maxSlope": "Steepest slope on route",
+      "climb": "Total climb",
+      "detour": "Detour ratio",
+      "sample": "Last sampled point: {km} km · {utc}",
+      "noSample": "No sampled point reached yet",
+      "noAnalysis": "Run the analysis first for Sun/Earth status.",
+      "note": "The route is computed by the backend on the NASA LOLA 80 m DEM; the 3D terrain is illustrative, the route is real. Sun/Earth are evaluated only at sampled points."
+    },
+    "sun": {
+      "full": "Fully sunlit",
+      "partial": "Partly sunlit",
+      "dark": "In shadow",
+      "unknown": "Sun unknown"
+    },
+    "earth": {
+      "visible": "Earth visible",
+      "blocked": "Earth blocked",
+      "unknown": "Earth unknown",
+      "boundary": "Earth on the horizon"
+    },
+    "lander": {
+      "title": "Lander",
+      "mass": "Mass at PDI",
+      "propellant": "Usable propellant",
+      "thrust": "Maximum thrust",
+      "isp": "Specific impulse (Isp)"
+    },
+    "weather": {
+      "title": "Solar activity · NOAA SWPC",
+      "needsAnalysis": "Solar activity is assessed against the analysis window; run the analysis first.",
+      "loading": "Fetching current NOAA SWPC data through the ingestion worker…",
+      "xray": "X-ray (now)",
+      "protons": "Protons ≥10 MeV",
+      "forecast": "Forecast (daily max)",
+      "acquired": "Acquired: {utc}",
+      "note": "Details and limits are in the Solar activity panel under Results. The Moon has no magnetic field, so the S level matters for the surface crew."
+    }
   }
 }

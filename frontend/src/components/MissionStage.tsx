@@ -11,6 +11,8 @@ import {
   type ReactNode,
 } from "react";
 import PolarMap from "./PolarMap";
+import SurfaceOps from "./SurfaceOps";
+import type { RoutePoint } from "./Rover";
 import type { Preset } from "../types";
 import {
   COVERAGE_MAX_LATITUDE_DEG,
@@ -83,6 +85,7 @@ export default function MissionStage({
   visible,
   compact,
   launchKey,
+  analysisId,
   condition,
   siteStatus,
   onSelect,
@@ -104,6 +107,8 @@ export default function MissionStage({
   visible: boolean;
   compact: boolean;
   launchKey: number;
+  /** Completed analysis used for post-landing sky checks and space weather. */
+  analysisId?: string;
   condition: SiteCondition;
   siteStatus?: ReactNode;
   onSelect: (latitude_deg: number, longitude_deg_east: number) => void;
@@ -162,6 +167,9 @@ export default function MissionStage({
   const [cameraMode, setCameraMode] = useState<CameraMode>("auto");
   const [notice, setNotice] = useState("");
   const [focusMoon, setFocusMoon] = useState(false);
+  const [rover, setRover] = useState<{ path: RoutePoint[]; drive: number } | null>(
+    null,
+  );
   const path = useMemo(() => {
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90)
       return null;
@@ -189,6 +197,9 @@ export default function MissionStage({
               ? "landing"
               : "spacecraft";
   const picking = cameraView === "pole" || cameraView === "moon";
+  // Post-landing operations start once the touchdown close-up is complete.
+  const landed =
+    webgl && cameraView === "landing" && active.phase.id === "landed" && progress >= 1;
 
   // A new target restarts the illustrative flight from Earth orbit.
   useEffect(() => {
@@ -305,6 +316,8 @@ export default function MissionStage({
                   else onPreset(site);
                 }}
                 onFailure={onSceneFailure}
+                roverPath={landed ? (rover?.path ?? null) : null}
+                roverDrive={rover?.drive ?? 0}
               />
             </Suspense>
           </SceneBoundary>
@@ -376,6 +389,15 @@ export default function MissionStage({
             </small>
           )}
         </div>
+        {landed && (
+          <SurfaceOps
+            lat={lat}
+            lon={lon}
+            analysisId={analysisId}
+            reduced={reduced}
+            onRover={setRover}
+          />
+        )}
         {notice && (
           <div className="stage-notice" role="status">
             {notice}

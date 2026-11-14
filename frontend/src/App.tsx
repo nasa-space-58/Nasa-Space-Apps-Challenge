@@ -1154,6 +1154,11 @@ export default function App() {
           visible={view === "mission" && pageVisible}
           compact={compactScene}
           launchKey={launchKey}
+          analysisId={
+            job && (job.status === "ready" || job.status === "insufficient_data")
+              ? job.id
+              : undefined
+          }
           condition={
             frame && result
               ? frame.sun.state === "full" || frame.sun.state === "partial"
