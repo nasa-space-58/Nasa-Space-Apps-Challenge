@@ -312,14 +312,46 @@ def simulate_powered_descent(
     Thrust magnitude and direction are held over each step. Delta-v per step is
     the rocket-equation value ve ln(m0 / m1). Propellant below zero cuts thrust.
     """
-    ve = profile.isp_s * STANDARD_GRAVITY_M_S2
-    dry_kg = profile.mass_at_pdi_kg - profile.usable_propellant_kg
     position, velocity = _state(
         site_radius_m, -pdi_range_m, PDI_ALTITUDE_M, periapsis_speed_mps, 0.0
     )
-    mass = profile.mass_at_pdi_kg
+    return fly_gates(
+        profile,
+        site_radius_m,
+        position,
+        velocity,
+        profile.mass_at_pdi_kg,
+        gate_states(site_radius_m, approach_s, terminal_s),
+        dt_s,
+        record,
+    )
+
+
+def fly_gates(
+    profile: VehicleProfile,
+    site_radius_m: float,
+    position_m: np.ndarray,
+    velocity_mps: np.ndarray,
+    mass_kg: float,
+    gates: list[dict],
+    dt_s: float = 0.1,
+    record: bool = True,
+) -> dict:
+    """Fly ZEM/ZEV guidance through `gates` from a planar state (RK4).
+
+    Shared by the PDI-to-touchdown descent and by mid-descent diverts (R7).
+    The dry mass is the profile's PDI mass minus its usable propellant.
+    Returns phases, samples, the touchdown summary, exhaustion and the final
+    planar position (m) and velocity (m/s).
+    """
+    ve = profile.isp_s * STANDARD_GRAVITY_M_S2
+    dry_kg = profile.mass_at_pdi_kg - profile.usable_propellant_kg
+    position = np.asarray(position_m, dtype=float)
+    velocity = np.asarray(velocity_mps, dtype=float)
+    mass = float(mass_kg)
     clock = 0.0
     exhausted = False
+    thrust = 0.0
     phases, samples = [], []
     command = np.zeros(2)
 
@@ -335,7 +367,7 @@ def simulate_powered_descent(
             }
         )
 
-    for gate in gate_states(site_radius_m, approach_s, terminal_s):
+    for gate in gates:
         start, elapsed = clock, 0.0
         phase_dv = 0.0
         phase_mass = mass
@@ -425,6 +457,8 @@ def simulate_powered_descent(
             "mass_kg": mass,
         },
         "propellant_exhausted": exhausted,
+        "final_position_m": position.tolist(),
+        "final_velocity_mps": velocity.tolist(),
     }
 
 

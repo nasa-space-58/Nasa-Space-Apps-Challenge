@@ -1,0 +1,173 @@
+{
+  "verified_on": "2026-11-14",
+  "branch": "feature/r7-alternative-landing",
+  "refactor": "a856773",
+  "skeleton": "9c56e45",
+  "frozen_tests": "946618c",
+  "environment": "Docker Compose nasa-task4 preview; real cached LDEM_80S_80MPP_ADJ",
+  "request": {
+    "site_id": "malapert-massif-r23",
+    "latitude_deg": -85.9948,
+    "longitude_deg_east": 359.76422,
+    "search_radius_m": 3000,
+    "max_candidates": 6,
+    "approach_azimuth_deg": 180
+  },
+  "runtime_s_approx": 3,
+  "high_gate": {
+    "result_id": "ad01666e020ef51f06eb1a976d7a888f90cd7933f98c506afef2b21eee4ca1ce",
+    "divert_state": {
+      "t_s": 506.0,
+      "altitude_m": 2159.4,
+      "downrange_m": -7894.2,
+      "speed_mps": 222.2,
+      "mass_kg": 9131.4,
+      "time_to_go_s": 208.0
+    },
+    "primary": {
+      "safety_score": 0.29,
+      "max_landing_slope_deg": 5.6,
+      "reserve_margin_kg": 680
+    },
+    "backups": [
+      {
+        "id": "B1",
+        "distance_m": 2037,
+        "bearing_deg": 314,
+        "max_landing_slope_deg": 1.6,
+        "safety_score": 0.54,
+        "divert_delta_v_mps": 47.6,
+        "reserve_margin_kg": 561,
+        "reachable": true
+      },
+      {
+        "id": "B2",
+        "distance_m": 461,
+        "bearing_deg": 358,
+        "max_landing_slope_deg": 3.3,
+        "safety_score": 0.5,
+        "divert_delta_v_mps": 5.4,
+        "reserve_margin_kg": 666,
+        "reachable": true
+      },
+      {
+        "id": "B3",
+        "distance_m": 2264,
+        "bearing_deg": 274,
+        "max_landing_slope_deg": 1.8,
+        "safety_score": 0.49,
+        "divert_delta_v_mps": 39.5,
+        "reserve_margin_kg": 581,
+        "reachable": true
+      },
+      {
+        "id": "B4",
+        "distance_m": 1900,
+        "bearing_deg": 91,
+        "max_landing_slope_deg": 2.3,
+        "safety_score": 0.48,
+        "divert_delta_v_mps": 31.4,
+        "reserve_margin_kg": 601,
+        "reachable": true
+      },
+      {
+        "id": "B5",
+        "distance_m": 2404,
+        "bearing_deg": 306,
+        "max_landing_slope_deg": 3.4,
+        "safety_score": 0.45,
+        "divert_delta_v_mps": 56.2,
+        "reserve_margin_kg": 540,
+        "reachable": true
+      },
+      {
+        "id": "B6",
+        "distance_m": 873,
+        "bearing_deg": 290,
+        "max_landing_slope_deg": 4.0,
+        "safety_score": 0.44,
+        "divert_delta_v_mps": 17.2,
+        "reserve_margin_kg": 637,
+        "reachable": true
+      }
+    ]
+  },
+  "low_gate": {
+    "result_id": "19b3727272e5fa8e1a5ba56ce767ea591ab88a8e06b8b1e41f4904933091f3cf",
+    "backups": [
+      {
+        "id": "B1",
+        "distance_m": 2037,
+        "bearing_deg": 314,
+        "max_landing_slope_deg": 1.6,
+        "safety_score": 0.54,
+        "divert_delta_v_mps": 48.7,
+        "reserve_margin_kg": 558,
+        "reachable": true
+      },
+      {
+        "id": "B2",
+        "distance_m": 461,
+        "bearing_deg": 358,
+        "max_landing_slope_deg": 3.3,
+        "safety_score": 0.5,
+        "divert_delta_v_mps": 2.0,
+        "reserve_margin_kg": 675,
+        "reachable": true
+      },
+      {
+        "id": "B3",
+        "distance_m": 2264,
+        "bearing_deg": 274,
+        "max_landing_slope_deg": 1.8,
+        "safety_score": 0.49,
+        "divert_delta_v_mps": 63.1,
+        "reserve_margin_kg": 522,
+        "reachable": true
+      },
+      {
+        "id": "B4",
+        "distance_m": 1900,
+        "bearing_deg": 91,
+        "max_landing_slope_deg": 2.3,
+        "safety_score": 0.48,
+        "divert_delta_v_mps": 52.7,
+        "reserve_margin_kg": 548,
+        "reachable": true
+      },
+      {
+        "id": "B5",
+        "distance_m": 2404,
+        "bearing_deg": 306,
+        "max_landing_slope_deg": 3.4,
+        "safety_score": 0.45,
+        "divert_delta_v_mps": 62.0,
+        "reserve_margin_kg": 525,
+        "reachable": true
+      },
+      {
+        "id": "B6",
+        "distance_m": 873,
+        "bearing_deg": 290,
+        "max_landing_slope_deg": 4.0,
+        "safety_score": 0.44,
+        "divert_delta_v_mps": 23.6,
+        "reserve_margin_kg": 621,
+        "reachable": true
+      }
+    ]
+  },
+  "repeat_result_id_identical": true,
+  "refactor_check": "R6 real-data result_id c29fe632ffd4 unchanged after extracting fly_gates",
+  "tests": {
+    "backend": 533,
+    "alternatives": 36,
+    "frontend": 6
+  },
+  "browser": {
+    "page": "Descent > Alternative landing plans",
+    "marked": "B2",
+    "console_errors": 0
+  },
+  "interpretation": "All six backups are reachable and have higher R3 safety scores (0.44-0.54) than the primary (0.29). Lateral diverts cost more from low gate because less time remains."
+}

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import type { Preset } from "../types";
 import RouteOptimizer, { type RouteResult } from "./RouteOptimizer";
 import RiskPanel from "./RiskPanel";
+import BackupPlans from "./BackupPlans";
 
 // R4 (S6): renders backend descent plans; all physics runs in the API.
 type Sample = {
@@ -318,6 +319,16 @@ export default function Descent({ sites }: { sites: Preset[] }) {
 
   const selected = profiles.find((p) => p.profile_id === profileId);
   const powered = useMemo(() => plan?.phases.filter((p) => p.name !== "coast") ?? [], [plan]);
+  // R6/R7 analyse the same plan as the form above.
+  const planBase = {
+    site_id: siteId,
+    latitude_deg: Number(lat),
+    longitude_deg_east: Number(lon),
+    orbit: { altitude_km: Number(altitude), inclination_deg: Number(inclination) },
+    allow_plane_change: allowTurn,
+    reserve_delta_v_mps: Number(reserveFps) * FT,
+    ...vehicle(),
+  };
 
   return (
     <section id="descent" className="window-search-section descent-section" aria-label="Descent trajectory">
@@ -609,17 +620,8 @@ export default function Descent({ sites }: { sites: Preset[] }) {
             </>
           )}
           {routes && <RouteOptimizer result={routes} />}
-          <RiskPanel
-            base={{
-              site_id: siteId,
-              latitude_deg: Number(lat),
-              longitude_deg_east: Number(lon),
-              orbit: { altitude_km: Number(altitude), inclination_deg: Number(inclination) },
-              allow_plane_change: allowTurn,
-              reserve_delta_v_mps: Number(reserveFps) * FT,
-              ...vehicle(),
-            }}
-          />
+          <RiskPanel base={planBase} />
+          <BackupPlans base={planBase} />
         </div>
       </div>
     </section>
