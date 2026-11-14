@@ -85,3 +85,17 @@ async def serve_space_weather(connection, data_dir: Path) -> None:
     async with queue.iterator() as messages:
         async for message in messages:
             await handle_space_weather_message(message, exchange, data_dir)
+
+
+async def serve_flight_ephemeris(connection, data_dir: Path) -> None:
+    """Consume flight ephemeris requests on a separate channel, one at a time."""
+    from shared.flight_ephemeris import declare_flight_ephemeris_topology
+    from app.flight_ephemeris import handle_flight_ephemeris_message
+
+    channel = await connection.channel(publisher_confirms=True, on_return_raises=True)
+    await channel.set_qos(prefetch_count=1)
+    queue, exchange = await declare_flight_ephemeris_topology(channel)
+    logging.info("Broker connected; flight ephemeris consumer ready")
+    async with queue.iterator() as messages:
+        async for message in messages:
+            await handle_flight_ephemeris_message(message, exchange, data_dir)

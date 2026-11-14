@@ -239,6 +239,12 @@ For looking very closely at a single landing site. Files are large — only wort
 
 ---
 
+## 13. JPL Horizons geocentric vectors (flight scene) ⭐⭐⭐⭐
+
+- **Use:** real Moon and Sun positions during the illustrative Earth-to-Moon flight in mission control. See [flight ephemeris](flight-ephemeris.md).
+- **Query:** `EPHEM_TYPE=VECTORS`, `COMMAND='301'` (Moon) and `'10'` (Sun), `CENTER='500@399'`, `REF_PLANE=ECLIPTIC`, `REF_SYSTEM=ICRF`, `VEC_TABLE=1`, `OUT_UNITS=KM-S`, `CSV_FORMAT=YES`, `TIME_TYPE=UT` (the table then has a `JDUT` column with UTC times).
+- **Acquired by:** the ingestion worker over RabbitMQ (`lunar.flight-ephemeris.requests.v1`). The backend only reads the checksummed cache.
+
 ## MVP data flow
 
 1. Frontend submits a site and UTC analysis interval to FastAPI.

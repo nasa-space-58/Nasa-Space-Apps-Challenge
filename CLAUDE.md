@@ -182,3 +182,7 @@ R11 (multi-mission planning) starts from `feature/r10-hybrid-optimization` `5f9a
 ### R10/R11 main push exception (user, 2026-11-15)
 
 At the user's explicit request, `feature/r11-multi-mission-planning` (which contains R10) was fast-forwarded directly onto `main` from `a5171d4` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### PR #18 merge exception (user, 2026-11-15)
+
+At the user's explicit request, PR #18 (`fix/healthinfo`: rover drive and surface panel, planet spin, real Moon/Sun/Earth flight positions from JPL Horizons; frozen tests `2f01b74`, see docs/flight-ephemeris.md) was squash-merged into `main` without another member's approval, overriding the approval rule for this one PR only. The default rules for `main` still apply afterwards.
