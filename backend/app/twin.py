@@ -57,7 +57,7 @@ from app.fuel_optimization import (
     _reason,
     reserve_propellant_kg,
 )
-from shared.constants import STANDARD_GRAVITY_M_S2
+from shared.constants import MOON_REFERENCE_RADIUS_M, STANDARD_GRAVITY_M_S2
 
 DEFAULT_STEP_S = 0.2
 MAX_EVENTS = 20
@@ -198,7 +198,7 @@ ASSUMPTIONS = (
     "The estimator is a constant-gain predictor-corrector: prediction with the commanded acceleration, correction toward each observation.",
     "Actual thrust carries a constant engine performance bias drawn once per run and unknown to the estimator; without observations the estimate drifts.",
     "Mass is known to the estimator (propellant gauging). Battery energy uses a constant load; no thermal or power model.",
-    "Events change the model: thrust_loss scales available thrust, sensor_degradation changes noise/health (degraded without values = 5x noise), propellant_leak removes mass instantly, comm_outage removes ground uplink, obstacle_detected adds a synthetic hazard disk.",
+    "Events change the model: thrust_loss scales available thrust, sensor_degradation changes noise/health (degraded without values = 5x the range-scaled noise; explicit values are used unscaled), propellant_leak removes mass instantly, comm_outage removes ground uplink, obstacle_detected adds a synthetic hazard disk.",
     "The twin does not replan: an invalidated plan keeps flying so its consequences are visible (R12 replans).",
     "All telemetry is simulated; obstacles are synthetic; the vehicle profile and terrain height keep their sources.",
 )
@@ -312,6 +312,470 @@ def _rk4(position, velocity, mass, thrust, direction, flow, step):
     )
 
 
+class TwinFlight:
+    """Step-wise twin flight: the engine behind `fly_twin`, also driven by R12.
+
+    State is advanced one integration step at a time so that a replanner can
+    stop between steps, read the estimated or true state and retarget.
+    """
+
+    def __init__(
+        self,
+        profile: VehicleProfile,
+        site_radius_m: float,
+        pdi_range_m: float,
+        periapsis_speed_mps: float,
+        sensor: SensorSettings,
+        events: list,
+        seed: int,
+        step_s: float = DEFAULT_STEP_S,
+        battery: BatterySettings | None = None,
+        plan_dependencies: tuple[str, ...] = DEFAULT_PLAN_DEPENDENCIES,
+        record_every: int = 1,
+    ):
+        self.profile = profile
+        self.sensor = sensor
+        self.step_s = step_s
+        self.battery = battery or BatterySettings()
+        parsed = [
+            e if isinstance(e, BaseModel) else _EVENTS.validate_python(e)
+            for e in events
+        ]
+        self.pending = [
+            parsed[i]
+            for i in sorted(range(len(parsed)), key=lambda i: (parsed[i].t_s, i))
+        ]
+        self.rng = np.random.default_rng(seed)
+        self.bias = sensor.thrust_noise_fraction * float(self.rng.standard_normal())
+        self.gain = sensor.gain
+        self.ve = profile.isp_s * STANDARD_GRAVITY_M_S2
+        self.dry_kg = profile.mass_at_pdi_kg - profile.usable_propellant_kg
+        self.site_radius_m = site_radius_m
+        self.position, self.velocity = _state(
+            site_radius_m, -pdi_range_m, PDI_ALTITUDE_M, periapsis_speed_mps, 0.0
+        )
+        self.est_p, self.est_v = self.position.copy(), self.velocity.copy()
+        self.mass = profile.mass_at_pdi_kg
+        self.clock = 0.0
+        self.exhausted = False
+        self.health = "nominal"
+        self.pos_sigma = sensor.position_sigma_m
+        self.speed_sigma = sensor.speed_sigma_mps
+        self.sigma_factor = 1.0
+        self.sigma_fixed = False
+        self.engine = profile
+        self.revision = 0
+        self.comm_until = None
+        self.est_std = estimate_sigma(sensor.position_sigma_m, self.gain)
+        self.dependencies = tuple(plan_dependencies)
+        self.log: list[dict] = []
+        self.obstacles: list[dict] = []
+        self.invalidated: list[str] = []
+        self.rows: list[dict] = []
+        self.max_error = 0.0
+        self.record_every = record_every
+        self.gates = gate_states(site_radius_m)
+        self.gate_index = 0
+        self.phases: list[dict] = []
+        self.command = np.zeros(2)
+        self.thrust = 0.0
+        self.step_index = 0
+        self.target_down_m = 0.0
+        self.target_cross_m = 0.0
+        self._open_phase()
+
+    # -- phases -------------------------------------------------------------
+    def _open_phase(self):
+        self.phase_start = self.clock
+        self.elapsed = 0.0
+        self.phase_dv = 0.0
+        self.phase_mass = self.mass
+        self.saturated_s = 0.0
+
+    def _close_phase(self):
+        end = _describe(self.position, self.velocity, self.site_radius_m)
+        self.phases.append(
+            {
+                "name": self.gates[self.gate_index]["name"],
+                "start_s": self.phase_start,
+                "end_s": self.clock,
+                "delta_v_mps": self.phase_dv,
+                "propellant_kg": self.phase_mass - self.mass,
+                "end_altitude_m": end["altitude_m"],
+                "saturated_s": self.saturated_s,
+            }
+        )
+
+    @property
+    def done(self) -> bool:
+        return self.gate_index >= len(self.gates)
+
+    @property
+    def phase(self) -> str | None:
+        return None if self.done else self.gates[self.gate_index]["name"]
+
+    def remaining_gates(self) -> list[dict]:
+        """Current gate with its remaining time, then the later gates."""
+        if self.done:
+            return []
+        current = dict(self.gates[self.gate_index])
+        current["duration_s"] = current["duration_s"] - self.elapsed
+        return [current] + [dict(g) for g in self.gates[self.gate_index + 1 :]]
+
+    # -- events -------------------------------------------------------------
+    def has_due_events(self) -> bool:
+        return bool(self.pending) and self.clock >= self.pending[0].t_s - 1e-9
+
+    def apply_due(self) -> list:
+        applied = []
+        while self.has_due_events():
+            event = self.pending.pop(0)
+            applied.append(event)
+            self.revision += 1
+            clock = self.clock
+            self.log.append(
+                {
+                    "t_s": clock,
+                    "kind": "event_applied",
+                    "event": event.model_dump(),
+                    "state_revision": self.revision,
+                }
+            )
+            covers = True
+            if event.kind == "thrust_loss":
+                fraction = event.available_fraction
+                self.engine = (
+                    self.profile
+                    if fraction == 1.0
+                    else self.profile.model_copy(
+                        update={
+                            "max_thrust_n": self.profile.max_thrust_n * fraction,
+                            "design_thrust_n": self.profile.design_thrust_n * fraction,
+                        }
+                    )
+                )
+            elif event.kind == "sensor_degradation":
+                self.health = event.health
+                explicit = (
+                    event.position_sigma_m is not None
+                    or event.speed_sigma_mps is not None
+                )
+                self.sigma_fixed = explicit
+                self.sigma_factor = (
+                    DEGRADED_SIGMA_FACTOR
+                    if event.health == "degraded" and not explicit
+                    else 1.0
+                )
+                self.pos_sigma = (
+                    event.position_sigma_m
+                    if event.position_sigma_m is not None
+                    else self.sensor.position_sigma_m
+                )
+                self.speed_sigma = (
+                    event.speed_sigma_mps
+                    if event.speed_sigma_mps is not None
+                    else self.sensor.speed_sigma_mps
+                )
+            elif event.kind == "propellant_leak":
+                self.mass -= event.leaked_kg
+                if self.mass < self.dry_kg:
+                    self.mass, self.exhausted = self.dry_kg, True
+            elif event.kind == "comm_outage":
+                self.comm_until = clock + event.duration_s
+            elif event.kind == "obstacle_detected":
+                down = event.down_m - self.target_down_m
+                cross = event.cross_m - self.target_cross_m
+                covers = math.hypot(down, cross) < event.radius_m
+                self.obstacles.append(
+                    {
+                        "t_s": clock,
+                        "down_m": event.down_m,
+                        "cross_m": event.cross_m,
+                        "radius_m": event.radius_m,
+                        "covers_target": covers,
+                        "label": "synthetic",
+                    }
+                )
+            dependency = EVENT_DEPENDENCY[event.kind]
+            if dependency in self.dependencies and covers:
+                if dependency not in self.invalidated:
+                    self.invalidated.append(dependency)
+                self.log.append(
+                    {
+                        "t_s": clock,
+                        "kind": "plan_invalidated",
+                        "event_kind": event.kind,
+                        "dependency": dependency,
+                        "plan_revision": self.revision,
+                        "reason": f"{event.kind.replace('_', ' ')} changed {dependency.replace('_', ' ')}, which the active plan depends on",
+                    }
+                )
+            else:
+                self.log.append(
+                    {
+                        "t_s": clock,
+                        "kind": "no_plan_effect",
+                        "event_kind": event.kind,
+                        "dependency": dependency,
+                        "reason": (
+                            "obstacle does not cover the target"
+                            if not covers
+                            else f"the active plan does not depend on {dependency.replace('_', ' ')}"
+                        ),
+                    }
+                )
+        return applied
+
+    # -- sensing ------------------------------------------------------------
+    def _sigmas(self) -> tuple[float, float]:
+        if self.sigma_fixed:
+            return self.pos_sigma, self.speed_sigma
+        altitude = float(np.linalg.norm(self.position)) - self.site_radius_m
+        pos_sigma, speed_sigma = effective_sigmas(
+            self.pos_sigma, self.speed_sigma, altitude, self.sensor
+        )
+        return pos_sigma * self.sigma_factor, speed_sigma * self.sigma_factor
+
+    def battery_energy(self) -> float:
+        return max(
+            self.battery.initial_energy_j - self.battery.load_w * self.clock, 0.0
+        )
+
+    def _row(self, phase, observation, thrust):
+        radius = self.site_radius_m
+        return {
+            "t_s": self.clock,
+            "phase": phase,
+            "truth": _streams(self.position, self.velocity, radius),
+            "observation": (
+                None
+                if observation is None
+                else _streams(observation[0], observation[1], radius)
+            ),
+            "estimate": _streams(self.est_p, self.est_v, radius),
+            "estimate_error_m": float(np.linalg.norm(self.position - self.est_p)),
+            "estimate_std_m": self.est_std,
+            "mass_kg": self.mass,
+            "propellant_kg": max(self.mass - self.dry_kg, 0.0),
+            "thrust_n": thrust,
+            "available_thrust_n": self.engine.max_thrust_n,
+            "battery_energy_j": self.battery_energy(),
+            "sensor_health": self.health,
+            "ground_uplink": self.comm_until is None or self.clock >= self.comm_until,
+            "target_down_m": self.target_down_m,
+            "target_cross_m": self.target_cross_m,
+            "record_label": "simulated",
+        }
+
+    # -- flight -------------------------------------------------------------
+    def step(self) -> None:
+        """Apply due events, observe, correct, guide and integrate one step."""
+        self.apply_due()
+        gate = self.gates[self.gate_index]
+        duration = gate["duration_s"]
+        step = min(self.step_s, duration - self.elapsed)
+        pos_sigma, speed_sigma = self._sigmas()
+        observation = observe(
+            self.position, self.velocity, self.health, pos_sigma, speed_sigma, self.rng
+        )
+        if observation is not None:
+            self.est_p = correct(self.est_p, observation[0], self.gain)
+            self.est_v = correct(self.est_v, observation[1], self.gain)
+            self.est_std = estimate_sigma(pos_sigma, self.gain)
+        else:
+            self.est_std += estimate_sigma(speed_sigma, self.gain) * step
+        self.max_error = max(
+            self.max_error, float(np.linalg.norm(self.position - self.est_p))
+        )
+        time_to_go = duration - self.elapsed
+        if time_to_go > GUIDANCE_HOLD_S:
+            self.command = zem_zev_acceleration(
+                self.est_p,
+                self.est_v,
+                gate["position_m"],
+                gate["velocity_mps"],
+                time_to_go,
+                _gravity(self.est_p),
+            )
+        norm = float(np.linalg.norm(self.command))
+        mass = self.mass
+        thrust, saturated = engine_thrust(mass * norm, self.engine)
+        if mass <= self.dry_kg:
+            thrust, self.exhausted = 0.0, True
+        self.thrust = thrust
+        direction = self.command / norm if norm > 0 else np.array([0.0, 1.0])
+        if self.step_index % self.record_every == 0:
+            self.rows.append(self._row(gate["name"], observation, thrust))
+        actual = thrust * (1.0 + self.bias)
+        flow = actual / self.ve
+        self.position, self.velocity = _rk4(
+            self.position, self.velocity, mass, actual, direction, flow, step
+        )
+        self.est_p, self.est_v = _rk4(
+            self.est_p, self.est_v, mass, thrust, direction, thrust / self.ve, step
+        )
+        new_mass = mass - flow * step
+        if new_mass < self.dry_kg:
+            new_mass, self.exhausted = self.dry_kg, True
+        if new_mass < mass:
+            self.phase_dv += self.ve * math.log(mass / new_mass)
+        self.mass = new_mass
+        self.saturated_s += step if saturated else 0.0
+        self.elapsed += step
+        self.clock += step
+        self.step_index += 1
+        if self.elapsed >= duration - 1e-9:
+            self._close_phase()
+            self.gate_index += 1
+            if not self.done:
+                self._open_phase()
+
+    # -- replanning hooks (R12) --------------------------------------------
+    def estimated_state(self) -> dict:
+        """What the vehicle believes: estimate, known mass and engine."""
+        return {
+            "position_m": self.est_p.copy(),
+            "velocity_mps": self.est_v.copy(),
+            "mass_kg": self.mass,
+            "engine": self.engine,
+            "estimate_std_m": self.est_std,
+            "revision": self.revision,
+            "t_s": self.clock,
+            "site_radius_m": self.site_radius_m,
+        }
+
+    def true_state(self) -> dict:
+        """Ground truth for independent validation (never used by guidance)."""
+        return self.estimated_state() | {
+            "position_m": self.position.copy(),
+            "velocity_mps": self.velocity.copy(),
+        }
+
+    def retarget(
+        self,
+        down_m: float,
+        cross_m: float,
+        target_height_m: float,
+        lateral_propellant_kg: float,
+        reason: str,
+    ) -> None:
+        """Move the target by (down, cross) metres from the current one.
+
+        Downrange: the planar state is rotated about the Moon's centre so the
+        R4 gates now lead to the new target at its own height. Crossrange:
+        the analytic lateral divert propellant is removed now (conservative).
+        """
+        radius = MOON_REFERENCE_RADIUS_M + target_height_m
+        angle = down_m / radius
+        c, s = math.cos(angle), math.sin(angle)
+        rotation = np.array([[c, -s], [s, c]])
+        self.position = rotation @ self.position
+        self.velocity = rotation @ self.velocity
+        self.est_p = rotation @ self.est_p
+        self.est_v = rotation @ self.est_v
+        self.site_radius_m = radius
+        self.gates = gate_states(radius)
+        self.command = np.zeros(2)
+        self.mass -= lateral_propellant_kg
+        if self.mass < self.dry_kg:
+            self.mass, self.exhausted = self.dry_kg, True
+        self.target_down_m += down_m
+        self.target_cross_m += cross_m
+        for obstacle in self.obstacles:
+            obstacle["covers_target"] = (
+                math.hypot(
+                    obstacle["down_m"] - self.target_down_m,
+                    obstacle["cross_m"] - self.target_cross_m,
+                )
+                < obstacle["radius_m"]
+            )
+        self.revision += 1
+        self.invalidated = []
+        self.log.append(
+            {
+                "t_s": self.clock,
+                "kind": "retargeted",
+                "down_m": down_m,
+                "cross_m": cross_m,
+                "target_height_m": target_height_m,
+                "lateral_propellant_kg": lateral_propellant_kg,
+                "plan_revision": self.revision,
+                "reason": reason,
+            }
+        )
+
+    def note(self, entry: dict) -> None:
+        """Append a replanning record to the deterministic log."""
+        self.log.append({"t_s": self.clock} | entry)
+
+    # -- touchdown ----------------------------------------------------------
+    def finish(self) -> dict:
+        pos_sigma, speed_sigma = self._sigmas()
+        observation = observe(
+            self.position, self.velocity, self.health, pos_sigma, speed_sigma, self.rng
+        )
+        if observation is not None:
+            self.est_p = correct(self.est_p, observation[0], self.gain)
+            self.est_v = correct(self.est_v, observation[1], self.gain)
+        final_error = float(np.linalg.norm(self.position - self.est_p))
+        self.max_error = max(self.max_error, final_error)
+        self.rows.append(self._row("landed", observation, self.thrust))
+        described = _describe(self.position, self.velocity, self.site_radius_m)
+        final = {
+            "position_error_m": float(
+                np.linalg.norm(self.position - np.array([0.0, self.site_radius_m]))
+            ),
+            "vertical_speed_mps": described["vertical_speed_mps"],
+            "horizontal_speed_mps": described["horizontal_speed_mps"],
+            "mass_kg": self.mass,
+        }
+        remaining = max(self.mass - self.dry_kg, 0.0)
+        self.log.append(
+            {
+                "t_s": self.clock,
+                "kind": "touchdown",
+                "final": final,
+                "propellant_remaining_kg": remaining,
+                "state_revision": self.revision,
+            }
+        )
+        for event in self.pending:
+            self.log.append(
+                {
+                    "t_s": event.t_s,
+                    "kind": "event_not_reached",
+                    "event": event.model_dump(),
+                }
+            )
+        energy = self.battery_energy()
+        return {
+            "rows": self.rows,
+            "final": final,
+            "propellant_exhausted": self.exhausted,
+            "propellant_remaining_kg": remaining,
+            "phases": self.phases,
+            "log": self.log,
+            "obstacles": self.obstacles,
+            "max_estimate_error_m": self.max_error,
+            "final_estimate_error_m": final_error,
+            "plan": {
+                "depends_on": list(self.dependencies),
+                "valid": not self.invalidated,
+                "invalidated_by": self.invalidated,
+                "revision": self.revision,
+            },
+            "target_offset_m": {
+                "down_m": self.target_down_m,
+                "cross_m": self.target_cross_m,
+            },
+            "duration_s": self.clock,
+            "battery_energy_j": energy,
+            "battery_empty": energy <= 0.0,
+            "engine_bias_fraction": self.bias,
+            "log_hash": canonical_hash(self.log),
+        }
+
+
 def fly_twin(
     profile: VehicleProfile,
     site_radius_m: float,
@@ -333,289 +797,22 @@ def fly_twin(
     `log_hash`. With zero sensor noise, gain 1, no thrust noise and no events
     it reproduces `fly_gates` exactly.
     """
-    battery = battery or BatterySettings()
-    parsed = [
-        e if isinstance(e, BaseModel) else _EVENTS.validate_python(e) for e in events
-    ]
-    pending = [
-        parsed[i] for i in sorted(range(len(parsed)), key=lambda i: (parsed[i].t_s, i))
-    ]
-    rng = np.random.default_rng(seed)
-    bias = sensor.thrust_noise_fraction * float(rng.standard_normal())
-    gain = sensor.gain
-    ve = profile.isp_s * STANDARD_GRAVITY_M_S2
-    dry_kg = profile.mass_at_pdi_kg - profile.usable_propellant_kg
-    position, velocity = _state(
-        site_radius_m, -pdi_range_m, PDI_ALTITUDE_M, periapsis_speed_mps, 0.0
-    )
-    est_p, est_v = position.copy(), velocity.copy()
-    mass = profile.mass_at_pdi_kg
-    state = {
-        "clock": 0.0,
-        "exhausted": False,
-        "health": "nominal",
-        "pos_sigma": sensor.position_sigma_m,
-        "speed_sigma": sensor.speed_sigma_mps,
-        "engine": profile,
-        "revision": 0,
-        "comm_until": None,
-        "mass": mass,
-    }
-    est_std = estimate_sigma(sensor.position_sigma_m, gain)
-    dependencies = tuple(plan_dependencies)
-    log: list[dict] = []
-    obstacles: list[dict] = []
-    invalidated: list[str] = []
-    rows: list[dict] = []
-    max_error = 0.0
-
-    def apply_due():
-        while pending and state["clock"] >= pending[0].t_s - 1e-9:
-            event = pending.pop(0)
-            state["revision"] += 1
-            clock = state["clock"]
-            log.append(
-                {
-                    "t_s": clock,
-                    "kind": "event_applied",
-                    "event": event.model_dump(),
-                    "state_revision": state["revision"],
-                }
-            )
-            covers = True
-            if event.kind == "thrust_loss":
-                fraction = event.available_fraction
-                state["engine"] = (
-                    profile
-                    if fraction == 1.0
-                    else profile.model_copy(
-                        update={
-                            "max_thrust_n": profile.max_thrust_n * fraction,
-                            "design_thrust_n": profile.design_thrust_n * fraction,
-                        }
-                    )
-                )
-            elif event.kind == "sensor_degradation":
-                state["health"] = event.health
-                factor = DEGRADED_SIGMA_FACTOR if event.health == "degraded" else 1.0
-                state["pos_sigma"] = (
-                    event.position_sigma_m
-                    if event.position_sigma_m is not None
-                    else sensor.position_sigma_m * factor
-                )
-                state["speed_sigma"] = (
-                    event.speed_sigma_mps
-                    if event.speed_sigma_mps is not None
-                    else sensor.speed_sigma_mps * factor
-                )
-            elif event.kind == "propellant_leak":
-                state["mass"] -= event.leaked_kg
-                if state["mass"] < dry_kg:
-                    state["mass"], state["exhausted"] = dry_kg, True
-            elif event.kind == "comm_outage":
-                state["comm_until"] = clock + event.duration_s
-            elif event.kind == "obstacle_detected":
-                covers = math.hypot(event.down_m, event.cross_m) < event.radius_m
-                obstacles.append(
-                    {
-                        "t_s": clock,
-                        "down_m": event.down_m,
-                        "cross_m": event.cross_m,
-                        "radius_m": event.radius_m,
-                        "covers_target": covers,
-                        "label": "synthetic",
-                    }
-                )
-            dependency = EVENT_DEPENDENCY[event.kind]
-            if dependency in dependencies and covers:
-                if dependency not in invalidated:
-                    invalidated.append(dependency)
-                log.append(
-                    {
-                        "t_s": clock,
-                        "kind": "plan_invalidated",
-                        "event_kind": event.kind,
-                        "dependency": dependency,
-                        "plan_revision": state["revision"],
-                        "reason": f"{event.kind.replace('_', ' ')} changed {dependency.replace('_', ' ')}, which the active plan depends on",
-                    }
-                )
-            else:
-                log.append(
-                    {
-                        "t_s": clock,
-                        "kind": "no_plan_effect",
-                        "event_kind": event.kind,
-                        "dependency": dependency,
-                        "reason": (
-                            "obstacle does not cover the target"
-                            if not covers
-                            else f"the active plan does not depend on {dependency.replace('_', ' ')}"
-                        ),
-                    }
-                )
-
-    def battery_energy():
-        return max(battery.initial_energy_j - battery.load_w * state["clock"], 0.0)
-
-    def row(phase, observation, thrust):
-        error = float(np.linalg.norm(position - est_p))
-        comm_until = state["comm_until"]
-        return {
-            "t_s": state["clock"],
-            "phase": phase,
-            "truth": _streams(position, velocity, site_radius_m),
-            "observation": (
-                None
-                if observation is None
-                else _streams(observation[0], observation[1], site_radius_m)
-            ),
-            "estimate": _streams(est_p, est_v, site_radius_m),
-            "estimate_error_m": error,
-            "estimate_std_m": est_std,
-            "mass_kg": state["mass"],
-            "propellant_kg": max(state["mass"] - dry_kg, 0.0),
-            "thrust_n": thrust,
-            "available_thrust_n": state["engine"].max_thrust_n,
-            "battery_energy_j": battery_energy(),
-            "sensor_health": state["health"],
-            "ground_uplink": comm_until is None or state["clock"] >= comm_until,
-            "record_label": "simulated",
-        }
-
-    phases = []
-    command = np.zeros(2)
-    thrust = 0.0
-    step_index = 0
-    for gate in gate_states(site_radius_m):
-        start, elapsed = state["clock"], 0.0
-        phase_dv, phase_mass, saturated_s = 0.0, state["mass"], 0.0
-        duration = gate["duration_s"]
-        while elapsed < duration - 1e-9:
-            apply_due()
-            step = min(step_s, duration - elapsed)
-            altitude = float(np.linalg.norm(position)) - site_radius_m
-            pos_sigma, speed_sigma = effective_sigmas(
-                state["pos_sigma"], state["speed_sigma"], altitude, sensor
-            )
-            observation = observe(
-                position, velocity, state["health"], pos_sigma, speed_sigma, rng
-            )
-            if observation is not None:
-                est_p = correct(est_p, observation[0], gain)
-                est_v = correct(est_v, observation[1], gain)
-                est_std = estimate_sigma(pos_sigma, gain)
-            else:
-                est_std += estimate_sigma(speed_sigma, gain) * step
-            max_error = max(max_error, float(np.linalg.norm(position - est_p)))
-            time_to_go = duration - elapsed
-            if time_to_go > GUIDANCE_HOLD_S:
-                command = zem_zev_acceleration(
-                    est_p,
-                    est_v,
-                    gate["position_m"],
-                    gate["velocity_mps"],
-                    time_to_go,
-                    _gravity(est_p),
-                )
-            norm = float(np.linalg.norm(command))
-            mass = state["mass"]
-            thrust, saturated = engine_thrust(mass * norm, state["engine"])
-            if mass <= dry_kg:
-                thrust, state["exhausted"] = 0.0, True
-            direction = command / norm if norm > 0 else np.array([0.0, 1.0])
-            if step_index % record_every == 0:
-                rows.append(row(gate["name"], observation, thrust))
-            actual = thrust * (1.0 + bias)
-            flow = actual / ve
-            position, velocity = _rk4(
-                position, velocity, mass, actual, direction, flow, step
-            )
-            est_p, est_v = _rk4(
-                est_p, est_v, mass, thrust, direction, thrust / ve, step
-            )
-            new_mass = mass - flow * step
-            if new_mass < dry_kg:
-                new_mass, state["exhausted"] = dry_kg, True
-            if new_mass < mass:
-                phase_dv += ve * math.log(mass / new_mass)
-            state["mass"] = new_mass
-            saturated_s += step if saturated else 0.0
-            elapsed += step
-            state["clock"] += step
-            step_index += 1
-        end = _describe(position, velocity, site_radius_m)
-        phases.append(
-            {
-                "name": gate["name"],
-                "start_s": start,
-                "end_s": state["clock"],
-                "delta_v_mps": phase_dv,
-                "propellant_kg": phase_mass - state["mass"],
-                "end_altitude_m": end["altitude_m"],
-                "saturated_s": saturated_s,
-            }
-        )
-    pos_sigma, speed_sigma = effective_sigmas(
-        state["pos_sigma"],
-        state["speed_sigma"],
-        float(np.linalg.norm(position)) - site_radius_m,
+    flight = TwinFlight(
+        profile,
+        site_radius_m,
+        pdi_range_m,
+        periapsis_speed_mps,
         sensor,
+        events,
+        seed,
+        step_s,
+        battery,
+        plan_dependencies,
+        record_every,
     )
-    observation = observe(
-        position, velocity, state["health"], pos_sigma, speed_sigma, rng
-    )
-    if observation is not None:
-        est_p = correct(est_p, observation[0], gain)
-        est_v = correct(est_v, observation[1], gain)
-    final_error = float(np.linalg.norm(position - est_p))
-    max_error = max(max_error, final_error)
-    rows.append(row("landed", observation, thrust))
-    described = _describe(position, velocity, site_radius_m)
-    final = {
-        "position_error_m": float(
-            np.linalg.norm(position - np.array([0.0, site_radius_m]))
-        ),
-        "vertical_speed_mps": described["vertical_speed_mps"],
-        "horizontal_speed_mps": described["horizontal_speed_mps"],
-        "mass_kg": state["mass"],
-    }
-    remaining = max(state["mass"] - dry_kg, 0.0)
-    log.append(
-        {
-            "t_s": state["clock"],
-            "kind": "touchdown",
-            "final": final,
-            "propellant_remaining_kg": remaining,
-            "state_revision": state["revision"],
-        }
-    )
-    for event in pending:
-        log.append(
-            {"t_s": event.t_s, "kind": "event_not_reached", "event": event.model_dump()}
-        )
-    return {
-        "rows": rows,
-        "final": final,
-        "propellant_exhausted": state["exhausted"],
-        "propellant_remaining_kg": remaining,
-        "phases": phases,
-        "log": log,
-        "obstacles": obstacles,
-        "max_estimate_error_m": max_error,
-        "final_estimate_error_m": final_error,
-        "plan": {
-            "depends_on": list(dependencies),
-            "valid": not invalidated,
-            "invalidated_by": invalidated,
-            "revision": state["revision"],
-        },
-        "duration_s": state["clock"],
-        "battery_energy_j": battery_energy(),
-        "battery_empty": battery_energy() <= 0.0,
-        "engine_bias_fraction": bias,
-        "log_hash": canonical_hash(log),
-    }
+    while not flight.done:
+        flight.step()
+    return flight.finish()
 
 
 def _vehicle(request: TwinRequest) -> VehicleProfile:
