@@ -38,6 +38,10 @@ class RobustPlan(Contract):
     miss_m: tuple[NonNegative, ...]
     r6_result_id: str
 
+    @model_validator(mode="after")
+    def matching_lengths(self):
+        return self  # Skeleton: validation added in the implementation.
+
 
 class LanderPlans(Contract):
     lander_id: Identifier
@@ -59,7 +63,7 @@ class RobustProblem(Contract):
 
     @model_validator(mode="after")
     def consistent(self):
-        raise NotImplementedError
+        return self  # Skeleton: validation added in the implementation.
 
 
 @dataclass(frozen=True)

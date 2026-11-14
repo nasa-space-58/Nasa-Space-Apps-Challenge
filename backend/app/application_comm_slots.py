@@ -63,7 +63,7 @@ class CommSlotProblem(Contract):
 
     @model_validator(mode="after")
     def consistent(self):
-        raise NotImplementedError
+        return self  # Skeleton: validation added in the implementation.
 
 
 def generate_comm_slots(

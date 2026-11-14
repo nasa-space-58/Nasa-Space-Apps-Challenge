@@ -32,7 +32,7 @@ class HorizonMask(Contract):
 
     @model_validator(mode="after")
     def closed_grid(self):
-        raise NotImplementedError
+        return self  # Skeleton: validation added in the implementation.
 
 
 class RelaySite(Contract):
@@ -75,7 +75,7 @@ class RelayProblem(Contract):
 
     @model_validator(mode="after")
     def consistent(self):
-        raise NotImplementedError
+        return self  # Skeleton: validation added in the implementation.
 
 
 class RelayLink(Contract):
