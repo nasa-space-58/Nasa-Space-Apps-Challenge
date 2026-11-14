@@ -180,8 +180,18 @@ def simulate_terminal(job_request: TerminalRequest) -> dict:
     return _simulate(job, job.dt_s)
 
 
-def _simulate(job, dt_s):
+def _simulate(
+    job,
+    dt_s,
+    *,
+    stop_after_s=None,
+    position_bias_m=(0.0, 0.0),
+    velocity_bias_mps=(0.0, 0.0),
+    thrust_limit_n=None,
+):
     vehicle, terrain = job.vehicle, job.terrain
+    stop_s = job.duration_s if stop_after_s is None else stop_after_s
+    thrust_cap = vehicle.max_thrust_n if thrust_limit_n is None else thrust_limit_n
     initial = job.initial_state
     position = np.array(initial.position_m)
     velocity = np.array(initial.velocity_mps)
@@ -233,15 +243,21 @@ def _simulate(job, dt_s):
         target_velocity = job.target_vertical_speed_mps * up
         command = np.zeros(2)
         termination = "timeout"
-        while elapsed < job.duration_s - 1e-9:
-            step_s = min(dt_s, job.duration_s - elapsed)
+        while elapsed < stop_s - 1e-9:
+            step_s = min(dt_s, stop_s - elapsed)
             time_to_go = job.duration_s - elapsed
             # Hold the last finite command in the final 0.2 s, avoiding singular gains.
             if time_to_go > max(0.2, dt_s) or elapsed == 0:
-                gravity = -MOON_GM_M3_S2 * position / np.linalg.norm(position) ** 3
+                estimated_position = position + np.array(position_bias_m)
+                estimated_velocity = velocity + np.array(velocity_bias_mps)
+                gravity = (
+                    -MOON_GM_M3_S2
+                    * estimated_position
+                    / np.linalg.norm(estimated_position) ** 3
+                )
                 command = zem_zev_acceleration(
-                    position,
-                    velocity,
+                    estimated_position,
+                    estimated_velocity,
                     target_position,
                     target_velocity,
                     time_to_go,
@@ -255,6 +271,7 @@ def _simulate(job, dt_s):
                 thrust = max(
                     requested, vehicle.min_throttle_fraction * vehicle.design_thrust_n
                 )
+            thrust = min(thrust, thrust_cap)
             if mass <= vehicle.dry_mass_kg:
                 thrust = 0.0
             direction = (
@@ -309,6 +326,8 @@ def _simulate(job, dt_s):
             current = sample(thrust, advanced.burn_s, advanced.coast_s)
             if termination != "timeout":
                 break
+    if termination == "timeout" and stop_s < job.duration_s:
+        termination = "paused"
     if termination == "terrain_unknown":
         reasons.append("terrain_coverage")
     elif termination == "initial_below_terrain":
@@ -335,6 +354,19 @@ def _simulate(job, dt_s):
         "request": job.model_dump(mode="json"),
         "integration_dt_s": dt_s,
     }
+    if (
+        stop_s != job.duration_s
+        or thrust_cap != vehicle.max_thrust_n
+        or any(position_bias_m)
+        or any(velocity_bias_mps)
+    ):
+        identity["propagation"] = dict(
+            version="h5-controls-v1",
+            stop_after_s=stop_s,
+            thrust_limit_n=thrust_cap,
+            position_bias_m=list(position_bias_m),
+            velocity_bias_mps=list(velocity_bias_mps),
+        )
     fingerprint = hashlib.sha256(
         json.dumps(
             identity, sort_keys=True, separators=(",", ":"), allow_nan=False
@@ -432,6 +464,35 @@ def propagate_terminal(
     position_bias_m=(0.0, 0.0),
     velocity_bias_mps=(0.0, 0.0),
     thrust_limit_n: float | None = None,
+    integration_dt_s: float | None = None,
 ) -> dict:
     """H5 propagation with persistent navigation bias, thrust cap and exact pause time."""
-    raise NotImplementedError
+    job = TerminalRequest.model_validate(job_request.model_dump())
+    for name, bias in (("position", position_bias_m), ("velocity", velocity_bias_mps)):
+        values = np.asarray(bias, dtype=float)
+        if (
+            values.shape != (2,)
+            or not np.isfinite(values).all()
+            or max(abs(values)) > 10000
+        ):
+            raise ValueError(f"Invalid planar {name} bias")
+    if stop_after_s is not None and not (
+        math.isfinite(stop_after_s) and 0 < stop_after_s <= job.duration_s
+    ):
+        raise ValueError("Pause time must be within the remaining flight duration")
+    if thrust_limit_n is not None and not (
+        math.isfinite(thrust_limit_n)
+        and 0 <= thrust_limit_n <= job.vehicle.max_thrust_n
+    ):
+        raise ValueError("Available thrust must be within the vehicle envelope")
+    step = job.dt_s if integration_dt_s is None else integration_dt_s
+    if not math.isfinite(step) or not 0.01 <= step <= 1:
+        raise ValueError("Integration step must be 0.01 to 1 second")
+    return _simulate(
+        job,
+        step,
+        stop_after_s=stop_after_s,
+        position_bias_m=position_bias_m,
+        velocity_bias_mps=velocity_bias_mps,
+        thrust_limit_n=thrust_limit_n,
+    )

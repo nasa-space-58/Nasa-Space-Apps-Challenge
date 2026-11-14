@@ -327,7 +327,7 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 - [x] **H2 — Quantum mapping:** deliver the bounded R10 QUBO/QAOA simulator experiment and prove mapping consistency against enumeration; compact encoding uses six qubits for the three-by-four example. General resource encodings and hardware experiments remain later work.
 - [x] **H3 — Resource integration:** connect explicit R2 geometry, station calendars and bounded ideal battery/activity models; compare classical/hybrid scheduling on identical supported inputs and report unsupported encodings. Real mission calibration and general resource encodings remain open.
 - [x] **H4 — Descent foundation:** share fuel-limited dynamics with R4/R5, restart a bounded planar terminal descent, and screen explicit landing candidates at two resolutions. Synthetic/reference physics validation is complete; real-terrain/3D flight validation remains outside this model.
-- [ ] **H5 — Classical self-healing:** add R6/R9 uncertainty, event replay and R12 classical replanning with feasible and infeasible recovery cases.
+- [x] **H5 — Classical self-healing:** deliver bounded planar fault replay, separate synthetic observations from truth, screen candidates under seeded uncertainty, and replan with recoverable/unrecoverable cases. Full sensor fusion, real-time execution and 3D mission validation remain outside this milestone.
 - [ ] **H6 — Hybrid recovery:** connect candidate-plan selection to downstream multi-mission scheduling, with deadlines, stale-result rejection and validated fallback behavior.
 - [ ] **H7 — Evidence and demonstration:** run hardware experiments where available, publish reproducible benchmarks, and demonstrate a fault changing both one vehicle's landing plan and subsequent mission schedules.
 
@@ -340,6 +340,8 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 **H3 delivery** — R2-shaped contact evidence, separately declared station calendars, and ideal storage/activity constraints feed the same H0 scenario. An eight-code-cell notebook shows binding energy limits, classical/QAOA comparison, unknown contact handling and spillage. See [resource integration and limitations](resource-integration.md).
 
 **H4 delivery** — Fuel exhaustion now stops thrust inside a time step. A restartable terminal checker validates sampled terrain contact, speed, slope and reserve; explicit target screening retains coarse/fine evidence. The 10-code-cell notebook and 55 H4 tests are described in [descent foundation and limits](descent-foundation.md). No quantum/provider calls or flight-certification claim are included.
+
+**H5 delivery** — Five fault types change physical/navigation/landing-policy constraints at exact UTC boundaries. Classical recovery preserves a valid target or selects a screened backup, retaining baseline comparison, state revisions and explicit infeasibility. Fifty-one frozen tests and a 10-code-cell notebook are documented in [self-healing and replay limits](self-healing.md). H6 hybrid/asynchronous integration remains open.
 
 ### Proposed hybrid demonstration features
 

@@ -144,3 +144,8 @@ H3 remains on `codex/quantum-hybrid`; no tahakrcc/main merge or push. Skeleton `
 ### H4 continuation (user, 2026-11-14)
 
 Continue on `codex/quantum-hybrid`; push only that branch, without tahakrcc/main merges. Skeleton `6292085`, frozen tests `3436c14` and `aa07539`; see `docs/descent-foundation.md`. Shared R4/H4 integration must stop thrust exactly at fuel depletion. H4's restartable terminal model uses an explicit nonrotating planar frame, sampled corridor clearance and two-resolution candidate screening. Never imply automatic MOON_ME conversion, continuous collision certification, a global reachability envelope or quantum execution from these checks.
+
+
+### H5 continuation (user, 2026-11-14)
+
+Continue on `codex/quantum-hybrid`; push only this branch without tahakrcc/main merges. Skeleton `9fd35a7`, frozen tests `9c9a6d1`, `1a4fc36` and `432cd67`; see `docs/self-healing.md`. H5 uses exact-time planar fault replay, explicit truth/observation/estimate separation, seeded shared uncertainty draws and classical retargeting. Never present finite Monte Carlo passes as certified probabilities, a landing exclusion as volumetric obstacle geometry, infeasibility as a safe abort, or synchronous planning as a real-time/hardware guarantee. H6 async quantum/fallback integration remains open.
