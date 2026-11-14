@@ -111,3 +111,7 @@ R3 (explained recommendations) starts from `temel` `fdc4020` on `feature/r3-expl
 ### R4 delivery override (user, 2026-11-14)
 
 R4 (descent trajectories) starts from `temel` `a0b7b8d` on `feature/r4-descent-trajectories`. Push that branch and the same commits to `temel`. Do not merge into or push to tahakrcc or main.
+
+### R5 delivery override (user, 2026-11-14)
+
+R5 (fuel optimization) starts from `temel` `f497f21` on `feature/r5-fuel-optimization`. Push that branch and the same commits to `temel`. Do not merge into or push to tahakrcc or main.

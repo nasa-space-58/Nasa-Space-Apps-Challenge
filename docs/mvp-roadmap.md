@@ -210,9 +210,11 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 ### R5 — Fuel optimization
 
-- [ ] Implement S7 fuel estimation and reserve/engine constraints across feasible trajectories.
-- [ ] Show fuel versus safety trade-offs and rejected-route reasons.
-- [ ] Extend S8/S9 ranking with validated reachability and fuel metrics.
+- [x] Implement S7 fuel estimation and reserve/engine constraints across feasible trajectories.
+- [x] Show fuel versus safety trade-offs and rejected-route reasons.
+- [x] Extend S8/S9 ranking with validated reachability and fuel metrics.
+
+**R5 delivery** — See [fuel optimization](fuel-optimization.md). Route grid over orbit altitude and approach/terminal durations on the R4 model; propellant counted from a DOI mass backed out of the PDI mass; default touchdown reserve 145 fps from the NASA TN D-6846 Table II contingencies (redesignation 60 fps + manual hover 85 fps); every route rejected with reasons when it breaks the reserve or R4 limits; Pareto front of fuel versus assessment time. R3 recommendations can opt into descent reachability and a fuel criterion without changing default R3 output. Frozen tests: `2994417`.
 
 **Completion evidence** — Every proposed route respects its configured fuel reserve and vehicle limits.
 

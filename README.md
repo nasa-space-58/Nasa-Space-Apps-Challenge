@@ -228,3 +228,11 @@ Gezinmedeki **Descent** bölümü, seçilen iniş noktası için Ay yörüngesin
 Varsayılan araç, Apollo 11 Ay modülüdür. Değerler NASA TN D-6846 ve Apollo 11 görev raporundan alınmıştır. Model, Apollo 11 iniş planındaki toplam Δv'yi (6775 fps) %2 farkla tutturur. Yörünge iniş noktasının üzerinden geçmiyorsa gereken düzlem değişimi bildirilir; yakıt yetmezse ya da temas toleransları aşılırsa nokta "ulaşılamaz" sayılır ve nedeni yazılır.
 
 Arazi engelleri, Ay'ın kütle konsantrasyonları (mascon) ve dönüşü modellenmez. Görselleştirme 2B'dir. [Kaynaklar, model ve doğrulama](docs/descent-trajectories.md).
+
+## R5: Rotalar arası yakıt optimizasyonu
+
+**Descent → Optimize routes**, aynı iniş noktası için 27 rota üretir. Rotalar üç değişkenle çeşitlenir: başlangıç yörüngesi (40/60/80 deniz mili), yaklaşma süresi (60/100/140 s) ve son iniş süresi (60/108/150 s). Her rotanın yörüngeden iniş manevrasından (DOI) temasa kadar harcadığı yakıt hesaplanır.
+
+Varsayılan temas rezervi 145 fps'dir. Bu değer NASA TN D-6846 Tablo II'deki iniş noktası değiştirme (60 fps) ve elle hover (85 fps) paylarının toplamıdır. Rezervi, yakıtı ya da R4 sınırlarını aşan rotalar nedeniyle birlikte elenir. Grafik, harcanan yakıtı inceleme süresine (yaklaşma + son iniş) karşı gösterir; Pareto cephesi ve en az yakıt harcayan rota işaretlidir.
+
+**Recommend** bölümünde "include descent" seçeneği açılırsa, her aday için R4 inişi hesaplanır. Ulaşılamayan nokta elenir; yakıt payı 5. kriter olarak sıralamaya eklenir. Seçenek kapalıyken R3 sonuçları değişmez. [Yöntem, kaynaklar ve doğrulama](docs/fuel-optimization.md).

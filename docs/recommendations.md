@@ -57,10 +57,12 @@ The total is a weight-normalized mean: total = Σ wᵢ·sᵢ / Σ wᵢ. The cont
 
 **Not modeled yet:**
 
-- **Fuel and reachability:** after the R4/R5 descent trajectories.
+- **Fuel and reachability:** available as an opt-in since R5 (see below).
 - **Science value:** no validated dataset is integrated.
 
 These are listed with every result.
+
+**R5 opt-in descent fuel.** With *Include descent reachability and fuel*, each candidate is planned with the R4 Apollo 11 LM descent. An unreachable candidate is rejected with the constraint `descent`. A reachable one gains a **fuel** criterion (propellant margin / propellant at PDI) with its own weight. See [fuel optimization](fuel-optimization.md#r3-extension-opt-in). Without the option, the behavior above is unchanged.
 
 ## Hard constraints and uncertainty
 
