@@ -178,3 +178,7 @@ R10 (classical-versus-hybrid benchmark) starts from `main` `a5171d4` on `feature
 ### R11 delivery (user, 2026-11-15)
 
 R11 (multi-mission planning) starts from `feature/r10-hybrid-optimization` `5f9a65b` on `feature/r11-multi-mission-planning`; push only that branch, no merge into or push to tahakrcc/main. Frozen tests `8504f81`; see `docs/multi-mission-planning.md`. Campaign contracts live in `shared/campaign.py` (H0 V1 is unchanged). Station geometry, calendar, capacity, data rate and exclusivity stay separate inputs; relay credit needs equipment, line-of-sight evidence, range and the relay's own station link. Do not present synthetic example campaigns as NASA plans or DSN bookings, or passing candidates as landing-safety certification.
+
+### R10/R11 main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/r11-multi-mission-planning` (which contains R10) was fast-forwarded directly onto `main` from `a5171d4` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
