@@ -11,6 +11,7 @@ import PolarMap from "./PolarMap";
 import type { Preset } from "../types";
 import {
   COVERAGE_MAX_LATITUDE_DEG,
+  LANDING_CLOSEUP_START_PROGRESS,
   MISSION_PHASES,
   buildTransferPath,
   phaseAt,
@@ -31,6 +32,7 @@ const cameraModes: { id: CameraMode; label: string }[] = [
   { id: "moon", label: "Moon orbit" },
   { id: "pole", label: "South pole" },
   { id: "spacecraft", label: "Spacecraft" },
+  { id: "landing", label: "Landing" },
 ];
 
 const coordinateLabel = (lat: number, lon: number) =>
@@ -96,7 +98,8 @@ export default function MissionStage({
   }, [lat, lon]);
   const active = phaseAt(progress);
   // Auto camera: with true-scale distances the wide Earth–Moon view only
-  // suits the coast, so the spacecraft close-up covers Earth orbit and descent.
+  // suits the coast, so the spacecraft close-up covers Earth orbit and early
+  // descent; the final descent and touchdown cut to the landing close-up.
   const cameraView: CameraView =
     cameraMode !== "auto"
       ? cameraMode
@@ -108,8 +111,8 @@ export default function MissionStage({
           ? "system"
           : active.phase.id === "lunar_orbit"
             ? "moon"
-            : active.phase.id === "landed"
-              ? "pole"
+            : progress >= LANDING_CLOSEUP_START_PROGRESS
+              ? "landing"
               : "spacecraft";
   const picking = cameraView === "pole" || cameraView === "moon";
 
@@ -285,7 +288,9 @@ export default function MissionStage({
             <small>
               {picking
                 ? "Click inside the dashed ring to choose · drag to rotate · scroll to zoom"
-                : "Click the Moon to zoom in and choose a site · drag to rotate"}
+                : cameraView === "landing"
+                  ? "Illustrative landing close-up · drag to rotate · use South pole to choose another site"
+                  : "Click the Moon to zoom in and choose a site · drag to rotate"}
             </small>
           )}
         </div>

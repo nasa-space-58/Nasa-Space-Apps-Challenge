@@ -113,6 +113,14 @@ R2 (DSN ground-station communication) starts from tahakrcc `a37e83c` on `feature
 
 R3 (explained recommendations) starts from `temel` `fdc4020` on `feature/r3-explained-recommendations`. Push that branch and the same commits to `temel`. Do not merge into or push to tahakrcc or main.
 
+### R4 delivery override (user, 2026-11-14)
+
+R4 (descent trajectories) starts from `temel` `a0b7b8d` on `feature/r4-descent-trajectories`. Push that branch and the same commits to `temel`. Do not merge into or push to tahakrcc or main.
+
+### R5 delivery override (user, 2026-11-14)
+
+R5 (fuel optimization) starts from `temel` `f497f21` on `feature/r5-fuel-optimization`. Push that branch and the same commits to `temel`. Do not merge into or push to tahakrcc or main.
+
 ### H0 delivery override (user, 2026-11-14)
 
 H0 starts from current tahakrcc `d67a32f` on `codex/h0-hybrid-contracts`. Push only the new branch; do not merge into or push to tahakrcc/main. The user merges manually. Shared contracts are in `shared/hybrid.py`, synthetic cases in `shared/examples/hybrid/`, and the runnable notebook in `notebooks/H0_shared_contracts.ipynb`. See `docs/hybrid-contracts.md`; skeleton `a4437db`, frozen tests `774a50f`. H0 does not implement an optimizer or physical simulator.

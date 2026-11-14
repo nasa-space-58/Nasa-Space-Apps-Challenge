@@ -2189,16 +2189,16 @@ footer a {
   background: #202d37;
 }
 .contribution.energy {
-  background: #d6ad67;
+  background: #3987e5;
 }
 .contribution.darkness {
-  background: #8a6f45;
+  background: #d95926;
 }
 .contribution.communication {
-  background: #8fb3c7;
+  background: #199e70;
 }
 .contribution.terrain_safety {
-  background: #7fa38a;
+  background: #c98500;
 }
 .rescore-compare {
   display: grid;
@@ -2248,4 +2248,123 @@ footer a {
   width: 10px;
   height: 10px;
   vertical-align: middle;
+}
+
+/* R4: descent trajectory. Phase hues are the validated reference categorical slots 1-3 (dark). */
+.descent-verdict {
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  border-left: 3px solid #199e70;
+}
+.descent-verdict.blocked {
+  border-left-color: #e66767;
+}
+.descent-verdict p {
+  margin: 8px 0 0;
+  color: #c4ced5;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.descent-chart-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+.descent-chart-head .text-button[aria-pressed="true"] {
+  text-decoration: underline;
+}
+.descent-chart {
+  position: relative;
+  margin: 8px 0 4px;
+}
+.descent-chart svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+.descent-chart .grid {
+  stroke: #202d37;
+  stroke-width: 1;
+}
+.descent-chart .tick {
+  fill: #8c9ba6;
+  font-size: 11px;
+}
+.descent-chart .axis-title {
+  fill: #8c9ba6;
+  font-size: 11px;
+}
+.descent-chart .direct-label {
+  fill: #c4ced5;
+  font-size: 11px;
+}
+.descent-chart .crosshair {
+  stroke: #c4ced5;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.descent-tooltip {
+  position: absolute;
+  top: 8px;
+  transform: translateX(-50%);
+  display: grid;
+  gap: 2px;
+  min-width: 170px;
+  padding: 10px 12px;
+  background: #080e13;
+  border: 1px solid #35434d;
+  font-size: 12px;
+  color: #c4ced5;
+  pointer-events: none;
+}
+.descent-tooltip b {
+  color: #e8edf1;
+}
+.chart-range {
+  display: flex;
+  gap: 16px;
+}
+
+/* R5: route optimization. */
+.route-optimizer {
+  margin-top: 28px;
+}
+.descent-chart .pareto-line {
+  stroke: #c4ced5;
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+.descent-chart .rejected-mark line {
+  stroke: #8c9ba6;
+  stroke-width: 2;
+}
+.scatter-legend {
+  margin-top: 6px;
+}
+.scatter-legend .legend-front {
+  background: transparent;
+  border-top: 1px dashed #c4ced5;
+  height: 0;
+  width: 14px;
+}
+.route-optimizer .ranking-table small {
+  display: block;
+}
+.route-optimizer tr.route-rejected th,
+.route-optimizer tr.route-rejected td {
+  color: #8c9ba6;
+}
+/* Contribution hues are the validated reference categorical slots 1-5 (dark), in criterion order. */
+.contribution.fuel {
+  background: #d55181;
+}
+.contribution-bar .contribution + .contribution {
+  border-left: 2px solid #10171e;
+}
+.table-scroll {
+  max-width: 100%;
+  overflow-x: auto;
 }

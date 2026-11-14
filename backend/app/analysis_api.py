@@ -391,6 +391,12 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     register_search_routes(app, searches)
     register_communication_routes(app, store, communications)
     register_recommendation_routes(app, recommendations)
+    from app.descent import register_descent_routes
+
+    register_descent_routes(app, data_dir)
+    from app.fuel_optimization import register_fuel_routes
+
+    register_fuel_routes(app, data_dir)
 
     @app.get("/health")
     def health():
