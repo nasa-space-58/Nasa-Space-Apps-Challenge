@@ -117,8 +117,9 @@ def generate_instance(spec: InstanceSpec) -> Scenario:
     Uses Python's random.Random(spec.seed) (stable across NumPy versions). IDs are
     mission-NN and mission-NN-option-KK (1-based, zero-padded); antennas are
     antenna-NN with capacity 1 channel over the whole window, starting
-    2030-01-01T00:00:00Z UTC. Objectives: science_value (score, maximize,
-    weight 1, scale 10) and waiting_s (s, minimize, weight 1, scale 36000).
+    2030-01-01T00:00:00Z UTC. Objectives: science_value (integer 1..20, score,
+    maximize, weight 1, scale 10) and waiting_s (slot start minus scenario
+    start, s, minimize, weight 1, scale 36000).
     Every mission keeps at least one option ending by its deadline. Raises
     ValueError for invalid specs. No feasibility claim is attached.
     """
@@ -174,8 +175,10 @@ def solve_milp(scenario: Scenario, *, time_limit_s: float = 10.0) -> MilpResult:
     """Solve the original linear 0/1 program with HiGHS; revalidate with H1.
 
     Rows: one option per mission, deadline/availability bounds, at-most-one sets,
-    per-interval channel capacity and cumulative joule budgets. A validator
-    disagreement raises RuntimeError. Invalid time limits raise ValueError.
+    per-interval channel capacity and cumulative joule budgets. objective_bound
+    is HiGHS's dual bound expressed as an upper bound on the maximization score.
+    A validator disagreement raises RuntimeError. time_limit_s must be a finite
+    float in (0, 3600]; otherwise ValueError.
     """
     raise NotImplementedError
 
