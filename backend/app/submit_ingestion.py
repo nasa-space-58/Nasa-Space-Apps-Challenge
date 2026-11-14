@@ -16,6 +16,11 @@ from shared.ingestion import (
 )
 
 
+async def connect_broker(broker_url: str, attempts: int = 10, delay_s: float = 2, connect_timeout_s: float = 5):
+    """Bound initial connection retries while the broker starts or restarts."""
+    raise NotImplementedError
+
+
 async def submit(request: IngestionRequest, broker_url: str, timeout_s: float = 600):
     """Send a persistent request and await a correlated durable reply.
 
