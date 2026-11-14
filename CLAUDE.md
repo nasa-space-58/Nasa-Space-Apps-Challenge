@@ -74,3 +74,7 @@ Task 2 starts from Task 1 on `feature/task2-terrain-horizon`. Push only this new
 ### Task 3 delivery override (user, 2026-11-14)
 
 Task 3 starts from Task 2 on `feature/task3-visibility-metrics`. Push only this new branch. Do not merge into or push to `tahakrcc` or `main`; the user performs merges manually.
+
+### Task 4 delivery override (user, 2026-11-14)
+
+Task 4 starts from Task 3 on `feature/task4-mission-interface`. Push only this new branch; the user manually merges. Do not merge into or push to tahakrcc or main.
