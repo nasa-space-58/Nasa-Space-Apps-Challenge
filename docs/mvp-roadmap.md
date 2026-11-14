@@ -63,19 +63,19 @@ Follow the non-UI skeleton → frozen test commit → implementation workflow in
 
 Depends on Step 0.
 
-- [ ] Define shared Pydantic ingestion request and ready/failed event schemas with request identifiers.
-- [ ] Implement durable queue processing, retry behavior and idempotent requests.
+- [x] Define shared Pydantic ingestion request and ready/failed event schemas with request identifiers.
+- [x] Implement durable queue processing, retry behavior and idempotent requests.
 - [x] Query Horizons for Sun (`10`) and Earth (`399`) from a lunar surface observer (`coord@301`).
 - [x] Preserve raw queries/responses and metadata, parse named CSV columns, and validate semantic errors even on HTTP 200.
 - [x] Retrieve angular diameter for partial solar disk evaluation.
-- [ ] Download a bounded LOLA terrain product, retaining source/product identifiers and integrity information.
-- [ ] Keep raw and processed data separate and publish completed files atomically before ready events.
+- [x] Download a bounded LOLA terrain product, retaining source/product identifiers and integrity information.
+- [x] Keep raw and processed data separate and publish completed files atomically before ready events.
 - [x] Cache by all result-affecting site, time, sampling, source and model parameters.
 - [x] Verify a documented Horizons reference query and coordinate conventions.
 
 **Completion evidence** — One selected site and interval have reproducible Sun/Earth data and terrain coverage. Retried requests leave consistent cached results.
 
-Horizons CLI acquisition and immutable cache verified on 2026-11-14; see [verification details](horizons-ingestion.md). Broker delivery and terrain remain open, so Step 1 is not complete.
+Step 1 implementation and local verification completed on 2026-11-14 in `feature/task1-ingestion-cache`. A backend RabbitMQ request produced a 501 × 501 Malapert terrain crop and 25 Sun/Earth samples. Queued requests survived broker restart; replay used existing verified files with the job attempt count still one. See [pipeline details](ingestion-pipeline.md) and [live evidence](verification/task1-ingestion-2026-11-14.json). Peer review/branch integration remain separate; no merge to tahakrcc or main was performed.
 
 ### Step 2 — Compute the terrain horizon
 

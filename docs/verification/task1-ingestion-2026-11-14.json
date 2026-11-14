@@ -1,0 +1,29 @@
+{
+  "verified_on": "2026-11-14",
+  "request_id": "f7b066d0-50cb-4bf5-a2b9-7e4db039f5ee",
+  "status": "ready",
+  "source_url": "https://pgda.gsfc.nasa.gov/data/LOLA_20mpp/LDEM_80S_80MPP_ADJ.TIF",
+  "raw_source_size_bytes": 189158392,
+  "raw_source_sha256": "82030dcbdd7c4bb0c7d858e9b4b293b9f2cda5a543ba31ec0f42784bd6beee5a",
+  "terrain_path": "terrain/processed/2d16e4a91f72903dc821c84342efe7350bb308b479b41e2b7a6ae62669ecbd29",
+  "horizons_path": "horizons/3c80bd85dee3121d7e79ea62c2a936dbfec508ba63920d94e8a3e69a24a89fed",
+  "terrain_cells": 251001,
+  "terrain_resolution_m": [
+    80.0,
+    80.0
+  ],
+  "terrain_bounds_m": [
+    -20560.0,
+    101440.0,
+    19520.0,
+    141520.0
+  ],
+  "surface_height_m": 4784.62451171875,
+  "horizons_sample_count": 25,
+  "job_attempts_after_restart_and_replay": 1,
+  "checksum_verification": "passed",
+  "queued_messages_before_broker_restart": 1,
+  "queued_messages_after_broker_restart": 1,
+  "invalid_message_dead_letter_check": "passed",
+  "outside_coverage_failed_event": "TerrainError, one attempt"
+}
