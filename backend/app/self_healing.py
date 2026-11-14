@@ -6,6 +6,7 @@ from collections import Counter
 from copy import deepcopy
 from datetime import datetime, timedelta
 from itertools import groupby
+from time import perf_counter
 
 from typing import Annotated, Literal
 
@@ -375,6 +376,14 @@ def replay_recovery(
         )
 
     def decide():
+        started = perf_counter()
+        try:
+            _decide()
+        finally:
+            if decision_timings is not None:
+                decision_timings.append(perf_counter() - started)
+
+    def _decide():
         nonlocal selected, status, final_reasons
         estimate = estimated()
         draws = _draws(uncertainty, scenario.seed, revision)

@@ -565,7 +565,9 @@ def replay_hybrid(
         return result["selected_target_id"]
 
     try:
-        replay = replay_recovery(recovery, target_selector=select)
+        replay = replay_recovery(
+            recovery, target_selector=select, decision_timings=decision_timings
+        )
     finally:
         coordinator.close()
     return dict(
