@@ -1,0 +1,38 @@
+{
+  "profiles": [
+    {
+      "profile_id": "apollo-lm-11",
+      "name": "Apollo Lunar Module (Apollo 11, LM-5)",
+      "mass_at_pdi_lb": 33401.6,
+      "usable_propellant_lb": 17992.5,
+      "max_thrust_lbf": 10000,
+      "design_thrust_lbf": 10500,
+      "min_throttle_fraction": 0.10,
+      "max_throttle_fraction": 0.60,
+      "isp_s": 309.7,
+      "sources": {
+        "mass_at_pdi_lb": "Apollo 11 Mission Report (MSC-00171), Table A-I: LM after descent orbit insertion cutoff 33 401.6 lb",
+        "usable_propellant_lb": "Propellant remaining at PDI: DPS load 18 260.5 lb (NASA TN D-6846, Table II) minus 268.0 lb used by descent orbit insertion (Apollo 11 Mission Report Table A-I: 33 669.6 lb at ignition, 33 401.6 lb at cutoff); unusable residuals are not subtracted",
+        "max_thrust_lbf": "NASA TN D-6846, System descriptions: maximum thrust approximately 10 000 lb (fixed throttle position)",
+        "design_thrust_lbf": "NASA TN D-6846: design thrust 10 500 lb",
+        "throttle": "NASA TN D-6846: throttleable between 10 and 60 percent of design thrust; commands above that use the fixed throttle position",
+        "isp_s": "NASA Apollo DPS flight evaluations: Apollo 9 time-integrated average specific impulse 309.7 s"
+      },
+      "urls": [
+        "https://ntrs.nasa.gov/api/citations/19720018205/downloads/19720018205.pdf",
+        "https://www.nasa.gov/wp-content/uploads/static/apollo50th/pdf/A11_MissionReport.pdf"
+      ]
+    }
+  ],
+  "apollo11_reference": {
+    "source": "NASA TN D-6846, Table I: Apollo 11 premission powered-descent event summary",
+    "pdi_altitude_ft": 50000,
+    "pdi_inertial_velocity_fps": 5560,
+    "doi_delta_v_fps": 75,
+    "initial_orbit_nmi": 60,
+    "high_gate": {"time_s": 506, "altitude_ft": 7515, "altitude_rate_fps": -145, "inertial_velocity_fps": 506, "range_nmi": 4.5},
+    "low_gate": {"time_s": 606, "altitude_ft": 512, "altitude_rate_fps": -16, "horizontal_velocity_fps": 55, "glide_angle_deg": 16},
+    "touchdown": {"time_s": 714, "altitude_rate_fps": -3},
+    "total_powered_delta_v_fps": 6775
+  }
+}
