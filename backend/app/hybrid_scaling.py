@@ -128,9 +128,11 @@ def generate_instance(spec: InstanceSpec) -> Scenario:
 def build_pairwise_model(scenario: Scenario) -> PairwiseModel:
     """Derive unary/pairwise hard rules without enumerating assignments.
 
-    Supported only when exactness is guaranteed: every positive concurrent demand
-    exceeds half its known capacity, and every budget is either non-binding or
-    exceeded by any two positive demands. Raise ValueError for events, unknown
+    Supported only when exactness is guaranteed: each resource is either
+    non-binding (the sum over missions of the largest per-option peak demand,
+    or total joules, is within capacity) or every positive demand exceeds half
+    its known capacity, so any violation already appears in a single option or
+    pair. Conflict pairs involving a forbidden option are omitted, as in H2. Raise ValueError for events, unknown
     data, or rules needing slack variables or higher-order terms.
     """
     raise NotImplementedError
