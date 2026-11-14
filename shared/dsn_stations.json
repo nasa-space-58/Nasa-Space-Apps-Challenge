@@ -1,0 +1,43 @@
+{
+  "source": {
+    "document": "DSN Telecommunications Link Design Handbook 810-005, module 301 Coverage and Geometry, Rev. P",
+    "issue_date": "2026-05-22",
+    "url": "https://deepspace.jpl.nasa.gov/dsndocs/810-005/301/301P.pdf",
+    "table": "Table 5. Geodetic Coordinates for DSN Stations With Respect to the WGS 84 Ellipsoid",
+    "elevation_limits_section": "2.2.3 Coverage Charts (generic limits: 6.0 deg receive, 10.0 deg low-power transmit, 13.5 deg high-power transmit)",
+    "accuracy": "+/-0.001 arcsec and +/-0.030 m (1-sigma), Table 5 note 2",
+    "ellipsoid": "WGS84 (a = 6378137 m, f = 1/298.257223563)",
+    "height_reference": "Height above the WGS84 ellipsoid, not mean sea level"
+  },
+  "generic_elevation_limits_deg": {
+    "receive": 6.0,
+    "low_power_transmit": 10.0,
+    "high_power_transmit": 13.5
+  },
+  "stations": [
+    {
+      "station_id": "DSS-14",
+      "complex": "Goldstone",
+      "antenna": "70-m",
+      "latitude_dms": [35, 25, 33.24312],
+      "longitude_east_dms": [243, 6, 37.66244],
+      "height_m": 1001.39
+    },
+    {
+      "station_id": "DSS-43",
+      "complex": "Canberra",
+      "antenna": "70-m",
+      "latitude_dms": [-35, -24, -8.72724],
+      "longitude_east_dms": [148, 58, 52.56231],
+      "height_m": 688.867
+    },
+    {
+      "station_id": "DSS-63",
+      "complex": "Madrid",
+      "antenna": "70-m",
+      "latitude_dms": [40, 25, 52.3551],
+      "longitude_east_dms": [355, 45, 7.16924],
+      "height_m": 864.816
+    }
+  ]
+}
