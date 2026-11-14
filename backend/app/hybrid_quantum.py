@@ -373,6 +373,7 @@ def run_qaoa(
     shots: int = 512,
     seed: int = 17,
     max_qubits: int = 6,
+    on_iteration=None,
 ) -> QaoaResult:
     """Run bounded seeded classical tuning, then sample the noiseless QAOA state.
 

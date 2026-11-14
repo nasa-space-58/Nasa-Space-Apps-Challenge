@@ -124,7 +124,9 @@ def validate_plan(plan: Plan, scenario: Scenario) -> ValidationReport:
     return _evaluate(plan, scenario, fingerprint(scenario))
 
 
-def solve_exact(scenario: Scenario, *, max_evaluations: int = 10_000) -> SolverResult:
+def solve_exact(
+    scenario: Scenario, *, max_evaluations: int = 10_000, on_assignment=None
+) -> SolverResult:
     """Enumerate bounded assignments; maximize H0 weighted normalized objectives.
 
     Return an incumbent and counts, with optimality only after full enumeration.
