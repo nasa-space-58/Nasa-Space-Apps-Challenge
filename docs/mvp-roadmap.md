@@ -144,17 +144,19 @@ Task 5 implementation and local verification completed on 2026-11-14 in `feature
 
 Depends on Step 5.
 
-- [ ] Run all required tests and lint checks in containers.
-- [ ] Test the complete user journey with supported coordinates and dates.
-- [ ] Exercise missing terrain, upstream failure, cached data and requests outside the supported interval.
-- [ ] Verify scientific reference cases and reproducibility metadata.
-- [ ] Compare with independent NASA reference products only where time period, model and resolution are comparable.
-- [ ] Measure response times for cached and uncached analyses and document results.
+- [x] Run all required tests and lint checks in containers.
+- [x] Test the complete user journey with supported coordinates and dates.
+- [x] Exercise missing terrain, upstream failure, cached data and requests outside the supported interval.
+- [x] Verify scientific reference cases and reproducibility metadata.
+- [x] Compare with independent NASA reference products only where time period, model and resolution are comparable.
+- [x] Measure response times for cached and uncached analyses and document results.
 - [ ] Check the interface with a teammate using the planner and public-user workflows.
-- [ ] Update README setup/run instructions and prepare the short site/date comparison demo.
-- [ ] Record the NASA resources actually used and the assumptions shown in the submission.
+- [x] Update README setup/run instructions and prepare the short site/date comparison demo.
+- [x] Record the NASA resources actually used and the assumptions shown in the submission.
 
 **MVP release gate** — All first-release acceptance conditions above are demonstrated and the required checks pass.
+
+Technical verification and fixes completed on 2026-11-14 in `feature/task6-demo-verification`: 222 tests, no-cache clean builds, real cold/warm data, outage/restart recovery, numerical regression and production UI checks. See [verification report](mvp-verification.md) and [demo/human acceptance checklist](demo-runbook.md). NASA long-cycle illumination maps were assessed and found unsuitable as short-window numerical targets. **Teammate acceptance remains pending; the full MVP release gate is not closed.**
 
 ## Subsequent releases in order
 

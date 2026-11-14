@@ -1,0 +1,1230 @@
+{
+  "verified_on": "2026-11-14",
+  "branch": "feature/task6-demo-verification",
+  "base": "c1d6348",
+  "tested_code": "682a731",
+  "technical_checks": "passed",
+  "teammate_acceptance": "pending",
+  "tests": {
+    "backend": 136,
+    "ingestion": 75,
+    "frontend": 11
+  },
+  "live": {
+    "api": "http://localhost:8002",
+    "cases": {
+      "cold": {
+        "job_id": "0fa275ce-f6b9-46f2-982d-c7bc7272c5f6",
+        "elapsed_s": 268.02,
+        "phases": [
+          "pending",
+          "preparing",
+          "refining",
+          "ready"
+        ],
+        "analysis_id": "1d2d7da736322844dac9b7351e3e5b0f9291d078efe152dd67b12c78c543ba4f",
+        "frames": 39,
+        "request": {
+          "site": {
+            "site_id": "malapert-massif-r23",
+            "longitude_deg_east": 359.76422,
+            "latitude_deg": -85.9948,
+            "altitude_km": 4.78662451171875,
+            "reference_frame": "MOON_ME"
+          },
+          "start_utc": "2026-11-04T00:00:00Z",
+          "end_utc": "2026-11-05T00:00:00Z",
+          "step_s": 3600
+        },
+        "sun": {
+          "visible_duration_s": 17738.15736,
+          "full_duration_s": 0,
+          "partial_duration_s": 17738.15736,
+          "blocked_duration_s": 68661.84264,
+          "unknown_duration_s": 0,
+          "visible_percent_of_interval": 20.530274722222224,
+          "longest_visible_s": 17738.15736,
+          "longest_blocked_s": 68661.84264
+        },
+        "earth": {
+          "visible_duration_s": 0,
+          "full_duration_s": 0,
+          "partial_duration_s": 0,
+          "blocked_duration_s": 86400.0,
+          "unknown_duration_s": 0,
+          "visible_percent_of_interval": 0.0,
+          "longest_visible_s": 0.0,
+          "longest_blocked_s": 86400.0
+        }
+      },
+      "warm": {
+        "job_id": "6bf8a750-67b5-4c52-848c-b677773d59cb",
+        "elapsed_s": 4.059,
+        "phases": [
+          "pending",
+          "refining",
+          "ready"
+        ],
+        "analysis_id": "1d2d7da736322844dac9b7351e3e5b0f9291d078efe152dd67b12c78c543ba4f",
+        "frames": 39,
+        "request": {
+          "site": {
+            "site_id": "malapert-massif-r23",
+            "longitude_deg_east": 359.76422,
+            "latitude_deg": -85.9948,
+            "altitude_km": 4.78662451171875,
+            "reference_frame": "MOON_ME"
+          },
+          "start_utc": "2026-11-04T00:00:00Z",
+          "end_utc": "2026-11-05T00:00:00Z",
+          "step_s": 3600
+        },
+        "sun": {
+          "visible_duration_s": 17738.15736,
+          "full_duration_s": 0,
+          "partial_duration_s": 17738.15736,
+          "blocked_duration_s": 68661.84264,
+          "unknown_duration_s": 0,
+          "visible_percent_of_interval": 20.530274722222224,
+          "longest_visible_s": 17738.15736,
+          "longest_blocked_s": 68661.84264
+        },
+        "earth": {
+          "visible_duration_s": 0,
+          "full_duration_s": 0,
+          "partial_duration_s": 0,
+          "blocked_duration_s": 86400.0,
+          "unknown_duration_s": 0,
+          "visible_percent_of_interval": 0.0,
+          "longest_visible_s": 0.0,
+          "longest_blocked_s": 86400.0
+        }
+      },
+      "delay48": {
+        "job_id": "52162f17-88c3-4e49-8088-72a870d2fcfc",
+        "elapsed_s": 5.065,
+        "phases": [
+          "pending",
+          "preparing",
+          "refining",
+          "ready"
+        ],
+        "analysis_id": "6d9a3398d59b6ae9bc42dd07b518da3f65042ffcceef1dc1086f36bf3ccd46b8",
+        "frames": 24,
+        "request": {
+          "site": {
+            "site_id": "malapert-massif-r23",
+            "longitude_deg_east": 359.76422,
+            "latitude_deg": -85.9948,
+            "altitude_km": 4.78662451171875,
+            "reference_frame": "MOON_ME"
+          },
+          "start_utc": "2026-11-06T00:00:00Z",
+          "end_utc": "2026-11-07T00:00:00Z",
+          "step_s": 3600
+        },
+        "sun": {
+          "visible_duration_s": 86400.0,
+          "full_duration_s": 0,
+          "partial_duration_s": 86400.0,
+          "blocked_duration_s": 0,
+          "unknown_duration_s": 0,
+          "visible_percent_of_interval": 100.0,
+          "longest_visible_s": 86400.0,
+          "longest_blocked_s": 0.0
+        },
+        "earth": {
+          "visible_duration_s": 0,
+          "full_duration_s": 0,
+          "partial_duration_s": 0,
+          "blocked_duration_s": 86400.0,
+          "unknown_duration_s": 0,
+          "visible_percent_of_interval": 0.0,
+          "longest_visible_s": 0.0,
+          "longest_blocked_s": 86400.0
+        }
+      },
+      "other_site": {
+        "job_id": "9ecbf941-b70d-4612-b576-7679021969f9",
+        "elapsed_s": 8.094,
+        "phases": [
+          "pending",
+          "preparing",
+          "refining",
+          "ready"
+        ],
+        "analysis_id": "06affc63c44591793c59202a22f0936a0b9ad5a8479e1c965766b3d71598e470",
+        "frames": 39,
+        "request": {
+          "site": {
+            "site_id": "mons-mouton-feature-center",
+            "longitude_deg_east": 31.0,
+            "latitude_deg": -84.6,
+            "altitude_km": 5.0411572265625,
+            "reference_frame": "MOON_ME"
+          },
+          "start_utc": "2026-11-04T00:00:00Z",
+          "end_utc": "2026-11-05T00:00:00Z",
+          "step_s": 3600
+        },
+        "sun": {
+          "visible_duration_s": 0,
+          "full_duration_s": 0,
+          "partial_duration_s": 0,
+          "blocked_duration_s": 86400.0,
+          "unknown_duration_s": 0,
+          "visible_percent_of_interval": 0.0,
+          "longest_visible_s": 0.0,
+          "longest_blocked_s": 86400.0
+        },
+        "earth": {
+          "visible_duration_s": 21876.480279,
+          "full_duration_s": 0,
+          "partial_duration_s": 0,
+          "blocked_duration_s": 64523.519721,
+          "unknown_duration_s": 0,
+          "visible_percent_of_interval": 25.320000322916666,
+          "longest_visible_s": 21876.480279,
+          "longest_blocked_s": 64523.519721
+        }
+      }
+    },
+    "validation": {
+      "empty_terrain_resolver": 409,
+      "outside_coverage": 422,
+      "outside_date": 422,
+      "zero_duration": 422
+    },
+    "cached_replay_identical": true,
+    "comparisons": {
+      "dates": {
+        "mode": "dates",
+        "status": "ready",
+        "alignment": "elapsed_since_start",
+        "duration_s": 86400.0,
+        "start_offset_s": 172800.0,
+        "deltas": {
+          "sun": {
+            "visible_duration_s": 68661.84264,
+            "visible_percent_of_interval": 79.46972527777777,
+            "longest_blocked_s": -68661.84264,
+            "longest_visible_s": 68661.84264,
+            "unknown_duration_s": 0
+          },
+          "earth": {
+            "visible_duration_s": 0,
+            "visible_percent_of_interval": 0.0,
+            "longest_blocked_s": 0.0,
+            "longest_visible_s": 0.0,
+            "unknown_duration_s": 0
+          }
+        },
+        "changes": {
+          "sun": [
+            {
+              "start_elapsed_s": 17738.15736,
+              "end_elapsed_s": 86400.0,
+              "a_state": "dark",
+              "b_state": "partial"
+            }
+          ],
+          "earth": []
+        },
+        "cursor": [
+          {
+            "elapsed_s": 0.0,
+            "a_index": 0,
+            "a_sample_age_s": 0.0,
+            "b_index": 0,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 3600.0,
+            "a_index": 1,
+            "a_sample_age_s": 0.0,
+            "b_index": 1,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 7200.0,
+            "a_index": 2,
+            "a_sample_age_s": 0.0,
+            "b_index": 2,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 10800.0,
+            "a_index": 3,
+            "a_sample_age_s": 0.0,
+            "b_index": 3,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 14400.0,
+            "a_index": 4,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 14700.0,
+            "a_index": 5,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 300.0
+          },
+          {
+            "elapsed_s": 15000.0,
+            "a_index": 6,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 600.0
+          },
+          {
+            "elapsed_s": 15300.0,
+            "a_index": 7,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 900.0
+          },
+          {
+            "elapsed_s": 15600.0,
+            "a_index": 8,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 1200.0
+          },
+          {
+            "elapsed_s": 15900.0,
+            "a_index": 9,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 1500.0
+          },
+          {
+            "elapsed_s": 16200.0,
+            "a_index": 10,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 1800.0
+          },
+          {
+            "elapsed_s": 16500.0,
+            "a_index": 11,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 2100.0
+          },
+          {
+            "elapsed_s": 16800.0,
+            "a_index": 12,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 2400.0
+          },
+          {
+            "elapsed_s": 17100.0,
+            "a_index": 13,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 2700.0
+          },
+          {
+            "elapsed_s": 17400.0,
+            "a_index": 14,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 3000.0
+          },
+          {
+            "elapsed_s": 17700.0,
+            "a_index": 15,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 3300.0
+          },
+          {
+            "elapsed_s": 17760.0,
+            "a_index": 16,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 3360.0
+          },
+          {
+            "elapsed_s": 17820.0,
+            "a_index": 17,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 3420.0
+          },
+          {
+            "elapsed_s": 17880.0,
+            "a_index": 18,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 3480.0
+          },
+          {
+            "elapsed_s": 17940.0,
+            "a_index": 19,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 3540.0
+          },
+          {
+            "elapsed_s": 18000.0,
+            "a_index": 20,
+            "a_sample_age_s": 0.0,
+            "b_index": 5,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 21600.0,
+            "a_index": 21,
+            "a_sample_age_s": 0.0,
+            "b_index": 6,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 25200.0,
+            "a_index": 22,
+            "a_sample_age_s": 0.0,
+            "b_index": 7,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 28800.0,
+            "a_index": 23,
+            "a_sample_age_s": 0.0,
+            "b_index": 8,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 32400.0,
+            "a_index": 24,
+            "a_sample_age_s": 0.0,
+            "b_index": 9,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 36000.0,
+            "a_index": 25,
+            "a_sample_age_s": 0.0,
+            "b_index": 10,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 39600.0,
+            "a_index": 26,
+            "a_sample_age_s": 0.0,
+            "b_index": 11,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 43200.0,
+            "a_index": 27,
+            "a_sample_age_s": 0.0,
+            "b_index": 12,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 46800.0,
+            "a_index": 28,
+            "a_sample_age_s": 0.0,
+            "b_index": 13,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 50400.0,
+            "a_index": 29,
+            "a_sample_age_s": 0.0,
+            "b_index": 14,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 54000.0,
+            "a_index": 30,
+            "a_sample_age_s": 0.0,
+            "b_index": 15,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 57600.0,
+            "a_index": 31,
+            "a_sample_age_s": 0.0,
+            "b_index": 16,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 61200.0,
+            "a_index": 32,
+            "a_sample_age_s": 0.0,
+            "b_index": 17,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 64800.0,
+            "a_index": 33,
+            "a_sample_age_s": 0.0,
+            "b_index": 18,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 68400.0,
+            "a_index": 34,
+            "a_sample_age_s": 0.0,
+            "b_index": 19,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 72000.0,
+            "a_index": 35,
+            "a_sample_age_s": 0.0,
+            "b_index": 20,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 75600.0,
+            "a_index": 36,
+            "a_sample_age_s": 0.0,
+            "b_index": 21,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 79200.0,
+            "a_index": 37,
+            "a_sample_age_s": 0.0,
+            "b_index": 22,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 82800.0,
+            "a_index": 38,
+            "a_sample_age_s": 0.0,
+            "b_index": 23,
+            "b_sample_age_s": 0.0
+          }
+        ],
+        "explanations": [
+          "Sunlight: B has 19.07 h more modeled visibility than A over the same 24 h window.",
+          "Sunlight: 1 elapsed-time segment(s) have different states; see both UTC timelines. Estimates inherit terrain and sampling limits.",
+          "Earth-center visibility: A and B have the same modeled visibility duration over the same 24 h window.",
+          "Earth-center visibility: 0 elapsed-time segment(s) have different states; see both UTC timelines. Estimates inherit terrain and sampling limits."
+        ],
+        "analysis_ids": [
+          "1d2d7da736322844dac9b7351e3e5b0f9291d078efe152dd67b12c78c543ba4f",
+          "6d9a3398d59b6ae9bc42dd07b518da3f65042ffcceef1dc1086f36bf3ccd46b8"
+        ],
+        "job_ids": {
+          "a_id": "0fa275ce-f6b9-46f2-982d-c7bc7272c5f6",
+          "b_id": "52162f17-88c3-4e49-8088-72a870d2fcfc"
+        }
+      },
+      "sites": {
+        "mode": "sites",
+        "status": "ready",
+        "alignment": "shared_utc",
+        "duration_s": 86400.0,
+        "start_offset_s": 0.0,
+        "deltas": {
+          "sun": {
+            "visible_duration_s": -17738.15736,
+            "visible_percent_of_interval": -20.530274722222224,
+            "longest_blocked_s": 17738.157359999997,
+            "longest_visible_s": -17738.15736,
+            "unknown_duration_s": 0
+          },
+          "earth": {
+            "visible_duration_s": 21876.480279,
+            "visible_percent_of_interval": 25.320000322916666,
+            "longest_blocked_s": -21876.480279000003,
+            "longest_visible_s": 21876.480279,
+            "unknown_duration_s": 0
+          }
+        },
+        "changes": {
+          "sun": [
+            {
+              "start_elapsed_s": 0.0,
+              "end_elapsed_s": 17738.15736,
+              "a_state": "partial",
+              "b_state": "dark"
+            }
+          ],
+          "earth": [
+            {
+              "start_elapsed_s": 0.0,
+              "end_elapsed_s": 21876.480279,
+              "a_state": "blocked",
+              "b_state": "visible"
+            }
+          ]
+        },
+        "cursor": [
+          {
+            "elapsed_s": 0.0,
+            "a_index": 0,
+            "a_sample_age_s": 0.0,
+            "b_index": 0,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 3600.0,
+            "a_index": 1,
+            "a_sample_age_s": 0.0,
+            "b_index": 1,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 7200.0,
+            "a_index": 2,
+            "a_sample_age_s": 0.0,
+            "b_index": 2,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 10800.0,
+            "a_index": 3,
+            "a_sample_age_s": 0.0,
+            "b_index": 3,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 14400.0,
+            "a_index": 4,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 14700.0,
+            "a_index": 5,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 300.0
+          },
+          {
+            "elapsed_s": 15000.0,
+            "a_index": 6,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 600.0
+          },
+          {
+            "elapsed_s": 15300.0,
+            "a_index": 7,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 900.0
+          },
+          {
+            "elapsed_s": 15600.0,
+            "a_index": 8,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 1200.0
+          },
+          {
+            "elapsed_s": 15900.0,
+            "a_index": 9,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 1500.0
+          },
+          {
+            "elapsed_s": 16200.0,
+            "a_index": 10,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 1800.0
+          },
+          {
+            "elapsed_s": 16500.0,
+            "a_index": 11,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 2100.0
+          },
+          {
+            "elapsed_s": 16800.0,
+            "a_index": 12,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 2400.0
+          },
+          {
+            "elapsed_s": 17100.0,
+            "a_index": 13,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 2700.0
+          },
+          {
+            "elapsed_s": 17400.0,
+            "a_index": 14,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 3000.0
+          },
+          {
+            "elapsed_s": 17700.0,
+            "a_index": 15,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 3300.0
+          },
+          {
+            "elapsed_s": 17760.0,
+            "a_index": 16,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 3360.0
+          },
+          {
+            "elapsed_s": 17820.0,
+            "a_index": 17,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 3420.0
+          },
+          {
+            "elapsed_s": 17880.0,
+            "a_index": 18,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 3480.0
+          },
+          {
+            "elapsed_s": 17940.0,
+            "a_index": 19,
+            "a_sample_age_s": 0.0,
+            "b_index": 4,
+            "b_sample_age_s": 3540.0
+          },
+          {
+            "elapsed_s": 18000.0,
+            "a_index": 20,
+            "a_sample_age_s": 0.0,
+            "b_index": 5,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 21600.0,
+            "a_index": 21,
+            "a_sample_age_s": 0.0,
+            "b_index": 6,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 21660.0,
+            "a_index": 21,
+            "a_sample_age_s": 60.0,
+            "b_index": 7,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 21720.0,
+            "a_index": 21,
+            "a_sample_age_s": 120.0,
+            "b_index": 8,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 21780.0,
+            "a_index": 21,
+            "a_sample_age_s": 180.0,
+            "b_index": 9,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 21840.0,
+            "a_index": 21,
+            "a_sample_age_s": 240.0,
+            "b_index": 10,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 21900.0,
+            "a_index": 21,
+            "a_sample_age_s": 300.0,
+            "b_index": 11,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 22200.0,
+            "a_index": 21,
+            "a_sample_age_s": 600.0,
+            "b_index": 12,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 22500.0,
+            "a_index": 21,
+            "a_sample_age_s": 900.0,
+            "b_index": 13,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 22800.0,
+            "a_index": 21,
+            "a_sample_age_s": 1200.0,
+            "b_index": 14,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 23100.0,
+            "a_index": 21,
+            "a_sample_age_s": 1500.0,
+            "b_index": 15,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 23400.0,
+            "a_index": 21,
+            "a_sample_age_s": 1800.0,
+            "b_index": 16,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 23700.0,
+            "a_index": 21,
+            "a_sample_age_s": 2100.0,
+            "b_index": 17,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 24000.0,
+            "a_index": 21,
+            "a_sample_age_s": 2400.0,
+            "b_index": 18,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 24300.0,
+            "a_index": 21,
+            "a_sample_age_s": 2700.0,
+            "b_index": 19,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 24600.0,
+            "a_index": 21,
+            "a_sample_age_s": 3000.0,
+            "b_index": 20,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 24900.0,
+            "a_index": 21,
+            "a_sample_age_s": 3300.0,
+            "b_index": 21,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 25200.0,
+            "a_index": 22,
+            "a_sample_age_s": 0.0,
+            "b_index": 22,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 28800.0,
+            "a_index": 23,
+            "a_sample_age_s": 0.0,
+            "b_index": 23,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 32400.0,
+            "a_index": 24,
+            "a_sample_age_s": 0.0,
+            "b_index": 24,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 36000.0,
+            "a_index": 25,
+            "a_sample_age_s": 0.0,
+            "b_index": 25,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 39600.0,
+            "a_index": 26,
+            "a_sample_age_s": 0.0,
+            "b_index": 26,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 43200.0,
+            "a_index": 27,
+            "a_sample_age_s": 0.0,
+            "b_index": 27,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 46800.0,
+            "a_index": 28,
+            "a_sample_age_s": 0.0,
+            "b_index": 28,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 50400.0,
+            "a_index": 29,
+            "a_sample_age_s": 0.0,
+            "b_index": 29,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 54000.0,
+            "a_index": 30,
+            "a_sample_age_s": 0.0,
+            "b_index": 30,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 57600.0,
+            "a_index": 31,
+            "a_sample_age_s": 0.0,
+            "b_index": 31,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 61200.0,
+            "a_index": 32,
+            "a_sample_age_s": 0.0,
+            "b_index": 32,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 64800.0,
+            "a_index": 33,
+            "a_sample_age_s": 0.0,
+            "b_index": 33,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 68400.0,
+            "a_index": 34,
+            "a_sample_age_s": 0.0,
+            "b_index": 34,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 72000.0,
+            "a_index": 35,
+            "a_sample_age_s": 0.0,
+            "b_index": 35,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 75600.0,
+            "a_index": 36,
+            "a_sample_age_s": 0.0,
+            "b_index": 36,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 79200.0,
+            "a_index": 37,
+            "a_sample_age_s": 0.0,
+            "b_index": 37,
+            "b_sample_age_s": 0.0
+          },
+          {
+            "elapsed_s": 82800.0,
+            "a_index": 38,
+            "a_sample_age_s": 0.0,
+            "b_index": 38,
+            "b_sample_age_s": 0.0
+          }
+        ],
+        "explanations": [
+          "Sunlight: B has 4.93 h less modeled visibility than A over the same 24 h window.",
+          "Sunlight: 1 elapsed-time segment(s) have different states; see both UTC timelines. Estimates inherit terrain and sampling limits.",
+          "Earth-center visibility: B has 6.08 h more modeled visibility than A over the same 24 h window.",
+          "Earth-center visibility: 1 elapsed-time segment(s) have different states; see both UTC timelines. Estimates inherit terrain and sampling limits."
+        ],
+        "analysis_ids": [
+          "1d2d7da736322844dac9b7351e3e5b0f9291d078efe152dd67b12c78c543ba4f",
+          "06affc63c44591793c59202a22f0936a0b9ad5a8479e1c965766b3d71598e470"
+        ],
+        "job_ids": {
+          "a_id": "0fa275ce-f6b9-46f2-982d-c7bc7272c5f6",
+          "b_id": "9ecbf941-b70d-4612-b576-7679021969f9"
+        }
+      }
+    }
+  },
+  "faults_and_recovery": {
+    "failed_job": {
+      "id": "a36b334e-fdf1-4c0d-a821-2ea3ee5d037a",
+      "created": "2026-11-14T14:19:55.452901+00:00",
+      "status": "failed",
+      "submission": {
+        "site_id": "malapert-massif-r23",
+        "latitude_deg": -85.9948,
+        "longitude_deg_east": 359.76422,
+        "observer_height_m": 2.0,
+        "start_utc": "2026-11-08T00:00:00Z",
+        "end_utc": "2026-11-09T00:00:00Z",
+        "step_s": 3600,
+        "refine": false,
+        "horizon": {
+          "azimuth_step_deg": 1.0,
+          "search_distance_m": 100000,
+          "radial_step_m": 40,
+          "source_extent": "raw"
+        }
+      },
+      "error": "Data acquisition failed: [Errno 111] Connection refused"
+    },
+    "elapsed_s": 13.160047415996814,
+    "body": {
+      "site_id": "malapert-massif-r23",
+      "latitude_deg": -85.9948,
+      "longitude_deg_east": 359.76422,
+      "observer_height_m": 2,
+      "start_utc": "2026-11-08T00:00:00Z",
+      "end_utc": "2026-11-09T00:00:00Z",
+      "refine": false
+    },
+    "retry_id": "dfac5392-a994-410a-b51b-590f51bc4373",
+    "retry_status": "failed",
+    "failed_status_after_restart": "failed",
+    "fixed_retry_id": "83e325d5-54da-45be-b769-b736c5c419fd",
+    "fixed_retry_status": "ready",
+    "completed_result_survived_restart": true
+  },
+  "health_latency": {
+    "samples": 20,
+    "median_ms": 3.5272919994895346,
+    "max_ms": 11.536707999766804,
+    "during": "cold terrain acquisition"
+  },
+  "long_window": {
+    "job_id": "bb61d3f2-e3d6-437e-96fa-b8f5976a6abb",
+    "elapsed_s": 57.59685208300289,
+    "frames": 1005,
+    "status": "ready",
+    "source_bundles": 38,
+    "max_transition_bracket_s": 60.0,
+    "analysis_id": "cda775e1993ea2431de66a78febf3946c751a97c3d29a042b0d1ec35625f977b"
+  },
+  "horizon_reference": {
+    "verified_on": "2026-11-14",
+    "terrain_reference": "terrain/processed/2d16e4a91f72903dc821c84342efe7350bb308b479b41e2b7a6ae62669ecbd29",
+    "source_sha256": "82030dcbdd7c4bb0c7d858e9b4b293b9f2cda5a543ba31ec0f42784bd6beee5a",
+    "site": {
+      "site_id": "malapert-massif-r23",
+      "longitude_deg_east": 359.76422,
+      "latitude_deg": -85.9948,
+      "altitude_km": 4.78662451171875,
+      "reference_frame": "MOON_ME"
+    },
+    "model_version": "spherical-ray-nearest-v1",
+    "software": {
+      "numpy": "2.5.4",
+      "rasterio": "1.5.2",
+      "gdal": "3.12.2"
+    },
+    "observer_height_above_terrain_m": 2.0,
+    "profiles": {
+      "20km": {
+        "profile_id": "0976cd8072379cc49595dadaa1e665f65668f86f0e19a6b4f8c4ca95147ea016",
+        "settings": {
+          "azimuth_step_deg": 1.0,
+          "search_distance_m": 20000,
+          "radial_step_m": 40,
+          "source_extent": "raw"
+        },
+        "complete_directions": 360,
+        "total_directions": 360,
+        "min_elevation_deg": -3.2758081192919057,
+        "max_elevation_deg": 6.529952109488072,
+        "elapsed_s": 1.406
+      },
+      "50km": {
+        "profile_id": "3bb0112692df2f13dfc64cc49f3a8ba655b0e489b89ccf3409fa292cc6b8c79e",
+        "settings": {
+          "azimuth_step_deg": 1.0,
+          "search_distance_m": 50000,
+          "radial_step_m": 40,
+          "source_extent": "raw"
+        },
+        "complete_directions": 360,
+        "total_directions": 360,
+        "min_elevation_deg": -3.2758081192919057,
+        "max_elevation_deg": 6.529952109488072,
+        "elapsed_s": 1.369
+      },
+      "100km": {
+        "profile_id": "0db8b71d945ebd7601746a3b4501ef843c17df2ba4cccdd4f7776f52e23ae5c2",
+        "settings": {
+          "azimuth_step_deg": 1.0,
+          "search_distance_m": 100000,
+          "radial_step_m": 40,
+          "source_extent": "raw"
+        },
+        "complete_directions": 360,
+        "total_directions": 360,
+        "min_elevation_deg": -3.2758081192919057,
+        "max_elevation_deg": 6.529952109488072,
+        "elapsed_s": 1.378
+      },
+      "150km": {
+        "profile_id": "054b8be0772ecd2aa981d77061cb7b274ba78d593de40d5ca2c38c1ba9eec2c6",
+        "settings": {
+          "azimuth_step_deg": 1.0,
+          "search_distance_m": 150000,
+          "radial_step_m": 40,
+          "source_extent": "raw"
+        },
+        "complete_directions": 360,
+        "total_directions": 360,
+        "min_elevation_deg": -3.2758081192919057,
+        "max_elevation_deg": 6.529952109488072,
+        "elapsed_s": 1.355
+      },
+      "100km-20m": {
+        "profile_id": "bdcd6df51bfb6659266c1f7345108f6fa1c36ef3ec5a97f848ebe4c01d2c658b",
+        "settings": {
+          "azimuth_step_deg": 1.0,
+          "search_distance_m": 100000,
+          "radial_step_m": 20,
+          "source_extent": "raw"
+        },
+        "complete_directions": 360,
+        "total_directions": 360,
+        "min_elevation_deg": -3.2758081192919057,
+        "max_elevation_deg": 6.529952109488072,
+        "elapsed_s": 1.475
+      },
+      "100km-half-degree": {
+        "profile_id": "13e760f59811ed45fe413839b24f8b0d104b215aeba733d96969d13c4937d2a3",
+        "settings": {
+          "azimuth_step_deg": 0.5,
+          "search_distance_m": 100000,
+          "radial_step_m": 40,
+          "source_extent": "raw"
+        },
+        "complete_directions": 720,
+        "total_directions": 720,
+        "min_elevation_deg": -3.2758081192919057,
+        "max_elevation_deg": 6.529952109488072,
+        "elapsed_s": 2.005
+      },
+      "crop-100km": {
+        "profile_id": "c765f5a3e0c376731440221059caf698e6094de1c81e86f1e3f0b9ffb238e2ee",
+        "settings": {
+          "azimuth_step_deg": 1.0,
+          "search_distance_m": 100000,
+          "radial_step_m": 40,
+          "source_extent": "crop"
+        },
+        "complete_directions": 0,
+        "total_directions": 360,
+        "min_elevation_deg": null,
+        "max_elevation_deg": null,
+        "elapsed_s": 0.785
+      }
+    },
+    "comparisons_to_100km": {
+      "20km": {
+        "common_complete_directions": 360,
+        "max_absolute_delta_deg": 0.0
+      },
+      "50km": {
+        "common_complete_directions": 360,
+        "max_absolute_delta_deg": 0.0
+      },
+      "150km": {
+        "common_complete_directions": 360,
+        "max_absolute_delta_deg": 0.0
+      },
+      "100km-20m": {
+        "common_complete_directions": 360,
+        "max_absolute_delta_deg": 0.11347673338481057
+      },
+      "half_degree_vs_interpolated_midpoints": {
+        "common_complete_directions": 360,
+        "max_absolute_delta_deg": 0.7306970236691157
+      }
+    },
+    "independent_cartesian_checks": [
+      {
+        "azimuth_deg": 0,
+        "reference_elevation_deg": 4.711139612883134,
+        "computed_elevation_deg": 4.711139612883288,
+        "absolute_delta_deg": 1.545430450278218e-13
+      },
+      {
+        "azimuth_deg": 90,
+        "reference_elevation_deg": 4.671429840650456,
+        "computed_elevation_deg": 4.671429840648696,
+        "absolute_delta_deg": 1.759481449425948e-12
+      },
+      {
+        "azimuth_deg": 180,
+        "reference_elevation_deg": -1.937130217564526,
+        "computed_elevation_deg": -1.93713021752059,
+        "absolute_delta_deg": 4.3935965976515945e-11
+      },
+      {
+        "azimuth_deg": 270,
+        "reference_elevation_deg": 2.3476998237100855,
+        "computed_elevation_deg": 2.3476998237074,
+        "absolute_delta_deg": 2.6854074519633286e-12
+      }
+    ],
+    "repeat_identical": true,
+    "limitations": "Finite sampled horizon only; convergence here does not bound unseen terrain or subpixel peaks."
+  },
+  "fresh_numerical_regression": {
+    "sun": {
+      "visible_duration_s": 0.0,
+      "full_duration_s": 0,
+      "partial_duration_s": 0.0,
+      "blocked_duration_s": 0.0,
+      "unknown_duration_s": 0,
+      "visible_percent_of_interval": 0.0,
+      "longest_visible_s": 0.0,
+      "longest_blocked_s": 0.0
+    },
+    "earth": {
+      "visible_duration_s": 0,
+      "full_duration_s": 0,
+      "partial_duration_s": 0,
+      "blocked_duration_s": 0.0,
+      "unknown_duration_s": 0,
+      "visible_percent_of_interval": 0.0,
+      "longest_visible_s": 0.0,
+      "longest_blocked_s": 0.0
+    }
+  },
+  "browser": {
+    "production_preview": true,
+    "desktop": [
+      1440,
+      1000
+    ],
+    "mobile_layout": [
+      390,
+      844
+    ],
+    "physical_mobile_tested": false,
+    "same_origin_transfer_bytes": 3049797,
+    "dom_content_loaded_ms": 96.1,
+    "desktop_frame_interval_median_ms": 16.7,
+    "api_503_recovery": true,
+    "saved_failed_inputs_restored": true,
+    "comparison_dates_verified": true,
+    "horizontal_overflow": false
+  },
+  "independent_nasa_illumination_comparison": {
+    "status": "not_comparable",
+    "source": "https://pgda.gsfc.nasa.gov/products/69",
+    "reason": "18.6-year averages, different resolution and any-limb Earth visibility do not match short-window 80m Earth-center calculations"
+  }
+}
