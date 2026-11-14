@@ -94,7 +94,8 @@
       "recommend": "Recommend",
       "descent": "Descent",
       "classroom": "Classroom",
-      "campaign": "Campaign"
+      "campaign": "Campaign",
+      "recovery": "Self-healing"
     },
     "nav": {
       "skip": "Skip to mission control",
@@ -1057,5 +1058,94 @@
       "sunlight_unknown": "unknown sunlight",
       "energy": "energy"
     }
+  },
+  "recovery": {
+    "title": "Self-healing landing: event replay",
+    "intro": "The same timestamped faults are replayed under the original plan, classical replanning and (when a campaign is supplied) guarded hybrid replanning. Every number comes from the backend H5/H6 models.",
+    "example": "Scenario",
+    "synthetic": "Synthetic · offline · planar model",
+    "running": "Replaying events…",
+    "error": "The recovery replay could not be computed.",
+    "examples": {
+      "combined_recovery": "Combined faults (fuel, thrust, blocked site)",
+      "engine_out": "Engine out (unrecoverable)",
+      "hybrid_campaign": "Combined faults + downstream campaign (hybrid)"
+    },
+    "outcomes": "Outcomes",
+    "trajectories": "Original and replanned trajectories",
+    "timeline": "Events and decisions over time",
+    "events": "Event panel",
+    "decisions": "Decision explanations and solver timing",
+    "limitations": "Limitations",
+    "branches": {
+      "original": "Original plan",
+      "classical": "Classical replanning",
+      "hybrid": "Hybrid replanning"
+    },
+    "status": {
+      "landed": "Landed within checks",
+      "failed": "Constraint failure",
+      "infeasible": "No validated continuation",
+      "running": "Running"
+    },
+    "actions": {
+      "continue": "Continue",
+      "retarget": "Retarget",
+      "no_feasible_continuation": "No feasible continuation"
+    },
+    "kinds": {
+      "thrust_loss": "Thrust loss",
+      "propellant_loss": "Propellant loss",
+      "sensor_degradation": "Sensor degradation",
+      "landing_hazard": "Newly observed hazard",
+      "communication_outage": "Communication outage"
+    },
+    "card": {
+      "target": "Final target",
+      "end": "End (vs nominal)",
+      "downrange": "Touchdown downrange",
+      "fuel": "Fuel left",
+      "reserve": "reserve {reserve} kg:",
+      "burnLoss": "Burned / lost",
+      "wall": "Replay wall time",
+      "unapplied": "Not applied (ended earlier): {ids}"
+    },
+    "col": {
+      "time": "Time",
+      "event": "Event",
+      "kind": "Kind",
+      "effect": "Applied effect",
+      "target": "Target",
+      "result": "Result",
+      "reasons": "Reasons",
+      "fuel": "Predicted burn",
+      "samples": "Samples passed",
+      "dispersion": "Sampled touchdown spread"
+    },
+    "noEvents": "No events declared.",
+    "noDecisions": "This branch makes no decisions.",
+    "accepted": "accepted",
+    "rejected": "rejected",
+    "revision": "state revision {revision}",
+    "thrust": "available thrust {value} N",
+    "timing": {
+      "planning": "Planning wall time",
+      "source": "Selected by",
+      "preparation": "Classical preparation",
+      "quantum": "Simulator worker",
+      "qubits": "{n} logical qubits",
+      "revalidation": "Fresh revalidation",
+      "deadline": "Elapsed / acceptance deadline",
+      "schedule": "Joint schedule"
+    },
+    "activeHazards": "Active landing exclusions: {list}",
+    "hybridNote": "Hybrid execution mode: {mode}; hardware jobs: {jobs}; final joint schedule: {options}. Simulated flight time is paused during planning.",
+    "axisDownrange": "downrange (m)",
+    "axisAltitude": "altitude (m)",
+    "hazardKey": "Landing exclusion",
+    "dispersionKey": "Dots: {count} sampled touchdowns for the selected decision",
+    "dispersionTitle": "{target}: {pass}/{count} samples passed, σ {std} m",
+    "trajectoryAria": "Altitude versus downrange for each replay branch",
+    "timelineAria": "Event and decision timeline for each replay branch"
   }
 }

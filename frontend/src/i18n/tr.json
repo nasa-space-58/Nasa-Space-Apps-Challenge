@@ -94,7 +94,8 @@
       "recommend": "Öneriler",
       "descent": "İniş",
       "classroom": "Sınıf",
-      "campaign": "Kampanya"
+      "campaign": "Kampanya",
+      "recovery": "Kendini onarma"
     },
     "nav": {
       "skip": "Görev kontrolüne geç",
@@ -1057,5 +1058,94 @@
       "sunlight_unknown": "güneş ışığı bilinmiyor",
       "energy": "enerji"
     }
+  },
+  "recovery": {
+    "title": "Kendini onaran iniş: olay yeniden oynatma",
+    "intro": "Aynı zaman damgalı arızalar orijinal plan, klasik yeniden planlama ve (kampanya verildiğinde) korumalı hibrit yeniden planlama altında yeniden oynatılır. Tüm sayılar backend H5/H6 modellerinden gelir.",
+    "example": "Senaryo",
+    "synthetic": "Sentetik · çevrimdışı · düzlemsel model",
+    "running": "Olaylar yeniden oynatılıyor…",
+    "error": "Kurtarma yeniden oynatması hesaplanamadı.",
+    "examples": {
+      "combined_recovery": "Birleşik arızalar (yakıt, itki, kapanan alan)",
+      "engine_out": "Motor kaybı (kurtarılamaz)",
+      "hybrid_campaign": "Birleşik arızalar + sonraki kampanya (hibrit)"
+    },
+    "outcomes": "Sonuçlar",
+    "trajectories": "Orijinal ve yeniden planlanan yörüngeler",
+    "timeline": "Zamana göre olaylar ve kararlar",
+    "events": "Olay paneli",
+    "decisions": "Karar açıklamaları ve çözücü süreleri",
+    "limitations": "Sınırlamalar",
+    "branches": {
+      "original": "Orijinal plan",
+      "classical": "Klasik yeniden planlama",
+      "hybrid": "Hibrit yeniden planlama"
+    },
+    "status": {
+      "landed": "Kontroller içinde iniş",
+      "failed": "Kısıt ihlali",
+      "infeasible": "Doğrulanmış devam yok",
+      "running": "Çalışıyor"
+    },
+    "actions": {
+      "continue": "Devam",
+      "retarget": "Hedef değiştir",
+      "no_feasible_continuation": "Uygulanabilir devam yok"
+    },
+    "kinds": {
+      "thrust_loss": "İtki kaybı",
+      "propellant_loss": "Yakıt kaybı",
+      "sensor_degradation": "Sensör bozulması",
+      "landing_hazard": "Yeni gözlenen tehlike",
+      "communication_outage": "İletişim kesintisi"
+    },
+    "card": {
+      "target": "Son hedef",
+      "end": "Bitiş (nominale göre)",
+      "downrange": "Temas menzili",
+      "fuel": "Kalan yakıt",
+      "reserve": "rezerv {reserve} kg:",
+      "burnLoss": "Yakılan / kaybedilen",
+      "wall": "Yeniden oynatma süresi",
+      "unapplied": "Uygulanmadı (daha erken bitti): {ids}"
+    },
+    "col": {
+      "time": "Zaman",
+      "event": "Olay",
+      "kind": "Tür",
+      "effect": "Uygulanan etki",
+      "target": "Hedef",
+      "result": "Sonuç",
+      "reasons": "Nedenler",
+      "fuel": "Tahmini yakım",
+      "samples": "Geçen örnekler",
+      "dispersion": "Örneklenmiş temas dağılımı"
+    },
+    "noEvents": "Tanımlı olay yok.",
+    "noDecisions": "Bu dal karar vermez.",
+    "accepted": "kabul",
+    "rejected": "ret",
+    "revision": "durum revizyonu {revision}",
+    "thrust": "kullanılabilir itki {value} N",
+    "timing": {
+      "planning": "Planlama süresi",
+      "source": "Seçen",
+      "preparation": "Klasik hazırlık",
+      "quantum": "Simülatör işçisi",
+      "qubits": "{n} mantıksal kübit",
+      "revalidation": "Güncel yeniden doğrulama",
+      "deadline": "Geçen / kabul son süresi",
+      "schedule": "Ortak çizelge"
+    },
+    "activeHazards": "Etkin iniş yasakları: {list}",
+    "hybridNote": "Hibrit çalışma modu: {mode}; donanım işi: {jobs}; son ortak çizelge: {options}. Planlama sırasında simüle uçuş zamanı durdurulur.",
+    "axisDownrange": "menzil (m)",
+    "axisAltitude": "irtifa (m)",
+    "hazardKey": "İniş yasağı",
+    "dispersionKey": "Noktalar: seçili karar için {count} örneklenmiş temas",
+    "dispersionTitle": "{target}: {pass}/{count} örnek geçti, σ {std} m",
+    "trajectoryAria": "Her yeniden oynatma dalı için menzile göre irtifa",
+    "timelineAria": "Her yeniden oynatma dalı için olay ve karar zaman çizelgesi"
   }
 }
