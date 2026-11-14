@@ -41,6 +41,7 @@ test("submits UTC coordinates and AGL height and reports a failed job", async ()
       }) as Response,
   );
   render(<App />);
+  fireEvent.click(screen.getByRole("button", { name: "Mission control" }));
   fireEvent.change(screen.getByLabelText("Latitude"), {
     target: { value: "-86.1" },
   });
@@ -67,6 +68,7 @@ test("submits UTC coordinates and AGL height and reports a failed job", async ()
 test("keeps API errors visible and supports reconnecting", async () => {
   vi.mocked(fetch).mockRejectedValueOnce(new Error("Network unavailable"));
   render(<App />);
+  fireEvent.click(screen.getByRole("button", { name: "Mission control" }));
   await screen.findByRole("alert");
   fireEvent.click(screen.getByRole("button", { name: "Reconnect" }));
   await waitFor(() => expect(screen.queryByRole("alert")).toBeNull());

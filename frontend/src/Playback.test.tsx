@@ -9,6 +9,7 @@ test('restores real API results and scrubs positions and next-setting state toge
  localStorage.setItem('lunar-analysis-id','saved-job');
  vi.stubGlobal('fetch', vi.fn(async (path: string) => ({ok:true,json:async()=> path.endsWith('/result') ? example : path.endsWith('/presets') ? {sites:[]} : {id:'saved-job',status:'ready'}})));
  render(<App />);
+ fireEvent.click(screen.getByRole('button',{name:'Mission control'}));
  await screen.findByText('20.5%');
  expect(screen.getByRole('img',{name:/Terrain horizon. Sun partial/})).toBeTruthy();
  const slider=screen.getByRole('slider',{name:'Observation time'});

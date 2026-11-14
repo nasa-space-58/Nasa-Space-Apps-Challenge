@@ -49,6 +49,18 @@ const utcLabel = (value: string) =>
     minute: "2-digit",
     hour12: false,
   });
+type View = "home" | "mission" | "search" | "recommend" | "classroom";
+const routes: Record<View, string> = {
+  home: "",
+  mission: "#/mission-control",
+  search: "#/time-search",
+  recommend: "#/recommendations",
+  classroom: "#/classroom",
+};
+const viewFromHash = (hash: string): View =>
+  (Object.keys(routes) as View[]).find(
+    (view) => view !== "home" && routes[view] === hash,
+  ) ?? "home";
 const jump = (id: string) =>
   document.getElementById(id)?.scrollIntoView({
     behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
@@ -195,11 +207,20 @@ export default function App() {
   const [apiError, setApiError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sources, setSources] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [classroomOpen, setClassroomOpen] = useState(false);
-  const [recommendOpen, setRecommendOpen] = useState(false);
   const [sharedB, setSharedB] = useState<string | undefined>(undefined);
   const shared = useRef(new URLSearchParams(location.search));
+  const [view, setView] = useState<View>(() =>
+    shared.current.has("analysis") ? "mission" : viewFromHash(location.hash),
+  );
+  const searchOpen = view === "search";
+  const classroomOpen = view === "classroom";
+  const recommendOpen = view === "recommend";
+  const goTo = (next: View) => {
+    if (window.scrollY) window.scrollTo({ top: 0, behavior: "auto" });
+    const url = `${location.pathname}${location.search}${routes[next]}`;
+    if (location.hash !== routes[next]) window.history.pushState({}, "", url);
+    setView(next);
+  };
   const [resolved, setResolved] = useState("");
   const busy = submitting || (!!job && activeStates.includes(job.status));
   const frame = result?.frames[frameIndex];
@@ -359,6 +380,19 @@ export default function App() {
   useEffect(() => {
     if (reduced) setPlaying(false);
   }, [reduced]);
+  useEffect(() => {
+    const follow = () => setView(viewFromHash(location.hash));
+    window.addEventListener("popstate", follow);
+    window.addEventListener("hashchange", follow);
+    return () => {
+      window.removeEventListener("popstate", follow);
+      window.removeEventListener("hashchange", follow);
+    };
+  }, []);
+  useEffect(() => {
+    if (view !== "mission") setPlaying(false);
+    if (view === "home") window.dispatchEvent(new Event("scroll"));
+  }, [view]);
 
   useEffect(() => {
     if (!sources) return;
@@ -459,7 +493,11 @@ export default function App() {
   };
   const clearSharedLink = () => {
     shared.current = new URLSearchParams();
-    window.history.replaceState({}, "", window.location.pathname);
+    window.history.replaceState(
+      {},
+      "",
+      `${window.location.pathname}${window.location.hash}`,
+    );
   };
   const openSearchResult = async (
     id: string,
@@ -484,9 +522,7 @@ export default function App() {
       ),
     );
     setRefine(submitted.refine);
-    setSearchOpen(false);
-    setClassroomOpen(false);
-    setRecommendOpen(false);
+    goTo("mission");
     setSharedB(otherId);
     setPlaying(false);
     setJob(selected);
@@ -517,14 +553,12 @@ export default function App() {
   };
 
   return (
-    <main>
+    <main data-view={view}>
       <button
         className="skip-link"
         onClick={() => {
-          setSearchOpen(false);
-          setClassroomOpen(false);
+          goTo("mission");
           setTimeout(() => {
-            jump("mission");
             document.getElementById("mission")?.focus({ preventScroll: true });
           }, 0);
         }}
@@ -535,7 +569,12 @@ export default function App() {
         <button
           className="brand"
           onClick={() =>
-            window.scrollTo({ top: 0, behavior: reduced ? "auto" : "smooth" })
+            view === "home"
+              ? window.scrollTo({
+                  top: 0,
+                  behavior: reduced ? "auto" : "smooth",
+                })
+              : goTo("home")
           }
           aria-label="Back to introduction"
         >
@@ -546,48 +585,26 @@ export default function App() {
         </button>
         <nav aria-label="Main navigation">
           <button
-            aria-pressed={!searchOpen && !classroomOpen && !recommendOpen}
-            onClick={() => {
-              setSearchOpen(false);
-              setClassroomOpen(false);
-              setRecommendOpen(false);
-              setTimeout(() => jump("mission"), 0);
-            }}
+            aria-current={view === "mission" ? "page" : undefined}
+            onClick={() => goTo("mission")}
           >
             Mission control
           </button>
           <button
-            aria-pressed={searchOpen}
-            onClick={() => {
-              setClassroomOpen(false);
-              setRecommendOpen(false);
-              setSearchOpen(true);
-              setTimeout(() => jump("window-search"), 0);
-            }}
+            aria-current={searchOpen ? "page" : undefined}
+            onClick={() => goTo("search")}
           >
             Time search
           </button>
           <button
-            aria-pressed={recommendOpen}
-            onClick={() => {
-              setSearchOpen(false);
-              setClassroomOpen(false);
-              setRecommendOpen(true);
-              setPlaying(false);
-              setTimeout(() => jump("recommendations"), 0);
-            }}
+            aria-current={recommendOpen ? "page" : undefined}
+            onClick={() => goTo("recommend")}
           >
             Recommend
           </button>
           <button
-            aria-pressed={classroomOpen}
-            onClick={() => {
-              setSearchOpen(false);
-              setRecommendOpen(false);
-              setClassroomOpen(true);
-              setPlaying(false);
-              setTimeout(() => jump("classroom"), 0);
-            }}
+            aria-current={classroomOpen ? "page" : undefined}
+            onClick={() => goTo("classroom")}
           >
             Classroom
           </button>
@@ -601,6 +618,7 @@ export default function App() {
       </header>
       <section
         className="introduction"
+        hidden={view !== "home"}
         ref={intro}
         aria-label="From orbit to the lunar surface"
       >
@@ -615,7 +633,7 @@ export default function App() {
                 <MoonScene
                   progress={progress}
                   reduced={reduced || motionPaused}
-                  visible={sceneVisible && pageVisible}
+                  visible={view === "home" && sceneVisible && pageVisible}
                   compact={compactScene}
                   onFailure={() => setWebgl(false)}
                 />
@@ -719,12 +737,7 @@ export default function App() {
             <div className="hero-actions">
               <button
                 className="primary"
-                onClick={() => {
-                  setSearchOpen(false);
-                  setClassroomOpen(false);
-                  setRecommendOpen(false);
-                  setTimeout(() => jump("mission"), 0);
-                }}
+                onClick={() => goTo("mission")}
               >
                 Plan your observation <span>↗</span>
               </button>
@@ -803,12 +816,7 @@ export default function App() {
             </p>
             <button
               className="primary"
-              onClick={() => {
-                setSearchOpen(false);
-                setClassroomOpen(false);
-                setRecommendOpen(false);
-                setTimeout(() => jump("mission"), 0);
-              }}
+              onClick={() => goTo("mission")}
             >
               Enter mission control <span>↓</span>
             </button>
@@ -823,7 +831,7 @@ export default function App() {
         id="mission"
         tabIndex={-1}
         className="mission-section"
-        hidden={searchOpen || classroomOpen || recommendOpen}
+        hidden={view !== "mission"}
       >
         <div className="workspace-kicker">
           <span>OBSERVATION WORKSPACE</span>
@@ -1325,7 +1333,7 @@ export default function App() {
           </div>
         </div>
       </section>
-      {comparisonBase && !searchOpen && !classroomOpen && !recommendOpen && (
+      {comparisonBase && view === "mission" && (
         <Comparison
           key={comparisonBase.id}
           aId={comparisonBase.id}

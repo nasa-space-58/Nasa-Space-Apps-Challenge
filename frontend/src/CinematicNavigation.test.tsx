@@ -31,7 +31,11 @@ test("ambient motion can be paused and resumed without hiding observation contro
       .getByRole("button", { name: "Resume ambient motion" })
       .getAttribute("aria-pressed"),
   ).toBe("true");
+  fireEvent.click(screen.getByRole("button", { name: "Mission control" }));
   expect(screen.getByRole("button", { name: /Run analysis/ })).toBeTruthy();
+  fireEvent.click(
+    screen.getByRole("button", { name: "Back to introduction" }),
+  );
   fireEvent.click(
     screen.getByRole("button", { name: "Resume ambient motion" }),
   );
@@ -68,6 +72,33 @@ test("system reduced motion is respected and cannot be accidentally overridden",
   }) as HTMLButtonElement;
   expect(button.disabled).toBe(true);
   expect(button.getAttribute("aria-pressed")).toBe("true");
+  expect(
+    screen.getByRole("heading", { name: "Lunar Landing Navigator" }),
+  ).toBeTruthy();
+});
+
+test("mission control is a separate page reached from the top bar", () => {
+  render(<App />);
+  expect(document.getElementById("mission")?.hidden).toBe(true);
+  const nav = screen.getByRole("button", { name: "Mission control" });
+  expect(nav.getAttribute("aria-current")).toBeNull();
+  fireEvent.click(nav);
+  expect(window.location.hash).toBe("#/mission-control");
+  expect(nav.getAttribute("aria-current")).toBe("page");
+  expect(document.getElementById("mission")?.hidden).toBe(false);
+  expect(
+    screen.queryByRole("heading", { name: "Lunar Landing Navigator" }),
+  ).toBeNull();
+  expect(screen.getByRole("button", { name: /Run analysis/ })).toBeTruthy();
+});
+
+test("browser history returns from mission control to the introduction", () => {
+  window.history.replaceState({}, "", "/#/mission-control");
+  render(<App />);
+  expect(document.getElementById("mission")?.hidden).toBe(false);
+  window.history.replaceState({}, "", "/");
+  fireEvent.popState(window);
+  expect(document.getElementById("mission")?.hidden).toBe(true);
   expect(
     screen.getByRole("heading", { name: "Lunar Landing Navigator" }),
   ).toBeTruthy();

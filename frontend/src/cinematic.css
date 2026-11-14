@@ -64,7 +64,7 @@
   transition: right 0.25s ease;
 }
 .navigation nav button:hover::after,
-.navigation nav button[aria-pressed="true"]::after {
+.navigation nav button[aria-current="page"]::after {
   right: 0;
 }
 .team-label {
@@ -736,5 +736,38 @@
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+}
+
+/* Standalone pages: mission control, time search and classroom sit below the fixed bar. */
+.navigation nav button[aria-current="page"] {
+  color: #f3eee4;
+}
+main:not([data-view="home"]) {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+main:not([data-view="home"]) > footer {
+  margin-top: auto;
+}
+main[data-view="mission"] .mission-section,
+main[data-view="search"] .window-search-section,
+main[data-view="classroom"] .classroom-section {
+  padding-top: calc(88px + 56px);
+  border-top: 0;
+  scroll-margin-top: 88px;
+}
+main[data-view="mission"] .comparison-section {
+  scroll-margin-top: 88px;
+}
+@media (max-width: 760px) {
+  main[data-view="mission"] .mission-section,
+  main[data-view="search"] .window-search-section,
+  main[data-view="classroom"] .classroom-section {
+    padding-top: calc(106px + 32px);
+  }
+  main[data-view="mission"] .comparison-section {
+    scroll-margin-top: 106px;
   }
 }

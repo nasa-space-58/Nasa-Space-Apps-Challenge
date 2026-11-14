@@ -30,6 +30,7 @@ test("ready-to-run example works even when the editable start field is empty", a
     ),
   );
   render(<App />);
+  fireEvent.click(screen.getByRole("button", { name: "Mission control" }));
   fireEvent.change(screen.getByLabelText("Start date & time · UTC"), {
     target: { value: "" },
   });
@@ -76,6 +77,7 @@ test("reload restores submitted scenario fields instead of silently displaying d
     ),
   );
   render(<App />);
+  fireEvent.click(screen.getByRole("button", { name: "Mission control" }));
   await waitFor(() =>
     expect((screen.getByLabelText("Latitude") as HTMLInputElement).value).toBe(
       "-87",
