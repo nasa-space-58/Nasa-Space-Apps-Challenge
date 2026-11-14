@@ -1,0 +1,117 @@
+{
+  "verified_on": "2026-11-14",
+  "branch": "feature/r9-descent-twin",
+  "skeleton": "63670aa",
+  "frozen_tests": "ac30279",
+  "environment": "Docker Compose nasa-task4 preview; Malapert R23 terrain height from the cached LOLA DEM; seed 2026; default sensor (5 m / 0.1 m/s caps, range-scaled, gain 0.05, 0.5 % engine bias)",
+  "scenarios": {
+    "nominal": {
+      "result_id": "2215d5706ec60505c0815f2da6522770f47e1efd80e19b5248de4531e85227a7",
+      "log_hash": "6aa9ae763373d271f291b3b4efad402dd6ece9bd68b570917d0fff35d9bb194f",
+      "position_error_m": 0.09,
+      "vertical_speed_mps": -0.84,
+      "horizontal_speed_mps": 0.01,
+      "final_estimate_error_m": 0.07,
+      "propellant_remaining_kg": 791,
+      "reserve_margin_kg": 679,
+      "success": true,
+      "failure_reasons": [],
+      "plan_invalidated_by": [],
+      "differences_vs_baseline": {
+        "position_error_m": 0.0,
+        "vertical_speed_mps": 0.0,
+        "horizontal_speed_mps": 0.0,
+        "propellant_remaining_kg": 0.0,
+        "duration_s": 0.0,
+        "max_estimate_error_m": 0.0
+      }
+    },
+    "sensor_lost_450s": {
+      "result_id": "7827110ef3e3463bdadd609bbf6304235b4af67d0c189cdb48608d974d3c1b62",
+      "log_hash": "a0cdb05edd5b3f8e470c9e6efd7dd1159f36a1d13a18659703e9bfe15f60e86a",
+      "position_error_m": 470.85,
+      "vertical_speed_mps": -2.85,
+      "horizontal_speed_mps": 1.86,
+      "final_estimate_error_m": 470.85,
+      "propellant_remaining_kg": 800,
+      "reserve_margin_kg": 688,
+      "success": false,
+      "failure_reasons": [
+        "position",
+        "vertical_speed",
+        "horizontal_speed"
+      ],
+      "plan_invalidated_by": [
+        "navigation_sensor"
+      ],
+      "differences_vs_baseline": {
+        "position_error_m": 470.76,
+        "vertical_speed_mps": -2.01,
+        "horizontal_speed_mps": 1.84,
+        "propellant_remaining_kg": 8.97,
+        "duration_s": 0.0,
+        "max_estimate_error_m": 468.35
+      }
+    },
+    "thrust_minus_25pct_520s": {
+      "result_id": "1cabf2d447221cb149351e6cd7364ef19d24bd57548e5a37820a6baef20dc4b7",
+      "log_hash": "a913775dc3858b7c9b2c7a5bcd4f7a893a45d334b13135d7d89be22c28da6510",
+      "position_error_m": 0.09,
+      "vertical_speed_mps": -0.84,
+      "horizontal_speed_mps": 0.01,
+      "final_estimate_error_m": 0.07,
+      "propellant_remaining_kg": 775,
+      "reserve_margin_kg": 663,
+      "success": true,
+      "failure_reasons": [],
+      "plan_invalidated_by": [
+        "available_thrust"
+      ],
+      "differences_vs_baseline": {
+        "position_error_m": 0.0,
+        "vertical_speed_mps": -0.0,
+        "horizontal_speed_mps": 0.0,
+        "propellant_remaining_kg": -15.89,
+        "duration_s": 0.0,
+        "max_estimate_error_m": 0.0
+      }
+    },
+    "leak_700kg_600s": {
+      "result_id": "765e3284e376689149722e6e37d624cc0645efde42a2679681565245eb2a1ad9",
+      "log_hash": "2d3230ed422327cc50f448f2590e5a2e579fb9bd399a0f683eb8b5981fc8a219",
+      "position_error_m": 0.09,
+      "vertical_speed_mps": -0.84,
+      "horizontal_speed_mps": 0.01,
+      "final_estimate_error_m": 0.07,
+      "propellant_remaining_kg": 133,
+      "reserve_margin_kg": 31,
+      "success": true,
+      "failure_reasons": [],
+      "plan_invalidated_by": [
+        "propellant"
+      ],
+      "differences_vs_baseline": {
+        "position_error_m": -0.0,
+        "vertical_speed_mps": 0.0,
+        "horizontal_speed_mps": -0.0,
+        "propellant_remaining_kg": -657.75,
+        "duration_s": 0.0,
+        "max_estimate_error_m": 0.0
+      }
+    }
+  },
+  "replay_identical": true,
+  "nominal_success_rate_default_sensor": "8 of 10 seeds (1-10); the two failures exceed the 1.0 m/s vertical tolerance at 1.03 and 1.11 m/s (R4 nominal is 0.91 m/s)",
+  "tests": {
+    "backend": 599,
+    "twin": 32,
+    "frontend": 6
+  },
+  "browser": {
+    "page": "Descent > Digital twin",
+    "scenario": "sensor lost",
+    "console_errors_from_app": 0,
+    "note": "console showed only errors from a Chrome extension script"
+  },
+  "interpretation": "With the sensor lost, the true navigation error grows to 471 m while the vehicle's own expected error stays at a few metres: the plan is invalidated but the twin keeps flying it, which motivates R12 replanning."
+}
