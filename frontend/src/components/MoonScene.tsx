@@ -3,6 +3,12 @@ import { Canvas, useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { Dust, Model, Terrain, smooth, noise } from "./LunarSurface";
 import { useTranslate } from "../i18n";
+import HeroOrrery from "./HeroOrrery";
+
+/** Scroll progress over which the hero orrery hands over to the big Moon. */
+const HERO_HANDOVER: [number, number] = [0.02, 0.12];
+const KEY_LIGHT_INTENSITY = 3.4;
+const FILL_LIGHT_INTENSITY = 0.35;
 
 function World({
   progress,
@@ -16,6 +22,10 @@ function World({
   const space = useRef<THREE.Group>(null!);
   const surface = useRef<THREE.Group>(null!);
   const moon = useRef<THREE.Mesh>(null!);
+  const moonGroup = useRef<THREE.Group>(null!);
+  const keyLight = useRef<THREE.DirectionalLight>(null!);
+  const fillLight = useRef<THREE.DirectionalLight>(null!);
+  const heroMix = useRef(1);
   const lro = useRef<THREE.Group>(null!);
   const lander = useRef<THREE.Group>(null!);
   const plume = useRef<THREE.Mesh>(null!);
@@ -71,6 +81,13 @@ function World({
     const descent = smooth(0.46, 0.93, progress);
     const orbitTime = ambientTime.current * 0.025;
     space.current.visible = progress < 0.49;
+    // Hero: Sun–Earth–Moon orrery; scrolling hands over to the big Moon.
+    heroMix.current = 1 - smooth(HERO_HANDOVER[0], HERO_HANDOVER[1], progress);
+    const moonShown = 1 - heroMix.current;
+    moonGroup.current.visible = moonShown > 0.001;
+    moonGroup.current.scale.setScalar(Math.max(0.001, moonShown));
+    keyLight.current.intensity = KEY_LIGHT_INTENSITY * moonShown;
+    fillLight.current.intensity = FILL_LIGHT_INTENSITY * moonShown;
     surface.current.visible = progress >= 0.49;
     // Slow illustrative self-rotation on top of the scroll-driven turn.
     moon.current.rotation.y =
@@ -112,8 +129,9 @@ function World({
       <fog attach="fog" args={["#05080b", 28, 65]} />
       <ambientLight intensity={0.2} />
       <directionalLight
+        ref={keyLight}
         position={[-10, 7, 6]}
-        intensity={3.4}
+        intensity={KEY_LIGHT_INTENSITY}
         color="#fff1dc"
         castShadow
         shadow-mapSize={[compact ? 1024 : 2048, compact ? 1024 : 2048]}
@@ -125,8 +143,9 @@ function World({
         shadow-bias={-0.0001}
       />
       <directionalLight
+        ref={fillLight}
         position={[5, 3, -4]}
-        intensity={0.35}
+        intensity={FILL_LIGHT_INTENSITY}
         color="#a9bfd1"
       />
       <points>
@@ -142,6 +161,11 @@ function World({
         />
       </points>
       <group ref={space}>
+        <HeroOrrery
+          mix={() => heroMix.current}
+          time={() => ambientTime.current}
+        />
+        <group ref={moonGroup}>
         <mesh ref={moon}>
           <sphereGeometry args={[2.45, 96, 64]} />
           <meshStandardMaterial
@@ -156,6 +180,7 @@ function World({
         </group>
         <group ref={lro}>
           <Model path="/nasa/lro.glb" size={1.05} />
+        </group>
         </group>
       </group>
       <group ref={surface}>
