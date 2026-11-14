@@ -15,30 +15,30 @@ from app.terrain import TerrainError
 
 
 @pytest.fixture
-def request():
+def job_request():
     return IngestionRequest.model_validate({'request_id':str(uuid4()), 'analysis':{
         'site':{'site_id':'reference','latitude_deg':-85.9948,'longitude_deg_east':359.76422,'altitude_km':4.78662451171875},
         'start_utc':'2026-11-14T00:00:00Z','end_utc':'2026-11-14T02:00:00Z','step_s':3600},
         'terrain_radius_m':80})
 
 
-def event(request):
-    return IngestionEvent(request_id=request.request_id,status='ready',
+def event(job_request):
+    return IngestionEvent(request_id=job_request.request_id,status='ready',
         horizons_path='horizons/'+'a'*64,terrain_path='terrain/processed/'+'b'*64)
 
 
 @pytest.mark.parametrize('change', [{'request_id':'../../bad'},{'schema_version':2},
     {'terrain_radius_m':0},{'terrain_radius_m':20001},{'terrain_radius_m':True},{'unexpected':1}])
-def test_bad_envelope(request, change):
+def test_bad_envelope(job_request, change):
     with pytest.raises(ValidationError):
-        IngestionRequest.model_validate(request.model_dump(mode='json')|change)
+        IngestionRequest.model_validate(job_request.model_dump(mode='json')|change)
 
 
 @pytest.mark.parametrize('change', [{'horizons_path':'/etc/passwd'}, {'terrain_path':'../escape'},
     {'horizons_path':None}, {'status':'failed'}, {'error_code':'wrong-for-ready'}])
-def test_event_consistency(request, change):
+def test_event_consistency(job_request, change):
     with pytest.raises(ValidationError):
-        IngestionEvent.model_validate(event(request).model_dump(mode='json')|change)
+        IngestionEvent.model_validate(event(job_request).model_dump(mode='json')|change)
 
 
 def test_topology():
@@ -66,30 +66,30 @@ def downloads(tmp_path, monkeypatch):
     return h,t
 
 
-def test_success_and_duplicate(request,tmp_path,downloads):
-    first=jobs.process_job(request,tmp_path)
-    second=jobs.process_job(request,tmp_path)
-    assert first==second==event(request)
+def test_success_and_duplicate(job_request,tmp_path,downloads):
+    first=jobs.process_job(job_request,tmp_path)
+    second=jobs.process_job(job_request,tmp_path)
+    assert first==second==event(job_request)
     assert downloads[0].call_count==downloads[1].call_count==1
-    assert json.loads((tmp_path/'jobs'/str(request.request_id)/'result.json').read_text())['status']=='ready'
+    assert json.loads((tmp_path/'jobs'/str(job_request.request_id)/'result.json').read_text())['status']=='ready'
 
 
-def test_reused_id_rejects_changed_request(request,tmp_path,downloads):
-    jobs.process_job(request,tmp_path)
-    request.terrain_radius_m=160
+def test_reused_id_rejects_changed_request(job_request,tmp_path,downloads):
+    jobs.process_job(job_request,tmp_path)
+    job_request.terrain_radius_m=160
     with pytest.raises(jobs.RequestConflict):
-        jobs.process_job(request,tmp_path)
+        jobs.process_job(job_request,tmp_path)
 
 
-def test_corrupt_ready_data_not_replayed(request,tmp_path,downloads):
-    ready=jobs.process_job(request,tmp_path)
+def test_corrupt_ready_data_not_replayed(job_request,tmp_path,downloads):
+    ready=jobs.process_job(job_request,tmp_path)
     (tmp_path/ready.terrain_path/'data.bin').write_bytes(b'corrupt')
-    result=jobs.process_job(request,tmp_path)
+    result=jobs.process_job(job_request,tmp_path)
     assert result.status=='failed'
     assert result.error_code=='cache_corrupt'
 
 
-def test_transient_retry_then_success(request,tmp_path,downloads):
+def test_transient_retry_then_success(job_request,tmp_path,downloads):
     original=downloads[1].side_effect
     count=0
     def flaky(*args):
@@ -98,52 +98,52 @@ def test_transient_retry_then_success(request,tmp_path,downloads):
         if count==1: raise httpx.ConnectError('offline')
         return original(*args)
     downloads[1].side_effect=flaky
-    assert jobs.process_job(request,tmp_path).status=='ready'
+    assert jobs.process_job(job_request,tmp_path).status=='ready'
     assert count==2
 
 
-def test_retry_budget_survives_replay(request,tmp_path,downloads):
+def test_retry_budget_survives_replay(job_request,tmp_path,downloads):
     downloads[1].side_effect=httpx.ConnectError('offline')
-    first=jobs.process_job(request,tmp_path)
-    second=jobs.process_job(request,tmp_path)
+    first=jobs.process_job(job_request,tmp_path)
+    second=jobs.process_job(job_request,tmp_path)
     assert first==second
     assert first.status=='failed'
     assert downloads[1].call_count==3
 
 
-def test_permanent_coverage_failure_not_retried(request,tmp_path,downloads):
+def test_permanent_coverage_failure_not_retried(job_request,tmp_path,downloads):
     downloads[1].side_effect=TerrainError('NoData')
-    assert jobs.process_job(request,tmp_path).status=='failed'
+    assert jobs.process_job(job_request,tmp_path).status=='failed'
     assert downloads[1].call_count==1
 
 
-def test_concurrent_duplicates(request,tmp_path,downloads):
+def test_concurrent_duplicates(job_request,tmp_path,downloads):
     from concurrent.futures import ThreadPoolExecutor
     with ThreadPoolExecutor(max_workers=2) as pool:
-        results=list(pool.map(lambda _:jobs.process_job(request,tmp_path),range(2)))
+        results=list(pool.map(lambda _:jobs.process_job(job_request,tmp_path),range(2)))
     assert results[0]==results[1]
     assert downloads[1].call_count==1
 
 
-def test_ack_after_event_confirmation(request,tmp_path,monkeypatch):
+def test_ack_after_event_confirmation(job_request,tmp_path,monkeypatch):
     order=[]
-    message=Mock(body=request.model_dump_json().encode())
+    message=Mock(body=job_request.model_dump_json().encode())
     message.ack=AsyncMock(side_effect=lambda:order.append('ack'))
     message.reject=AsyncMock()
     exchange=Mock(publish=AsyncMock(side_effect=lambda *a,**k:order.append('publish')))
-    monkeypatch.setattr(consumer,'process_job',lambda *a:event(request))
+    monkeypatch.setattr(consumer,'process_job',lambda *a:event(job_request))
     asyncio.run(consumer.handle_message(message,exchange,tmp_path))
     assert order==['publish','ack']
     sent=exchange.publish.await_args.args[0]
     assert int(sent.delivery_mode)==2
-    assert sent.correlation_id==str(request.request_id)
+    assert sent.correlation_id==str(job_request.request_id)
     assert exchange.publish.await_args.kwargs['mandatory'] is True
 
 
-def test_broken_publication_keeps_request_unacked(request,tmp_path,monkeypatch):
-    message=Mock(body=request.model_dump_json().encode(),ack=AsyncMock(),nack=AsyncMock(),reject=AsyncMock())
+def test_broken_publication_keeps_request_unacked(job_request,tmp_path,monkeypatch):
+    message=Mock(body=job_request.model_dump_json().encode(),ack=AsyncMock(),nack=AsyncMock(),reject=AsyncMock())
     exchange=Mock(publish=AsyncMock(side_effect=ConnectionError('broker down')))
-    monkeypatch.setattr(consumer,'process_job',lambda *a:event(request))
+    monkeypatch.setattr(consumer,'process_job',lambda *a:event(job_request))
     with pytest.raises(ConnectionError):
         asyncio.run(consumer.handle_message(message,exchange,tmp_path))
     message.ack.assert_not_awaited()
