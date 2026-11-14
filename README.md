@@ -220,3 +220,19 @@ Gezinmedeki **Recommend** bölümü 2–6 aday noktayı aynı UTC zaman aralığ
 Ağırlık kaydırıcıları değişince sıralama, analizler tekrar çalışmadan yeniden hesaplanır; eski ve yeni sıralama yan yana gösterilir. Takvim kaydığında (örneğin 48 saat) aynı adaylar yeni tarih için yeniden sıralanır ve en iyi alternatif önerilir.
 
 Eğim, önbellekteki 80 m LOLA verisinden Horn yöntemiyle hesaplanır. Varsayılan 10° iniş alanı sınırı bir planlama varsayımıdır; NASA sayısal bir değer yayımlamamıştır. 80 m çözünürlük küçük krater ve kayaları göremez; yakıt ve bilim değeri henüz modellenmez. [Yöntem, kaynaklar ve API](docs/recommendations.md).
+
+## R4: İniş yörüngesi
+
+Gezinmedeki **Descent** bölümü, seçilen iniş noktası için Ay yörüngesinden temasa kadar iniş yörüngesini hesaplar. Aşamalar: yörüngeden iniş manevrası (DOI), süzülme, frenleme, yaklaşma ve son iniş. Her aşamanın süresi, Δv'si ve yakıtı gösterilir; irtifa–menzil grafiği üzerinde fareyle anlık değerler okunabilir.
+
+Varsayılan araç, Apollo 11 Ay modülüdür. Değerler NASA TN D-6846 ve Apollo 11 görev raporundan alınmıştır. Model, Apollo 11 iniş planındaki toplam Δv'yi (6775 fps) %2 farkla tutturur. Yörünge iniş noktasının üzerinden geçmiyorsa gereken düzlem değişimi bildirilir; yakıt yetmezse ya da temas toleransları aşılırsa nokta "ulaşılamaz" sayılır ve nedeni yazılır.
+
+Arazi engelleri, Ay'ın kütle konsantrasyonları (mascon) ve dönüşü modellenmez. Görselleştirme 2B'dir. [Kaynaklar, model ve doğrulama](docs/descent-trajectories.md).
+
+## R5: Rotalar arası yakıt optimizasyonu
+
+**Descent → Optimize routes**, aynı iniş noktası için 27 rota üretir. Rotalar üç değişkenle çeşitlenir: başlangıç yörüngesi (40/60/80 deniz mili), yaklaşma süresi (60/100/140 s) ve son iniş süresi (60/108/150 s). Her rotanın yörüngeden iniş manevrasından (DOI) temasa kadar harcadığı yakıt hesaplanır.
+
+Varsayılan temas rezervi 145 fps'dir. Bu değer NASA TN D-6846 Tablo II'deki iniş noktası değiştirme (60 fps) ve elle hover (85 fps) paylarının toplamıdır. Rezervi, yakıtı ya da R4 sınırlarını aşan rotalar nedeniyle birlikte elenir. Grafik, harcanan yakıtı inceleme süresine (yaklaşma + son iniş) karşı gösterir; Pareto cephesi ve en az yakıt harcayan rota işaretlidir.
+
+**Recommend** bölümünde "include descent" seçeneği açılırsa, her aday için R4 inişi hesaplanır. Ulaşılamayan nokta elenir; yakıt payı 5. kriter olarak sıralamaya eklenir. Seçenek kapalıyken R3 sonuçları değişmez. [Yöntem, kaynaklar ve doğrulama](docs/fuel-optimization.md).

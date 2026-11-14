@@ -200,17 +200,21 @@ Each release builds on the preceding delivered functionality. Existing scenario 
 
 ### R4 — Descent trajectories
 
-- [ ] Define spacecraft profiles, initial orbit, physical assumptions and tolerances.
-- [ ] Implement and validate S6 descent phases and reachability limits.
-- [ ] Display the trajectory, phase timing and delta-v.
+- [x] Define spacecraft profiles, initial orbit, physical assumptions and tolerances.
+- [x] Implement and validate S6 descent phases and reachability limits.
+- [x] Display the trajectory, phase timing and delta-v.
+
+**R4 delivery** — See [descent trajectories](descent-trajectories.md). Apollo 11 LM profile from the Apollo 11 Mission Report and NASA TN D-6846; planar point-mass model with Hohmann DOI and ZEM/ZEV guidance through the TN D-6846 gates. Total powered delta-v is within 2 % of the Apollo 11 plan (6775 fps). Terrain clearance, mascons, lunar rotation and a 3D view are not included. Frozen tests: `9ed69c8`.
 
 **Completion evidence** — A feasible trajectory reaches its selected target within documented tolerances.
 
 ### R5 — Fuel optimization
 
-- [ ] Implement S7 fuel estimation and reserve/engine constraints across feasible trajectories.
-- [ ] Show fuel versus safety trade-offs and rejected-route reasons.
-- [ ] Extend S8/S9 ranking with validated reachability and fuel metrics.
+- [x] Implement S7 fuel estimation and reserve/engine constraints across feasible trajectories.
+- [x] Show fuel versus safety trade-offs and rejected-route reasons.
+- [x] Extend S8/S9 ranking with validated reachability and fuel metrics.
+
+**R5 delivery** — See [fuel optimization](fuel-optimization.md). Route grid over orbit altitude and approach/terminal durations on the R4 model; propellant counted from a DOI mass backed out of the PDI mass; default touchdown reserve 145 fps from the NASA TN D-6846 Table II contingencies (redesignation 60 fps + manual hover 85 fps); every route rejected with reasons when it breaks the reserve or R4 limits; Pareto front of fuel versus assessment time. R3 recommendations can opt into descent reachability and a fuel criterion without changing default R3 output. Frozen tests: `2994417`.
 
 **Completion evidence** — Every proposed route respects its configured fuel reserve and vehicle limits.
 

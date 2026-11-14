@@ -16,6 +16,7 @@ import ScenarioTransfer from "./components/ScenarioTransfer";
 import Classroom from "./components/Classroom";
 import Communication from "./components/Communication";
 import Recommendations from "./components/Recommendations";
+import Descent from "./components/Descent";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
 
 const MoonScene = lazy(() => import("./components/MoonScene"));
@@ -49,12 +50,19 @@ const utcLabel = (value: string) =>
     minute: "2-digit",
     hour12: false,
   });
-type View = "home" | "mission" | "search" | "recommend" | "classroom";
+type View =
+  | "home"
+  | "mission"
+  | "search"
+  | "recommend"
+  | "descent"
+  | "classroom";
 const routes: Record<View, string> = {
   home: "",
   mission: "#/mission-control",
   search: "#/time-search",
   recommend: "#/recommendations",
+  descent: "#/descent",
   classroom: "#/classroom",
 };
 const viewFromHash = (hash: string): View =>
@@ -217,6 +225,7 @@ export default function App() {
   const searchOpen = view === "search";
   const classroomOpen = view === "classroom";
   const recommendOpen = view === "recommend";
+  const descentOpen = view === "descent";
   const goTo = (next: View) => {
     if (window.scrollY) window.scrollTo({ top: 0, behavior: "auto" });
     const url = `${location.pathname}${location.search}${routes[next]}`;
@@ -604,6 +613,12 @@ export default function App() {
             onClick={() => goTo("recommend")}
           >
             Recommend
+          </button>
+          <button
+            aria-current={descentOpen ? "page" : undefined}
+            onClick={() => goTo("descent")}
+          >
+            Descent
           </button>
           <button
             aria-current={classroomOpen ? "page" : undefined}
@@ -1377,6 +1392,7 @@ export default function App() {
       {searchOpen && <WindowSearch sites={sites} onChoose={openSearchResult} />}
       {classroomOpen && <Classroom onOpen={openSearchResult} />}
       {recommendOpen && <Recommendations sites={sites} />}
+      {descentOpen && <Descent sites={sites} />}
       <footer>
         <span>
           2GBRAM <i> / </i> LUNAR LANDING NAVIGATOR
