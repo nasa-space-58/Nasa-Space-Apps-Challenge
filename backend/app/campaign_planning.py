@@ -1509,6 +1509,13 @@ def _mission_text(plan, ctx, mid, outcome, selected, measure):
         reason, delta = measure(forbid_cancel_mission_ids=(mid,))
         penalty = float(ctx.missions[mid].policy.cancel_penalty_score)
         if reason == "forcing_infeasible":
+            alone, _ = measure(
+                only_mission_ids=(mid,), forbid_cancel_mission_ids=(mid,)
+            )
+            if alone == "forcing_infeasible":
+                return (
+                    f"Cancelled (penalty {penalty:g}): {_conflict_detail(ctx, [mid])}"
+                )
             return f"Cancelled (penalty {penalty:g}): no option for {mid} fits with the other missions."
         if reason == "lower_joint_score":
             return f"Cancelled (penalty {penalty:g}): completing {mid} lowers the joint score by {-delta:.3f}."
