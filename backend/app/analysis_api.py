@@ -413,6 +413,9 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     from app.solver_arena import register_arena_routes
 
     register_arena_routes(app)
+    from app.shared_antenna import register_campaign_routes
+
+    register_campaign_routes(app)
 
     @app.get("/health")
     def health():

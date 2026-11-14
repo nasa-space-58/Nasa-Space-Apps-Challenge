@@ -363,7 +363,7 @@ Completed demonstrations are checked below; unchecked items remain planned conce
   - Animate the QAOA measurement distribution across optimization iterations, highlighting feasible plans and the known optimum.
   - Finish with a shared scoreboard: feasible-solution rate, objective value, optimum gap and end-to-end runtime, including tuning and validation.
   - Label the execution mode (noiseless simulator, noise model or hardware) and never declare a winner the measurements do not support.
-- [ ] **H9 — Artemis-style shared-antenna scenario:** an illustrative campaign with one crewed lander and two robotic CLPS-class missions sharing limited DSN capacity.
+- [x] **H9 — Artemis-style shared-antenna scenario:** source-bound three-mission scheduling, independent/classical/QAOA timelines, pinned crew choices, explicit infeasible/incomplete cases and one six-qubit Rigetti trial are delivered. See [campaign evidence and measured limits](shared-antenna-campaign.md).
   - Use candidate sites and start times from the existing sunlight and R2 communication analyses, each with a deadline and communication demand.
   - Show a shared timeline in which moving one mission's landing date shifts the others' antenna windows and resolves or creates conflicts.
   - Contrast independently chosen "best" options that conflict with a jointly feasible plan, and explain mission sets with no feasible plan.

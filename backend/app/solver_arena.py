@@ -53,9 +53,14 @@ def compare_solvers(request: ArenaRequest) -> dict:
     retain classical explanations without pretending a quantum run completed.
     No network, SDK, paid execution or repair is used.
     """
+    return compare_scenario(load_arena_scenario(request.preset_id), request)
+
+
+def compare_scenario(scenario: Scenario, request: ArenaRequest) -> dict:
+    """Compare one explicit snapshot with H8 observers and independent validation."""
     started = perf_counter()
     request = ArenaRequest.model_validate(request.model_dump())
-    scenario = load_arena_scenario(request.preset_id)
+    scenario = Scenario.model_validate(scenario.model_dump(mode="python"))
     digest = fingerprint(scenario)
     preparation_s = perf_counter() - started
     classical_trace = []
@@ -244,8 +249,3 @@ def register_arena_routes(app):
             raise HTTPException(409, str(exc)) from exc
         finally:
             _RUN_LOCK.release()
-
-
-def compare_scenario(scenario: Scenario, request: ArenaRequest) -> dict:
-    """Compare a supplied immutable snapshot with the same H8 traces and validator."""
-    raise NotImplementedError

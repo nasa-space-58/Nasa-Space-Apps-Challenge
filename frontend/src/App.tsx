@@ -13,6 +13,7 @@ import Comparison from "./components/Comparison";
 import WindowSearch from "./components/WindowSearch";
 import DateScrubber from "./components/DateScrubber";
 import SolverArena from "./components/SolverArena";
+import SharedAntenna from "./components/SharedAntenna";
 import ExportPanel from "./components/ExportPanel";
 import ScenarioTransfer from "./components/ScenarioTransfer";
 import Classroom from "./components/Classroom";
@@ -47,6 +48,7 @@ const routes: Record<View, string> = {
 /** Former standalone pages are mission-control panel tabs; their hashes still open them. */
 const MODULE_HASHES: Record<string, string> = {
   "#/solver-arena": "arena",
+  "#/shared-antenna": "campaign",
   "#/time-search": "window-search",
   "#/recommendations": "recommendations",
   "#/descent": "descent",
@@ -844,6 +846,7 @@ export default function App() {
     </section>
   );
   const stageModules = [
+    { id: "campaign", label: t("campaign.tab"), content: <SharedAntenna active={view === "mission" && panel === "campaign" && pageVisible} /> },
     { id: "arena", label: t("arena.tab"), content: <SolverArena active={view === "mission" && panel === "arena" && pageVisible} /> },
     { id: "results", label: t("app.modules.results"), content: resultsModule },
     ...(comparisonBase

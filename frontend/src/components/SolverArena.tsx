@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useTranslate } from "../i18n";
 import "./solver-arena.css";
 
@@ -8,7 +8,7 @@ type Validation = { status: string; score: number; issues: { message: string }[]
 type ClassicalStep = { evaluated: number; feasible_count: number; best_option_ids: string[]; best_exact_score: string | null; elapsed_s: number };
 type QuantumStep = { iteration: number; probabilities: number[]; best_probabilities: number[]; energy: number; best_energy: number; elapsed_s: number };
 type Sample = { basis_index: number; probability: number; count: number; selected_option_ids: string[]; feasible: boolean; optimal: boolean };
-type Run = {
+export type Run = {
   input_fingerprint: string; request: Controls; preparation_s: number; total_elapsed_s: number;
   classical: { elapsed_s: number; score: number | null; optimum_gap: number | null; trace: ClassicalStep[];
     result: { status: string; evaluated_combinations: number; total_combinations: number; feasible_count: number; plan: Plan | null; issues: {message: string}[] } };
@@ -22,11 +22,13 @@ type Hardware = { kind: string; job_id: string; backend_code: string; input_fing
 const number = (value: number | null | undefined, digits = 3) => value == null ? "—" : value.toFixed(digits);
 const percent = (value: number | null | undefined) => value == null ? "—" : `${(value * 100).toFixed(1)}%`;
 
-export default function SolverArena({ active }: { active: boolean }) {
+export default function SolverArena({ active, comparison }: { active: boolean; comparison?: Run }) {
   const { t } = useTranslate();
+  const titleId = useId();
   const [presets, setPresets] = useState<string[]>([]);
   const [controls, setControls] = useState<Controls>({ preset_id: "recovery", depth: 2, evaluations: 80, shots: 512, seed: 17 });
-  const [result, setResult] = useState<Run | null>(null);
+  const [localResult, setResult] = useState<Run | null>(null);
+  const result = comparison ?? localResult;
   const [hardware, setHardware] = useState<Hardware | null>(null);
   const [running, setRunning] = useState(false);
   const [error, setError] = useState("");
@@ -48,6 +50,7 @@ export default function SolverArena({ active }: { active: boolean }) {
       return;
     }
     setRunning(false);
+    if (comparison) return;
     const request = new AbortController();
     fetch("/api/arena/presets", { signal: request.signal })
       .then(async response => {
@@ -57,7 +60,7 @@ export default function SolverArena({ active }: { active: boolean }) {
       .then(body => { if (!request.signal.aborted) setPresets(body.presets.map((p: { id: string }) => p.id)); })
       .catch(e => { if (!request.signal.aborted) setError(e.message); });
     return () => { request.abort(); controller.current?.abort(); generation.current += 1; };
-  }, [active, t]);
+  }, [active, t, comparison]);
 
   useEffect(() => {
     if (expanded && dialog.current) { dialog.current.showModal(); wasExpanded.current = true; }
@@ -120,17 +123,17 @@ export default function SolverArena({ active }: { active: boolean }) {
   const quantum = result?.quantum.trace[at(result.quantum.trace.length)];
   const probabilities = quantum ? incumbent ? quantum.best_probabilities : quantum.probabilities : [];
   const samples = result?.quantum.result?.samples ?? [];
-  const dirty = result && JSON.stringify(result.request) !== JSON.stringify(controls);
+  const dirty = !comparison && result && JSON.stringify(result.request) !== JSON.stringify(controls);
   const selected = (ids: string[] | undefined) => ids?.length ? ids.join(" + ") : t("arena.none");
 
-  const content = <section className="solver-arena" aria-labelledby="arena-title" aria-busy={running}>
+  const content = <section className="solver-arena" aria-labelledby={titleId} aria-busy={running}>
     <header className="arena-header">
-      <div><p className="eyebrow">H8 / {t("arena.eyebrow")}</p><h2 id="arena-title">{t("arena.title")}</h2></div>
+      <div><p className="eyebrow">H8 / {t("arena.eyebrow")}</p><h2 id={titleId}>{t("arena.title")}</h2></div>
       <button type="button" ref={!expanded ? expandButton : undefined} onClick={() => setExpanded(!expanded)}>{t(expanded ? "arena.close" : "arena.expand")}</button>
     </header>
-    <p className="arena-intro">{t("arena.intro")}</p>
-    <div className="arena-tags"><span>{t("arena.simulation")}</span><span>{t("arena.synthetic")}</span><span>{t("arena.noCredits")}</span></div>
-    <form className="arena-controls" onSubmit={e => { e.preventDefault(); void run(); }}>
+    <p className="arena-intro">{t(comparison ? "campaign.arenaIntro" : "arena.intro")}</p>
+    <div className="arena-tags"><span>{t("arena.simulation")}</span><span>{t(comparison ? "campaign.illustrative" : "arena.synthetic")}</span><span>{t("arena.noCredits")}</span></div>
+    {!comparison && <form className="arena-controls" onSubmit={e => { e.preventDefault(); void run(); }}>
       <fieldset disabled={running}>
         <label className="arena-preset">{t("arena.scenario")}<select value={controls.preset_id} onChange={e => setControls({ ...controls, preset_id: e.target.value })}>
           {(presets.length ? presets : ["recovery"]).map(id => <option key={id} value={id}>{t(`arena.presets.${id}`)}</option>)}
@@ -139,7 +142,7 @@ export default function SolverArena({ active }: { active: boolean }) {
           <label key={key}>{t(`arena.${key}`)}<input type="number" min={min} max={max} step="1" required value={Number.isNaN(controls[key]) ? "" : controls[key]} onChange={e => setControls({ ...controls, [key]: e.target.valueAsNumber })} /></label>)}
         <button className="primary" type="submit">{t(running ? "arena.running" : "arena.run")}</button>
       </fieldset>
-    </form>
+    </form>}
     {error && <p className="alert" role="alert">{error}</p>}
     <p role="status" className="arena-status">{running ? t("arena.working") : result ? t("arena.completed") : t("arena.ready")}</p>
     {!result && !running && <div className="arena-empty"><span aria-hidden="true">01 ↔ 11</span><h3>{t("arena.emptyTitle")}</h3><p>{t("arena.emptyBody")}</p></div>}
@@ -206,5 +209,5 @@ export default function SolverArena({ active }: { active: boolean }) {
       <details className="arena-details"><summary>{t("arena.identity")}</summary><code className="arena-id">{result.input_fingerprint}</code></details>
     </>}
   </section>;
-  return expanded ? <dialog className="arena-dialog" aria-labelledby="arena-title" ref={dialog} onCancel={() => setExpanded(false)}>{content}</dialog> : content;
+  return expanded ? <dialog className="arena-dialog" aria-labelledby={titleId} ref={dialog} onCancel={() => setExpanded(false)}>{content}</dialog> : content;
 }

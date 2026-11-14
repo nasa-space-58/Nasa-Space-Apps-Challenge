@@ -268,3 +268,11 @@ Görev kontrolündeki **Çözücü arenası** sekmesi (`#/solver-arena`), aynı 
 
 - Açıklama ve sınırlar: [H8 solver arena](docs/solver-arena.md)
 - Çalıştırılmış notebook: [H8_solver_arena.ipynb](notebooks/H8_solver_arena.ipynb)
+
+### H9 — Üç görev, ortak anten
+
+H9, bir insanlı ve iki robotik örnek görevin tek anten paylaşımını planlar. Bağımsız seçimlerin çakışmasını, ortak klasik/QAOA planını ve sabitlenen insanlı görev seçiminin etkisini aynı zaman çizelgesinde gösterir. Kaynaklı görünürlük verileriyle örnek kapasite/öncelik varsayımları ayrıdır; sonuç NASA görev planı veya iniş/enerji güvenliği onayı değildir.
+
+- Arayüz: görev kontrolünde **Ortak anten**, `#/shared-antenna`.
+- [Kapsam, kaynaklar ve doğrulama](docs/shared-antenna-campaign.md)
+- [H9 Jupyter notebooku](notebooks/H9_shared_antenna.ipynb): Run All yeni kuantum işi göndermez veya kredi harcamaz.
