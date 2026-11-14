@@ -1,0 +1,692 @@
+import {
+  Suspense,
+  useEffect,
+  useMemo,
+  useRef,
+  type MutableRefObject,
+} from "react";
+import {
+  Canvas,
+  useFrame,
+  useLoader,
+  useThree,
+  type ThreeEvent,
+} from "@react-three/fiber";
+import * as THREE from "three";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import type { Preset } from "../types";
+import {
+  COVERAGE_MAX_LATITUDE_DEG,
+  SCENE_LAYOUT,
+  allPathPoints,
+  headingAt,
+  pathPointsUntil,
+  phaseAt,
+  positionAt,
+  siteSelectionFromPoint,
+  surfaceUnitVector,
+  type TransferPath,
+  type Vec3,
+} from "../missionPath";
+
+// Display-only placement of the Sun in the illustrative scene frame (not to scale).
+const SUN_SCENE: Vec3 = [-20, 0, 8];
+const SUN_RADIUS_SCENE = 2.2;
+
+export type CameraMode = "auto" | "system" | "moon" | "pole" | "spacecraft";
+export type CameraView = Exclude<CameraMode, "auto">;
+export type SiteCondition = "sunlit" | "dark" | "unknown";
+
+const v3 = (v: Vec3) => new THREE.Vector3(v[0], v[1], v[2]);
+const onSurface = (lat: number, lon: number, lift = 1.004) =>
+  v3(surfaceUnitVector(lat, lon)).multiplyScalar(
+    SCENE_LAYOUT.moon_radius_scene * lift,
+  );
+
+function Model({ path, size }: { path: string; size: number }) {
+  const gltf = useLoader(GLTFLoader, path, (loader) => {
+    loader.setDRACOLoader(new DRACOLoader().setDecoderPath("/draco/"));
+  });
+  const { model, scale, center } = useMemo(() => {
+    const model = gltf.scene.clone(true);
+    const box = new THREE.Box3().setFromObject(model);
+    const dimensions = box.getSize(new THREE.Vector3());
+    return {
+      model,
+      scale: size / Math.max(dimensions.x, dimensions.y, dimensions.z),
+      center: box.getCenter(new THREE.Vector3()).negate(),
+    };
+  }, [gltf, size]);
+  return (
+    <group scale={scale}>
+      <primitive object={model} position={center} />
+    </group>
+  );
+}
+
+function glowTexture(inner: string, outer: string) {
+  const canvas = document.createElement("canvas");
+  canvas.width = canvas.height = 128;
+  const context = canvas.getContext("2d")!;
+  const gradient = context.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gradient.addColorStop(0, inner);
+  gradient.addColorStop(0.25, inner);
+  gradient.addColorStop(1, outer);
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, 128, 128);
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
+function Line({
+  points,
+  color,
+  opacity,
+  dashed = false,
+}: {
+  points: THREE.Vector3[];
+  color: string;
+  opacity: number;
+  dashed?: boolean;
+}) {
+  const line = useMemo(() => {
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    const material = dashed
+      ? new THREE.LineDashedMaterial({
+          color,
+          transparent: true,
+          opacity,
+          dashSize: 0.18,
+          gapSize: 0.14,
+        })
+      : new THREE.LineBasicMaterial({ color, transparent: true, opacity });
+    const object = new THREE.Line(geometry, material);
+    if (dashed) object.computeLineDistances();
+    return object;
+  }, [points, color, opacity, dashed]);
+  useEffect(
+    () => () => {
+      line.geometry.dispose();
+      (line.material as THREE.Material).dispose();
+    },
+    [line],
+  );
+  return <primitive object={line} />;
+}
+
+function Trail({
+  path,
+  progress,
+}: {
+  path: TransferPath;
+  progress: MutableRefObject<number>;
+}) {
+  const capacity = allPathPoints(path).length + 2;
+  const line = useMemo(() => {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(new Float32Array(capacity * 3), 3),
+    );
+    return new THREE.Line(
+      geometry,
+      new THREE.LineBasicMaterial({
+        color: "#edbb66",
+        transparent: true,
+        opacity: 0.95,
+      }),
+    );
+  }, [capacity]);
+  useEffect(
+    () => () => {
+      line.geometry.dispose();
+      (line.material as THREE.Material).dispose();
+    },
+    [line],
+  );
+  useFrame(() => {
+    const points = pathPointsUntil(path, progress.current);
+    const attribute = line.geometry.getAttribute(
+      "position",
+    ) as THREE.BufferAttribute;
+    const count = Math.min(points.length, capacity);
+    for (let i = 0; i < count; i++) attribute.setXYZ(i, ...points[i]);
+    attribute.needsUpdate = true;
+    line.geometry.setDrawRange(0, count);
+    line.geometry.computeBoundingSphere();
+  });
+  return <primitive object={line} />;
+}
+
+function Spacecraft({
+  path,
+  progress,
+  spacecraft,
+}: {
+  path: TransferPath;
+  progress: MutableRefObject<number>;
+  spacecraft: MutableRefObject<THREE.Vector3>;
+}) {
+  const group = useRef<THREE.Group>(null!);
+  const orbiter = useRef<THREE.Group>(null!);
+  const lander = useRef<THREE.Group>(null!);
+  const halo = useRef<THREE.Sprite>(null!);
+  const glow = useMemo(() => glowTexture("#fff3d6", "#edbb6600"), []);
+  const look = useMemo(() => new THREE.Vector3(), []);
+  useEffect(() => () => glow.dispose(), [glow]);
+  useFrame(({ camera }) => {
+    const p = progress.current;
+    const position = positionAt(path, p);
+    group.current.position.set(...position);
+    spacecraft.current.set(...position);
+    const phase = phaseAt(p).phase.id;
+    const nearMoon = phase === "descent" || phase === "landed";
+    orbiter.current.visible = !nearMoon;
+    lander.current.visible = nearMoon;
+    // Keep the beacon a similar size on screen at every camera distance.
+    halo.current.visible = phase !== "landed";
+    halo.current.scale.setScalar(
+      THREE.MathUtils.clamp(camera.position.distanceTo(group.current.position) * 0.03, 0.02, 0.9),
+    );
+    if (nearMoon) {
+      // Keep the lander upright relative to the local surface normal.
+      group.current.quaternion.setFromUnitVectors(
+        new THREE.Vector3(0, 1, 0),
+        v3(position).normalize(),
+      );
+    } else {
+      const heading = headingAt(path, p);
+      look.set(
+        position[0] + heading[0],
+        position[1] + heading[1],
+        position[2] + heading[2],
+      );
+      group.current.lookAt(look);
+    }
+  });
+  return (
+    <group ref={group}>
+      <group ref={orbiter}>
+        <Model path="/nasa/lro.glb" size={0.32} />
+      </group>
+      <group ref={lander}>
+        <group position={[0, 0.045, 0]}>
+          <Model path="/nasa/apollo.glb" size={0.09} />
+        </group>
+      </group>
+      <sprite ref={halo}>
+        <spriteMaterial
+          map={glow}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+          opacity={0.75}
+        />
+      </sprite>
+    </group>
+  );
+}
+
+function SiteMarker({
+  lat,
+  lon,
+  condition,
+  reduced,
+}: {
+  lat: number;
+  lon: number;
+  condition: SiteCondition;
+  reduced: boolean;
+}) {
+  const ring = useRef<THREE.Mesh>(null!);
+  const position = useMemo(() => onSurface(lat, lon, 1.006), [lat, lon]);
+  const quaternion = useMemo(
+    () =>
+      new THREE.Quaternion().setFromUnitVectors(
+        new THREE.Vector3(0, 0, 1),
+        position.clone().normalize(),
+      ),
+    [position],
+  );
+  const color =
+    condition === "sunlit"
+      ? "#edbb66"
+      : condition === "dark"
+        ? "#7f93a3"
+        : "#edbb66";
+  useFrame(({ clock }) => {
+    const pulse = reduced ? 1 : 1 + 0.35 * Math.sin(clock.elapsedTime * 3);
+    ring.current.scale.setScalar(pulse);
+  });
+  return (
+    <group position={position} quaternion={quaternion}>
+      <mesh>
+        <circleGeometry args={[0.022, 24]} />
+        <meshBasicMaterial color={color} />
+      </mesh>
+      <mesh ref={ring}>
+        <ringGeometry args={[0.05, 0.062, 40]} />
+        <meshBasicMaterial color={color} transparent opacity={0.85} />
+      </mesh>
+      <Line
+        points={[new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, 0.32)]}
+        color={color}
+        opacity={0.9}
+      />
+    </group>
+  );
+}
+
+function CameraRig({
+  mode,
+  lat,
+  lon,
+  spacecraft,
+  progress,
+  reduced,
+}: {
+  mode: CameraView;
+  lat: number;
+  lon: number;
+  spacecraft: MutableRefObject<THREE.Vector3>;
+  progress: MutableRefObject<number>;
+  reduced: boolean;
+}) {
+  const { camera, gl, invalidate, size } = useThree();
+  const user = useRef({ yaw: 0, pitch: 0, zoom: 1 });
+  const target = useMemo(() => new THREE.Vector3(7, 0, 0), []);
+  const desiredTarget = useMemo(() => new THREE.Vector3(), []);
+  const desiredPosition = useMemo(() => new THREE.Vector3(), []);
+  const first = useRef(true);
+  useEffect(() => {
+    user.current = { yaw: 0, pitch: 0, zoom: 1 };
+    invalidate();
+  }, [mode, invalidate]);
+  useEffect(() => {
+    const canvas = gl.domElement;
+    let dragging: { x: number; y: number } | null = null;
+    const down = (e: PointerEvent) => {
+      dragging = { x: e.clientX, y: e.clientY };
+    };
+    const move = (e: PointerEvent) => {
+      if (!dragging) return;
+      user.current.yaw -= (e.clientX - dragging.x) * 0.006;
+      user.current.pitch = THREE.MathUtils.clamp(
+        user.current.pitch + (e.clientY - dragging.y) * 0.005,
+        -1.2,
+        1.2,
+      );
+      dragging = { x: e.clientX, y: e.clientY };
+      invalidate();
+    };
+    const up = () => {
+      dragging = null;
+    };
+    const wheel = (e: WheelEvent) => {
+      e.preventDefault();
+      user.current.zoom = THREE.MathUtils.clamp(
+        user.current.zoom * Math.exp(e.deltaY * 0.001),
+        0.35,
+        2.4,
+      );
+      invalidate();
+    };
+    canvas.addEventListener("pointerdown", down);
+    window.addEventListener("pointermove", move);
+    window.addEventListener("pointerup", up);
+    canvas.addEventListener("wheel", wheel, { passive: false });
+    return () => {
+      canvas.removeEventListener("pointerdown", down);
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      canvas.removeEventListener("wheel", wheel);
+    };
+  }, [gl, invalidate]);
+  useFrame((_, delta) => {
+    const phase = phaseAt(progress.current).phase.id;
+    // Camera direction from yaw (around +Y) and pitch (positive = above).
+    let yaw = 0.2,
+      pitch = 0.78,
+      distance = 36;
+    const siteYaw = () => {
+      const site = surfaceUnitVector(
+        Number.isFinite(lat) ? lat : -89,
+        Number.isFinite(lon) ? lon : 0,
+      );
+      return Math.atan2(site[0], site[2]) || 0.35;
+    };
+    if (mode === "system") {
+      desiredTarget.set(-2.5, 0, 2);
+      // Narrow viewports need a longer distance to keep Sun, Moon and Earth in frame.
+      distance *= Math.max(1, 1.3 / Math.max(0.3, size.width / size.height));
+    } else if (mode === "pole") {
+      desiredTarget.set(0, -SCENE_LAYOUT.moon_radius_scene, 0);
+      yaw = siteYaw();
+      pitch = -1.38;
+      distance = 1.25;
+    } else if (mode === "moon") {
+      desiredTarget.set(0, -0.35, 0);
+      yaw = siteYaw();
+      pitch = -1.0;
+      distance = 4.6;
+    } else {
+      desiredTarget.copy(spacecraft.current);
+      const phaseEarly = phase === "parking_orbit";
+      yaw = 0.9;
+      pitch = 0.42;
+      distance = phaseEarly ? 9 : 7;
+    }
+    yaw += user.current.yaw;
+    pitch = THREE.MathUtils.clamp(pitch + user.current.pitch, -1.45, 1.45);
+    distance *= user.current.zoom;
+    desiredPosition
+      .set(
+        Math.sin(yaw) * Math.cos(pitch),
+        Math.sin(pitch),
+        Math.cos(yaw) * Math.cos(pitch),
+      )
+      .multiplyScalar(distance)
+      .add(desiredTarget);
+    const k = reduced || first.current ? 1 : 1 - Math.exp(-delta * 3.2);
+    first.current = false;
+    target.lerp(desiredTarget, k);
+    camera.position.lerp(desiredPosition, k);
+    camera.lookAt(target);
+  });
+  return null;
+}
+
+function ProgressEaser({
+  target,
+  progress,
+  snap,
+}: {
+  target: number;
+  progress: MutableRefObject<number>;
+  snap: boolean;
+}) {
+  useFrame((_, delta) => {
+    const gap = target - progress.current;
+    progress.current =
+      snap || Math.abs(gap) > 0.08 || Math.abs(gap) < 1e-5
+        ? target
+        : progress.current + gap * (1 - Math.exp(-delta * 14));
+  });
+  return null;
+}
+
+function System({
+  path,
+  lat,
+  lon,
+  sites,
+  progress,
+  cameraMode,
+  condition,
+  reduced,
+  selectable,
+  onPick,
+  onPreset,
+}: SceneProps & {
+  path: TransferPath | null;
+  progress: MutableRefObject<number>;
+}) {
+  const [moonMap, moonRelief, earthMap] = useLoader(THREE.TextureLoader, [
+    "/nasa/moon.jpg",
+    "/nasa/moon-relief.jpg",
+    "/nasa/earth.jpg",
+  ]);
+  moonMap.colorSpace = THREE.SRGBColorSpace;
+  earthMap.colorSpace = THREE.SRGBColorSpace;
+  const earth = useRef<THREE.Mesh>(null!);
+  const spacecraft = useRef(new THREE.Vector3());
+  const sunGlow = useMemo(() => glowTexture("#fff4cf", "#ffb54700"), []);
+  const atmosphere = useMemo(() => glowTexture("#8fc6ff55", "#8fc6ff00"), []);
+  useEffect(
+    () => () => {
+      sunGlow.dispose();
+      atmosphere.dispose();
+    },
+    [sunGlow, atmosphere],
+  );
+  const stars = useMemo(() => {
+    const values = new Float32Array(2400 * 3);
+    for (let i = 0; i < 2400; i++) {
+      const a = Math.sin(i * 12.9898) * 43758.5453;
+      const b = Math.sin(i * 78.233) * 12345.678;
+      const u = a - Math.floor(a),
+        w = b - Math.floor(b);
+      const theta = u * Math.PI * 2,
+        z = w * 2 - 1,
+        r = 140;
+      const s = Math.sqrt(1 - z * z);
+      values.set([Math.cos(theta) * s * r, z * r, Math.sin(theta) * s * r], i * 3);
+    }
+    return values;
+  }, []);
+  const coverage = useMemo(
+    () =>
+      Array.from({ length: 129 }, (_, i) =>
+        onSurface(COVERAGE_MAX_LATITUDE_DEG, (i / 128) * 360, 1.003),
+      ),
+    [],
+  );
+  const fullPath = useMemo(
+    () => (path ? allPathPoints(path).map(v3) : []),
+    [path],
+  );
+  const parkingRing = useMemo(
+    () =>
+      Array.from({ length: 129 }, (_, i) => {
+        const a = (i / 128) * Math.PI * 2;
+        const r = SCENE_LAYOUT.parking_orbit_radius_scene;
+        return v3(SCENE_LAYOUT.earth_center_scene).add(
+          new THREE.Vector3(Math.sin(a) * r, 0, Math.cos(a) * r),
+        );
+      }),
+    [],
+  );
+  useFrame((_, delta) => {
+    if (!reduced) earth.current.rotation.y += delta * 0.05;
+  });
+  const pick = (event: ThreeEvent<MouseEvent>) => {
+    event.stopPropagation();
+    if (event.delta > 6) return;
+    const point = event.point;
+    onPick(siteSelectionFromPoint([point.x, point.y, point.z]));
+  };
+  return (
+    <>
+      <color attach="background" args={["#03060a"]} />
+      <ambientLight intensity={0.22} />
+      <directionalLight
+        position={SUN_SCENE as unknown as [number, number, number]}
+        intensity={3.1}
+        color="#fff3df"
+      />
+      <points>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" args={[stars, 3]} />
+        </bufferGeometry>
+        <pointsMaterial
+          color="#b9c7d4"
+          size={0.35}
+          sizeAttenuation
+          transparent
+          opacity={0.75}
+        />
+      </points>
+      <group position={SUN_SCENE as unknown as [number, number, number]}>
+        <mesh>
+          <sphereGeometry args={[SUN_RADIUS_SCENE, 48, 32]} />
+          <meshBasicMaterial color="#fff1c9" />
+        </mesh>
+        <sprite scale={[16, 16, 16]}>
+          <spriteMaterial
+            map={sunGlow}
+            transparent
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </sprite>
+      </group>
+      <group
+        position={
+          SCENE_LAYOUT.earth_center_scene as unknown as [number, number, number]
+        }
+      >
+        <group rotation={[0, 0, (23.4 * Math.PI) / 180]}>
+          <mesh ref={earth}>
+            <sphereGeometry args={[SCENE_LAYOUT.earth_radius_scene, 96, 64]} />
+            <meshStandardMaterial map={earthMap} roughness={0.85} />
+          </mesh>
+        </group>
+        <sprite
+          scale={[
+            SCENE_LAYOUT.earth_radius_scene * 2.7,
+            SCENE_LAYOUT.earth_radius_scene * 2.7,
+            1,
+          ]}
+        >
+          <spriteMaterial
+            map={atmosphere}
+            transparent
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </sprite>
+      </group>
+      <Line points={parkingRing} color="#9ac9e5" opacity={0.18} />
+      <mesh
+        onClick={pick}
+        onPointerOver={() => {
+          document.body.style.cursor = selectable ? "crosshair" : "zoom-in";
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = "";
+        }}
+      >
+        <sphereGeometry args={[SCENE_LAYOUT.moon_radius_scene, 128, 96]} />
+        <meshStandardMaterial
+          map={moonMap}
+          bumpMap={moonRelief}
+          bumpScale={0.03}
+          roughness={1}
+        />
+      </mesh>
+      <Line points={coverage} color="#9ac9e5" opacity={0.75} dashed />
+      {sites.map((site) => (
+        <mesh
+          key={site.site_id}
+          position={onSurface(site.latitude_deg, site.longitude_deg_east, 1.008)}
+          onClick={(event) => {
+            event.stopPropagation();
+            if (event.delta <= 6) onPreset(site);
+          }}
+        >
+          <sphereGeometry args={[0.012, 16, 12]} />
+          <meshBasicMaterial color="#dfe8ee" />
+        </mesh>
+      ))}
+      {Number.isFinite(lat) && Number.isFinite(lon) && (
+        <SiteMarker lat={lat} lon={lon} condition={condition} reduced={reduced} />
+      )}
+      {path && (
+        <>
+          <Line points={fullPath} color="#c6d3dc" opacity={0.28} dashed />
+          <Trail path={path} progress={progress} />
+          <Spacecraft path={path} progress={progress} spacecraft={spacecraft} />
+        </>
+      )}
+      <CameraRig
+        mode={cameraMode}
+        lat={lat}
+        lon={lon}
+        spacecraft={spacecraft}
+        progress={progress}
+        reduced={reduced}
+      />
+    </>
+  );
+}
+
+type SceneProps = {
+  lat: number;
+  lon: number;
+  sites: Preset[];
+  cameraMode: CameraView;
+  condition: SiteCondition;
+  reduced: boolean;
+  selectable: boolean;
+  onPick: (selection: ReturnType<typeof siteSelectionFromPoint>) => void;
+  onPreset: (site: Preset) => void;
+};
+
+function ContextGuard({ onFailure }: { onFailure: () => void }) {
+  const gl = useThree((state) => state.gl);
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const lost = (event: Event) => {
+      event.preventDefault();
+      onFailure();
+    };
+    canvas.addEventListener("webglcontextlost", lost);
+    return () => canvas.removeEventListener("webglcontextlost", lost);
+  }, [gl, onFailure]);
+  return null;
+}
+
+function Invalidator({ deps }: { deps: unknown[] }) {
+  const invalidate = useThree((state) => state.invalidate);
+  useEffect(() => {
+    invalidate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+  return null;
+}
+
+export default function MissionScene(
+  props: SceneProps & {
+    path: TransferPath | null;
+    visible: boolean;
+    animate: boolean;
+    compact: boolean;
+    progressValue: number;
+    onFailure: () => void;
+  },
+) {
+  const { visible, animate, compact, onFailure, progressValue, ...scene } =
+    props;
+  const progress = useRef(progressValue);
+  return (
+    <Canvas
+      aria-label="Illustrative Earth, Moon and Sun scene. Click the south polar cap to choose a landing site; the latitude and longitude fields offer keyboard input."
+      camera={{ position: [6, 28, 21], fov: 50, near: 0.02, far: 600 }}
+      dpr={compact ? 1 : [1, 1.75]}
+      frameloop={visible && animate ? "always" : "demand"}
+      gl={{ antialias: true, alpha: false }}
+    >
+      <ContextGuard onFailure={onFailure} />
+      <Invalidator
+        deps={[
+          progressValue,
+          scene.lat,
+          scene.lon,
+          scene.cameraMode,
+          scene.condition,
+          visible,
+        ]}
+      />
+      <ProgressEaser
+        target={progressValue}
+        progress={progress}
+        snap={!animate}
+      />
+      <Suspense fallback={null}>
+        <System {...scene} progress={progress} />
+      </Suspense>
+    </Canvas>
+  );
+}
