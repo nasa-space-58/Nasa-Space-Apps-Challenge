@@ -66,3 +66,7 @@ Rules:
 - ALWAYS read graphify output (graphify-out/GRAPH_REPORT.md, then `graphify query`) FIRST, before looking at any other file or source in this project.
 - ALWAYS update the graphify output after EVERY code change: run `graphify update .` right after writing or editing code, before moving on.
 - ALWAYS follow the documents under docs/ (docs/coding-conventions.md, docs/user-scenarios.md, and any others added there). Act according to them in every task; if a request conflicts with them, point out the conflict before proceeding.
+
+### Task 2 delivery override (user, 2026-11-14)
+
+Task 2 starts from Task 1 on `feature/task2-terrain-horizon`. Push only this new branch. Do not merge into or push to `tahakrcc` or `main`; the user performs merges manually.

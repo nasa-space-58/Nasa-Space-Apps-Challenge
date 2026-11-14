@@ -174,3 +174,7 @@ Vite 7.3.8 and Vitest 4.1.12 are pinned in package.json. The earlier Vitest 3.2.
 ### Task 1 ingestion implementation
 
 The ingestion image now includes Rasterio 1.5.2 (GDAL wheel, with libexpat1) and its locked NumPy dependency. Backend messaging uses aio-pika 9.5.7. Durable queues, persisted job state and bounded full-source terrain acquisition are documented in [ingestion-pipeline.md](ingestion-pipeline.md). UI and analysis endpoints remain Step 4.
+
+### Task 2 terrain horizon implementation
+
+The backend activates the previously selected Rasterio/GDAL and NumPy stack, pinned to Rasterio 1.5.2 and NumPy 2.5.4 with hashed transitive locks. It reads the existing terrain cache only; no external data acquisition moves into the backend. The image installs libexpat1 for the GDAL wheel.
