@@ -1,0 +1,79 @@
+/* R8: post-landing surface routes (kept separate from style.css; reuses risk.css and alternatives.css). */
+.surface-targets {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+.surface-targets th {
+  text-align: left;
+  color: var(--muted);
+  font-weight: 400;
+  padding: 0 6px 4px 0;
+}
+.surface-targets td {
+  padding: 2px 6px 2px 0;
+}
+.surface-targets input {
+  width: 100%;
+}
+.surface-form > fieldset {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.surface-map {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--line);
+  background: #0b1117;
+}
+.surface-label {
+  fill: #e8edf1;
+  font-size: 11px;
+}
+.wp-full,
+.wp-partial {
+  fill: var(--gold);
+  stroke: #0b1117;
+}
+.wp-partial {
+  fill-opacity: 0.55;
+}
+.wp-dark {
+  fill: #0b1117;
+  stroke: #c4ced5;
+  stroke-width: 1.5;
+}
+.wp-unknown,
+.wp-none {
+  fill: #6c7a84;
+}
+.risk-legend .wp-full-swatch {
+  background: var(--gold);
+}
+.risk-legend .wp-unknown-swatch {
+  background: #6c7a84;
+}
+.risk-legend .square {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border: 1.5px solid #c4ced5;
+  vertical-align: middle;
+}
+.route-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 3px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
