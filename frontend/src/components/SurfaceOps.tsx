@@ -27,9 +27,9 @@ type Route = {
 type RouteResult = { sky_evaluated: boolean; routes: Route[] };
 type Profile = {
   name: string;
-  mass_at_pdi_lb: number;
-  usable_propellant_lb: number;
-  max_thrust_lbf: number;
+  mass_at_pdi_kg: number;
+  usable_propellant_kg: number;
+  max_thrust_n: number;
   isp_s: number;
   urls: string[];
 };
@@ -99,6 +99,11 @@ function loadRoutes(lat: number, lon: number, analysisId?: string) {
   return pending;
 }
 
+/** Rounded display of a backend value; a missing field shows a dash, never throws. */
+const whole = (value: number | undefined) =>
+  typeof value === "number" && Number.isFinite(value)
+    ? Math.round(value).toLocaleString()
+    : "—";
 const km = (m: number) => (m / 1000).toFixed(2);
 const hours = (s: number) => (s / 3600).toFixed(1);
 const utcLabel = (iso: string) => iso.replace("T", " ").replace(/:\d\dZ$/, " UTC");
@@ -374,13 +379,13 @@ export default function SurfaceOps({
                 <p className="ops-name">{profile.name}</p>
                 <dl className="ops-grid">
                   <dt>{t("surfaceOps.lander.mass")}</dt>
-                  <dd>{profile.mass_at_pdi_lb.toLocaleString()} lb</dd>
+                  <dd>{whole(profile.mass_at_pdi_kg)} kg</dd>
                   <dt>{t("surfaceOps.lander.propellant")}</dt>
-                  <dd>{profile.usable_propellant_lb.toLocaleString()} lb</dd>
+                  <dd>{whole(profile.usable_propellant_kg)} kg</dd>
                   <dt>{t("surfaceOps.lander.thrust")}</dt>
-                  <dd>{profile.max_thrust_lbf.toLocaleString()} lbf</dd>
+                  <dd>{whole(profile.max_thrust_n)} N</dd>
                   <dt>{t("surfaceOps.lander.isp")}</dt>
-                  <dd>{profile.isp_s} s</dd>
+                  <dd>{profile.isp_s ?? "—"} s</dd>
                 </dl>
                 {profile.urls[0] && (
                   <a className="ops-link" href={profile.urls[0]} target="_blank" rel="noreferrer">

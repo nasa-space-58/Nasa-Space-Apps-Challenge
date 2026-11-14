@@ -390,13 +390,15 @@ export default function MissionStage({
           )}
         </div>
         {landed && (
-          <SurfaceOps
-            lat={lat}
-            lon={lon}
-            analysisId={analysisId}
-            reduced={reduced}
-            onRover={setRover}
-          />
+          <SceneBoundary fallback={null}>
+            <SurfaceOps
+              lat={lat}
+              lon={lon}
+              analysisId={analysisId}
+              reduced={reduced}
+              onRover={setRover}
+            />
+          </SceneBoundary>
         )}
         {notice && (
           <div className="stage-notice" role="status">
