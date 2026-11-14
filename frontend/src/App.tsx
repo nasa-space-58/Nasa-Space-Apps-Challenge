@@ -172,6 +172,9 @@ export default function App() {
   const [sceneVisible, setSceneVisible] = useState(true);
   const [reduced, setReduced] = useState(false);
   const [webgl, setWebgl] = useState(false);
+  const [compactScene, setCompactScene] = useState(false);
+  const [motionPaused, setMotionPaused] = useState(false);
+  const [pageVisible, setPageVisible] = useState(true);
   const [sites, setSites] = useState<Preset[]>([]);
   const [siteId, setSiteId] = useState("malapert-massif-r23");
   const [lat, setLat] = useState("-85.9948");
@@ -207,6 +210,12 @@ export default function App() {
     const changed = () => setReduced(mq?.matches ?? false);
     mq?.addEventListener("change", changed);
     setWebgl(typeof window.WebGLRenderingContext !== "undefined");
+    const resize = () => setCompactScene(window.innerWidth < 760);
+    const visibility = () => setPageVisible(!document.hidden);
+    resize();
+    visibility();
+    window.addEventListener("resize", resize);
+    document.addEventListener("visibilitychange", visibility);
     let scheduled = false;
     const scroll = () => {
       if (scheduled) return;
@@ -218,16 +227,23 @@ export default function App() {
         setProgress(
           Math.min(
             1,
-            Math.max(0, -box.top / (box.height - window.innerHeight)),
+            Math.max(
+              0,
+              -box.top / Math.max(1, box.height - window.innerHeight),
+            ),
           ),
         );
         setSceneVisible(box.bottom > 0);
       });
     };
     window.addEventListener("scroll", scroll, { passive: true });
+    window.addEventListener("resize", scroll);
     scroll();
     return () => {
       window.removeEventListener("scroll", scroll);
+      window.removeEventListener("resize", scroll);
+      window.removeEventListener("resize", resize);
+      document.removeEventListener("visibilitychange", visibility);
       mq?.removeEventListener("change", changed);
     };
   }, []);
@@ -502,6 +518,19 @@ export default function App() {
 
   return (
     <main>
+      <button
+        className="skip-link"
+        onClick={() => {
+          setSearchOpen(false);
+          setClassroomOpen(false);
+          setTimeout(() => {
+            jump("mission");
+            document.getElementById("mission")?.focus({ preventScroll: true });
+          }, 0);
+        }}
+      >
+        Skip to mission control
+      </button>
       <header className="navigation">
         <button
           className="brand"
@@ -585,8 +614,10 @@ export default function App() {
               >
                 <MoonScene
                   progress={progress}
-                  reduced={reduced}
-                  visible={sceneVisible}
+                  reduced={reduced || motionPaused}
+                  visible={sceneVisible && pageVisible}
+                  compact={compactScene}
+                  onFailure={() => setWebgl(false)}
                 />
               </Suspense>
             </SceneBoundary>
@@ -596,39 +627,94 @@ export default function App() {
             </div>
           )}
           <div className="scene-vignette" />
+          <div
+            className="scene-cut"
+            style={{
+              opacity: Math.max(0, 1 - Math.abs(progress - 0.49) / 0.045),
+            }}
+          />
+          <div className="scene-readout">
+            <span className="readout-cross">+</span>
+            <p>
+              {progress < 0.49
+                ? "LUNAR RECONNAISSANCE"
+                : progress < 0.935
+                  ? "SURFACE APPROACH"
+                  : "SURFACE CONTACT"}
+            </p>
+            <strong>
+              {progress < 0.49
+                ? "LRO / ORBITAL VIEW"
+                : "APOLLO / CONCEPT SCENE"}
+            </strong>
+            <span className="readout-rule" />
+            <small>
+              {progress < 0.49
+                ? "FROM A DIFFERENT PERSPECTIVE"
+                : "ILLUSTRATIVE TERRAIN"}
+            </small>
+          </div>
           <div className="scene-caption">
-            <span>NASA 3D ASSETS</span>
+            <span>NASA MODELS · ORIGINAL TERRAIN</span>
             <span>
               Illustrative orbit & descent · not a trajectory simulation
             </span>
           </div>
           <div className="scene-index">
-            <span>0{progress < 0.3 ? 1 : progress < 0.75 ? 2 : 3}</span>
+            <span>
+              0
+              {progress < 0.22
+                ? 1
+                : progress < 0.49
+                  ? 2
+                  : progress < 0.9
+                    ? 3
+                    : 4}
+            </span>
             <div>
               <i style={{ height: `${Math.max(4, progress * 100)}%` }} />
             </div>
-            <small>03</small>
+            <small>04</small>
           </div>
+        </div>
+        <div className="intro-controls">
+          <button
+            className="motion-toggle"
+            aria-pressed={motionPaused || reduced}
+            disabled={reduced}
+            onClick={() => setMotionPaused(!motionPaused)}
+          >
+            <span aria-hidden="true">
+              {motionPaused || reduced ? "▷" : "Ⅱ"}
+            </span>
+            {reduced
+              ? "Reduced motion"
+              : motionPaused
+                ? "Resume ambient motion"
+                : "Pause ambient motion"}
+          </button>
+          <span className="scroll-cue">
+            SCROLL TO EXPLORE <span aria-hidden="true">↓</span>
+          </span>
         </div>
         <section className="story hero" id="intro">
           <div className="story-copy">
             <p className="eyebrow">
-              <i /> A DIFFERENT PERSPECTIVE ON LANDING
+              <i /> THE NEXT FRONTIER STARTS WITH A PERSPECTIVE
             </p>
             <h1>
-              Lunar Landing
+              <span className="hero-title-top">Lunar Landing</span>
               <br />
               <em>Navigator</em>
             </h1>
             <p className="intro-copy">
-              A place on the Moon.
+              Find your place.
               <br />
-              The right moment to be there.
+              Choose your moment.
             </p>
             <p className="muted story-description">
-              Explore the lunar south pole. Follow the light.
-              <br />
-              Plan around the terrain that shapes your mission.
+              A journey from lunar orbit to the surface. Explore the light,
+              terrain and connections that shape your mission.
             </p>
             <div className="hero-actions">
               <button
@@ -686,7 +772,26 @@ export default function App() {
         </section>
         <section className="story descent">
           <div className="story-copy">
-            <p className="eyebrow">02 / SURFACE PERSPECTIVE</p>
+            <p className="eyebrow">02 / THE FINAL APPROACH</p>
+            <h2>
+              A new
+              <br />
+              <em>point of view.</em>
+            </h2>
+            <p className="intro-copy">The surface changes everything.</p>
+            <p className="muted story-description">
+              Beyond the crater rims, a different horizon comes into view.
+              Follow the descent from open space to the ground.
+            </p>
+            <div className="story-note">
+              <span className="note-line" />
+              APOLLO MODEL · ILLUSTRATIVE DESCENT
+            </div>
+          </div>
+        </section>
+        <section className="story touchdown">
+          <div className="story-copy">
+            <p className="eyebrow">03 / ON THE SURFACE</p>
             <h2>
               Make every
               <br />
@@ -716,13 +821,17 @@ export default function App() {
 
       <section
         id="mission"
+        tabIndex={-1}
         className="mission-section"
         hidden={searchOpen || classroomOpen || recommendOpen}
       >
-        <ScenarioTransfer onOpen={openSearchResult} />
+        <div className="workspace-kicker">
+          <span>OBSERVATION WORKSPACE</span>
+          <span>01 — LOCATION / 02 — TIME / 03 — PERSPECTIVE</span>
+        </div>
         <div className="section-heading">
           <div>
-            <p className="eyebrow">03 / YOUR OBSERVATION WINDOW</p>
+            <p className="eyebrow">04 / YOUR OBSERVATION WINDOW</p>
             <h2>
               Mission control<span>.</span>
             </h2>
@@ -731,6 +840,11 @@ export default function App() {
             <i /> {job ? stateLabel[job.status] : "Ready to plan"}
           </div>
         </div>
+        <p className="workspace-description">
+          One location. One window in time. Explore the horizon before comparing
+          your next possibility.
+        </p>
+        <ScenarioTransfer onOpen={openSearchResult} />
         {apiError && (
           <div className="alert" role="alert">
             The API is unavailable. {apiError}{" "}
@@ -1257,8 +1371,10 @@ export default function App() {
             <p className="eyebrow">PROVENANCE</p>
             <h2 id="sources-title">A view built on real data.</h2>
             <p>
-              NASA models illustrate the journey. Scientific results use cached
-              Horizons ephemerides and the verified LOLA terrain product.
+              NASA models illustrate the journey. The introductory crater
+              terrain is original decorative geometry, not the selected
+              location. Scientific results use cached Horizons ephemerides and
+              the verified LOLA terrain product.
             </p>
             <ul>
               <li>
