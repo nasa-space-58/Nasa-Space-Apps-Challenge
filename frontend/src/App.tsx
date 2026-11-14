@@ -1412,7 +1412,9 @@ export default function App() {
               NASA models illustrate the journey. The introductory crater
               terrain is original decorative geometry, not the selected
               location. The mission-control flight from Earth to the Moon is
-              illustrative and not to scale; it is not a computed trajectory. Scientific results use cached Horizons ephemerides and
+              illustrative: Earth, the Moon and their distance are to scale,
+              the spacecraft are enlarged and the Sun is shown closer at its
+              true apparent size; it is not a computed trajectory. Scientific results use cached Horizons ephemerides and
               the verified LOLA terrain product.
             </p>
             <ul>

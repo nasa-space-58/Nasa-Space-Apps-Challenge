@@ -95,8 +95,8 @@ export default function MissionStage({
     return buildTransferPath(lat, lon);
   }, [lat, lon]);
   const active = phaseAt(progress);
-  // Auto camera: wide Earth–Moon–Sun view while flying out, the south pole
-  // after capture, and the south pole once the user starts picking a site.
+  // Auto camera: with true-scale distances the wide Earth–Moon view only
+  // suits the coast, so the spacecraft close-up covers Earth orbit and descent.
   const cameraView: CameraView =
     cameraMode !== "auto"
       ? cameraMode
@@ -104,12 +104,13 @@ export default function MissionStage({
         ? focusMoon
           ? "pole"
           : "system"
-        : active.phase.id === "parking_orbit" ||
-            active.phase.id === "translunar_coast"
+        : active.phase.id === "translunar_coast"
           ? "system"
-          : active.phase.id === "landed"
-            ? "pole"
-            : "moon";
+          : active.phase.id === "lunar_orbit"
+            ? "moon"
+            : active.phase.id === "landed"
+              ? "pole"
+              : "spacecraft";
   const picking = cameraView === "pole" || cameraView === "moon";
 
   // A new target restarts the illustrative flight from Earth orbit.
@@ -274,7 +275,7 @@ export default function MissionStage({
           <span>
             <i className="legend-ring" /> Terrain coverage 80–90° S
           </span>
-          <small>Illustrative · not to scale · not a computed trajectory</small>
+          <small>Earth, Moon &amp; distances to scale · spacecraft enlarged · not a computed trajectory</small>
         </div>
         <div className="stage-hud stage-target">
           <span className="eyebrow">TARGET SITE</span>

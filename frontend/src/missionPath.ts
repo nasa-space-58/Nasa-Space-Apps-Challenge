@@ -3,9 +3,11 @@
  *
  * Everything here lives in the "illustrative scene frame": dimensionless scene
  * units, Moon centre at the origin, +Y towards the lunar north pole and +X
- * towards the 0° E meridian (the Earth-facing side). Sizes and distances are
- * NOT to scale and the path is NOT a computed trajectory; it only explains the
- * order of mission phases. Scientific results come from the backend.
+ * towards the 0° E meridian (the Earth-facing side). One scene unit is one
+ * mean lunar radius, so Earth's and the Moon's radii, their mean separation and
+ * the parking/lunar orbit altitudes are to scale. The path itself is NOT a
+ * computed trajectory; it only explains the order of mission phases.
+ * Scientific results come from the backend.
  *
  * Angles cross this module's boundary in degrees (suffix `_deg`) and are
  * handled in radians internally.
@@ -22,14 +24,31 @@ export type SceneLayout = {
   lunar_orbit_radius_scene: number;
 };
 
-/** Default illustrative layout (not to scale). */
+// Reference sizes for the display scale (IAU 2015 nominal radii; IAU 2012
+// astronomical unit; mean Earth–Moon distance from NASA's Moon fact sheet).
+export const MOON_MEAN_RADIUS_KM = 1737.4;
+export const EARTH_MEAN_RADIUS_KM = 6371.0;
+export const EARTH_MOON_MEAN_DISTANCE_KM = 384_400;
+export const SUN_NOMINAL_RADIUS_KM = 695_700;
+export const ASTRONOMICAL_UNIT_KM = 149_597_870.7;
+/** Illustrative circular orbit altitudes (typical LEO and low lunar orbit). */
+const PARKING_ORBIT_ALTITUDE_KM = 400;
+const LUNAR_ORBIT_ALTITUDE_KM = 100;
+
+const sceneUnits = (length_km: number) => length_km / MOON_MEAN_RADIUS_KM;
+
+/** Default layout: true relative sizes and Earth–Moon distance. */
 export const SCENE_LAYOUT: SceneLayout = {
   moon_center_scene: [0, 0, 0],
   moon_radius_scene: 1,
-  earth_center_scene: [14, 0, 0],
-  earth_radius_scene: 2.2,
-  parking_orbit_radius_scene: 3,
-  lunar_orbit_radius_scene: 1.6,
+  earth_center_scene: [sceneUnits(EARTH_MOON_MEAN_DISTANCE_KM), 0, 0],
+  earth_radius_scene: sceneUnits(EARTH_MEAN_RADIUS_KM),
+  parking_orbit_radius_scene: sceneUnits(
+    EARTH_MEAN_RADIUS_KM + PARKING_ORBIT_ALTITUDE_KM,
+  ),
+  lunar_orbit_radius_scene: sceneUnits(
+    MOON_MEAN_RADIUS_KM + LUNAR_ORBIT_ALTITUDE_KM,
+  ),
 };
 
 /** Northern limit of the cached south-pole terrain product. */

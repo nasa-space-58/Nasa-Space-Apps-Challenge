@@ -17,8 +17,10 @@ import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import type { Preset } from "../types";
 import {
+  ASTRONOMICAL_UNIT_KM,
   COVERAGE_MAX_LATITUDE_DEG,
   SCENE_LAYOUT,
+  SUN_NOMINAL_RADIUS_KM,
   allPathPoints,
   headingAt,
   pathPointsUntil,
@@ -30,9 +32,26 @@ import {
   type Vec3,
 } from "../missionPath";
 
-// Display-only placement of the Sun in the illustrative scene frame (not to scale).
-const SUN_SCENE: Vec3 = [-20, 0, 8];
-const SUN_RADIUS_SCENE = 2.2;
+// Display-only Sun: it cannot sit 1 AU away in a renderable scene, so it is
+// placed closer but sized to keep its true apparent diameter (~0.53°).
+const SUN_DISTANCE_SCENE = 2400;
+const SUN_SCENE: Vec3 = (() => {
+  const direction = new THREE.Vector3(-20, 0, 8).normalize();
+  return [
+    direction.x * SUN_DISTANCE_SCENE,
+    direction.y * SUN_DISTANCE_SCENE,
+    direction.z * SUN_DISTANCE_SCENE,
+  ];
+})();
+const SUN_RADIUS_SCENE =
+  (SUN_DISTANCE_SCENE * SUN_NOMINAL_RADIUS_KM) / ASTRONOMICAL_UNIT_KM;
+const STAR_SPHERE_RADIUS_SCENE = 3200;
+// Spacecraft models are enlarged far beyond their true size (metres against a
+// 1737 km lunar radius) so they remain visible in close-up views.
+const LANDER_SIZE_SCENE = 0.03;
+const ORBITER_SIZE_SCENE = 0.04;
+/** Radius of the ambient LRO orbit (≈ 200 km altitude). */
+const SCIENCE_ORBIT_RADIUS_SCENE = 1.12;
 
 export type CameraMode = "auto" | "system" | "moon" | "pole" | "spacecraft";
 export type CameraView = Exclude<CameraMode, "auto">;
@@ -85,11 +104,13 @@ function Line({
   color,
   opacity,
   dashed = false,
+  dashSize = 0.18,
 }: {
   points: THREE.Vector3[];
   color: string;
   opacity: number;
   dashed?: boolean;
+  dashSize?: number;
 }) {
   const line = useMemo(() => {
     const geometry = new THREE.BufferGeometry().setFromPoints(points);
@@ -98,14 +119,14 @@ function Line({
           color,
           transparent: true,
           opacity,
-          dashSize: 0.18,
-          gapSize: 0.14,
+          dashSize,
+          gapSize: dashSize * 0.78,
         })
       : new THREE.LineBasicMaterial({ color, transparent: true, opacity });
     const object = new THREE.Line(geometry, material);
     if (dashed) object.computeLineDistances();
     return object;
-  }, [points, color, opacity, dashed]);
+  }, [points, color, opacity, dashed, dashSize]);
   useEffect(
     () => () => {
       line.geometry.dispose();
@@ -164,32 +185,37 @@ function Spacecraft({
   path,
   progress,
   spacecraft,
+  reduced,
 }: {
   path: TransferPath;
   progress: MutableRefObject<number>;
   spacecraft: MutableRefObject<THREE.Vector3>;
+  reduced: boolean;
 }) {
   const group = useRef<THREE.Group>(null!);
-  const orbiter = useRef<THREE.Group>(null!);
-  const lander = useRef<THREE.Group>(null!);
+  const plume = useRef<THREE.Mesh>(null!);
   const halo = useRef<THREE.Sprite>(null!);
   const glow = useMemo(() => glowTexture("#fff3d6", "#edbb6600"), []);
   const look = useMemo(() => new THREE.Vector3(), []);
   useEffect(() => () => glow.dispose(), [glow]);
-  useFrame(({ camera }) => {
+  useFrame(({ camera, clock }) => {
     const p = progress.current;
     const position = positionAt(path, p);
     group.current.position.set(...position);
     spacecraft.current.set(...position);
     const phase = phaseAt(p).phase.id;
     const nearMoon = phase === "descent" || phase === "landed";
-    orbiter.current.visible = !nearMoon;
-    lander.current.visible = nearMoon;
-    // Keep the beacon a similar size on screen at every camera distance.
-    halo.current.visible = phase !== "landed";
-    halo.current.scale.setScalar(
-      THREE.MathUtils.clamp(camera.position.distanceTo(group.current.position) * 0.03, 0.02, 0.9),
+    plume.current.visible = phase === "descent";
+    plume.current.scale.set(
+      1,
+      0.8 + (reduced ? 0 : Math.sin(clock.elapsedTime * 24) * 0.08),
+      1,
     );
+    // Keep the beacon a similar size on screen at every camera distance; hide
+    // it in close-ups where the model itself is visible.
+    const cameraDistance = camera.position.distanceTo(group.current.position);
+    halo.current.visible = phase !== "landed" && cameraDistance > 1.2;
+    halo.current.scale.setScalar(cameraDistance * 0.012);
     if (nearMoon) {
       // Keep the lander upright relative to the local surface normal.
       group.current.quaternion.setFromUnitVectors(
@@ -208,14 +234,25 @@ function Spacecraft({
   });
   return (
     <group ref={group}>
-      <group ref={orbiter}>
-        <Model path="/nasa/lro.glb" size={0.32} />
+      <group position={[0, LANDER_SIZE_SCENE / 2, 0]}>
+        <Model path="/nasa/apollo.glb" size={LANDER_SIZE_SCENE} />
       </group>
-      <group ref={lander}>
-        <group position={[0, 0.045, 0]}>
-          <Model path="/nasa/apollo.glb" size={0.09} />
-        </group>
-      </group>
+      <mesh
+        ref={plume}
+        rotation={[Math.PI, 0, 0]}
+        position={[0, -LANDER_SIZE_SCENE * 0.25, 0]}
+      >
+        <coneGeometry
+          args={[LANDER_SIZE_SCENE * 0.06, LANDER_SIZE_SCENE * 0.3, 24]}
+        />
+        <meshBasicMaterial
+          color="#ead5aa"
+          transparent
+          opacity={0.36}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
       <sprite ref={halo}>
         <spriteMaterial
           map={glow}
@@ -225,6 +262,43 @@ function Spacecraft({
           opacity={0.75}
         />
       </sprite>
+    </group>
+  );
+}
+
+/** LRO circling the Moon on a near-polar orbit, as on the introduction page. */
+function ScienceOrbiter({ reduced }: { reduced: boolean }) {
+  const orbiter = useRef<THREE.Group>(null!);
+  const elapsed = useRef(0);
+  const ring = useMemo(
+    () =>
+      Array.from({ length: 161 }, (_, i) => {
+        const a = (i / 160) * Math.PI * 2;
+        return new THREE.Vector3(
+          Math.cos(a) * SCIENCE_ORBIT_RADIUS_SCENE,
+          Math.sin(a) * SCIENCE_ORBIT_RADIUS_SCENE,
+          0,
+        );
+      }),
+    [],
+  );
+  useFrame((_, delta) => {
+    if (!reduced) elapsed.current += Math.min(delta, 0.05);
+    const a = 2.1 + elapsed.current * 0.22;
+    orbiter.current.position.set(
+      Math.cos(a) * SCIENCE_ORBIT_RADIUS_SCENE,
+      Math.sin(a) * SCIENCE_ORBIT_RADIUS_SCENE,
+      0,
+    );
+    // Nadir-pointing: face the direction of motion with the instrument deck down.
+    orbiter.current.rotation.set(0, 0, a + Math.PI / 2);
+  });
+  return (
+    <group rotation={[0, 0.6, 0.12]}>
+      <Line points={ring} color="#9c947c" opacity={0.32} />
+      <group ref={orbiter}>
+        <Model path="/nasa/lro.glb" size={ORBITER_SIZE_SCENE} />
+      </group>
     </group>
   );
 }
@@ -328,7 +402,7 @@ function CameraRig({
       e.preventDefault();
       user.current.zoom = THREE.MathUtils.clamp(
         user.current.zoom * Math.exp(e.deltaY * 0.001),
-        0.35,
+        0.05,
         2.4,
       );
       invalidate();
@@ -349,7 +423,7 @@ function CameraRig({
     // Camera direction from yaw (around +Y) and pitch (positive = above).
     let yaw = 0.2,
       pitch = 0.78,
-      distance = 36;
+      distance = 270;
     const siteYaw = () => {
       const site = surfaceUnitVector(
         Number.isFinite(lat) ? lat : -89,
@@ -358,7 +432,7 @@ function CameraRig({
       return Math.atan2(site[0], site[2]) || 0.35;
     };
     if (mode === "system") {
-      desiredTarget.set(-2.5, 0, 2);
+      desiredTarget.set(SCENE_LAYOUT.earth_center_scene[0] / 2, 0, 0);
       // Narrow viewports need a longer distance to keep Sun, Moon and Earth in frame.
       distance *= Math.max(1, 1.3 / Math.max(0.3, size.width / size.height));
     } else if (mode === "pole") {
@@ -372,11 +446,24 @@ function CameraRig({
       pitch = -1.0;
       distance = 4.6;
     } else {
+      // Look over the spacecraft from outside the body it is closest to.
       desiredTarget.copy(spacecraft.current);
-      const phaseEarly = phase === "parking_orbit";
-      yaw = 0.9;
-      pitch = 0.42;
-      distance = phaseEarly ? 9 : 7;
+      const earth = v3(SCENE_LAYOUT.earth_center_scene);
+      const center =
+        spacecraft.current.distanceTo(earth) /
+          SCENE_LAYOUT.earth_radius_scene <
+        spacecraft.current.length() / SCENE_LAYOUT.moon_radius_scene
+          ? earth
+          : new THREE.Vector3();
+      const view = spacecraft.current
+        .clone()
+        .sub(center)
+        .normalize()
+        .add(new THREE.Vector3(0.4, 0.3, 0.5))
+        .normalize();
+      yaw = Math.atan2(view.x, view.z);
+      pitch = Math.asin(view.y);
+      distance = phase === "landed" ? 0.22 : 0.3;
     }
     yaw += user.current.yaw;
     pitch = THREE.MathUtils.clamp(pitch + user.current.pitch, -1.45, 1.45);
@@ -460,7 +547,7 @@ function System({
         w = b - Math.floor(b);
       const theta = u * Math.PI * 2,
         z = w * 2 - 1,
-        r = 140;
+        r = STAR_SPHERE_RADIUS_SCENE;
       const s = Math.sqrt(1 - z * z);
       values.set([Math.cos(theta) * s * r, z * r, Math.sin(theta) * s * r], i * 3);
     }
@@ -512,8 +599,8 @@ function System({
         </bufferGeometry>
         <pointsMaterial
           color="#b9c7d4"
-          size={0.35}
-          sizeAttenuation
+          size={1.6}
+          sizeAttenuation={false}
           transparent
           opacity={0.75}
         />
@@ -523,7 +610,9 @@ function System({
           <sphereGeometry args={[SUN_RADIUS_SCENE, 48, 32]} />
           <meshBasicMaterial color="#fff1c9" />
         </mesh>
-        <sprite scale={[16, 16, 16]}>
+        <sprite
+          scale={[SUN_RADIUS_SCENE * 9, SUN_RADIUS_SCENE * 9, 1]}
+        >
           <spriteMaterial
             map={sunGlow}
             transparent
@@ -576,7 +665,14 @@ function System({
           roughness={1}
         />
       </mesh>
-      <Line points={coverage} color="#9ac9e5" opacity={0.75} dashed />
+      <Line
+        points={coverage}
+        color="#9ac9e5"
+        opacity={0.75}
+        dashed
+        dashSize={0.04}
+      />
+      <ScienceOrbiter reduced={reduced} />
       {sites.map((site) => (
         <mesh
           key={site.site_id}
@@ -595,9 +691,20 @@ function System({
       )}
       {path && (
         <>
-          <Line points={fullPath} color="#c6d3dc" opacity={0.28} dashed />
+          <Line
+            points={fullPath}
+            color="#c6d3dc"
+            opacity={0.28}
+            dashed
+            dashSize={0.3}
+          />
           <Trail path={path} progress={progress} />
-          <Spacecraft path={path} progress={progress} spacecraft={spacecraft} />
+          <Spacecraft
+            path={path}
+            progress={progress}
+            spacecraft={spacecraft}
+            reduced={reduced}
+          />
         </>
       )}
       <CameraRig
@@ -663,10 +770,10 @@ export default function MissionScene(
   return (
     <Canvas
       aria-label="Illustrative Earth, Moon and Sun scene. Click the south polar cap to choose a landing site; the latitude and longitude fields offer keyboard input."
-      camera={{ position: [6, 28, 21], fov: 50, near: 0.02, far: 600 }}
+      camera={{ position: [150, 190, 175], fov: 50, near: 0.001, far: 8000 }}
       dpr={compact ? 1 : [1, 1.75]}
       frameloop={visible && animate ? "always" : "demand"}
-      gl={{ antialias: true, alpha: false }}
+      gl={{ antialias: true, alpha: false, logarithmicDepthBuffer: true }}
     >
       <ContextGuard onFailure={onFailure} />
       <Invalidator
