@@ -306,3 +306,12 @@ indirme desteklenir. Kararlar klasiktir; kuantum işi veya kredi kullanımı yok
 Bunlar sentetik, çevrimdışı örneklerdir. Kalkış/yolculuk kaynak muhasebesi, iniş
 düzlemsel fizik, yüzey ise basit enerji/sıcaklık modeli kullanır. Gerçek uçuş
 güvenliği garantisi verilmez. [Kapsam, API ve sınırlar](docs/mission-resilience.md).
+
+### C3: Kuantum katkısı gerçekten var mı?
+
+Çevrimdışı deney, 6 kubitlik yerel örnek üreticisini beş klasik arama yöntemiyle
+karşılaştırır. Aranan şey, aynı simülasyon hakkı veya aynı süreyle daha fazla
+farklı görev aksaması bulmaktır. Sonuç **NO-GO**: bu küçük yüzey örneklerinde
+kuantum katkısı gösterilemedi. Uygulamanın kararlarına eklenmez ve gerçek kuantum
+kredisi harcamaz. [Deney protokolü](docs/stress-discovery-c3-protocol.md) ve
+[sonuçlar, sınırlar, yeniden çalıştırma](docs/stress-discovery-c3-results.md).
