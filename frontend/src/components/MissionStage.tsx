@@ -13,7 +13,7 @@ import {
 import PolarMap from "./PolarMap";
 import SurfaceOps from "./SurfaceOps";
 import "./flight-readout.css";
-import type { RoutePoint } from "./Rover";
+import type { RoverState } from "./Rover";
 import type { Preset } from "../types";
 import {
   COVERAGE_MAX_LATITUDE_DEG,
@@ -226,9 +226,7 @@ export default function MissionStage({
   const [cameraMode, setCameraMode] = useState<CameraMode>("auto");
   const [notice, setNotice] = useState("");
   const [focusMoon, setFocusMoon] = useState(false);
-  const [rover, setRover] = useState<{ path: RoutePoint[]; drive: number } | null>(
-    null,
-  );
+  const [rover, setRover] = useState<RoverState | null>(null);
   const path = useMemo(() => {
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90)
       return null;
@@ -416,6 +414,9 @@ export default function MissionStage({
                 flight={flight}
                 roverPath={landed ? (rover?.path ?? null) : null}
                 roverDrive={rover?.drive ?? 0}
+                roverScan={rover?.scan ?? 1}
+                roverScene={landed ? (rover?.scene ?? null) : null}
+                roverTarget={rover?.targetId ?? ""}
               />
             </Suspense>
           </SceneBoundary>

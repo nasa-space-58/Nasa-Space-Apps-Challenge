@@ -16,6 +16,8 @@ import * as THREE from "three";
 import { Dust, Model, Terrain, smooth } from "./LunarSurface";
 import LaunchSite from "./LaunchSite";
 import Rover, { type RoutePoint } from "./Rover";
+import { DemTerrain, ScanOverlay } from "./RoverScan";
+import { SEARCH_END, sceneMapping, type SurfaceScene } from "./surfaceScene";
 import type { Preset } from "../types";
 import { useTranslate } from "../i18n";
 import {
@@ -942,14 +944,29 @@ function LandingSite({
   compact,
   roverPath,
   roverDrive,
+  roverScan,
+  roverScene,
+  roverTarget,
 }: {
   progress: MutableRefObject<number>;
   reduced: boolean;
   compact: boolean;
   roverPath: RoutePoint[] | null;
   roverDrive: MutableRefObject<number>;
+  roverScan: MutableRefObject<number>;
+  roverScene: SurfaceScene | null;
+  roverTarget: string;
 }) {
   const lander = useRef<THREE.Group>(null!);
+  // Real LOLA DEM window from the backend route scene, when loaded.
+  const mapping = useMemo(
+    () => (roverScene ? sceneMapping(roverScene) : null),
+    [roverScene],
+  );
+  const reach = roverScene && mapping
+    ? (Math.max(roverScene.rows, roverScene.cols) * roverScene.pixel_m * mapping.scale) / 2
+    : 0;
+  const overview = useRef(0);
   // After touchdown the camera eases from the lander to the driving rover.
   const roverFocus = useMemo(() => new THREE.Vector3(), []);
   const roverLook = useMemo(() => new THREE.Vector3(), []);
@@ -976,7 +993,7 @@ function LandingSite({
     const descent = descentAt(p);
     const height = (1 - descent) * 5;
     const landerX = (1 - descent) * -1.6;
-    lander.current.position.set(landerX, height, 0);
+    lander.current.position.set(landerX, height + (mapping ? mapping.ground(0, 0) : 0), 0);
     lander.current.rotation.set(0, -0.4 + descent * 0.35, (1 - descent) * 0.12);
     plume.current.visible = descent < 1;
     plume.current.position.set(landerX, height + 0.2, 0);
@@ -995,6 +1012,13 @@ function LandingSite({
       0,
       1,
     );
+    // While the antenna scan plays, the camera rises for an overview.
+    const scanning = driving && mapping !== null && roverScan.current < SEARCH_END;
+    overview.current = THREE.MathUtils.clamp(
+      overview.current + (scanning ? 1 : -1) * Math.min(delta, 0.05) * 0.7,
+      0,
+      1,
+    );
     if (follow.current > 0) {
       const weight = smooth(0, 1, follow.current);
       roverLook.copy(roverFocus).setY(roverFocus.y + 0.45);
@@ -1009,15 +1033,17 @@ function LandingSite({
     );
     spherical.setFromVector3(offset);
     spherical.theta += user.current.yaw + settledTime.current * 0.06;
+    const rise = smooth(0, 1, overview.current);
     spherical.phi = THREE.MathUtils.clamp(
-      spherical.phi - user.current.pitch,
+      THREE.MathUtils.lerp(spherical.phi, 0.55, rise) - user.current.pitch,
       0.2,
       1.5,
     );
     spherical.radius *=
       (compact ? 1.25 : 1) *
       THREE.MathUtils.clamp(user.current.zoom, 0.35, 2.4) *
-      (1 - 0.25 * smooth(0, 1, follow.current));
+      (1 - 0.25 * smooth(0, 1, follow.current)) *
+      (1 + 1.6 * rise);
     camera.position.setFromSpherical(spherical).add(cameraLook.current);
     camera.lookAt(cameraLook.current);
   });
@@ -1035,10 +1061,10 @@ function LandingSite({
         color="#fff1dc"
         castShadow
         shadow-mapSize={[compact ? 1024 : 2048, compact ? 1024 : 2048]}
-        shadow-camera-left={-18}
-        shadow-camera-right={18}
-        shadow-camera-top={18}
-        shadow-camera-bottom={-18}
+        shadow-camera-left={mapping ? -30 : -18}
+        shadow-camera-right={mapping ? 30 : 18}
+        shadow-camera-top={mapping ? 30 : 18}
+        shadow-camera-bottom={mapping ? -30 : -18}
         shadow-normalBias={0.04}
         shadow-bias={-0.0001}
       />
@@ -1060,12 +1086,31 @@ function LandingSite({
           sizeAttenuation
         />
       </points>
-      <Terrain />
+      {roverScene && mapping ? (
+        <>
+          <DemTerrain scene={roverScene} mapping={mapping} />
+          <ScanOverlay
+            scene={roverScene}
+            mapping={mapping}
+            target={roverTarget}
+            scan={roverScan}
+          />
+        </>
+      ) : (
+        <Terrain />
+      )}
       <group ref={lander}>
         <Model path="/nasa/apollo.glb" size={2.3} grounded />
       </group>
       {roverPath && (
-        <Rover path={roverPath} drive={roverDrive} focus={roverFocus} />
+        <Rover
+          path={roverPath}
+          drive={roverDrive}
+          focus={roverFocus}
+          scan={roverScan}
+          mapping={mapping}
+          reach={reach}
+        />
       )}
       <mesh ref={plume} rotation={[Math.PI, 0, 0]}>
         <coneGeometry args={[0.13, 0.65, 24]} />
@@ -1162,6 +1207,11 @@ export default function MissionScene(
     roverPath?: RoutePoint[] | null;
     /** Travelled share of the rover route, 0–1. */
     roverDrive?: number;
+    /** Antenna scan / A* playback progress, 0–1. */
+    roverScan?: number;
+    /** Backend DEM window and A* order for the route, if loaded. */
+    roverScene?: SurfaceScene | null;
+    roverTarget?: string;
   },
 ) {
   const {
@@ -1172,6 +1222,9 @@ export default function MissionScene(
     progressValue,
     roverPath = null,
     roverDrive = 0,
+    roverScan = 1,
+    roverScene = null,
+    roverTarget = "",
     flight = null,
     path,
     ...scene
@@ -1190,6 +1243,8 @@ export default function MissionScene(
   const progress = useRef(progressValue);
   const drive = useRef(roverDrive);
   drive.current = roverDrive;
+  const scan = useRef(roverScan);
+  scan.current = roverScan;
   const { t } = useTranslate();
   return (
     <Canvas
@@ -1211,6 +1266,8 @@ export default function MissionScene(
           visible,
           roverPath,
           roverDrive,
+          roverScan,
+          roverScene,
         ]}
       />
       <ProgressEaser
@@ -1232,6 +1289,9 @@ export default function MissionScene(
             compact={compact}
             roverPath={roverPath}
             roverDrive={drive}
+            roverScan={scan}
+            roverScene={roverScene}
+            roverTarget={roverTarget}
           />
         ) : (
           <System {...scene} view={view} progress={progress} />

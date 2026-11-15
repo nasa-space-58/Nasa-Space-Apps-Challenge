@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslate } from "../i18n";
-import type { RoutePoint } from "./Rover";
+import type { RoutePoint, RoverState } from "./Rover";
+import { PULSE_END, SEARCH_END, type SurfaceScene } from "./surfaceScene";
 import "./surface-ops.css";
 
 // Post-landing HUD: the rover drives a backend R8 route, and the cards show
@@ -24,7 +25,7 @@ type Route = {
   path: RoutePoint[];
   waypoints: Waypoint[];
 };
-type RouteResult = { sky_evaluated: boolean; routes: Route[] };
+type RouteResult = { sky_evaluated: boolean; routes: Route[]; scene: SurfaceScene | null };
 type Profile = {
   name: string;
   mass_at_pdi_kg: number;
@@ -58,6 +59,10 @@ const SPEED_MPS = 0.1;
 /** Simulated seconds per wall-clock second. */
 const PLAYBACK_RATES = [60, 600, 3600];
 const TICK_MS = 100;
+/** Wall-clock seconds of the antenna scan and A* playback before driving. */
+const SCAN_SECONDS = 9;
+/** DEM margin around the routes in the 3-D scene (backend default is 400 m). */
+const SCENE_MARGIN_M = 1000;
 const POLL_MS = 2000;
 const routeCache = new Map<string, Promise<RouteResult>>();
 
@@ -85,6 +90,8 @@ function loadRoutes(lat: number, lon: number, analysisId?: string) {
     targets: TARGETS,
     speed_mps: SPEED_MPS,
     analysis_job_id: analysisId ?? null,
+    include_scene: true,
+    scene_margin_m: SCENE_MARGIN_M,
   });
   let pending = routeCache.get(body);
   if (!pending) {
@@ -119,7 +126,7 @@ export default function SurfaceOps({
   lon: number;
   analysisId?: string;
   reduced: boolean;
-  onRover: (rover: { path: RoutePoint[]; drive: number } | null) => void;
+  onRover: (rover: RoverState | null) => void;
 }) {
   const { t } = useTranslate();
   const [open, setOpen] = useState(true);
@@ -127,6 +134,7 @@ export default function SurfaceOps({
   const [routeError, setRouteError] = useState("");
   const [choice, setChoice] = useState(0);
   const [elapsed, setElapsed] = useState(0);
+  const [scan, setScan] = useState(reduced ? 1 : 0);
   const [playing, setPlaying] = useState(!reduced);
   const [rate, setRate] = useState(PLAYBACK_RATES[1]);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -140,6 +148,7 @@ export default function SurfaceOps({
     setRouteError("");
     setChoice(0);
     setElapsed(0);
+    setScan(reduced ? 1 : 0);
     if (!covered) return;
     let live = true;
     loadRoutes(lat, lon, analysisId).then(
@@ -149,7 +158,7 @@ export default function SurfaceOps({
     return () => {
       live = false;
     };
-  }, [lat, lon, analysisId, covered]);
+  }, [lat, lon, analysisId, covered, reduced]);
 
   useEffect(() => {
     call<{ profiles: Profile[] }>("/vehicle-profiles").then(
@@ -222,9 +231,15 @@ export default function SurfaceOps({
   const duration = route?.duration_s ?? 0;
   const drive = duration > 0 ? Math.min(1, elapsed / duration) : 0;
 
+  const scanning = scan < 1;
   useEffect(() => {
     if (!playing || !route || duration <= 0) return;
     const timer = setInterval(() => {
+      // The antenna scan and search playback run first, then the drive.
+      if (scanning) {
+        setScan((value) => Math.min(1, value + TICK_MS / 1000 / SCAN_SECONDS));
+        return;
+      }
       setElapsed((value) => {
         const next = Math.min(duration, value + (TICK_MS / 1000) * rate);
         if (next >= duration) setPlaying(false);
@@ -232,13 +247,28 @@ export default function SurfaceOps({
       });
     }, TICK_MS);
     return () => clearInterval(timer);
-  }, [playing, route, duration, rate]);
+  }, [playing, route, duration, rate, scanning]);
 
   const report = useRef(onRover);
   report.current = onRover;
   useEffect(() => {
-    report.current(route ? { path: route.path, drive } : null);
-  }, [route, drive]);
+    report.current(
+      route
+        ? {
+            path: route.path,
+            drive,
+            scan,
+            scene: routes?.scene ?? null,
+            targetId: route.target_id,
+          }
+        : null,
+    );
+  }, [route, drive, scan, routes]);
+  const scene = routes?.scene ?? null;
+  const searchedCells = scene && route ? (scene.explored[route.target_id] ?? []).length : 0;
+  const truncated = Boolean(scene && route && scene.explored_truncated[route.target_id]);
+  const scanStage =
+    scan < PULSE_END ? "pulse" : scan < SEARCH_END ? "search" : scan < 1 ? "route" : "done";
   useEffect(() => () => report.current(null), []);
 
   // Latest backend-sampled waypoint the rover has passed (no interpolation).
@@ -284,6 +314,7 @@ export default function SurfaceOps({
                     onChange={(e) => {
                       setChoice(Number(e.target.value));
                       setElapsed(0);
+                      setScan(reduced ? 1 : 0);
                       setPlaying(!reduced);
                     }}
                   >
@@ -304,6 +335,18 @@ export default function SurfaceOps({
                   >
                     {playing ? t("surfaceOps.rover.pause") : t("surfaceOps.rover.play")}
                   </button>
+                  {scene && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setElapsed(0);
+                        setScan(0);
+                        setPlaying(true);
+                      }}
+                    >
+                      {t("surfaceOps.scan.replay")}
+                    </button>
+                  )}
                   <div role="group" aria-label={t("surfaceOps.rover.rate")}>
                     {PLAYBACK_RATES.map((value) => (
                       <button
@@ -326,9 +369,24 @@ export default function SurfaceOps({
                   aria-label={t("surfaceOps.rover.scrub")}
                   onChange={(e) => {
                     setPlaying(false);
+                    setScan(1);
                     setElapsed(Number(e.target.value));
                   }}
                 />
+                {scene && (
+                  <div className="ops-scan" aria-live="polite">
+                    <p>
+                      <b>{t(`surfaceOps.scan.${scanStage}`, { cells: searchedCells.toLocaleString() })}</b>
+                    </p>
+                    <ul className="ops-legend">
+                      <li><i className="swatch open" />{t("surfaceOps.scan.legendOpen", { deg: scene.slope_limit_deg })}</li>
+                      <li><i className="swatch steep" />{t("surfaceOps.scan.legendSteep", { deg: scene.slope_limit_deg })}</li>
+                      <li><i className="swatch searched" />{t("surfaceOps.scan.legendSearched")}</li>
+                      <li><i className="swatch route" />{t("surfaceOps.scan.legendRoute")}</li>
+                    </ul>
+                    {truncated && <p className="ops-foot">{t("surfaceOps.scan.truncated")}</p>}
+                  </div>
+                )}
                 <dl className="ops-grid">
                   <dt>{t("surfaceOps.rover.distance")}</dt>
                   <dd>

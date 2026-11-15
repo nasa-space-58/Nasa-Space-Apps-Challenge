@@ -1393,7 +1393,7 @@
       "sample": "Son ölçüm noktası: {km} km · {utc}",
       "noSample": "Henüz ölçüm noktasına varılmadı",
       "noAnalysis": "Güneş/Dünya durumu için önce Analizi çalıştırın.",
-      "note": "Rota NASA LOLA 80 m arazisinde backend tarafından hesaplanır; 3B arazi temsilidir, rota gerçektir. Güneş/Dünya durumu yalnızca örneklenen noktalarda değerlendirilir."
+      "note": "Rota NASA LOLA 80 m arazisinde backend tarafından hesaplanır. 3B zemin bu gerçek arazi penceresidir ve yükseklikler gerçek oranındadır; gezgin modeli ölçekli değildir, tarama animasyonunun hızı yalnızca gösterim içindir. Güneş/Dünya durumu yalnızca örneklenen noktalarda değerlendirilir."
     },
     "sun": {
       "full": "Tam güneşte",
@@ -1423,6 +1423,18 @@
       "forecast": "Tahmin (günlük en yüksek)",
       "acquired": "Veri çekilme zamanı: {utc}",
       "note": "Ayrıntılar ve sınırlar Sonuçlar sekmesindeki Güneş aktivitesi panelinde. Ay'ın manyetik alanı olmadığından S seviyesi yüzeydeki ekip için önemlidir."
+    },
+    "scan": {
+      "pulse": "Anten çevreyi tarıyor: her hücrenin eğimi ölçülüyor…",
+      "search": "A* en kısa güvenli yolu arıyor: {cells} hücre incelendi",
+      "route": "Rota bulundu: kraterlerin dik kenarlarından kaçınıyor",
+      "done": "Tarama tamam: gezgin hesaplanan rotada ilerliyor",
+      "replay": "↻ Taramayı tekrarla",
+      "legendOpen": "Geçilebilir (≤{deg}°)",
+      "legendSteep": "Çok dik (>{deg}°)",
+      "legendSearched": "A* tarafından incelendi",
+      "legendRoute": "Seçilen rota",
+      "truncated": "İncelenen hücrelerin yalnızca ilk kısmı gösteriliyor."
     }
   }
 }

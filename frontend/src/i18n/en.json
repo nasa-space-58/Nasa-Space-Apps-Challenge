@@ -1393,7 +1393,7 @@
       "sample": "Last sampled point: {km} km · {utc}",
       "noSample": "No sampled point reached yet",
       "noAnalysis": "Run the analysis first for Sun/Earth status.",
-      "note": "The route is computed by the backend on the NASA LOLA 80 m DEM; the 3D terrain is illustrative, the route is real. Sun/Earth are evaluated only at sampled points."
+      "note": "The backend computes the route on NASA LOLA 80 m terrain. The 3-D ground is that real terrain window at true height proportions; the rover model is not to scale and the scan animation pace is display-only. Sun/Earth state is evaluated only at sampled points."
     },
     "sun": {
       "full": "Fully sunlit",
@@ -1423,6 +1423,18 @@
       "forecast": "Forecast (daily max)",
       "acquired": "Acquired: {utc}",
       "note": "Details and limits are in the Solar activity panel under Results. The Moon has no magnetic field, so the S level matters for the surface crew."
+    },
+    "scan": {
+      "pulse": "Antenna scanning: measuring the slope of every cell…",
+      "search": "A* searching for the shortest safe path: {cells} cells examined",
+      "route": "Route found: it avoids the steep crater walls",
+      "done": "Scan complete: the rover drives the computed route",
+      "replay": "↻ Replay scan",
+      "legendOpen": "Passable (≤{deg}°)",
+      "legendSteep": "Too steep (>{deg}°)",
+      "legendSearched": "Examined by A*",
+      "legendRoute": "Chosen route",
+      "truncated": "Only the first part of the examined cells is shown."
     }
   }
 }
