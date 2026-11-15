@@ -254,3 +254,7 @@ At the user's explicit request, `feature/mission-run-simulation` was fast-forwar
 ### Split comparison simulator main push exception (user, 2026-11-15)
 
 At the user's explicit request, `feature/split-comparison-simulator` (split 3D viewport with synchronized A/B day panes; see the split simulator section of docs/scenario-comparison.md) was fast-forwarded directly onto `main` from `3d2b819` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### Sources page main push exception (user, 2026-11-15)
+
+At the user's explicit request, `ui/sources-page-complete` (complete grouped Sources dialog: every model, terrain, ephemeris, mission, communication and quantum source, including the CC BY 4.0 rover attribution; catalog in `frontend/src/sourceCatalog.ts`) was fast-forwarded directly onto `main` from `d57db9a` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
