@@ -30,6 +30,12 @@ requests, queue overflow, exceptions, cancellation and lifecycle cleanup.
 Measure actual HTTP calls through a separate local server on synthetic verified
 DEM fixtures: seeds 831/832, 24 draws, cold/warm/off, fixed 32 MiB cap. Report
 exact outcome equality and retained memory; no global application speed claim.
+Before release, additionally measure the unchanged default 200-draw workload
+at seed 833 (cold/warm/off). This size exceeds the entry cap, so freeze additive
+scan-resistance tests before implementing request-scoped admission protection:
+entries hit or admitted during a request cannot be evicted by its later scan.
+New requests may replace unprotected old entries within the same byte limit.
+These are resource-policy checks, not changes to any physics or quantum gate.
 Do not recreate any shared Docker environment or deploy production.
 
 ## Next quantum step: readiness audit, not a trained surrogate
