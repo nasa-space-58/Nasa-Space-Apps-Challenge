@@ -462,6 +462,9 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     from app.mission_run import register_mission_run_routes
 
     register_mission_run_routes(app, store, data_dir)
+    from app.mission_routes import register_mission_route_routes
+
+    register_mission_route_routes(app, store, data_dir)
     from app.fuel_optimization import register_fuel_routes
 
     register_fuel_routes(app, data_dir)

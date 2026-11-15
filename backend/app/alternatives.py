@@ -152,6 +152,18 @@ def lateral_divert(cross_m: float, time_to_go_s: float) -> dict:
     }
 
 
+def lateral_offset_m(
+    cross_m: float, t_s: float, lateral_start_s: float, window_s: float
+) -> float:
+    """Crossrange position (m) of the minimum-energy lateral divert at t_s.
+
+    c (3 s^2 - 2 s^3) with s = (t_s - lateral_start_s) / window_s clipped to
+    [0, 1]: zero before the divert starts and c once it ends. A non-positive
+    window means no lateral move is possible, so the offset stays zero.
+    """
+    raise NotImplementedError
+
+
 def rotate_state(position_m, velocity_mps, angle_rad: float):
     """Rotate planar state vectors counter-clockwise by angle_rad.
 
@@ -208,13 +220,19 @@ def evaluate_divert(
     cross_m: float,
     divert_from: str,
     request: AlternativesRequest,
+    record_path: bool = False,
 ) -> dict:
     """Fly from the divert state to a target offset (down_m, cross_m).
 
     Returns reachable, rejection_reasons, in-plane and lateral delta-v (m/s),
     total delta-v from the divert, propellant remaining (kg), reserve margin
     (kg), hover margin (s), time to touchdown (s) and the touchdown state.
+    With record_path, also `path`: the flown samples as t_s (since the
+    divert), downrange_m and altitude_m relative to the target, and cross_m
+    from the lateral divert profile.
     """
+    if record_path:
+        raise NotImplementedError
     site_radius = MOON_REFERENCE_RADIUS_M + target_height_m
     gates = _remaining_gates(site_radius, divert_from)
     position, velocity = rotate_state(
@@ -495,13 +513,21 @@ def _row(identifier, role, place: dict, evaluation: dict, base_in_plane: float):
 
 
 def plan_alternatives(
-    request: AlternativesRequest, terrain: LocalTerrain, terrain_height_m: float
+    request: AlternativesRequest,
+    terrain: LocalTerrain,
+    terrain_height_m: float,
+    trajectories: bool = False,
 ) -> dict:
     """Primary row plus ranked backups with the same metrics, deterministic.
 
+    With trajectories, the output also maps each row id to its flown divert
+    path in the primary frame (t_s since PDI, down_m, cross_m, altitude_m
+    above the primary site sphere); `result_id` is unchanged by this.
     Raises AlternativesError for an unknown vehicle, a plan the R4 model
     rejects or a primary site without terrain margin for the safety check.
     """
+    if trajectories:
+        raise NotImplementedError
     profile = _vehicle(request)
     descent = DescentRequest(
         site_id=request.site_id,
