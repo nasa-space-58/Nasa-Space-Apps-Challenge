@@ -242,3 +242,7 @@ The user authorized consolidating the latest GitHub branches into main, cleaning
 ### Terrain R12 restoration (user, 2026-11-15)
 
 The user explicitly authorized restoring the archived R12 features without breaking either system, testing and publishing to main. This supersedes the earlier archive-only disposition for this implementation and authorizes this delivery to main. Terrain recovery is isolated in `app.terrain_recovery` / `app.terrain_twin` at `/descents/self-healing`; existing H5/H6 and public R9 remain unchanged. Frozen new test baseline: `1fa44d5`. See docs/terrain-recovery.md. Do not conflate this real-DEM classical experiment with the shared hybrid plan or certified flight control.
+
+### Mission run simulation (user, 2026-11-15)
+
+The user asked for a real simulation instead of an always-successful flight, without a plain failure rate. Branch `feature/mission-run-simulation` from main `de18ad4`; push only this branch, no merge into main/tahakrcc. Skeleton `3c43546`, frozen tests `af70068`, user-approved test correction `d8d990c` (new baseline). Outcomes come from ordered physics gates (faulted R4 descent, R3 touchdown slope, ideal battery over analysed sunlight, Earth-contact rules) and typed fault scenarios in `shared/mission_faults.json`; unknown inputs make the run inconclusive. Never present it as landing-safety, power/thermal or link certification, or the curated scenarios as NASA failure statistics. See docs/mission-run.md.

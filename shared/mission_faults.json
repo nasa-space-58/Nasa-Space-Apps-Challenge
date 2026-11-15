@@ -2,18 +2,20 @@
   "note": "Curated, illustrative fault scenarios for the mission run. Values are team-chosen teaching cases, not NASA failure statistics or real anomaly reconstructions.",
   "scenarios": [
     {"scenario_id": "nominal", "summary": "No injected fault; the outcome follows from the site, date and vehicle alone.", "faults": []},
-    {"scenario_id": "engine-thrust-loss", "summary": "Descent engine limited to 80 % of maximum thrust from 200 s after powered descent initiation.", "faults": [
-      {"kind": "engine_thrust_loss", "start_after_pdi_s": 200, "thrust_fraction": 0.8}]},
+    {"scenario_id": "engine-thrust-loss", "summary": "Descent engine limited to 90 % of maximum thrust from 200 s after powered descent initiation; braking needs the fixed full-thrust setting.", "faults": [
+      {"kind": "engine_thrust_loss", "start_after_pdi_s": 200, "thrust_fraction": 0.9}]},
     {"scenario_id": "small-propellant-leak", "summary": "Slow propellant leak of 0.5 kg/s for 10 minutes; the landing margin shrinks.", "faults": [
       {"kind": "propellant_leak", "start_after_pdi_s": 60, "leak_rate_kg_s": 0.5, "duration_s": 600}]},
-    {"scenario_id": "major-propellant-leak", "summary": "Propellant leak of 1.5 kg/s from 60 s after powered descent initiation.", "faults": [
+    {"scenario_id": "marginal-propellant-leak", "summary": "Propellant leak of 1.5 kg/s from 60 s after powered descent initiation; the landing margin nearly vanishes.", "faults": [
       {"kind": "propellant_leak", "start_after_pdi_s": 60, "leak_rate_kg_s": 1.5, "duration_s": 700}]},
+    {"scenario_id": "major-propellant-leak", "summary": "Propellant leak of 2.5 kg/s from 60 s after powered descent initiation.", "faults": [
+      {"kind": "propellant_leak", "start_after_pdi_s": 60, "leak_rate_kg_s": 2.5, "duration_s": 700}]},
     {"scenario_id": "engine-efficiency-loss", "summary": "Specific impulse drops to 90 % of nominal from 100 s after powered descent initiation.", "faults": [
       {"kind": "isp_degradation", "start_after_pdi_s": 100, "isp_fraction": 0.9}]},
     {"scenario_id": "navigation-drift", "summary": "Navigation estimate drifts 600 m east; the lander touches down away from the surveyed point.", "faults": [
       {"kind": "navigation_bias", "offset_m": 600, "bearing_deg": 90}]},
-    {"scenario_id": "wave-off", "summary": "Landing waved off and retried 24 hours later; lighting and Earth geometry change.", "faults": [
-      {"kind": "landing_delay", "delay_h": 24}]},
+    {"scenario_id": "wave-off", "summary": "Landing waved off and retried one orbit (about 2 hours) later; the surface day starts later in the analysed window.", "faults": [
+      {"kind": "landing_delay", "delay_h": 2}]},
     {"scenario_id": "battery-cell-loss", "summary": "Half of the battery capacity is lost at touchdown.", "faults": [
       {"kind": "battery_capacity_loss", "start_after_landing_h": 0, "capacity_fraction_lost": 0.5}]},
     {"scenario_id": "stuck-heater", "summary": "A survival heater sticks on, adding 250 W from 6 hours after landing for 48 hours.", "faults": [

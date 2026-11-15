@@ -374,6 +374,17 @@ The R10 decision applies: the classical MILP is retained, and QAOA covers only H
 
 The execution gate (`solve_application`) therefore keeps the classical MILP everywhere and runs QAOA only for a held-out GO. Frozen tests: `351c1e1`. Results: [verification](verification/r13-application-benchmark-2026-11-15.json). No hardware job or quantum advantage is claimed.
 
+### Mission run simulation with fault scenarios
+
+The mission-control flight previously always ended in a successful landing. A mission run makes the outcome follow from physics. See [gates, fault models and limits](mission-run.md).
+
+- [x] Ordered physics gates: faulted R4 descent with ground-contact detection, R3 DEM slope at the shifted touchdown point, exact ideal-battery propagation over analysed sunlight, and Earth-contact rules over analysed visibility.
+- [x] Typed, time-activated descent and surface fault models, a curated team scenario catalog and user-built scenarios in the interface.
+- [x] Unknown sunlight/Earth intervals bracketed, so dependent outcomes are reported as inconclusive.
+- [x] 3D landing close-up ends in a crash or tip-over when the run fails at those gates; surface operations stay closed.
+- [ ] Phase 2: operator trade-off decisions (propellant versus payload, battery sizing) with consistent vehicle mass.
+- [ ] Phase 3: seeded physical dispersions (thrust, navigation) and repeated runs, reported as finite samples, not certified probabilities.
+
 ## Hybrid development sequence
 
 - [x] **H0 — Shared contracts:** define the R9 state/event/plan model, constraint semantics, data provenance and benchmark scenario formats.
