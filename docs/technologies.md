@@ -50,6 +50,8 @@ Responsibilities:
 
 Task 4 activates the planned Three.js / React Three Fiber stack (locked versions 0.187.0 / 9.8.2). Small NASA display models are local assets with recorded credits; Draco decoding is served locally. The introductory descent is illustrative. This branch documents changes for team review before manual integration.
 
+R10 activates the planned SciPy dependency in the backend (locked version 1.16.3) solely for `scipy.optimize.milp`, the HiGHS mixed-integer baseline used by the hybrid benchmark. Every MILP answer is revalidated by the exact classical validator; no new service is added.
+
 ## Backend
 
 | Area | Technology |

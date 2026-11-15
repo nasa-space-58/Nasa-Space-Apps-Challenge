@@ -182,3 +182,32 @@ At the user's explicit request, `feature/space-weather-noaa` (NOAA SWPC solar ac
 ### H10/H11 delivery (user, 2026-11-15)
 
 Start from H9 `fb59791` on `codex/h10-h11-scaling-relays`. Complete H10 then H11, run intermediate and combined tests, and push only this new branch for the user to merge. Never merge into or push main/tahakrcc. Ask before any real quantum credit expenditure, including free credits. H10 records exact/MILP benchmarks, not a quantum speedup; H11 supports k=1/2 relay selection on explicitly approximate, sampled CR3BP/terrain geometry. Preserve the local H6 notebook edit. Test baselines and two narrowly approved test corrections are documented in docs/problem-scaling.md and docs/relay-orbit-selection.md.
+
+### R10 delivery (user, 2026-11-15)
+
+R10 (classical-versus-hybrid benchmark) starts from `main` `a5171d4` on `feature/r10-hybrid-optimization`; push only that branch, no merge into or push to tahakrcc/main. Frozen tests `6c96376` and `411d549`; see `docs/hybrid-benchmark.md`. SciPy (HiGHS MILP) is now locked in the backend. The pre-registered held-out decision is NO-GO for both direct QAOA and QAOA-solved subproblems, so the MILP solver is retained. Do not tune on held-out cases after the fact, present the illustrative noise model as calibrated, or claim quantum advantage.
+
+### R11 delivery (user, 2026-11-15)
+
+R11 (multi-mission planning) starts from `feature/r10-hybrid-optimization` `5f9a65b` on `feature/r11-multi-mission-planning`; push only that branch, no merge into or push to tahakrcc/main. Frozen tests `8504f81`; see `docs/multi-mission-planning.md`. Campaign contracts live in `shared/campaign.py` (H0 V1 is unchanged). Station geometry, calendar, capacity, data rate and exclusivity stay separate inputs; relay credit needs equipment, line-of-sight evidence, range and the relay's own station link. Do not present synthetic example campaigns as NASA plans or DSN bookings, or passing candidates as landing-safety certification.
+
+### R10/R11 main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/r11-multi-mission-planning` (which contains R10) was fast-forwarded directly onto `main` from `a5171d4` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### PR #18 merge exception (user, 2026-11-15)
+
+At the user's explicit request, PR #18 (`fix/healthinfo`: rover drive and surface panel, planet spin, real Moon/Sun/Earth flight positions from JPL Horizons; frozen tests `2f01b74`, see docs/flight-ephemeris.md) was squash-merged into `main` without another member's approval, overriding the approval rule for this one PR only. The default rules for `main` still apply afterwards.
+
+### R12 completion and main push exception (user, 2026-11-15)
+
+R12's last item (visual event panel) was built from `main` `90d6561` on `feature/r12-event-panel`. Skeleton `e9600d0`, frozen tests `7332c3e`; see `docs/r12-event-panel.md`. The panel is built on H5/H6; the conflicting `feature/r12-self-healing` branch was not merged. At the user's explicit request, the branch (after merging PR #18 from `main` `8c3dff5`) was pushed directly onto `main` as a fast-forward without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### R13 delivery and main merge (user, 2026-11-15)
+
+R13 (additional quantum application benchmarks) starts from `main` `456f4ef` on `feature/r13-quantum-application-benchmarks`. Pre-registration/skeleton `0bcb830`, frozen tests `351c1e1`; see `docs/quantum-applications.md`. All five applications (communication slots, science activities, relay selection, R8 rover routes, R6 robust plans) are NO-GO on held-out instances, so `solve_application` keeps the HiGHS MILP and runs QAOA only for a held-out GO. At the user's explicit request the branch was merged into `main` and pushed, overriding the PR/approval rule for this one merge only. Do not present the raw-feasibility gain of noiseless QAOA as an end-to-end contribution, and do not tune on held-out cases after the fact.
+
+
+### H11 and current main integration (user, 2026-11-15)
+
+The user explicitly authorized integrating the latest main with the completed H10/H11 branch and publishing the combined version to main after resolving conflicts and passing checks. This one-time authorization supersedes the earlier H10/H11 manual-merge boundary. Preserve both teams' features and the unrelated local H6 notebook edit. No new quantum submission or credit spending is authorized by this integration.

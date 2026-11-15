@@ -1,0 +1,2298 @@
+{
+  "applications": {
+    "comm_slots": {
+      "aggregates": [
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 2,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "conflicts": 0.0,
+            "delivered_bits": 730000000.0,
+            "max_latency_s": 3600.0,
+            "mean_latency_s": 3600.0,
+            "served_requests": 3.5,
+            "unmet_demand_bits": 170000000.0
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.04430407399922842,
+          "method": "exact",
+          "optimum_hits": 2,
+          "runs": 2,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 3,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "conflicts": 0.0,
+            "delivered_bits": 1266666666.6666667,
+            "max_latency_s": 8400.0,
+            "mean_latency_s": 5880.0,
+            "served_requests": 5.0,
+            "unmet_demand_bits": 166666666.66666666
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.2854570530010581,
+          "method": "exact",
+          "optimum_hits": 3,
+          "runs": 3,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 6,
+          "max_qubits": 8,
+          "mean_gap": 0.05000000000000001,
+          "mean_metrics": {
+            "conflicts": 0.0,
+            "delivered_bits": 730000000.0,
+            "max_latency_s": 7200.0,
+            "mean_latency_s": 4500.0,
+            "served_requests": 3.5,
+            "unmet_demand_bits": 170000000.0
+          },
+          "mean_raw_feasible_rate": 0.049641927083333336,
+          "mean_total_s": 0.04775333816602748,
+          "method": "lns_exact",
+          "optimum_hits": 3,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.46249999999999997,
+          "mean_metrics": {
+            "conflicts": 0.0,
+            "delivered_bits": 1435000000.0,
+            "max_latency_s": 9900.0,
+            "mean_latency_s": 5962.5,
+            "served_requests": 5.5,
+            "unmet_demand_bits": 240000000.0
+          },
+          "mean_raw_feasible_rate": 0.10355631510416667,
+          "mean_total_s": 0.05675767683351296,
+          "method": "lns_exact",
+          "optimum_hits": 6,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "noise_model",
+          "feasible_runs": 6,
+          "max_qubits": 8,
+          "mean_gap": 0.05000000000000001,
+          "mean_metrics": {
+            "conflicts": 0.0,
+            "delivered_bits": 730000000.0,
+            "max_latency_s": 7200.0,
+            "mean_latency_s": 4500.0,
+            "served_requests": 3.5,
+            "unmet_demand_bits": 170000000.0
+          },
+          "mean_raw_feasible_rate": 0.4730224609375,
+          "mean_total_s": 0.14156462066724393,
+          "method": "lns_qaoa",
+          "optimum_hits": 3,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "noise_model",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.46249999999999997,
+          "mean_metrics": {
+            "conflicts": 0.0,
+            "delivered_bits": 1435000000.0,
+            "max_latency_s": 9900.0,
+            "mean_latency_s": 5962.5,
+            "served_requests": 5.5,
+            "unmet_demand_bits": 240000000.0
+          },
+          "mean_raw_feasible_rate": 0.58563232421875,
+          "mean_total_s": 0.14874349125178318,
+          "method": "lns_qaoa",
+          "optimum_hits": 6,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "noiseless_simulator",
+          "feasible_runs": 6,
+          "max_qubits": 8,
+          "mean_gap": 0.05000000000000001,
+          "mean_metrics": {
+            "conflicts": 0.0,
+            "delivered_bits": 730000000.0,
+            "max_latency_s": 7200.0,
+            "mean_latency_s": 4500.0,
+            "served_requests": 3.5,
+            "unmet_demand_bits": 170000000.0
+          },
+          "mean_raw_feasible_rate": 0.8956705729166666,
+          "mean_total_s": 0.1203492828317394,
+          "method": "lns_qaoa",
+          "optimum_hits": 3,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "noiseless_simulator",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.46249999999999997,
+          "mean_metrics": {
+            "conflicts": 0.0,
+            "delivered_bits": 1435000000.0,
+            "max_latency_s": 9900.0,
+            "mean_latency_s": 5962.5,
+            "served_requests": 5.5,
+            "unmet_demand_bits": 240000000.0
+          },
+          "mean_raw_feasible_rate": 0.92559814453125,
+          "mean_total_s": 0.1287337728329779,
+          "method": "lns_qaoa",
+          "optimum_hits": 6,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 6,
+          "max_qubits": 8,
+          "mean_gap": 0.05000000000000001,
+          "mean_metrics": {
+            "conflicts": 0.0,
+            "delivered_bits": 730000000.0,
+            "max_latency_s": 7200.0,
+            "mean_latency_s": 4500.0,
+            "served_requests": 3.5,
+            "unmet_demand_bits": 170000000.0
+          },
+          "mean_raw_feasible_rate": 0.048543294270833336,
+          "mean_total_s": 0.035670300836500246,
+          "method": "lns_random",
+          "optimum_hits": 3,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.46249999999999997,
+          "mean_metrics": {
+            "conflicts": 0.0,
+            "delivered_bits": 1435000000.0,
+            "max_latency_s": 9900.0,
+            "mean_latency_s": 5962.5,
+            "served_requests": 5.5,
+            "unmet_demand_bits": 240000000.0
+          },
+          "mean_raw_feasible_rate": 0.10325113932291667,
+          "mean_total_s": 0.044734889751149844,
+          "method": "lns_random",
+          "optimum_hits": 6,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 2,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "conflicts": 0.0,
+            "delivered_bits": 730000000.0,
+            "max_latency_s": 3600.0,
+            "mean_latency_s": 3600.0,
+            "served_requests": 3.5,
+            "unmet_demand_bits": 170000000.0
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.0015932985006656963,
+          "method": "milp",
+          "optimum_hits": 2,
+          "runs": 2,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 4,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "conflicts": 0.0,
+            "delivered_bits": 1480000000.0,
+            "max_latency_s": 8100.0,
+            "mean_latency_s": 5872.5,
+            "served_requests": 5.75,
+            "unmet_demand_bits": 195000000.0
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.0013319577501533786,
+          "method": "milp",
+          "optimum_hits": 4,
+          "runs": 4,
+          "split": "held_out"
+        }
+      ],
+      "decision": {
+        "criteria": [
+          {
+            "measured": 1.0,
+            "name": "validated_feasibility",
+            "passed": true,
+            "threshold": 1.0
+          },
+          {
+            "measured": 0.46249999999999997,
+            "name": "objective_quality",
+            "passed": false,
+            "threshold": 0.0
+          },
+          {
+            "measured": 0.8223470052083334,
+            "name": "raw_feasibility_vs_random",
+            "passed": true,
+            "threshold": 0.0
+          },
+          {
+            "measured": 0.0,
+            "name": "repaired_quality_vs_random",
+            "passed": true,
+            "threshold": 0.0
+          },
+          {
+            "measured": 96.6500422540834,
+            "name": "end_to_end_runtime",
+            "passed": false,
+            "threshold": 1.0
+          }
+        ],
+        "retained_solver": "r13-highs-milp-v1",
+        "verdict": "no_go"
+      },
+      "instances": [
+        {
+          "audit": {
+            "assignments": 1024,
+            "feasible_assignments": 75,
+            "feasible_energy_matches_objective": true,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 4.440892098500626e-16,
+            "variables": 10
+          },
+          "input_fingerprint": "88571a965313ef37f894a27931f82c7aa291ded990fb46b0f86db2b276da9528",
+          "instance_id": "comm-slots-101",
+          "optimum": "28/5",
+          "optimum_source": "exact",
+          "optimum_value": 5.6,
+          "qubo_encoding": "exact pairwise penalties (A = 1 + 2 sum|c|)",
+          "qubo_exact": true,
+          "rejections": [],
+          "seed": 101,
+          "split": "dev",
+          "variables": 10
+        },
+        {
+          "audit": {
+            "assignments": 4096,
+            "feasible_assignments": 71,
+            "feasible_energy_matches_objective": true,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 4.440892098500626e-16,
+            "variables": 12
+          },
+          "input_fingerprint": "6d2e97993635aecc8c47547280fca782dd7f3bdcb775cb750fdfd37efe0d43ce",
+          "instance_id": "comm-slots-102",
+          "optimum": "9",
+          "optimum_source": "exact",
+          "optimum_value": 9.0,
+          "qubo_encoding": "exact pairwise penalties (A = 1 + 2 sum|c|)",
+          "qubo_exact": true,
+          "rejections": [],
+          "seed": 102,
+          "split": "dev",
+          "variables": 12
+        },
+        {
+          "audit": {
+            "assignments": 2048,
+            "feasible_assignments": 119,
+            "feasible_energy_matches_objective": true,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 1.7763568394002505e-15,
+            "variables": 11
+          },
+          "input_fingerprint": "3708ae6bf4b7d03906610439f55a5d332f098997326c0a4265897159a6f78a12",
+          "instance_id": "comm-slots-201",
+          "optimum": "59/5",
+          "optimum_source": "exact",
+          "optimum_value": 11.8,
+          "qubo_encoding": "exact pairwise penalties (A = 1 + 2 sum|c|)",
+          "qubo_exact": true,
+          "rejections": [],
+          "seed": 201,
+          "split": "held_out",
+          "variables": 11
+        },
+        {
+          "audit": {
+            "assignments": 8192,
+            "feasible_assignments": 273,
+            "feasible_energy_matches_objective": true,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 1.7763568394002505e-15,
+            "variables": 13
+          },
+          "input_fingerprint": "bb92195114a074c93aca34507c8042be41a77c078c198785ce290e3014925425",
+          "instance_id": "comm-slots-202",
+          "optimum": "119/10",
+          "optimum_source": "exact",
+          "optimum_value": 11.9,
+          "qubo_encoding": "exact pairwise penalties (A = 1 + 2 sum|c|)",
+          "qubo_exact": true,
+          "rejections": [],
+          "seed": 202,
+          "split": "held_out",
+          "variables": 13
+        },
+        {
+          "audit": {
+            "assignments": 32768,
+            "feasible_assignments": 1476,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": false,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 118.50036000000001,
+            "variables": 15
+          },
+          "input_fingerprint": "f8ae3d6137c4c269dbf3d4bb58de716655b1a68bf5e02728b19e3b7a1e2f2da8",
+          "instance_id": "comm-slots-203",
+          "optimum": "277/20",
+          "optimum_source": "exact",
+          "optimum_value": 13.85,
+          "qubo_encoding": "pairwise penalties plus unbalanced penalties for capacity > 1 (heuristic)",
+          "qubo_exact": false,
+          "rejections": [],
+          "seed": 203,
+          "split": "held_out",
+          "variables": 15
+        },
+        {
+          "audit": null,
+          "input_fingerprint": "a18ae209edc5919f32d95b9397a38aa37b6ac982771dc17037ef89b53700e6ec",
+          "instance_id": "comm-slots-204",
+          "optimum": "419/20",
+          "optimum_source": "milp",
+          "optimum_value": 20.95,
+          "qubo_encoding": "exact pairwise penalties (A = 1 + 2 sum|c|)",
+          "qubo_exact": true,
+          "rejections": [],
+          "seed": 204,
+          "split": "held_out",
+          "variables": 26
+        }
+      ],
+      "policy_reason": "Held-out NO-GO (failed: objective_quality, end_to_end_runtime); MILP retained.",
+      "quantum_enabled": false
+    },
+    "relay_selection": {
+      "aggregates": [
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 2,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "coverage": 0.8222222222222222,
+            "covered_points": 15.5,
+            "demand_points": 19.0,
+            "double_coverage": 0.3222222222222222,
+            "longest_gap_s": 3600.0,
+            "resilience": 0.375,
+            "resilient_points": 7.0,
+            "selected": 2.0
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.00033687699760776013,
+          "method": "exact",
+          "optimum_hits": 2,
+          "runs": 2,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 4,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "coverage": 0.6314709595959596,
+            "covered_points": 13.25,
+            "demand_points": 22.25,
+            "double_coverage": 0.21448863636363635,
+            "longest_gap_s": 13500.0,
+            "resilience": 0.3180239898989899,
+            "resilient_points": 6.75,
+            "selected": 2.5
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.0009602877507859375,
+          "method": "exact",
+          "optimum_hits": 4,
+          "runs": 4,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 6,
+          "max_qubits": 3,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "coverage": 0.8222222222222223,
+            "covered_points": 15.5,
+            "demand_points": 19.0,
+            "double_coverage": 0.32222222222222224,
+            "longest_gap_s": 3600.0,
+            "resilience": 0.375,
+            "resilient_points": 7.0,
+            "selected": 2.0
+          },
+          "mean_raw_feasible_rate": 0.375,
+          "mean_total_s": 0.004060529669610939,
+          "method": "lns_exact",
+          "optimum_hits": 6,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 12,
+          "max_qubits": 5,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "coverage": 0.6314709595959597,
+            "covered_points": 13.25,
+            "demand_points": 22.25,
+            "double_coverage": 0.22964015151515152,
+            "longest_gap_s": 13500.0,
+            "resilience": 0.3180239898989899,
+            "resilient_points": 6.75,
+            "selected": 2.5
+          },
+          "mean_raw_feasible_rate": 0.328125,
+          "mean_total_s": 0.010156468999412027,
+          "method": "lns_exact",
+          "optimum_hits": 12,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "noise_model",
+          "feasible_runs": 6,
+          "max_qubits": 3,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "coverage": 0.8222222222222223,
+            "covered_points": 15.5,
+            "demand_points": 19.0,
+            "double_coverage": 0.32222222222222224,
+            "longest_gap_s": 3600.0,
+            "resilience": 0.375,
+            "resilient_points": 7.0,
+            "selected": 2.0
+          },
+          "mean_raw_feasible_rate": 0.7419840494791666,
+          "mean_total_s": 0.05423884750052821,
+          "method": "lns_qaoa",
+          "optimum_hits": 6,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "noise_model",
+          "feasible_runs": 12,
+          "max_qubits": 5,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "coverage": 0.6314709595959597,
+            "covered_points": 13.25,
+            "demand_points": 22.25,
+            "double_coverage": 0.22964015151515152,
+            "longest_gap_s": 13500.0,
+            "resilience": 0.3180239898989899,
+            "resilient_points": 6.75,
+            "selected": 2.5
+          },
+          "mean_raw_feasible_rate": 0.63385009765625,
+          "mean_total_s": 0.06617743099923246,
+          "method": "lns_qaoa",
+          "optimum_hits": 12,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "noiseless_simulator",
+          "feasible_runs": 6,
+          "max_qubits": 3,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "coverage": 0.8222222222222223,
+            "covered_points": 15.5,
+            "demand_points": 19.0,
+            "double_coverage": 0.32222222222222224,
+            "longest_gap_s": 3600.0,
+            "resilience": 0.375,
+            "resilient_points": 7.0,
+            "selected": 2.0
+          },
+          "mean_raw_feasible_rate": 0.8330891927083334,
+          "mean_total_s": 0.053920073832462855,
+          "method": "lns_qaoa",
+          "optimum_hits": 6,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "noiseless_simulator",
+          "feasible_runs": 12,
+          "max_qubits": 5,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "coverage": 0.6314709595959597,
+            "covered_points": 13.25,
+            "demand_points": 22.25,
+            "double_coverage": 0.22964015151515152,
+            "longest_gap_s": 13500.0,
+            "resilience": 0.3180239898989899,
+            "resilient_points": 6.75,
+            "selected": 2.5
+          },
+          "mean_raw_feasible_rate": 0.7567545572916666,
+          "mean_total_s": 0.06532264000088617,
+          "method": "lns_qaoa",
+          "optimum_hits": 12,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 6,
+          "max_qubits": 3,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "coverage": 0.8222222222222223,
+            "covered_points": 15.5,
+            "demand_points": 19.0,
+            "double_coverage": 0.32222222222222224,
+            "longest_gap_s": 3600.0,
+            "resilience": 0.375,
+            "resilient_points": 7.0,
+            "selected": 2.0
+          },
+          "mean_raw_feasible_rate": 0.37939453125,
+          "mean_total_s": 0.004198258667505191,
+          "method": "lns_random",
+          "optimum_hits": 6,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 12,
+          "max_qubits": 5,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "coverage": 0.6314709595959597,
+            "covered_points": 13.25,
+            "demand_points": 22.25,
+            "double_coverage": 0.22964015151515152,
+            "longest_gap_s": 13500.0,
+            "resilience": 0.3180239898989899,
+            "resilient_points": 6.75,
+            "selected": 2.5
+          },
+          "mean_raw_feasible_rate": 0.3293050130208333,
+          "mean_total_s": 0.010146365999389673,
+          "method": "lns_random",
+          "optimum_hits": 12,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 2,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "coverage": 0.8222222222222222,
+            "covered_points": 15.5,
+            "demand_points": 19.0,
+            "double_coverage": 0.3222222222222222,
+            "longest_gap_s": 3600.0,
+            "resilience": 0.375,
+            "resilient_points": 7.0,
+            "selected": 2.0
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.0017738364986144006,
+          "method": "milp",
+          "optimum_hits": 2,
+          "runs": 2,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 4,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "coverage": 0.6314709595959596,
+            "covered_points": 13.25,
+            "demand_points": 22.25,
+            "double_coverage": 0.22964015151515152,
+            "longest_gap_s": 13500.0,
+            "resilience": 0.3180239898989899,
+            "resilient_points": 6.75,
+            "selected": 2.5
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.0024593827492935816,
+          "method": "milp",
+          "optimum_hits": 4,
+          "runs": 4,
+          "split": "held_out"
+        }
+      ],
+      "decision": {
+        "criteria": [
+          {
+            "measured": 1.0,
+            "name": "validated_feasibility",
+            "passed": true,
+            "threshold": 1.0
+          },
+          {
+            "measured": 0.0,
+            "name": "objective_quality",
+            "passed": true,
+            "threshold": 0.0
+          },
+          {
+            "measured": 0.4274495442708333,
+            "name": "raw_feasibility_vs_random",
+            "passed": true,
+            "threshold": 0.0
+          },
+          {
+            "measured": 0.0,
+            "name": "repaired_quality_vs_random",
+            "passed": true,
+            "threshold": 0.0
+          },
+          {
+            "measured": 26.560583146177247,
+            "name": "end_to_end_runtime",
+            "passed": false,
+            "threshold": 1.0
+          }
+        ],
+        "retained_solver": "r13-highs-milp-v1",
+        "verdict": "no_go"
+      },
+      "instances": [
+        {
+          "audit": {
+            "assignments": 8,
+            "feasible_assignments": 3,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 0.5,
+            "variables": 3
+          },
+          "input_fingerprint": "0b5da08c7a8bea1c4f2548479c597f064003d92a4cd7e962f3ece6c5be2de726",
+          "instance_id": "relays-101",
+          "optimum": "43/2",
+          "optimum_source": "exact",
+          "optimum_value": 21.5,
+          "qubo_encoding": "second-order inclusion-exclusion coverage, double-coverage resilience proxy and exact-k penalty (heuristic)",
+          "qubo_exact": false,
+          "rejections": [
+            "R1:capacity_exceeded",
+            "R4:no_credited_link",
+            "R6:capacity_exceeded"
+          ],
+          "seed": 101,
+          "split": "dev",
+          "variables": 3
+        },
+        {
+          "audit": {
+            "assignments": 8,
+            "feasible_assignments": 3,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 1.5,
+            "variables": 3
+          },
+          "input_fingerprint": "983f05321588677f4ec4f1e903b98ac5593c6d842968e2fee2f1f9b522162cd3",
+          "instance_id": "relays-102",
+          "optimum": "33/2",
+          "optimum_source": "exact",
+          "optimum_value": 16.5,
+          "qubo_encoding": "second-order inclusion-exclusion coverage, double-coverage resilience proxy and exact-k penalty (heuristic)",
+          "qubo_exact": false,
+          "rejections": [
+            "R1:no_credited_link",
+            "R2:capacity_exceeded",
+            "R6:capacity_exceeded",
+            "R7:capacity_exceeded",
+            "R8:no_credited_link"
+          ],
+          "seed": 102,
+          "split": "dev",
+          "variables": 3
+        },
+        {
+          "audit": {
+            "assignments": 8,
+            "feasible_assignments": 3,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 1.5,
+            "variables": 3
+          },
+          "input_fingerprint": "dc87c05d7fda475dbe28b2ce10af95e0ac0d50bfa5492014d3e8ee1ad008db90",
+          "instance_id": "relays-201",
+          "optimum": "27/2",
+          "optimum_source": "exact",
+          "optimum_value": 13.5,
+          "qubo_encoding": "second-order inclusion-exclusion coverage, double-coverage resilience proxy and exact-k penalty (heuristic)",
+          "qubo_exact": false,
+          "rejections": [
+            "R3:no_credited_link",
+            "R5:no_credited_link",
+            "R6:capacity_exceeded"
+          ],
+          "seed": 201,
+          "split": "held_out",
+          "variables": 3
+        },
+        {
+          "audit": {
+            "assignments": 8,
+            "feasible_assignments": 3,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 1.5,
+            "variables": 3
+          },
+          "input_fingerprint": "f37b7fcf3431b2a93fdac5f5a67e83da335962b52cfc71d8736a8fab873a5fe2",
+          "instance_id": "relays-202",
+          "optimum": "18",
+          "optimum_source": "exact",
+          "optimum_value": 18.0,
+          "qubo_encoding": "second-order inclusion-exclusion coverage, double-coverage resilience proxy and exact-k penalty (heuristic)",
+          "qubo_exact": false,
+          "rejections": [
+            "R1:no_credited_link",
+            "R3:no_relay_equipment",
+            "R5:no_credited_link",
+            "R7:no_relay_equipment",
+            "R8:no_credited_link"
+          ],
+          "seed": 202,
+          "split": "held_out",
+          "variables": 3
+        },
+        {
+          "audit": {
+            "assignments": 16,
+            "feasible_assignments": 4,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 1.0,
+            "variables": 4
+          },
+          "input_fingerprint": "d4dcccde22190a1c175891a8cb420bba0ffa13811f97eb98ebd62db9ea7eef68",
+          "instance_id": "relays-203",
+          "optimum": "17",
+          "optimum_source": "exact",
+          "optimum_value": 17.0,
+          "qubo_encoding": "second-order inclusion-exclusion coverage, double-coverage resilience proxy and exact-k penalty (heuristic)",
+          "qubo_exact": false,
+          "rejections": [
+            "R2:capacity_exceeded",
+            "R3:no_credited_link",
+            "R6:no_relay_equipment",
+            "R8:no_credited_link",
+            "R9:no_relay_equipment",
+            "R10:capacity_exceeded"
+          ],
+          "seed": 203,
+          "split": "held_out",
+          "variables": 4
+        },
+        {
+          "audit": {
+            "assignments": 32,
+            "feasible_assignments": 10,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 3.5,
+            "variables": 5
+          },
+          "input_fingerprint": "1f9af993fcc1b2af26d511c028295e957fb98ecc47f170edee189ba35a0a5c03",
+          "instance_id": "relays-204",
+          "optimum": "18",
+          "optimum_source": "exact",
+          "optimum_value": 18.0,
+          "qubo_encoding": "second-order inclusion-exclusion coverage, double-coverage resilience proxy and exact-k penalty (heuristic)",
+          "qubo_exact": false,
+          "rejections": [
+            "R1:capacity_exceeded",
+            "R2:no_relay_equipment",
+            "R3:no_credited_link",
+            "R4:no_relay_equipment",
+            "R6:no_relay_equipment",
+            "R8:capacity_exceeded",
+            "R10:no_credited_link"
+          ],
+          "seed": 204,
+          "split": "held_out",
+          "variables": 5
+        }
+      ],
+      "policy_reason": "Held-out NO-GO (failed: end_to_end_runtime); MILP retained.",
+      "quantum_enabled": false
+    },
+    "robust_plans": {
+      "aggregates": [
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 2,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "LA_success_rate": 0.5208333333333333,
+            "LB_success_rate": 0.2916666666666667,
+            "campaign_success_rate": 0.2916666666666667,
+            "campaign_wilson95_high": 0.4888061272366421,
+            "campaign_wilson95_low": 0.15201911269209772,
+            "mean_cost_m": 263.538257720704,
+            "worst_case_cost_m": 524.9925762236084
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.0037340770031732973,
+          "method": "exact",
+          "optimum_hits": 2,
+          "runs": 2,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 4,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "LA_success_rate": 0.16666666666666666,
+            "LB_success_rate": 0.22916666666666666,
+            "campaign_success_rate": 0.08333333333333333,
+            "campaign_wilson95_high": 0.2533748959341704,
+            "campaign_wilson95_low": 0.028275583923309054,
+            "mean_cost_m": 270.3663612888976,
+            "worst_case_cost_m": 523.0887604070634
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.0025065767513297033,
+          "method": "exact",
+          "optimum_hits": 4,
+          "runs": 4,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 6,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "LA_success_rate": 0.5208333333333334,
+            "LB_success_rate": 0.2916666666666667,
+            "campaign_success_rate": 0.2916666666666667,
+            "campaign_wilson95_high": 0.48880612723664213,
+            "campaign_wilson95_low": 0.15201911269209772,
+            "mean_cost_m": 263.538257720704,
+            "worst_case_cost_m": 524.9925762236084
+          },
+          "mean_raw_feasible_rate": 0.0625,
+          "mean_total_s": 0.029353907331824303,
+          "method": "lns_exact",
+          "optimum_hits": 6,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "LA_success_rate": 0.1875,
+            "LB_success_rate": 0.22916666666666666,
+            "campaign_success_rate": 0.08333333333333333,
+            "campaign_wilson95_high": 0.25337489593417045,
+            "campaign_wilson95_low": 0.02827558392330905,
+            "mean_cost_m": 270.3663612888976,
+            "worst_case_cost_m": 523.0887604070634
+          },
+          "mean_raw_feasible_rate": 0.0625,
+          "mean_total_s": 0.029591975167932105,
+          "method": "lns_exact",
+          "optimum_hits": 12,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "noise_model",
+          "feasible_runs": 6,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "LA_success_rate": 0.5208333333333334,
+            "LB_success_rate": 0.2916666666666667,
+            "campaign_success_rate": 0.2916666666666667,
+            "campaign_wilson95_high": 0.48880612723664213,
+            "campaign_wilson95_low": 0.15201911269209772,
+            "mean_cost_m": 263.538257720704,
+            "worst_case_cost_m": 524.9925762236084
+          },
+          "mean_raw_feasible_rate": 0.1656494140625,
+          "mean_total_s": 0.14431940266634533,
+          "method": "lns_qaoa",
+          "optimum_hits": 6,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "noise_model",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "LA_success_rate": 0.1875,
+            "LB_success_rate": 0.22916666666666666,
+            "campaign_success_rate": 0.08333333333333333,
+            "campaign_wilson95_high": 0.25337489593417045,
+            "campaign_wilson95_low": 0.02827558392330905,
+            "mean_cost_m": 270.3663612888976,
+            "worst_case_cost_m": 523.0887604070634
+          },
+          "mean_raw_feasible_rate": 0.16575113932291666,
+          "mean_total_s": 0.13817640391547079,
+          "method": "lns_qaoa",
+          "optimum_hits": 12,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "noiseless_simulator",
+          "feasible_runs": 6,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "LA_success_rate": 0.5208333333333334,
+            "LB_success_rate": 0.2916666666666667,
+            "campaign_success_rate": 0.2916666666666667,
+            "campaign_wilson95_high": 0.48880612723664213,
+            "campaign_wilson95_low": 0.15201911269209772,
+            "mean_cost_m": 263.538257720704,
+            "worst_case_cost_m": 524.9925762236084
+          },
+          "mean_raw_feasible_rate": 0.4453125,
+          "mean_total_s": 0.12641216916623912,
+          "method": "lns_qaoa",
+          "optimum_hits": 6,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "noiseless_simulator",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "LA_success_rate": 0.1875,
+            "LB_success_rate": 0.22916666666666666,
+            "campaign_success_rate": 0.08333333333333333,
+            "campaign_wilson95_high": 0.25337489593417045,
+            "campaign_wilson95_low": 0.02827558392330905,
+            "mean_cost_m": 270.3663612888976,
+            "worst_case_cost_m": 523.0887604070634
+          },
+          "mean_raw_feasible_rate": 0.44720458984375,
+          "mean_total_s": 0.1256806435837158,
+          "method": "lns_qaoa",
+          "optimum_hits": 12,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 6,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "LA_success_rate": 0.5208333333333334,
+            "LB_success_rate": 0.2916666666666667,
+            "campaign_success_rate": 0.2916666666666667,
+            "campaign_wilson95_high": 0.48880612723664213,
+            "campaign_wilson95_low": 0.15201911269209772,
+            "mean_cost_m": 263.538257720704,
+            "worst_case_cost_m": 524.9925762236084
+          },
+          "mean_raw_feasible_rate": 0.06266276041666667,
+          "mean_total_s": 0.022082184668154998,
+          "method": "lns_random",
+          "optimum_hits": 6,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "LA_success_rate": 0.1875,
+            "LB_success_rate": 0.22916666666666666,
+            "campaign_success_rate": 0.08333333333333333,
+            "campaign_wilson95_high": 0.25337489593417045,
+            "campaign_wilson95_low": 0.02827558392330905,
+            "mean_cost_m": 270.3663612888976,
+            "worst_case_cost_m": 523.0887604070634
+          },
+          "mean_raw_feasible_rate": 0.06266276041666667,
+          "mean_total_s": 0.02284293741528624,
+          "method": "lns_random",
+          "optimum_hits": 12,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 2,
+          "max_qubits": 0,
+          "mean_gap": 5.8184426e-10,
+          "mean_metrics": {
+            "LA_success_rate": 0.5208333333333333,
+            "LB_success_rate": 0.2916666666666667,
+            "campaign_success_rate": 0.2916666666666667,
+            "campaign_wilson95_high": 0.4888061272366421,
+            "campaign_wilson95_low": 0.15201911269209772,
+            "mean_cost_m": 263.53825499611963,
+            "worst_case_cost_m": 524.9925768054526
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.002349505502934335,
+          "method": "milp",
+          "optimum_hits": 2,
+          "runs": 2,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 4,
+          "max_qubits": 0,
+          "mean_gap": 1.9292311514999997e-08,
+          "mean_metrics": {
+            "LA_success_rate": 0.1875,
+            "LB_success_rate": 0.22916666666666666,
+            "campaign_success_rate": 0.08333333333333333,
+            "campaign_wilson95_high": 0.2533748959341704,
+            "campaign_wilson95_low": 0.028275583923309054,
+            "mean_cost_m": 270.36636715406394,
+            "worst_case_cost_m": 523.088779699375
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.001933219002239639,
+          "method": "milp",
+          "optimum_hits": 4,
+          "runs": 4,
+          "split": "held_out"
+        }
+      ],
+      "decision": {
+        "criteria": [
+          {
+            "measured": 1.0,
+            "name": "validated_feasibility",
+            "passed": true,
+            "threshold": 1.0
+          },
+          {
+            "measured": -1.9292311514999997e-08,
+            "name": "objective_quality",
+            "passed": true,
+            "threshold": 0.0
+          },
+          {
+            "measured": 0.3845418294270833,
+            "name": "raw_feasibility_vs_random",
+            "passed": true,
+            "threshold": 0.0
+          },
+          {
+            "measured": 0.0,
+            "name": "repaired_quality_vs_random",
+            "passed": true,
+            "threshold": 0.0
+          },
+          {
+            "measured": 65.01107398495176,
+            "name": "end_to_end_runtime",
+            "passed": false,
+            "threshold": 1.0
+          }
+        ],
+        "retained_solver": "r13-highs-milp-v1",
+        "verdict": "no_go"
+      },
+      "instances": [
+        {
+          "audit": {
+            "assignments": 256,
+            "feasible_assignments": 16,
+            "feasible_energy_matches_objective": true,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 0.0,
+            "variables": 8
+          },
+          "input_fingerprint": "e76d491fca50326e30950acdfd067a8a99ecf6b5288a1f3d3482b965d748ed37",
+          "instance_id": "robust-101",
+          "optimum": "22008827689754599/5000000000000000",
+          "optimum_source": "exact",
+          "optimum_value": 4.4017655379509195,
+          "qubo_encoding": "exact one-hot and pair penalties",
+          "qubo_exact": true,
+          "rejections": [],
+          "seed": 101,
+          "split": "dev",
+          "variables": 8
+        },
+        {
+          "audit": {
+            "assignments": 256,
+            "feasible_assignments": 16,
+            "feasible_energy_matches_objective": true,
+            "ground_state_feasible": true,
+            "ground_state_optimal": false,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 0.0,
+            "variables": 8
+          },
+          "input_fingerprint": "6d06cab8ba99c11687e27f372aeec2e25849d7ad4fb9e928b986b08942e9ea2b",
+          "instance_id": "robust-102",
+          "optimum": "213706232740046589/25000000000000000",
+          "optimum_source": "exact",
+          "optimum_value": 8.548249309601864,
+          "qubo_encoding": "exact one-hot and pair penalties",
+          "qubo_exact": true,
+          "rejections": [],
+          "seed": 102,
+          "split": "dev",
+          "variables": 8
+        },
+        {
+          "audit": {
+            "assignments": 256,
+            "feasible_assignments": 16,
+            "feasible_energy_matches_objective": true,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 0.0,
+            "variables": 8
+          },
+          "input_fingerprint": "34d733013d28ece5b5ec3b5bf1bcd90310c919e74cccefc61d7b7e2680ec5591",
+          "instance_id": "robust-201",
+          "optimum": "7535235811379649/5000000000000000",
+          "optimum_source": "exact",
+          "optimum_value": 1.5070471622759298,
+          "qubo_encoding": "exact one-hot and pair penalties",
+          "qubo_exact": true,
+          "rejections": [],
+          "seed": 201,
+          "split": "held_out",
+          "variables": 8
+        },
+        {
+          "audit": {
+            "assignments": 256,
+            "feasible_assignments": 16,
+            "feasible_energy_matches_objective": true,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 0.0,
+            "variables": 8
+          },
+          "input_fingerprint": "428376cd28e557b0ab669ef55a2cdbb5030bdbfa8c29924eec0f761fb32dfcf3",
+          "instance_id": "robust-202",
+          "optimum": "17099973578442609/5000000000000000",
+          "optimum_source": "exact",
+          "optimum_value": 3.4199947156885218,
+          "qubo_encoding": "exact one-hot and pair penalties",
+          "qubo_exact": true,
+          "rejections": [],
+          "seed": 202,
+          "split": "held_out",
+          "variables": 8
+        },
+        {
+          "audit": {
+            "assignments": 256,
+            "feasible_assignments": 16,
+            "feasible_energy_matches_objective": true,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 0.0,
+            "variables": 8
+          },
+          "input_fingerprint": "45b8ab279056f9ec16b3d9bae2297dd5fd5b65be64d559c783707eb44079db1c",
+          "instance_id": "robust-203",
+          "optimum": "7567280371114747/5000000000000000",
+          "optimum_source": "exact",
+          "optimum_value": 1.5134560742229495,
+          "qubo_encoding": "exact one-hot and pair penalties",
+          "qubo_exact": true,
+          "rejections": [],
+          "seed": 203,
+          "split": "held_out",
+          "variables": 8
+        },
+        {
+          "audit": {
+            "assignments": 256,
+            "feasible_assignments": 16,
+            "feasible_energy_matches_objective": true,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 0.0,
+            "variables": 8
+          },
+          "input_fingerprint": "d9ad6286e0e2722cf791312f45c6d379a51ffb8abe274d2e8a877db402c183f3",
+          "instance_id": "robust-204",
+          "optimum": "-1332132484539137/2500000000000000",
+          "optimum_source": "exact",
+          "optimum_value": -0.5328529938156548,
+          "qubo_encoding": "exact one-hot and pair penalties",
+          "qubo_exact": true,
+          "rejections": [],
+          "seed": 204,
+          "split": "held_out",
+          "variables": 8
+        }
+      ],
+      "policy_reason": "Held-out NO-GO (failed: end_to_end_runtime); MILP retained.",
+      "quantum_enabled": false
+    },
+    "rover_routes": {
+      "aggregates": [
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 2,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "comm_gap_max_s": 5624.060272128825,
+            "comm_gap_total_s": 5624.060272128825,
+            "energy_used_j": 11462331.780225446,
+            "science_return": 15.0,
+            "targets_visited": 2.0,
+            "traverse_time_s": 114346.20399819702
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.00041433400110690854,
+          "method": "exact",
+          "optimum_hits": 2,
+          "runs": 2,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 4,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "comm_gap_max_s": 3587.2475072616244,
+            "comm_gap_total_s": 4663.227344920251,
+            "energy_used_j": 9687593.214908201,
+            "science_return": 12.75,
+            "targets_visited": 1.75,
+            "traverse_time_s": 96274.22610307956
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.012957264751094044,
+          "method": "exact",
+          "optimum_hits": 4,
+          "runs": 4,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 6,
+          "max_qubits": 4,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "comm_gap_max_s": 5624.060272128826,
+            "comm_gap_total_s": 5624.060272128826,
+            "energy_used_j": 11462331.780225446,
+            "science_return": 15.0,
+            "targets_visited": 2.0,
+            "traverse_time_s": 114346.20399819703
+          },
+          "mean_raw_feasible_rate": 0.5625,
+          "mean_total_s": 0.0045384973333663465,
+          "method": "lns_exact",
+          "optimum_hits": 6,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "comm_gap_max_s": 3587.247507261625,
+            "comm_gap_total_s": 4663.227344920252,
+            "energy_used_j": 9687593.214908201,
+            "science_return": 12.75,
+            "targets_visited": 1.75,
+            "traverse_time_s": 96274.22610307956
+          },
+          "mean_raw_feasible_rate": 0.3701171875,
+          "mean_total_s": 0.04711431016585266,
+          "method": "lns_exact",
+          "optimum_hits": 12,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "noise_model",
+          "feasible_runs": 6,
+          "max_qubits": 4,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "comm_gap_max_s": 5624.060272128826,
+            "comm_gap_total_s": 5624.060272128826,
+            "energy_used_j": 11462331.780225446,
+            "science_return": 15.0,
+            "targets_visited": 2.0,
+            "traverse_time_s": 114346.20399819703
+          },
+          "mean_raw_feasible_rate": 0.885986328125,
+          "mean_total_s": 0.062239294832882784,
+          "method": "lns_qaoa",
+          "optimum_hits": 6,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "noise_model",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "comm_gap_max_s": 3587.247507261625,
+            "comm_gap_total_s": 4663.227344920252,
+            "energy_used_j": 9687593.214908201,
+            "science_return": 12.75,
+            "targets_visited": 1.75,
+            "traverse_time_s": 96274.22610307956
+          },
+          "mean_raw_feasible_rate": 0.6319986979166666,
+          "mean_total_s": 0.11800938775013492,
+          "method": "lns_qaoa",
+          "optimum_hits": 12,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "noiseless_simulator",
+          "feasible_runs": 6,
+          "max_qubits": 4,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "comm_gap_max_s": 5624.060272128826,
+            "comm_gap_total_s": 5624.060272128826,
+            "energy_used_j": 11462331.780225446,
+            "science_return": 15.0,
+            "targets_visited": 2.0,
+            "traverse_time_s": 114346.20399819703
+          },
+          "mean_raw_feasible_rate": 0.9895426432291666,
+          "mean_total_s": 0.059785718499673145,
+          "method": "lns_qaoa",
+          "optimum_hits": 6,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "noiseless_simulator",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "comm_gap_max_s": 3587.247507261625,
+            "comm_gap_total_s": 4663.227344920252,
+            "energy_used_j": 9687593.214908201,
+            "science_return": 12.75,
+            "targets_visited": 1.75,
+            "traverse_time_s": 96274.22610307956
+          },
+          "mean_raw_feasible_rate": 0.9768880208333334,
+          "mean_total_s": 0.08776113008328441,
+          "method": "lns_qaoa",
+          "optimum_hits": 12,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 6,
+          "max_qubits": 4,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "comm_gap_max_s": 5624.060272128826,
+            "comm_gap_total_s": 5624.060272128826,
+            "energy_used_j": 11462331.780225446,
+            "science_return": 15.0,
+            "targets_visited": 2.0,
+            "traverse_time_s": 114346.20399819703
+          },
+          "mean_raw_feasible_rate": 0.5679524739583334,
+          "mean_total_s": 0.004503414165810682,
+          "method": "lns_random",
+          "optimum_hits": 6,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "comm_gap_max_s": 3587.247507261625,
+            "comm_gap_total_s": 4663.227344920252,
+            "energy_used_j": 9687593.214908201,
+            "science_return": 12.75,
+            "targets_visited": 1.75,
+            "traverse_time_s": 96274.22610307956
+          },
+          "mean_raw_feasible_rate": 0.3707275390625,
+          "mean_total_s": 0.03866151733442772,
+          "method": "lns_random",
+          "optimum_hits": 12,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 2,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "comm_gap_max_s": 5624.060272128825,
+            "comm_gap_total_s": 5624.060272128825,
+            "energy_used_j": 11462331.780225446,
+            "science_return": 15.0,
+            "targets_visited": 2.0,
+            "traverse_time_s": 114346.20399819702
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.0009967775004042778,
+          "method": "milp",
+          "optimum_hits": 2,
+          "runs": 2,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 4,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "comm_gap_max_s": 3587.2475072616244,
+            "comm_gap_total_s": 4663.227344920251,
+            "energy_used_j": 9687593.214908201,
+            "science_return": 12.75,
+            "targets_visited": 1.75,
+            "traverse_time_s": 96274.22610307956
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.0011548515012691496,
+          "method": "milp",
+          "optimum_hits": 4,
+          "runs": 4,
+          "split": "held_out"
+        }
+      ],
+      "decision": {
+        "criteria": [
+          {
+            "measured": 1.0,
+            "name": "validated_feasibility",
+            "passed": true,
+            "threshold": 1.0
+          },
+          {
+            "measured": 0.0,
+            "name": "objective_quality",
+            "passed": true,
+            "threshold": 0.0
+          },
+          {
+            "measured": 0.6061604817708334,
+            "name": "raw_feasibility_vs_random",
+            "passed": true,
+            "threshold": 0.0
+          },
+          {
+            "measured": 0.0,
+            "name": "repaired_quality_vs_random",
+            "passed": true,
+            "threshold": 0.0
+          },
+          {
+            "measured": 75.99343291049748,
+            "name": "end_to_end_runtime",
+            "passed": false,
+            "threshold": 1.0
+          }
+        ],
+        "retained_solver": "r13-highs-milp-v1",
+        "verdict": "no_go"
+      },
+      "instances": [
+        {
+          "audit": {
+            "assignments": 16,
+            "feasible_assignments": 9,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": false,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 125.5818946590806,
+            "variables": 4
+          },
+          "input_fingerprint": "69be85f9c5bd8013e8701afe060401f1d01cf0e29cb199cbe5b811a5d13bb3a6",
+          "instance_id": "rover-101",
+          "optimum": "125693562404256227/7500000000000000",
+          "optimum_source": "exact",
+          "optimum_value": 16.75914165390083,
+          "qubo_encoding": "pairwise penalties plus unbalanced penalties for binding budgets (heuristic)",
+          "qubo_exact": false,
+          "rejections": [
+            "T2@conservative:comm_gap_exceeds_limit",
+            "T2@direct:comm_gap_exceeds_limit",
+            "T4@conservative:comm_gap_exceeds_limit",
+            "T4@direct:comm_gap_exceeds_limit"
+          ],
+          "seed": 101,
+          "split": "dev",
+          "variables": 4
+        },
+        {
+          "audit": {
+            "assignments": 16,
+            "feasible_assignments": 9,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": false,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 80.37310319645721,
+            "variables": 4
+          },
+          "input_fingerprint": "be5d4eda7d47350e2afa5bd3b470863f27cd3b6d313a11d084eead22731b7cbd",
+          "instance_id": "rover-102",
+          "optimum": "53179720985790173/5000000000000000",
+          "optimum_source": "exact",
+          "optimum_value": 10.635944197158034,
+          "qubo_encoding": "pairwise penalties plus unbalanced penalties for binding budgets (heuristic)",
+          "qubo_exact": false,
+          "rejections": [
+            "T3@conservative:comm_gap_exceeds_limit",
+            "T3@direct:comm_gap_exceeds_limit",
+            "T4@conservative:comm_gap_exceeds_limit",
+            "T4@direct:comm_gap_exceeds_limit",
+            "T5@conservative:comm_gap_exceeds_limit",
+            "T5@direct:comm_gap_exceeds_limit"
+          ],
+          "seed": 102,
+          "split": "dev",
+          "variables": 4
+        },
+        {
+          "audit": {
+            "assignments": 4,
+            "feasible_assignments": 3,
+            "feasible_energy_matches_objective": true,
+            "ground_state_feasible": true,
+            "ground_state_optimal": true,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 0.0,
+            "variables": 2
+          },
+          "input_fingerprint": "72bfa41f502d5d16b35e510b0bda73f4bbef4089cf215677d5946233af1cc4b7",
+          "instance_id": "rover-201",
+          "optimum": "663675293916864649/120000000000000000",
+          "optimum_source": "exact",
+          "optimum_value": 5.530627449307206,
+          "qubo_encoding": "exact pairwise penalties; budgets non-binding",
+          "qubo_exact": true,
+          "rejections": [
+            "T1@conservative:comm_gap_exceeds_limit",
+            "T1@direct:comm_gap_exceeds_limit",
+            "T2@conservative:comm_gap_exceeds_limit",
+            "T2@direct:comm_gap_exceeds_limit",
+            "T3@conservative:comm_gap_exceeds_limit",
+            "T3@direct:comm_gap_exceeds_limit"
+          ],
+          "seed": 201,
+          "split": "held_out",
+          "variables": 2
+        },
+        {
+          "audit": {
+            "assignments": 256,
+            "feasible_assignments": 29,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": false,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 176.93532960868507,
+            "variables": 8
+          },
+          "input_fingerprint": "f1f406b5e0af9f3d45d08b287bf56b7e38d9343ae81e06f4dc7ebcf8366cb6de",
+          "instance_id": "rover-202",
+          "optimum": "3047989180442855677/180000000000000000",
+          "optimum_source": "exact",
+          "optimum_value": 16.93327322468253,
+          "qubo_encoding": "pairwise penalties plus unbalanced penalties for binding budgets (heuristic)",
+          "qubo_exact": false,
+          "rejections": [
+            "T1@conservative:comm_gap_exceeds_limit",
+            "T1@direct:comm_gap_exceeds_limit"
+          ],
+          "seed": 202,
+          "split": "held_out",
+          "variables": 8
+        },
+        {
+          "audit": {
+            "assignments": 16,
+            "feasible_assignments": 9,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": false,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 87.15456377705078,
+            "variables": 4
+          },
+          "input_fingerprint": "99fe9a34919d2b1a83c2e1d70f766c47b19908c7b3639876ea52e8b2063c4fe7",
+          "instance_id": "rover-203",
+          "optimum": "2079799745350138471/180000000000000000",
+          "optimum_source": "exact",
+          "optimum_value": 11.554443029722991,
+          "qubo_encoding": "pairwise penalties plus unbalanced penalties for binding budgets (heuristic)",
+          "qubo_exact": false,
+          "rejections": [
+            "T1@conservative:comm_gap_exceeds_limit",
+            "T1@direct:comm_gap_exceeds_limit",
+            "T2@conservative:comm_gap_exceeds_limit",
+            "T2@direct:comm_gap_exceeds_limit",
+            "T3@conservative:comm_gap_exceeds_limit",
+            "T3@direct:comm_gap_exceeds_limit"
+          ],
+          "seed": 203,
+          "split": "held_out",
+          "variables": 4
+        },
+        {
+          "audit": {
+            "assignments": 1024,
+            "feasible_assignments": 51,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": false,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 174.76091807913238,
+            "variables": 10
+          },
+          "input_fingerprint": "689625abd73b3e9e2a2b03dbae454bd990ce5ec9c79993e1694deac8d013d4a3",
+          "instance_id": "rover-204",
+          "optimum": "3933900824583183/312500000000000",
+          "optimum_source": "exact",
+          "optimum_value": 12.588482638666186,
+          "qubo_encoding": "pairwise penalties plus unbalanced penalties for binding budgets (heuristic)",
+          "qubo_exact": false,
+          "rejections": [],
+          "seed": 204,
+          "split": "held_out",
+          "variables": 10
+        }
+      ],
+      "policy_reason": "Held-out NO-GO (failed: end_to_end_runtime); MILP retained.",
+      "quantum_enabled": false
+    },
+    "science_activities": {
+      "aggregates": [
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 2,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "completed_activities": 2.0,
+            "completed_science_value": 12.0,
+            "makespan_s": 16200.0,
+            "min_battery_margin_j": 0.0,
+            "missed_deadlines": 1.5
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.060404795502108755,
+          "method": "exact",
+          "optimum_hits": 2,
+          "runs": 2,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 4,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "completed_activities": 2.75,
+            "completed_science_value": 15.5,
+            "makespan_s": 17100.0,
+            "min_battery_margin_j": 27.5,
+            "missed_deadlines": 1.25
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.18144263875001343,
+          "method": "exact",
+          "optimum_hits": 4,
+          "runs": 4,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 6,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "completed_activities": 2.0,
+            "completed_science_value": 12.0,
+            "makespan_s": 16200.0,
+            "min_battery_margin_j": 0.0,
+            "missed_deadlines": 1.5
+          },
+          "mean_raw_feasible_rate": 0.08797200520833333,
+          "mean_total_s": 0.07383877233466289,
+          "method": "lns_exact",
+          "optimum_hits": 6,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "completed_activities": 2.75,
+            "completed_science_value": 15.5,
+            "makespan_s": 17100.0,
+            "min_battery_margin_j": 27.5,
+            "missed_deadlines": 1.25
+          },
+          "mean_raw_feasible_rate": 0.055908203125,
+          "mean_total_s": 0.11130854350024795,
+          "method": "lns_exact",
+          "optimum_hits": 12,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "noise_model",
+          "feasible_runs": 6,
+          "max_qubits": 8,
+          "mean_gap": 0.45,
+          "mean_metrics": {
+            "completed_activities": 1.5,
+            "completed_science_value": 11.5,
+            "makespan_s": 16200.0,
+            "min_battery_margin_j": 50.0,
+            "missed_deadlines": 2.0
+          },
+          "mean_raw_feasible_rate": 0.4499104817708333,
+          "mean_total_s": 0.14486993549993107,
+          "method": "lns_qaoa",
+          "optimum_hits": 3,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "noise_model",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.24583333333333335,
+          "mean_metrics": {
+            "completed_activities": 2.6666666666666665,
+            "completed_science_value": 15.25,
+            "makespan_s": 17400.0,
+            "min_battery_margin_j": 27.5,
+            "missed_deadlines": 1.3333333333333333
+          },
+          "mean_raw_feasible_rate": 0.24932861328125,
+          "mean_total_s": 0.19336589533243873,
+          "method": "lns_qaoa",
+          "optimum_hits": 11,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "noiseless_simulator",
+          "feasible_runs": 6,
+          "max_qubits": 8,
+          "mean_gap": 0.15,
+          "mean_metrics": {
+            "completed_activities": 1.8333333333333333,
+            "completed_science_value": 11.833333333333334,
+            "makespan_s": 16200.0,
+            "min_battery_margin_j": 16.666666666666668,
+            "missed_deadlines": 1.6666666666666667
+          },
+          "mean_raw_feasible_rate": 0.9066162109375,
+          "mean_total_s": 0.100123657334431,
+          "method": "lns_qaoa",
+          "optimum_hits": 5,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "noiseless_simulator",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.24583333333333335,
+          "mean_metrics": {
+            "completed_activities": 2.6666666666666665,
+            "completed_science_value": 15.25,
+            "makespan_s": 17400.0,
+            "min_battery_margin_j": 27.5,
+            "missed_deadlines": 1.3333333333333333
+          },
+          "mean_raw_feasible_rate": 0.58917236328125,
+          "mean_total_s": 0.12367298850040243,
+          "method": "lns_qaoa",
+          "optimum_hits": 11,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 6,
+          "max_qubits": 8,
+          "mean_gap": 0.45,
+          "mean_metrics": {
+            "completed_activities": 1.5,
+            "completed_science_value": 11.5,
+            "makespan_s": 16200.0,
+            "min_battery_margin_j": 50.0,
+            "missed_deadlines": 2.0
+          },
+          "mean_raw_feasible_rate": 0.0904541015625,
+          "mean_total_s": 0.05963890233397251,
+          "method": "lns_random",
+          "optimum_hits": 3,
+          "runs": 6,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 12,
+          "max_qubits": 8,
+          "mean_gap": 0.24583333333333335,
+          "mean_metrics": {
+            "completed_activities": 2.6666666666666665,
+            "completed_science_value": 15.25,
+            "makespan_s": 17400.0,
+            "min_battery_margin_j": 27.5,
+            "missed_deadlines": 1.3333333333333333
+          },
+          "mean_raw_feasible_rate": 0.056681315104166664,
+          "mean_total_s": 0.09610895483274362,
+          "method": "lns_random",
+          "optimum_hits": 11,
+          "runs": 12,
+          "split": "held_out"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 2,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "completed_activities": 2.0,
+            "completed_science_value": 12.0,
+            "makespan_s": 16200.0,
+            "min_battery_margin_j": 0.0,
+            "missed_deadlines": 1.5
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.001223415500135161,
+          "method": "milp",
+          "optimum_hits": 2,
+          "runs": 2,
+          "split": "dev"
+        },
+        {
+          "execution_mode": "classical",
+          "feasible_runs": 4,
+          "max_qubits": 0,
+          "mean_gap": 0.0,
+          "mean_metrics": {
+            "completed_activities": 2.75,
+            "completed_science_value": 15.5,
+            "makespan_s": 17100.0,
+            "min_battery_margin_j": 27.5,
+            "missed_deadlines": 1.25
+          },
+          "mean_raw_feasible_rate": null,
+          "mean_total_s": 0.001452587750463863,
+          "method": "milp",
+          "optimum_hits": 4,
+          "runs": 4,
+          "split": "held_out"
+        }
+      ],
+      "decision": {
+        "criteria": [
+          {
+            "measured": 1.0,
+            "name": "validated_feasibility",
+            "passed": true,
+            "threshold": 1.0
+          },
+          {
+            "measured": 0.24583333333333335,
+            "name": "objective_quality",
+            "passed": false,
+            "threshold": 0.0
+          },
+          {
+            "measured": 0.5324910481770834,
+            "name": "raw_feasibility_vs_random",
+            "passed": true,
+            "threshold": 0.0
+          },
+          {
+            "measured": 0.0,
+            "name": "repaired_quality_vs_random",
+            "passed": true,
+            "threshold": 0.0
+          },
+          {
+            "measured": 85.13977104715997,
+            "name": "end_to_end_runtime",
+            "passed": false,
+            "threshold": 1.0
+          }
+        ],
+        "retained_solver": "r13-highs-milp-v1",
+        "verdict": "no_go"
+      },
+      "instances": [
+        {
+          "audit": {
+            "assignments": 32,
+            "feasible_assignments": 5,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": false,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 222.04974,
+            "variables": 5
+          },
+          "input_fingerprint": "2917f21d3afedb3b5670dec59c05a9ad911493acffc3eece706e9ac60cc83280",
+          "instance_id": "science-101",
+          "optimum": "99/10",
+          "optimum_source": "exact",
+          "optimum_value": 9.9,
+          "qubo_encoding": "pairwise penalties plus unbalanced penalties for binding energy rows (heuristic)",
+          "qubo_exact": false,
+          "rejections": [],
+          "seed": 101,
+          "split": "dev",
+          "variables": 5
+        },
+        {
+          "audit": {
+            "assignments": 2048,
+            "feasible_assignments": 23,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": false,
+            "infeasible_below_optimum": 25,
+            "max_feasible_energy_error": 574.41296,
+            "variables": 11
+          },
+          "input_fingerprint": "f35b4378680d96b74412b8972fe48557c8f62f40065d4e8aadf887b9d7699d1f",
+          "instance_id": "science-102",
+          "optimum": "68/5",
+          "optimum_source": "exact",
+          "optimum_value": 13.6,
+          "qubo_encoding": "pairwise penalties plus unbalanced penalties for binding energy rows (heuristic)",
+          "qubo_exact": false,
+          "rejections": [],
+          "seed": 102,
+          "split": "dev",
+          "variables": 11
+        },
+        {
+          "audit": {
+            "assignments": 64,
+            "feasible_assignments": 8,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": false,
+            "infeasible_below_optimum": 0,
+            "max_feasible_energy_error": 87.30633999999999,
+            "variables": 6
+          },
+          "input_fingerprint": "64a535680a9b18a8f4c1fbed869f13d3abaa59b041c5056374c6c48658b4dda5",
+          "instance_id": "science-201",
+          "optimum": "35/4",
+          "optimum_source": "exact",
+          "optimum_value": 8.75,
+          "qubo_encoding": "pairwise penalties plus unbalanced penalties for binding energy rows (heuristic)",
+          "qubo_exact": false,
+          "rejections": [],
+          "seed": 201,
+          "split": "held_out",
+          "variables": 6
+        },
+        {
+          "audit": {
+            "assignments": 2048,
+            "feasible_assignments": 14,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": false,
+            "infeasible_below_optimum": 15,
+            "max_feasible_energy_error": 818.42772,
+            "variables": 11
+          },
+          "input_fingerprint": "ed3a092ef85c4049c6c496e677b8cea84cd53bd1929680472ee596e4410b4511",
+          "instance_id": "science-202",
+          "optimum": "49/5",
+          "optimum_source": "exact",
+          "optimum_value": 9.8,
+          "qubo_encoding": "pairwise penalties plus unbalanced penalties for binding energy rows (heuristic)",
+          "qubo_exact": false,
+          "rejections": [],
+          "seed": 202,
+          "split": "held_out",
+          "variables": 11
+        },
+        {
+          "audit": {
+            "assignments": 512,
+            "feasible_assignments": 27,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": false,
+            "infeasible_below_optimum": 7,
+            "max_feasible_energy_error": 679.71585,
+            "variables": 9
+          },
+          "input_fingerprint": "3611ee0de95859fab6d7374a63dfda01e954d45de4cf87f2c780350f1a8edd7c",
+          "instance_id": "science-203",
+          "optimum": "103/4",
+          "optimum_source": "exact",
+          "optimum_value": 25.75,
+          "qubo_encoding": "pairwise penalties plus unbalanced penalties for binding energy rows (heuristic)",
+          "qubo_exact": false,
+          "rejections": [],
+          "seed": 203,
+          "split": "held_out",
+          "variables": 9
+        },
+        {
+          "audit": {
+            "assignments": 8192,
+            "feasible_assignments": 62,
+            "feasible_energy_matches_objective": false,
+            "ground_state_feasible": true,
+            "ground_state_optimal": false,
+            "infeasible_below_optimum": 99,
+            "max_feasible_energy_error": 514.42446,
+            "variables": 13
+          },
+          "input_fingerprint": "ae193f24e90824c28a60d2202842190255901087fdf37aba302a7422afdf16da",
+          "instance_id": "science-204",
+          "optimum": "327/20",
+          "optimum_source": "exact",
+          "optimum_value": 16.35,
+          "qubo_encoding": "pairwise penalties plus unbalanced penalties for binding energy rows (heuristic)",
+          "qubo_exact": false,
+          "rejections": [],
+          "seed": 204,
+          "split": "held_out",
+          "variables": 13
+        }
+      ],
+      "policy_reason": "Held-out NO-GO (failed: objective_quality, end_to_end_runtime); MILP retained.",
+      "quantum_enabled": false
+    }
+  },
+  "benchmark_schema": "r13-application-benchmark-v1",
+  "config": {
+    "applications": [
+      {
+        "application": "comm_slots",
+        "dev_seeds": [
+          101,
+          102
+        ],
+        "held_out_seeds": [
+          201,
+          202,
+          203,
+          204
+        ]
+      },
+      {
+        "application": "science_activities",
+        "dev_seeds": [
+          101,
+          102
+        ],
+        "held_out_seeds": [
+          201,
+          202,
+          203,
+          204
+        ]
+      },
+      {
+        "application": "relay_selection",
+        "dev_seeds": [
+          101,
+          102
+        ],
+        "held_out_seeds": [
+          201,
+          202,
+          203,
+          204
+        ]
+      },
+      {
+        "application": "rover_routes",
+        "dev_seeds": [
+          101,
+          102
+        ],
+        "held_out_seeds": [
+          201,
+          202,
+          203,
+          204
+        ]
+      },
+      {
+        "application": "robust_plans",
+        "dev_seeds": [
+          101,
+          102
+        ],
+        "held_out_seeds": [
+          201,
+          202,
+          203,
+          204
+        ]
+      }
+    ],
+    "exact_max_variables": 16,
+    "milp_time_limit_s": 30.0,
+    "qaoa_seeds": [
+      17,
+      23,
+      42
+    ],
+    "search": {
+      "candidates_per_step": 8,
+      "depth": 2,
+      "evaluations": 160,
+      "max_free_variables": 8,
+      "noise": {
+        "label": "illustrative-global-depolarizing-v1",
+        "readout_flip": 0.02,
+        "single_qubit_depolarizing": 0.001,
+        "two_qubit_depolarizing": 0.01
+      },
+      "repair_moves": 64,
+      "shots": 512,
+      "steps": 8
+    }
+  },
+  "config_fingerprint": "62516b977dbddbc6ae51d9bec404e0e7d3ee47eec23a67d2e89fe943ff113480",
+  "environment": {
+    "machine": "x86_64",
+    "numpy": "2.5.4",
+    "platform": "Linux-7.3.4-arch1-1-x86_64-with-glibc2.41",
+    "pydantic": "2.12.5",
+    "python": "3.12.12",
+    "scipy": "1.16.3"
+  },
+  "full_report_sha256": "82113b773ef5f1d231c0d591f6b925ea9aade10a91754a3ac6b8eddeadcb1f85",
+  "hardware_jobs": 0,
+  "schema_version": "r13-application-summary-v1",
+  "statement": "Local statevector simulation only (some runs through an illustrative noise model); no hardware or provider job was submitted and no quantum advantage is claimed. Instances are synthetic planning benchmarks, not NASA plans, DSN bookings, validated relay sites or certified landing/traverse plans."
+}

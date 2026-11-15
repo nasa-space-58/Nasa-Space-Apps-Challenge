@@ -22,6 +22,8 @@ import Communication from "./components/Communication";
 import SpaceWeather from "./components/SpaceWeather";
 import Recommendations from "./components/Recommendations";
 import Descent from "./components/Descent";
+import MissionPlanner from "./components/MissionPlanner";
+import SelfHealing from "./components/SelfHealing";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
 import { LanguageToggle, useTranslate, type Translate } from "./i18n";
 
@@ -50,7 +52,7 @@ const routes: Record<View, string> = {
 /** Former standalone pages are mission-control panel tabs; their hashes still open them. */
 const MODULE_HASHES: Record<string, string> = {
   "#/solver-arena": "arena",
-  "#/shared-antenna": "campaign",
+  "#/shared-antenna": "shared-antenna",
   "#/scaling": "scaling",
   "#/relays": "relays",
   "#/time-search": "window-search",
@@ -853,7 +855,7 @@ export default function App() {
   const stageModules = [
     { id: "scaling", label: t("research.scaling"), content: <ResearchLab kind="scaling" active={view === "mission" && panel === "scaling" && pageVisible} /> },
     { id: "relays", label: t("research.relays"), content: <ResearchLab kind="relays" active={view === "mission" && panel === "relays" && pageVisible} /> },
-    { id: "campaign", label: t("campaign.tab"), content: <SharedAntenna active={view === "mission" && panel === "campaign" && pageVisible} /> },
+    { id: "shared-antenna", label: t("sharedAntenna.tab"), content: <SharedAntenna active={view === "mission" && panel === "shared-antenna" && pageVisible} /> },
     { id: "arena", label: t("arena.tab"), content: <SolverArena active={view === "mission" && panel === "arena" && pageVisible} /> },
     { id: "results", label: t("app.modules.results"), content: resultsModule },
     ...(comparisonBase
@@ -883,6 +885,8 @@ export default function App() {
       content: <Recommendations sites={sites} />,
     },
     { id: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} /> },
+    { id: "campaign", label: t("app.modules.campaign"), content: <MissionPlanner /> },
+    { id: "recovery", label: t("app.modules.recovery"), content: <SelfHealing /> },
     {
       id: "classroom",
       label: t("app.modules.classroom"),
@@ -1165,6 +1169,12 @@ export default function App() {
           visible={view === "mission" && pageVisible}
           compact={compactScene}
           launchKey={launchKey}
+          landingUtc={`${start}:00Z`}
+          analysisId={
+            job && (job.status === "ready" || job.status === "insufficient_data")
+              ? job.id
+              : undefined
+          }
           condition={
             frame && result
               ? frame.sun.state === "full" || frame.sun.state === "partial"

@@ -13,9 +13,8 @@ Language, framework and tooling choices (which part is written in which language
 2. **One feature = one branch.** Nobody commits directly to `main`.
 3. **Non-UI code follows the three-phase workflow:** minimum skeleton → comprehensive tests → full implementation, **without touching the tests**.
 4. **A task is done only when all tests pass.** A partially passing test suite means the task is not finished.
-5. **`main` must always build, pass all tests and be demo-ready.**
-6. **All code, identifiers, comments, commit messages and docs are written in English.**
-7. **Every physical quantity has an explicit unit. Every coordinate has an explicit reference frame. Every timestamp has an explicit time scale.**
+5. **All code, identifiers, comments, commit messages and docs are written in English.**
+6. **Every physical quantity has an explicit unit. Every coordinate has an explicit reference frame. Every timestamp has an explicit time scale.**
 
 ---
 

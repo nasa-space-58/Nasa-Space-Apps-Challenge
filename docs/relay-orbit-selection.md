@@ -1,6 +1,6 @@
 # H11 — Audited relay-orbit selection
 
-H11 is a bounded concept demonstration: classical Earth–Moon circular restricted three-body dynamics produce candidate relay paths, terrain geometry produces contact intervals, and the existing H8 exact/QAOA pair selects one or two distinct candidates. No provider job or credit spending occurs in this stage.
+H11 is a bounded concept demonstration: classical Earth–Moon circular restricted three-body dynamics produce candidate relay paths, terrain geometry produces contact intervals, and the existing H8 exact/QAOA pair selects one or two distinct candidates. The offline H11 pipeline does not submit provider jobs. A separately authorized hardware experiment is recorded below.
 
 ## Sources and frames
 
@@ -74,3 +74,13 @@ H10/H11 delivery branch: `codex/h10-h11-scaling-relays`, based on H9 `fb59791`. 
 On 2026-11-15 (Europe/Istanbul), the complete suites passed: **1178 backend tests, 191 ingestion tests and 91 optional quantum tests**, with Ruff checks passing. TypeScript/Vite build passed. H10's seven and H11's ten notebook code cells executed without errors. No frontend tests or screenshots were run; visual acceptance remains with the user. The pre-existing large LunarSurface chunk and Starlette/AnyIO deprecation warnings remain.
 
 Live API checks returned HTTP 200 for both recorded reports. Default two-relay and one-relay comparisons returned optimal classical results and completed local simulation; the strict all-sites 100%-coverage/zero-gap case returned infeasible and did not run QAOA. Every API response reported zero credit spending. The offline report-builder CLI was rerun, and all four accepted plus the rejected orbit state were checked against a newly downloaded worker catalog. No QPU submission or provider account access occurred.
+
+## Separately authorized hardware trial
+
+On 2026-11-15 (Europe/Istanbul), one OpenQuantum Rigetti Cepheus-1-108Q job completed using four physical qubits, one QAOA layer and 256 shots. Parameters were trained locally; the uploaded circuit contained 34 CX and 8 SWAP gates. Its measurement distribution was independently checked against the logical circuit before submission. The job cost one Spark; no retry was submitted.
+
+[Raw counts and independent validation](verification/h11-hardware-2026-11-15.json) retain the exact problem fingerprint, circuit checksum, job ID, parameters and all 16 decoded assignments. There were **129/256 feasible samples (50.390625%)** and **51/256 optimal samples (19.921875%)**. No repair was applied. The best observed plan selected catalog rows 0 and 240, matching the classical optimum with zero gap. Its original geometry check passed: Mons Mouton coverage 88.1944%, maximum gap 81600 s; Malapert coverage 100%, maximum gap 0 s.
+
+The local 256-shot reference had 208 feasible and 55 optimal samples. The exact noiseless probabilities for the submitted parameters are 77.7365% feasible and 24.0927% optimal; sample frequencies need not equal those probabilities. Uniform selection over the same 16 assignments has 37.5% feasible and 12.5% optimal probability. These are sampler comparisons on a tiny problem, not an end-to-end quantum advantage or a reason to override the R10/R13 classical-default decisions. The existing relay UI still displays its labeled local simulation report; the hardware evidence is a separate archived artifact.
+
+Provider attribution: this experiment used [Open Quantum](https://www.openquantum.com/citation), with execution on Rigetti hardware. [Completed job](https://www.openquantum.com/jobs/007a1e27-1073-41a3-bd6c-1e0bcd336dde).

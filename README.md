@@ -237,6 +237,16 @@ Varsayılan temas rezervi 145 fps'dir. Bu değer NASA TN D-6846 Tablo II'deki in
 
 **Recommend** bölümünde "include descent" seçeneği açılırsa, her aday için R4 inişi hesaplanır. Ulaşılamayan nokta elenir; yakıt payı 5. kriter olarak sıralamaya eklenir. Seçenek kapalıyken R3 sonuçları değişmez. [Yöntem, kaynaklar ve doğrulama](docs/fuel-optimization.md).
 
+## R11: Çok görevli kampanya planlaması
+
+Mission control'deki **Campaign** sekmesi birden fazla görevi birlikte planlar. Görevler aynı iniş alanlarını, zamanı ve yer istasyonu kapasitesini paylaşır. Her görevin tipi, önceliği, son tarihi, bağımlılıkları, enerji ve veri ihtiyacı, iptal/erteleme kuralları tanımlıdır.
+
+İniş seçenekleri arazi eğimi, güneş ışığı, iniş yakıtı ve araç kanıtlarından üretilir; elenen her zaman için nedeni yazılır. Planlayıcı (HiGHS MILP) her görev için bir seçenek, erteleme ya da iptal seçer ve her veri indirme dilimini zamanlar. İstasyon görüşü, takvimi, kapasitesi, veri hızı ve özel bağlantı ihtiyacı ayrı girdilerdir. Röle desteği yalnızca röle donanımı, görüş hattı kanıtı ve menzil sağlanırsa sayılır.
+
+Her plan, çözücüden bağımsız bir doğrulayıcıyla yeniden denetlenir. Ortak zaman çizelgesi, görevlerin tek başına seçtikleri en iyi seçeneklerin birlikte neden çakıştığını ve her kararın gerekçesini gösterir. Uygun plan yoksa birlikte tamamlanamayan en küçük görev kümesi açıklanır.
+
+Örnek kampanyalar sentetiktir; NASA görev planı veya DSN rezervasyonu değildir. [Yöntem, sonuçlar ve sınırlar](docs/multi-mission-planning.md).
+
 ## H0: Hibrit planlama için ortak veri temeli
 
 Jupyter notebook: [`notebooks/H0_shared_contracts.ipynb`](notebooks/H0_shared_contracts.ipynb). Ortak modeller, beş örnek senaryo, veri doğrulama ve girdi parmak izi kontrollerini hücre hücre çalıştırır. Kurulum ve alan açıklamaları: [H0 sözleşmeleri](docs/hybrid-contracts.md). Bu aşamada kuantum çözücü çalıştırılmaz; klasik referans H1, QUBO/QAOA deneyi H2 kapsamında geliştirilir.

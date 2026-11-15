@@ -541,6 +541,7 @@ def replay_hybrid(
     bindings: tuple[LandingBinding, ...],
     dependencies: tuple[LandingDependency, ...],
     budget: QuantumBudget = QuantumBudget(),
+    decision_timings: list | None = None,
 ) -> dict:
     """Offline replay: simulated flight clock is paused while selection runs.
 
@@ -564,7 +565,9 @@ def replay_hybrid(
         return result["selected_target_id"]
 
     try:
-        replay = replay_recovery(recovery, target_selector=select)
+        replay = replay_recovery(
+            recovery, target_selector=select, decision_timings=decision_timings
+        )
     finally:
         coordinator.close()
     return dict(

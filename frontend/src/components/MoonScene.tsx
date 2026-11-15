@@ -72,7 +72,9 @@ function World({
     const orbitTime = ambientTime.current * 0.025;
     space.current.visible = progress < 0.49;
     surface.current.visible = progress >= 0.49;
-    moon.current.rotation.y = -0.55 + approach * 0.45;
+    // Slow illustrative self-rotation on top of the scroll-driven turn.
+    moon.current.rotation.y =
+      -0.55 + approach * 0.45 + ambientTime.current * 0.06;
     space.current.position.set(compact ? 0 : 2.25, compact ? 2.9 : 0, 0);
     space.current.scale.setScalar((compact ? 0.73 : 1) + approach * 0.5);
     lro.current.position.set(
