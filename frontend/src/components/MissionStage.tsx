@@ -32,6 +32,8 @@ import {
 } from "../missionPath";
 import type { CameraMode, CameraView, SiteCondition } from "./MissionScene";
 import { useTranslate, type Translate } from "../i18n";
+import { touchdownOutcome, useMissionRun } from "../missionRunStore";
+import "./mission-run.css";
 
 const MissionScene = lazy(() => import("./MissionScene"));
 /** Wall-clock length of one illustrative flight playback. */
@@ -368,7 +370,16 @@ export default function MissionStage({
   }, [sceneFamily, reduced]);
   // Post-landing operations start once touchdown is complete and stay alive
   // across camera changes; the rover is drawn only in the landing close-up.
-  const landed = webgl && active.phase.id === "landed" && progress >= 1;
+  // A mission run of this analysis decides how the touchdown ends; a crash or
+  // tip-over leaves no surface operations.
+  const missionRun = useMissionRun(analysisId);
+  const touchdown = touchdownOutcome(missionRun);
+  const arrived = active.phase.id === "landed" && progress >= 1;
+  const landed = webgl && arrived && touchdown === "landed";
+  const stageLabel = (id: string) =>
+    id === "landed" && touchdown !== "landed"
+      ? t(`missionRun.scene.${touchdown}`)
+      : phaseLabel(id);
 
   // A new target restarts the illustrative flight from Earth orbit.
   useEffect(() => {
@@ -500,6 +511,7 @@ export default function MissionStage({
                 roverScene={landed ? (rover?.scene ?? null) : null}
                 roverTarget={rover?.targetId ?? ""}
                 roverAlternatives={rover?.alternatives}
+                touchdown={touchdown}
               />
             </Suspense>
           </SceneBoundary>
@@ -508,7 +520,7 @@ export default function MissionStage({
         )}
         {!preview && !cleanView && <button aria-live="polite" className="stage-hud stage-phase phase-chip" onClick={() => inspect("flight")}>
           <span className="eyebrow">{t("missionStage.phase", { n: active.index + 1, total: MISSION_PHASES.length })}</span>
-          <strong>{progress === 0 && !flying ? t("missionStage.preLaunch") : phaseLabel(active.phase.id)}</strong>
+          <strong>{progress === 0 && !flying ? t("missionStage.preLaunch") : stageLabel(active.phase.id)}</strong>
           <span aria-hidden="true">↗</span>
         </button>}
         <div className="stage-hud scene-toolbar">
@@ -550,6 +562,20 @@ export default function MissionStage({
           <input type="range" aria-label={t("workspace.resultTime")} min="0" max="1000" value={Math.round(previewProgress*1000)} disabled={preview.stale} onChange={e=>{setPreviewPlaying(false);setPreviewProgress(Number(e.target.value)/1000);}}/>
           <span>{Math.round(previewProgress*100)}%</span>
         </div>}
+        {!preview && !cleanView && missionRun && arrived && (
+          <button
+            className={`stage-hud mission-outcome run-${missionRun.outcome}`}
+            onClick={() => onModuleChange("mission-run")}
+          >
+            <strong>{t(`missionRun.outcome.${missionRun.outcome}`)}</strong>
+            {missionRun.failure && (
+              <span>
+                {t(`missionRun.gates.${missionRun.failure.gate}`)} ·{" "}
+                {t(`missionRun.events.${missionRun.failure.code}`)}
+              </span>
+            )}
+          </button>
+        )}
         {!preview && !cleanView && <div className="scene-source">{landed && rover?.source ? (rover.source === "demo" ? "DEMO · A*" : "LOLA DEM · A*") : t("missionStage.illustrative")}</div>}
         {!preview && !cleanView && <div className="stage-hud scene-dock">
           <button disabled={!path} onClick={toggleFlight} aria-label={flying ? t("missionStage.pauseFlight") : t("missionStage.simulate")}>{flying ? "Ⅱ" : "▷"}</button>
@@ -791,7 +817,7 @@ export default function MissionStage({
             />
           </SceneBoundary>
         )}
-          {!landed && <p>{tr ? "Yüzey operasyonları inişten sonra açılır." : "Surface operations become available after landing."}</p>}
+          {!landed && <p>{arrived && touchdown !== "landed" ? (tr ? "Araç inişte kaybedildi; yüzey operasyonları yapılamaz." : "The vehicle was lost at touchdown; no surface operations are possible.") : (tr ? "Yüzey operasyonları inişten sonra açılır." : "Surface operations become available after landing.")}</p>}
         </div>
         <div
           className="panel-body"

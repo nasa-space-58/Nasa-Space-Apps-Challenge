@@ -109,7 +109,8 @@
       "descent": "İniş",
       "classroom": "Sınıf",
       "campaign": "Kampanya",
-      "recovery": "Kendini onarma"
+      "recovery": "Kendini onarma",
+      "missionRun": "Simülasyon"
     },
     "nav": {
       "skip": "Görev kontrolüne geç",
@@ -1953,6 +1954,152 @@
       "estimate": "Sensör tahmini",
       "original": "Özgün plan",
       "replanned": "Yeniden planlanan rota"
+    }
+  },
+  "missionRun": {
+    "title": "Görev simülasyonu",
+    "intro": "Görev, gerçek fizik kontrollerinden geçer: iniş yanması, temas noktasındaki eğim, yüzeyde batarya ve Dünya ile iletişim. Sonuç zar atılarak değil, seçilen alan, tarih, araç ve arızalardan hesaplanır.",
+    "needsAnalysis": "Simülasyon için önce bir alan ve tarih analizi tamamlayın.",
+    "catalogError": "Arıza kataloğu yüklenemedi.",
+    "invalidInput": "Girdi geçersiz.",
+    "scenarioHeading": "Arıza senaryosu",
+    "noFault": "Arıza yok",
+    "run": "Simüle et",
+    "running": "Hesaplanıyor…",
+    "customHeading": "Kendi arıza senaryonu oluştur",
+    "customIntro": "Arızaları zamanlarıyla birlikte ekleyin. İniş arızaları motor yanmasının başlangıcından (PDI), yüzey arızaları temastan itibaren sayılır.",
+    "removeFault": "Arızayı kaldır",
+    "faultKind": "Arıza türü",
+    "addFault": "Arıza ekle",
+    "namePlaceholder": "Senaryo adı",
+    "save": "Kaydet",
+    "runCustom": "Bu senaryoyu simüle et",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "vehicleHeading": "Araç ve görev kuralları",
+    "customScenario": "Özel senaryo",
+    "watch": "Sahnede izle",
+    "altitudeChart": "İniş: yükseklik / zaman",
+    "batteryChart": "Batarya enerjisi",
+    "timeline": "Olay akışı",
+    "disclaimer": "Eğitim amaçlı belirlenimci simülasyon. İniş güvenliği sertifikası, termal/güç yeterliliği, DSN rezervasyonu veya bağlantı bütçesi değildir; güç sistemi değerleri örnektir.",
+    "phase": {
+      "descent": "İniş",
+      "landing": "İniş zamanı",
+      "surface": "Yüzey"
+    },
+    "outcome": {
+      "success": "Görev başarılı",
+      "success_with_warnings": "Başarılı, uyarılarla",
+      "failure": "Görev başarısız",
+      "inconclusive": "Sonuç belirsiz"
+    },
+    "status": {
+      "pass": "geçti",
+      "warn": "uyarı",
+      "fail": "başarısız",
+      "unknown": "belirsiz",
+      "not_reached": "ulaşılmadı"
+    },
+    "gates": {
+      "descent": "Motorlu iniş",
+      "touchdown_terrain": "Temas zemini",
+      "power": "Yüzeyde enerji",
+      "communication": "Dünya ile iletişim"
+    },
+    "scenarios": {
+      "nominal": "Arızasız",
+      "engine-thrust-loss": "Motor itki kaybı",
+      "small-propellant-leak": "Küçük yakıt sızıntısı",
+      "marginal-propellant-leak": "Kıl payı sızıntı",
+      "major-propellant-leak": "Büyük yakıt sızıntısı",
+      "engine-efficiency-loss": "Motor verim kaybı",
+      "navigation-drift": "Navigasyon kayması",
+      "wave-off": "İnişi bir tur ertele",
+      "battery-cell-loss": "Batarya hücresi kaybı",
+      "stuck-heater": "Takılı kalan ısıtıcı",
+      "dusty-panels": "Tozlu paneller",
+      "transmitter-fault": "Verici arızası",
+      "cascade": "Zincirleme arızalar"
+    },
+    "faults": {
+      "engine_thrust_loss": "İtki kaybı",
+      "propellant_leak": "Yakıt sızıntısı",
+      "isp_degradation": "Motor verimi (Isp) düşüşü",
+      "navigation_bias": "Navigasyon hatası",
+      "landing_delay": "İniş ertelemesi",
+      "battery_capacity_loss": "Batarya kapasite kaybı",
+      "power_load_increase": "Ek güç yükü",
+      "solar_array_degradation": "Güneş paneli verim kaybı",
+      "communication_outage": "İletişim kesintisi"
+    },
+    "fields": {
+      "start_after_pdi_s": "PDI'dan sonra başlangıç",
+      "thrust_fraction": "Kalan itki oranı",
+      "leak_rate_kg_s": "Sızıntı hızı",
+      "duration_s": "Süre",
+      "isp_fraction": "Kalan Isp oranı",
+      "offset_m": "Kayma mesafesi",
+      "bearing_deg": "Kayma yönü (kuzeyden)",
+      "delay_h": "Erteleme",
+      "start_after_landing_h": "İnişten sonra başlangıç",
+      "capacity_fraction_lost": "Kaybedilen kapasite oranı",
+      "duration_h": "Süre",
+      "extra_load_w": "Ek yük",
+      "output_fraction": "Kalan panel çıkışı",
+      "battery_capacity_wh": "Batarya kapasitesi",
+      "solar_array_power_w": "Panel gücü (tam Güneş)",
+      "base_load_w": "Temel yük",
+      "first_contact_deadline_h": "İlk temas için süre sınırı",
+      "max_contact_gap_h": "En uzun izinli sessizlik"
+    },
+    "reason": {
+      "descent": {
+        "pass": "{v} m/s dikey hızla yumuşak temas; {margin} kg yakıt kaldı (arızasız: {nominal} kg).",
+        "crash": "Çarpma: yere {v} m/s dikey ve {h} m/s yatay hızla değdi; iniş takımı sınırları aşıldı.",
+        "no_contact": "Araç sınırlı iniş süresi içinde yüzeye ulaşamadı.",
+        "hard_landing": "Sert iniş: {v} m/s dikey, {h} m/s yatay; yapısal sınırların içinde.",
+        "propellant_exhausted": "Yakıt yüzeyin {altitude} m üzerinde bitti; araç yedeksiz indi.",
+        "target_miss": "Hedeften {offset} m uzağa inildi; {margin} kg yakıt kaldı."
+      },
+      "touchdown_terrain": {
+        "pass": "Temas noktasında eğim {slope}°, sınır {limit}°.",
+        "tip_over": "Devrilme: temas noktasındaki eğim {slope}°, {limit}° sınırını aşıyor.",
+        "steep_terrain_nearby": "Temas noktası güvenli ({slope}°) ama iniş alanında eğim {area}°'ye çıkıyor.",
+        "landing_area_unknown": "Temas noktası güvenli ({slope}°); iniş alanının bir kısmında eğim verisi yok.",
+        "terrain_unknown": "Temas noktası için DEM eğim verisi yok.",
+        "outside_coverage": "Temas noktası arazi verisinin kapsamı dışında."
+      },
+      "power": {
+        "pass": "Batarya görev boyunca sıfırın üstünde kaldı (en düşük {energy} Wh).",
+        "battery_depleted": "Batarya bitti: Güneş üretimi yükleri karşılayamadı.",
+        "sunlight_unknown": "Batarya ömrü, analizin belirleyemediği güneşlenme aralıklarına bağlı."
+      },
+      "communication": {
+        "pass": "Dünya ile iletişim kuralları sağlandı (en uzun boşluk {gap} sa).",
+        "first_contact_deadline": "İnişten sonraki {deadline} saat içinde Dünya görünmedi; iniş doğrulanamadı.",
+        "contact_gap": "Dünya ile {maxgap} saatten uzun süre temas kurulamadı; görev kayıp sayıldı.",
+        "earth_visibility_unknown": "İletişim, analizin belirleyemediği Dünya görünürlüğüne bağlı."
+      }
+    },
+    "events": {
+      "pdi": "Motorlu iniş başladı (PDI)",
+      "fault_activated": "Arıza başladı: {fault}",
+      "propellant_exhausted": "Yakıt bitti",
+      "contact": "Yere temas",
+      "schedule_end_airborne": "Rehberlik bitti, araç hâlâ havada",
+      "no_contact": "Yüzeye ulaşılamadı",
+      "tip_over": "Araç devrildi",
+      "battery_depleted": "Batarya bitti",
+      "first_contact_deadline": "İlk temas süresi doldu",
+      "contact_gap": "İletişim boşluğu sınırı aşıldı",
+      "window_end": "Analiz penceresinin sonu",
+      "crash": "Çarpma",
+      "nominal_plan_infeasible": "Nominal iniş planı uygulanamaz"
+    },
+    "scene": {
+      "crash": "Çarpma",
+      "tip_over": "Devrildi"
     }
   }
 }

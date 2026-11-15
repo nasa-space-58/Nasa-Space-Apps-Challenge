@@ -25,6 +25,7 @@ import Communication from "./components/Communication";
 import SpaceWeather from "./components/SpaceWeather";
 import Recommendations from "./components/Recommendations";
 import Descent from "./components/Descent";
+import MissionRun from "./components/MissionRun";
 import MissionPlanner from "./components/MissionPlanner";
 import SelfHealing from "./components/SelfHealing";
 import AssistantPanel from "./components/AssistantPanel";
@@ -909,6 +910,21 @@ export default function App() {
           },
         ]
       : []),
+    {
+      id: "mission-run",
+      group: "descent",
+      label: t("app.modules.missionRun"),
+      content: (
+        <MissionRun
+          analysisId={
+            job && (job.status === "ready" || job.status === "insufficient_data")
+              ? job.id
+              : undefined
+          }
+          onWatch={() => setLaunchKey((key) => key + 1)}
+        />
+      ),
+    },
     { id: "descent", group: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} onCandidates={setDescentCandidates} onLocation={(latitude,longitude)=>{setLat(String(latitude));setLon(String(longitude));setSiteId("custom");setResolved("");}} /> },
     {
       id: "classroom",

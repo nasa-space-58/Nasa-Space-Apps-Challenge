@@ -109,7 +109,8 @@
       "descent": "Descent",
       "classroom": "Classroom",
       "campaign": "Campaign",
-      "recovery": "Self-healing"
+      "recovery": "Self-healing",
+      "missionRun": "Simulation"
     },
     "nav": {
       "skip": "Skip to mission control",
@@ -1903,6 +1904,152 @@
       "estimate": "Sensor estimate",
       "original": "Original plan",
       "replanned": "Replanned route"
+    }
+  },
+  "missionRun": {
+    "title": "Mission simulation",
+    "intro": "The mission passes physics checks in order: powered descent, slope at the touchdown point, surface battery and Earth contact. The outcome is computed from the chosen site, date, vehicle and faults, not rolled at random.",
+    "needsAnalysis": "Complete a site and date analysis before simulating.",
+    "catalogError": "The fault catalog could not be loaded.",
+    "invalidInput": "Invalid input.",
+    "scenarioHeading": "Fault scenario",
+    "noFault": "No fault",
+    "run": "Simulate",
+    "running": "Computing…",
+    "customHeading": "Build your own fault scenario",
+    "customIntro": "Add faults with their timing. Descent faults count from powered descent initiation (PDI), surface faults from touchdown.",
+    "removeFault": "Remove fault",
+    "faultKind": "Fault type",
+    "addFault": "Add fault",
+    "namePlaceholder": "Scenario name",
+    "save": "Save",
+    "runCustom": "Simulate this scenario",
+    "edit": "Edit",
+    "delete": "Delete",
+    "vehicleHeading": "Vehicle and mission rules",
+    "customScenario": "Custom scenario",
+    "watch": "Watch in scene",
+    "altitudeChart": "Descent: altitude / time",
+    "batteryChart": "Battery energy",
+    "timeline": "Event timeline",
+    "disclaimer": "Deterministic educational simulation. Not landing-safety certification, a thermal/power qualification, a DSN booking or a link budget; power-system values are illustrative.",
+    "phase": {
+      "descent": "Descent",
+      "landing": "Landing time",
+      "surface": "Surface"
+    },
+    "outcome": {
+      "success": "Mission successful",
+      "success_with_warnings": "Successful, with warnings",
+      "failure": "Mission failed",
+      "inconclusive": "Inconclusive"
+    },
+    "status": {
+      "pass": "passed",
+      "warn": "warning",
+      "fail": "failed",
+      "unknown": "unknown",
+      "not_reached": "not reached"
+    },
+    "gates": {
+      "descent": "Powered descent",
+      "touchdown_terrain": "Touchdown terrain",
+      "power": "Surface power",
+      "communication": "Earth contact"
+    },
+    "scenarios": {
+      "nominal": "No fault",
+      "engine-thrust-loss": "Engine thrust loss",
+      "small-propellant-leak": "Small propellant leak",
+      "marginal-propellant-leak": "Marginal leak",
+      "major-propellant-leak": "Major propellant leak",
+      "engine-efficiency-loss": "Engine efficiency loss",
+      "navigation-drift": "Navigation drift",
+      "wave-off": "Wave off one orbit",
+      "battery-cell-loss": "Battery cell loss",
+      "stuck-heater": "Stuck heater",
+      "dusty-panels": "Dusty panels",
+      "transmitter-fault": "Transmitter fault",
+      "cascade": "Cascading faults"
+    },
+    "faults": {
+      "engine_thrust_loss": "Thrust loss",
+      "propellant_leak": "Propellant leak",
+      "isp_degradation": "Specific impulse loss",
+      "navigation_bias": "Navigation error",
+      "landing_delay": "Landing delay",
+      "battery_capacity_loss": "Battery capacity loss",
+      "power_load_increase": "Extra power load",
+      "solar_array_degradation": "Solar array degradation",
+      "communication_outage": "Communication outage"
+    },
+    "fields": {
+      "start_after_pdi_s": "Start after PDI",
+      "thrust_fraction": "Remaining thrust fraction",
+      "leak_rate_kg_s": "Leak rate",
+      "duration_s": "Duration",
+      "isp_fraction": "Remaining Isp fraction",
+      "offset_m": "Offset distance",
+      "bearing_deg": "Offset bearing (from north)",
+      "delay_h": "Delay",
+      "start_after_landing_h": "Start after landing",
+      "capacity_fraction_lost": "Capacity fraction lost",
+      "duration_h": "Duration",
+      "extra_load_w": "Extra load",
+      "output_fraction": "Remaining array output",
+      "battery_capacity_wh": "Battery capacity",
+      "solar_array_power_w": "Array power (full Sun)",
+      "base_load_w": "Base load",
+      "first_contact_deadline_h": "First-contact deadline",
+      "max_contact_gap_h": "Longest allowed silence"
+    },
+    "reason": {
+      "descent": {
+        "pass": "Soft contact at {v} m/s vertical; {margin} kg propellant left (fault-free: {nominal} kg).",
+        "crash": "Crash: ground contact at {v} m/s vertical and {h} m/s horizontal exceeded the landing-gear limits.",
+        "no_contact": "The vehicle did not reach the surface within the bounded descent.",
+        "hard_landing": "Hard landing: {v} m/s vertical, {h} m/s horizontal; within the structural limits.",
+        "propellant_exhausted": "Propellant ran out {altitude} m above the surface; the vehicle landed without reserve.",
+        "target_miss": "Touched down {offset} m from the target; {margin} kg propellant left."
+      },
+      "touchdown_terrain": {
+        "pass": "Slope at the touchdown point {slope}°, limit {limit}°.",
+        "tip_over": "Tip-over: the touchdown slope {slope}° exceeds the {limit}° limit.",
+        "steep_terrain_nearby": "The touchdown point is safe ({slope}°) but the landing area reaches {area}°.",
+        "landing_area_unknown": "The touchdown point is safe ({slope}°); part of the landing area has no slope data.",
+        "terrain_unknown": "The DEM has no slope at the touchdown point.",
+        "outside_coverage": "The touchdown point is outside terrain coverage."
+      },
+      "power": {
+        "pass": "The battery stayed above zero for the whole mission (minimum {energy} Wh).",
+        "battery_depleted": "Battery depleted: solar generation could not cover the loads.",
+        "sunlight_unknown": "Battery survival depends on sunlight intervals the analysis could not determine."
+      },
+      "communication": {
+        "pass": "Earth-contact rules held (longest gap {gap} h).",
+        "first_contact_deadline": "Earth was not visible within {deadline} h of touchdown; the landing could not be confirmed.",
+        "contact_gap": "No Earth contact for more than {maxgap} h; the mission is declared lost.",
+        "earth_visibility_unknown": "Contact depends on Earth visibility the analysis could not determine."
+      }
+    },
+    "events": {
+      "pdi": "Powered descent initiation (PDI)",
+      "fault_activated": "Fault started: {fault}",
+      "propellant_exhausted": "Propellant exhausted",
+      "contact": "Ground contact",
+      "schedule_end_airborne": "Guidance ended, still airborne",
+      "no_contact": "Surface not reached",
+      "tip_over": "Vehicle tipped over",
+      "battery_depleted": "Battery depleted",
+      "first_contact_deadline": "First-contact deadline passed",
+      "contact_gap": "Contact-gap limit exceeded",
+      "window_end": "End of the analysis window",
+      "crash": "Crash",
+      "nominal_plan_infeasible": "Nominal descent plan infeasible"
+    },
+    "scene": {
+      "crash": "Crash",
+      "tip_over": "Tipped over"
     }
   }
 }

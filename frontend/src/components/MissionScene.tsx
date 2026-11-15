@@ -15,6 +15,7 @@ import {
   type ThreeEvent,
 } from "@react-three/fiber";
 import * as THREE from "three";
+import type { TouchdownOutcome } from "../missionRunStore";
 import { Dust, Model, Terrain, smooth } from "./LunarSurface";
 import LaunchSite from "./LaunchSite";
 import Rover, { preloadRoverModel, type RoutePoint, type RoverState } from "./Rover";
@@ -1054,7 +1055,9 @@ function LandingSite({
   roverTarget,
   roverAlternatives,
   showHazards, showSearch, showRoutes,
+  touchdown = "landed",
 }: {
+  touchdown?: TouchdownOutcome;
   progress: MutableRefObject<number>;
   reduced: boolean;
   compact: boolean;
@@ -1088,6 +1091,9 @@ function LandingSite({
   const cameraLook = useRef<THREE.Vector3 | null>(null);
   const follow = useRef(0);
   const plume = useRef<THREE.Mesh>(null!);
+  const flash = useRef<THREE.Mesh>(null!);
+  // Seconds since touchdown, driving the crash flash and the tip-over fall.
+  const impact = useRef(0);
   const user = useOrbitInput("landing");
   const look = useMemo(() => new THREE.Vector3(), []);
   const offset = useMemo(() => new THREE.Vector3(), []);
@@ -1108,9 +1114,32 @@ function LandingSite({
     const descent = descentAt(p);
     const height = (1 - descent) * 5;
     const landerX = (1 - descent) * -1.6;
-    lander.current.position.set(landerX, height + (mapping ? mapping.ground(0, 0) : 0), 0);
-    lander.current.rotation.set(0, -0.4 + descent * 0.35, (1 - descent) * 0.12);
-    plume.current.visible = descent < 1;
+    if (descent >= 1) impact.current += reduced ? 10 : Math.min(delta, 0.05);
+    else impact.current = 0;
+    // Crash: the engine is out before contact and the vehicle buckles into the
+    // regolith. Tip-over: the lander falls onto its side after touchdown.
+    const crashed = touchdown === "crash";
+    const fall =
+      crashed
+        ? 0.6 * smooth(0, 0.35, impact.current)
+        : touchdown === "tip_over"
+          ? 1.4 * smooth(0, 1.6, impact.current) ** 2
+          : 0;
+    const sink = crashed ? 0.45 * smooth(0, 0.35, impact.current) : 0;
+    lander.current.position.set(
+      landerX,
+      height + (mapping ? mapping.ground(0, 0) : 0) - sink,
+      0,
+    );
+    lander.current.rotation.set(0, -0.4 + descent * 0.35, (1 - descent) * 0.12 + fall);
+    plume.current.visible = crashed ? descent < 0.72 : descent < 1;
+    flash.current.visible = crashed && descent >= 1 && impact.current < 1.4;
+    if (flash.current.visible) {
+      const k = impact.current / 1.4;
+      flash.current.position.set(landerX, height + 0.3, 0);
+      flash.current.scale.setScalar(0.4 + k * 3.2);
+      (flash.current.material as THREE.MeshBasicMaterial).opacity = 0.85 * (1 - k);
+    }
     plume.current.position.set(landerX, height + 0.2, 0);
     plume.current.scale.set(
       1,
@@ -1231,6 +1260,16 @@ function LandingSite({
           reach={reach}
         />
       )}
+      <mesh ref={flash} visible={false}>
+        <sphereGeometry args={[0.5, 24, 16]} />
+        <meshBasicMaterial
+          color="#ffb072"
+          transparent
+          opacity={0}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
       <mesh ref={plume} rotation={[Math.PI, 0, 0]}>
         <coneGeometry args={[0.13, 0.65, 24]} />
         <meshBasicMaterial
@@ -1341,6 +1380,8 @@ export default function MissionScene(
     showHazards?: boolean;
     showSearch?: boolean;
     showRoutes?: boolean;
+    /** How the landing close-up ends, from the latest mission run. */
+    touchdown?: TouchdownOutcome;
   },
 ) {
   const {
@@ -1357,6 +1398,7 @@ export default function MissionScene(
     roverTarget = "",
     roverAlternatives,
     showHazards = true, showSearch = true, showRoutes = true,
+    touchdown = "landed",
     flight = null,
     path,
     ...scene
@@ -1403,6 +1445,7 @@ export default function MissionScene(
           roverDrive,
           roverScan,
           roverScene,
+          touchdown,
         ]}
       />
       <ProgressEaser
@@ -1429,6 +1472,7 @@ export default function MissionScene(
             roverTarget={roverTarget}
             roverAlternatives={roverAlternatives}
             showHazards={showHazards} showSearch={showSearch} showRoutes={showRoutes}
+            touchdown={touchdown}
           />
         ) : (
           <System {...scene} view={view} progress={progress} />
