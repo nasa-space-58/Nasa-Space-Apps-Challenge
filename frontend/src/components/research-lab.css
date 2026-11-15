@@ -1,5 +1,5 @@
-.research-lab { max-width: 1200px; margin: auto; }
-.research-charts { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 1rem; margin: 1.5rem 0; }
+.research-lab { width: 100%; max-width: 1200px; margin-inline: auto; box-sizing: border-box; min-width: 0; }
+.research-charts { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,260px),1fr)); gap: 1rem; margin: 1.5rem 0; }
 .research-charts figure { margin: 0; padding: 1rem; border: 1px solid #334155; background: #0b1626; border-radius: 1rem; }
 .research-charts figcaption { color: #e2e8f0; font-weight: 700; }
 .research-charts svg { width: 100%; max-height: 320px; overflow: visible; }
