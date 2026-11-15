@@ -30,13 +30,14 @@ approach azimuth (clockwise from local north), crossrange to its right.
 import hashlib
 import json
 import math
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
 import numpy as np
 import rasterio
 from affine import Affine
-from fastapi import HTTPException
+from fastapi import HTTPException, Request
 from pydantic import BaseModel, ConfigDict, Field
 from rasterio.warp import transform
 from rasterio.windows import Window
@@ -50,7 +51,6 @@ from app.descent import (
     load_profiles,
     plan_descent,
     simulate_powered_descent,
-    terrain_height_m,
 )
 from app.fuel_optimization import DEFAULT_RESERVE_DELTA_V_MPS, reserve_propellant_kg
 from app.horizon import _validate_dataset, ray_coordinates
@@ -393,6 +393,7 @@ def run_monte_carlo(
     slope_map: LocalSlopeMap | None = None,
     *,
     physics_cache: PhysicsCache | None = None,
+    cancelled=None,
 ) -> dict:
     """Fly `request.runs` perturbed descents and aggregate success and causes.
 
@@ -401,6 +402,12 @@ def run_monte_carlo(
     Optional process-local reuse caches only identical dynamics/nominal calls;
     all terrain, reserve, touchdown and uncertainty checks still execute.
     """
+
+    def check_cancelled():
+        if cancelled is not None and cancelled():
+            raise RiskCancelled("Risk evaluation cancelled")
+
+    check_cancelled()
     profile = _vehicle(request)
     descent = DescentRequest(
         site_id=request.site_id,
@@ -443,6 +450,7 @@ def run_monte_carlo(
     margins = np.zeros(request.runs)
     causes_per_run: list[list[str]] = []
     for index, error in enumerate(errors):
+        check_cancelled()
         thrust_scale = 1 + error[0]
         perturbed = vehicle.model_copy(
             update={
@@ -464,6 +472,7 @@ def run_monte_carlo(
             MC_STEP_S,
             record=True,
         )
+        check_cancelled()
         contact = touchdown_with_terrain_error(
             run["samples"], run["final"], float(error[4]), gravity
         )
@@ -487,6 +496,7 @@ def run_monte_carlo(
         landing[index] = (contact["downrange_m"] + error[5], error[6])
         causes_per_run.append(causes)
 
+    check_cancelled()
     if slope_map is not None:
         slopes = slope_map.slopes_at(
             landing[:, 0], landing[:, 1], request.approach_azimuth_deg
@@ -621,6 +631,7 @@ def run_monte_carlo(
     }
     identity = json.dumps(result, sort_keys=True, allow_nan=False).encode()
     result["result_id"] = hashlib.sha256(identity).hexdigest()
+    check_cancelled()
     return result
 
 
@@ -692,26 +703,36 @@ def load_slope_map(
     )
 
 
-def register_risk_routes(app, data_dir: Path) -> None:
-    """POST /descents/risk: 409 without cached terrain, 422 for invalid plans."""
+def register_risk_routes(app, data_dir: Path):
+    """Register bounded POST /descents/risk and return its lifecycle owner."""
+    from app.risk_runtime import RiskBusy, RiskClosed, RiskRuntime
+
+    enabled = os.environ.get("RISK_PHYSICS_CACHE_ENABLED", "1")
+    if enabled not in ("0", "1"):
+        raise ValueError("RISK_PHYSICS_CACHE_ENABLED must be 0 or 1")
+    runtime = RiskRuntime(
+        data_dir,
+        enabled=enabled == "1",
+        max_bytes=int(
+            os.environ.get("RISK_PHYSICS_CACHE_BYTES", str(32 * 1024 * 1024))
+        ),
+        max_entries=int(os.environ.get("RISK_PHYSICS_CACHE_ENTRIES", "128")),
+    )
+    app.state.risk_runtime = runtime
 
     @app.post("/descents/risk")
-    def descent_risk(body: RiskRequest):
+    async def descent_risk(body: RiskRequest, request: Request):
         try:
-            height = terrain_height_m(
-                data_dir, body.latitude_deg, body.longitude_deg_east
-            )
-            half_width = max(
-                5 * body.uncertainty.navigation_sigma_m, MIN_SLOPE_MAP_HALF_WIDTH_M
-            )
-            slope_map = load_slope_map(
-                data_dir, body.latitude_deg, body.longitude_deg_east, half_width
-            )
+            return await runtime.evaluate(body, request)
         except FileNotFoundError as exc:
             raise HTTPException(409, str(exc)) from exc
         except (DescentError, RiskError) as exc:
             raise HTTPException(422, str(exc)) from exc
-        try:
-            return run_monte_carlo(body, height, slope_map)
-        except RiskError as exc:
-            raise HTTPException(422, str(exc)) from exc
+        except RiskBusy as exc:
+            raise HTTPException(429, str(exc)) from exc
+        except RiskClosed as exc:
+            raise HTTPException(503, str(exc)) from exc
+        except RiskCancelled as exc:
+            raise HTTPException(499, str(exc)) from exc
+
+    return runtime

@@ -433,14 +433,17 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
             if start_worker
             else []
         )
-        yield
-        unified.recover_interrupted()
-        for task in tasks:
-            task.cancel()
-            try:
-                await task
-            except asyncio.CancelledError:
-                pass
+        try:
+            yield
+        finally:
+            await asyncio.to_thread(risk_runtime.close)
+            unified.recover_interrupted()
+            for task in tasks:
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
 
     app = FastAPI(title="Lunar Landing Navigator", lifespan=lifespan)
     app.state.unified = unified
@@ -464,7 +467,7 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     register_fuel_routes(app, data_dir)
     from app.risk import register_risk_routes
 
-    register_risk_routes(app, data_dir)
+    risk_runtime = register_risk_routes(app, data_dir)
     from app.alternatives import register_alternative_routes
 
     register_alternative_routes(app, data_dir)

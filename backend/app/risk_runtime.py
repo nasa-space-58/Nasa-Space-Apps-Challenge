@@ -6,6 +6,7 @@ import json
 import os
 import threading
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from time import perf_counter
@@ -60,6 +61,8 @@ class BoundedPhysicsCache(PhysicsCache):
         self.max_bytes, self.revision = max_bytes, revision
         self._lock = threading.RLock()
         self._bytes = self._oversize = 0
+        self._capacity_bypass = 0
+        self._protected = None
 
     def _lookup(self, kind, inputs, compute):
         # One critical section makes invalidation atomic with a computation.
@@ -79,6 +82,8 @@ class BoundedPhysicsCache(PhysicsCache):
                 if self.enabled and key in self._entries:
                     stat["hits"] += 1
                     self._entries.move_to_end(key)
+                    if self._protected is not None:
+                        self._protected.add(key)
                     return json.loads(self._entries[key])
                 stat["misses"] += 1
                 mark = perf_counter()
@@ -100,10 +105,29 @@ class BoundedPhysicsCache(PhysicsCache):
                             len(self._entries) >= self.max_entries
                             or self._bytes + size > self.max_bytes
                         ):
-                            old_key, old_payload = self._entries.popitem(last=False)
+                            old_key = next(
+                                (
+                                    candidate
+                                    for candidate in self._entries
+                                    if self._protected is None
+                                    or candidate not in self._protected
+                                ),
+                                None,
+                            )
+                            if old_key is None:
+                                break
+                            old_payload = self._entries.pop(old_key)
                             self._bytes -= len(old_key) + len(old_payload)
-                        self._entries[key] = payload
-                        self._bytes += size
+                        if (
+                            len(self._entries) < self.max_entries
+                            and self._bytes + size <= self.max_bytes
+                        ):
+                            self._entries[key] = payload
+                            self._bytes += size
+                            if self._protected is not None:
+                                self._protected.add(key)
+                        else:
+                            self._capacity_bypass += 1
                     else:
                         self._oversize += 1
                 return result
@@ -117,12 +141,23 @@ class BoundedPhysicsCache(PhysicsCache):
         with self._lock:
             self._entries.clear()
             self._bytes = 0
+            if self._protected is not None:
+                self._protected.clear()
             if revision is not None:
                 self.revision = revision
 
+    @contextmanager
     def batch(self):
         """Protect reused/new entries against scan eviction within one request."""
-        raise NotImplementedError
+        with self._lock:
+            if self._protected is not None:
+                raise RuntimeError("Cache batches cannot overlap")
+            self._protected = set()
+        try:
+            yield
+        finally:
+            with self._lock:
+                self._protected = None
 
     def snapshot(self):
         """Read local cumulative counters without exposing cached trajectories."""
@@ -133,6 +168,7 @@ class BoundedPhysicsCache(PhysicsCache):
                 max_entries=self.max_entries,
                 revision=self.revision,
                 bypassed_oversize=self._oversize,
+                bypassed_capacity=self._capacity_bypass,
                 enabled=self.enabled,
             )
 
@@ -184,9 +220,10 @@ class RiskRuntime:
         slope_map = load_slope_map(
             self.data_dir, body.latitude_deg, body.longitude_deg_east, half
         )
-        result = run_monte_carlo(
-            body, height, slope_map, physics_cache=self.cache, cancelled=stop.is_set
-        )
+        with self.cache.batch():
+            result = run_monte_carlo(
+                body, height, slope_map, physics_cache=self.cache, cancelled=stop.is_set
+            )
         if stop.is_set():
             raise RiskCancelled("Risk evaluation cancelled before delivery")
         return result
