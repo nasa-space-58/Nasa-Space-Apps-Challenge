@@ -1,0 +1,20 @@
+{
+  "reference": "Apollo 11 ground elapsed times (GET) from launch",
+  "events_s": {
+    "earth_orbit_insertion": 709.9,
+    "translunar_injection": 9856.2,
+    "lunar_orbit_insertion": 272990.4,
+    "powered_descent_initiation": 369185.0,
+    "landing": 369939.9
+  },
+  "sources": {
+    "earth_orbit_insertion": "Apollo 11 Mission Report (MSC-00171), Table 3-I: earth orbit insertion 000:11:49.9",
+    "translunar_injection": "Apollo 11 Mission Report (MSC-00171), Table 3-I: translunar injection ignition 002:44:16.2",
+    "lunar_orbit_insertion": "Apollo 11 Mission Report (MSC-00171), Table 3-I: first lunar orbit insertion ignition 075:49:50.4",
+    "powered_descent_initiation": "Apollo 11 Mission Report (MSC-00171), Table 3-I: powered descent initiation 102:33:05.0",
+    "landing": "Apollo 11 Mission Report (MSC-00171), Table 3-I: lunar landing 102:45:39.9"
+  },
+  "urls": [
+    "https://www.nasa.gov/wp-content/uploads/static/apollo50th/pdf/A11_MissionReport.pdf"
+  ]
+}

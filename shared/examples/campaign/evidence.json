@@ -1,0 +1,1367 @@
+{
+  "sha256": "5430ee2239f5308681f8347d4be79b7aad6965d132477d6ccfa58ffe8e00d484",
+  "payload": {
+    "version": "h9-evidence-v1",
+    "station_id": "DSS-43",
+    "snapshots": [
+      {
+        "analysis": {
+          "id": "e430cbda-c6fb-5828-b105-f16eb6579441",
+          "status": "ready",
+          "submission": {
+            "site_id": "mons-mouton-feature-center",
+            "latitude_deg": -84.6,
+            "longitude_deg_east": 31.0,
+            "observer_height_m": 2.0,
+            "start_utc": "2026-11-04T00:00:00Z",
+            "end_utc": "2026-11-05T00:00:00Z",
+            "step_s": 3600,
+            "refine": true,
+            "horizon": {
+              "azimuth_step_deg": 1.0,
+              "search_distance_m": 100000,
+              "radial_step_m": 40,
+              "source_extent": "raw"
+            }
+          },
+          "result": {
+            "analysis": {
+              "request": {
+                "site": {
+                  "site_id": "mons-mouton-feature-center",
+                  "longitude_deg_east": 31.0,
+                  "latitude_deg": -84.6,
+                  "altitude_km": 5.0411572265625,
+                  "reference_frame": "MOON_ME"
+                },
+                "start_utc": "2026-11-04T00:00:00Z",
+                "end_utc": "2026-11-05T00:00:00Z",
+                "step_s": 3600
+              },
+              "sun": {
+                "intervals": [
+                  {
+                    "start_utc": "2026-11-04T00:00:00Z",
+                    "end_utc": "2026-11-05T00:00:00Z",
+                    "state": "dark",
+                    "duration_s": 86400.0
+                  }
+                ],
+                "metrics": {
+                  "visible_duration_s": 0,
+                  "full_duration_s": 0,
+                  "partial_duration_s": 0,
+                  "blocked_duration_s": 86400.0,
+                  "unknown_duration_s": 0,
+                  "visible_percent_of_interval": 0.0,
+                  "longest_visible_s": 0.0,
+                  "longest_blocked_s": 86400.0
+                },
+                "next_setting": {
+                  "status": "no_event_in_range"
+                }
+              },
+              "earth": {
+                "intervals": [
+                  {
+                    "start_utc": "2026-11-04T00:00:00Z",
+                    "end_utc": "2026-11-04T06:04:36.480279Z",
+                    "state": "visible",
+                    "duration_s": 21876.480279
+                  },
+                  {
+                    "start_utc": "2026-11-04T06:04:36.480279Z",
+                    "end_utc": "2026-11-05T00:00:00Z",
+                    "state": "blocked",
+                    "duration_s": 64523.519721
+                  }
+                ],
+                "metrics": {
+                  "visible_duration_s": 21876.480279,
+                  "full_duration_s": 0,
+                  "partial_duration_s": 0,
+                  "blocked_duration_s": 64523.519721,
+                  "unknown_duration_s": 0,
+                  "visible_percent_of_interval": 25.320000322916666,
+                  "longest_visible_s": 21876.480279,
+                  "longest_blocked_s": 64523.519721
+                },
+                "next_setting": {
+                  "kind": "earthset",
+                  "estimated_at_utc": "2026-11-04T06:04:36.480279Z",
+                  "bracket_start_utc": "2026-11-04T06:04:00Z",
+                  "bracket_end_utc": "2026-11-04T06:05:00Z",
+                  "bracket_width_s": 60.0,
+                  "status": "found",
+                  "time_until_estimate_s": 21876.480279,
+                  "time_until_bracket_s": [
+                    21840.0,
+                    21900.0
+                  ]
+                }
+              },
+              "provenance": {
+                "terrain_reference": "terrain/processed/9ff8f03c93ee5d3c58ef62b13ac50e042ef46affa1d106847b0ff58494544446",
+                "ephemerides": [
+                  {
+                    "reference": "horizons/f537c00d1345d14749fd3195d93770838bf8f720fbc6876279ce1e6f9cb75bd6",
+                    "sha256": {
+                      "raw/10.json": "cb398e6a891277fc057d5c5ad53da4c3f2db50cfc9dbb876e0594c400b4bf6cf",
+                      "raw/399.json": "315e882308dbd7b6a758461271503743b72638c4a8a0f5a6fe381b086d6900d6",
+                      "samples.json": "7ef2b0153fa1514de0dbc7b791964575617125a48beafe13544826f2673c1514"
+                    }
+                  },
+                  {
+                    "reference": "horizons/9df1bd962884156767ec2cd7da385d1e9fca75d31b4f9c50a1a4d896ae1efcf4",
+                    "sha256": {
+                      "raw/10.json": "a13c74e1f9939fe67c0f8ebf194c14bb94b3fbcb67b2b67fe1dad6bff3d55c03",
+                      "raw/399.json": "d2366f6e5d861dcb0a06939a37e4a6ec4e09674aee90674e4b749d6c695f453d",
+                      "samples.json": "705d97f889e7b8e587a89b261bb69862d6a04e7d52a47abf613805d52933c4ac"
+                    }
+                  },
+                  {
+                    "reference": "horizons/9e54b2e3721636aabdb70470ad8cfea8d60c491d73772b5d197660b3bb8edc3a",
+                    "sha256": {
+                      "raw/10.json": "d466d5da74d1ff3ac35db88185ee49c56e782dd432bb2cf59432807f93300ba8",
+                      "raw/399.json": "d945685df86364d4f6451bb98422028c6794f34342522f38cf8d67d7fc819c3d",
+                      "samples.json": "8a3ef759776e135f5932a02b51ab5645ce533dbde1a9b326c33c9cd7228c62cf"
+                    }
+                  }
+                ]
+              },
+              "horizon_profile_id": "407610a04a98db74e83a57be7676c9cc548e1b1db18ad7d8703131c38983ead3",
+              "horizon_quality": {
+                "terrain_model": "piecewise_constant_80m_cells",
+                "subpixel_terrain_resolved": false,
+                "azimuth_interpolation_is_approximate": true,
+                "global_horizon_verified": false
+              },
+              "model": {
+                "durations_are_estimates": true,
+                "temporal_model": "piecewise_linear_clearance",
+                "solar_disk_model": "locally_constant_terrain_horizon",
+                "earth_visibility": "geometric_center_only",
+                "eclipses_modeled": false,
+                "unseen_between_sample_events_possible": true
+              },
+              "analysis_id": "2efa84a7dde88bedc0fb39fac9dfb4ee365a240c9811f70c0dd53d4655446bc4",
+              "refinement": {
+                "status": "completed",
+                "passes": [
+                  {
+                    "step_s": 300,
+                    "windows": 1
+                  },
+                  {
+                    "step_s": 60,
+                    "windows": 1
+                  }
+                ],
+                "scope": "detected transition brackets only; not a full fine-grid search"
+              }
+            }
+          },
+          "original_result_sha256": "74bfaa7d34c86b097a1fe06b5e9c0dc8ee5a5212a53798e392b43f1f0e4b11cf"
+        },
+        "communication": {
+          "id": "e447de5d-ffa8-4212-8083-1b3e97ac0b91",
+          "created": "2026-11-14T21:05:43.513186+00:00",
+          "analysis_id": "e430cbda-c6fb-5828-b105-f16eb6579441",
+          "request": {
+            "min_elevation_deg": 6.0
+          },
+          "status": "ready",
+          "result": {
+            "analysis_id": "e430cbda-c6fb-5828-b105-f16eb6579441",
+            "min_elevation_deg": 6.0,
+            "start_utc": "2026-11-04T00:00:00Z",
+            "end_utc": "2026-11-05T00:00:00Z",
+            "stations": [
+              {
+                "station_id": "DSS-14",
+                "complex": "Goldstone",
+                "antenna": "70-m",
+                "latitude_deg": 35.425900866666666,
+                "longitude_deg_east": 243.11046178888887,
+                "height_m": 1001.39,
+                "ellipsoid": "WGS84"
+              },
+              {
+                "station_id": "DSS-43",
+                "complex": "Canberra",
+                "antenna": "70-m",
+                "latitude_deg": -35.402424233333335,
+                "longitude_deg_east": 148.98126730833334,
+                "height_m": 688.867,
+                "ellipsoid": "WGS84"
+              },
+              {
+                "station_id": "DSS-63",
+                "complex": "Madrid",
+                "antenna": "70-m",
+                "latitude_deg": 40.43120975,
+                "longitude_deg_east": 355.7519914555556,
+                "height_m": 864.816,
+                "ellipsoid": "WGS84"
+              }
+            ],
+            "windows": {
+              "stations": {
+                "DSS-14": {
+                  "intervals": [
+                    {
+                      "start_utc": "2026-11-04T00:00:00Z",
+                      "end_utc": "2026-11-05T00:00:00Z",
+                      "state": "unavailable",
+                      "duration_s": 86400.0
+                    }
+                  ],
+                  "metrics": {
+                    "available_duration_s": 0.0,
+                    "unavailable_duration_s": 86400.0,
+                    "unknown_duration_s": 0.0,
+                    "available_percent_of_interval": 0.0,
+                    "longest_available_s": 0.0,
+                    "window_count": 0
+                  }
+                },
+                "DSS-43": {
+                  "intervals": [
+                    {
+                      "start_utc": "2026-11-04T00:00:00Z",
+                      "end_utc": "2026-11-04T03:02:54.957753Z",
+                      "state": "available",
+                      "duration_s": 10974.957753
+                    },
+                    {
+                      "start_utc": "2026-11-04T03:02:54.957753Z",
+                      "end_utc": "2026-11-05T00:00:00Z",
+                      "state": "unavailable",
+                      "duration_s": 75425.042247
+                    }
+                  ],
+                  "metrics": {
+                    "available_duration_s": 10974.957753,
+                    "unavailable_duration_s": 75425.042247,
+                    "unknown_duration_s": 0.0,
+                    "available_percent_of_interval": 12.702497399305557,
+                    "longest_available_s": 10974.957753,
+                    "window_count": 1
+                  }
+                },
+                "DSS-63": {
+                  "intervals": [
+                    {
+                      "start_utc": "2026-11-04T00:00:00Z",
+                      "end_utc": "2026-11-04T02:21:42.481092Z",
+                      "state": "unavailable",
+                      "duration_s": 8502.481092
+                    },
+                    {
+                      "start_utc": "2026-11-04T02:21:42.481092Z",
+                      "end_utc": "2026-11-04T06:04:36.480279Z",
+                      "state": "available",
+                      "duration_s": 13373.999187
+                    },
+                    {
+                      "start_utc": "2026-11-04T06:04:36.480279Z",
+                      "end_utc": "2026-11-05T00:00:00Z",
+                      "state": "unavailable",
+                      "duration_s": 64523.519721
+                    }
+                  ],
+                  "metrics": {
+                    "available_duration_s": 13373.999187,
+                    "unavailable_duration_s": 73026.00081299999,
+                    "unknown_duration_s": 0.0,
+                    "available_percent_of_interval": 15.479165725694445,
+                    "longest_available_s": 13373.999187,
+                    "window_count": 1
+                  }
+                }
+              },
+              "combined": {
+                "intervals": [
+                  {
+                    "start_utc": "2026-11-04T00:00:00Z",
+                    "end_utc": "2026-11-04T02:21:42.481092Z",
+                    "state": "available",
+                    "duration_s": 8502.481092,
+                    "station_ids": [
+                      "DSS-43"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-04T02:21:42.481092Z",
+                    "end_utc": "2026-11-04T03:02:54.957753Z",
+                    "state": "available",
+                    "duration_s": 2472.476661,
+                    "station_ids": [
+                      "DSS-43",
+                      "DSS-63"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-04T03:02:54.957753Z",
+                    "end_utc": "2026-11-04T06:04:36.480279Z",
+                    "state": "available",
+                    "duration_s": 10901.522526,
+                    "station_ids": [
+                      "DSS-63"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-04T06:04:36.480279Z",
+                    "end_utc": "2026-11-05T00:00:00Z",
+                    "state": "unavailable",
+                    "duration_s": 64523.519721,
+                    "station_ids": []
+                  }
+                ],
+                "metrics": {
+                  "available_duration_s": 21876.480279000003,
+                  "unavailable_duration_s": 64523.519721,
+                  "unknown_duration_s": 0.0,
+                  "available_percent_of_interval": 25.320000322916666,
+                  "longest_available_s": 21876.480279000003,
+                  "window_count": 1
+                }
+              }
+            },
+            "source": {
+              "station_document": "DSN Telecommunications Link Design Handbook 810-005, module 301 Coverage and Geometry, Rev. P",
+              "station_url": "https://deepspace.jpl.nasa.gov/dsndocs/810-005/301/301P.pdf",
+              "ephemeris": "NASA/JPL Horizons API, Moon (301) from coord@399, airless",
+              "dsn_path": "dsn/ff687dfe74fe38b9c663f68003e298a192b92d621be66dc0486270c7c2048baf",
+              "sample_step_s": 300,
+              "interpolation": "Linear in elevation between station samples"
+            },
+            "limitations": [
+              "Geometric line of sight only; not a guaranteed radio link.",
+              "Generic DSN elevation limit; station-specific horizon masks are not applied.",
+              "Antenna keyhole, station scheduling, availability and link budget are not modeled.",
+              "Earth visibility refers to the Earth center above the local terrain horizon."
+            ]
+          },
+          "error": null
+        }
+      },
+      {
+        "analysis": {
+          "id": "c817a988-79c8-4cfe-9a19-71b5a9424838",
+          "status": "ready",
+          "submission": {
+            "site_id": "custom",
+            "latitude_deg": -84.40115,
+            "longitude_deg_east": 21.95459,
+            "observer_height_m": 2.0,
+            "start_utc": "2026-11-04T00:00:00Z",
+            "end_utc": "2026-11-05T00:00:00Z",
+            "step_s": 3600,
+            "refine": true,
+            "horizon": {
+              "azimuth_step_deg": 1.0,
+              "search_distance_m": 100000,
+              "radial_step_m": 40,
+              "source_extent": "raw"
+            }
+          },
+          "result": {
+            "analysis": {
+              "request": {
+                "site": {
+                  "site_id": "custom",
+                  "longitude_deg_east": 21.95459,
+                  "latitude_deg": -84.40115,
+                  "altitude_km": 3.817825439453125,
+                  "reference_frame": "MOON_ME"
+                },
+                "start_utc": "2026-11-04T00:00:00Z",
+                "end_utc": "2026-11-05T00:00:00Z",
+                "step_s": 3600
+              },
+              "sun": {
+                "intervals": [
+                  {
+                    "start_utc": "2026-11-04T00:00:00Z",
+                    "end_utc": "2026-11-05T00:00:00Z",
+                    "state": "dark",
+                    "duration_s": 86400.0
+                  }
+                ],
+                "metrics": {
+                  "visible_duration_s": 0,
+                  "full_duration_s": 0,
+                  "partial_duration_s": 0,
+                  "blocked_duration_s": 86400.0,
+                  "unknown_duration_s": 0,
+                  "visible_percent_of_interval": 0.0,
+                  "longest_visible_s": 0.0,
+                  "longest_blocked_s": 86400.0
+                },
+                "next_setting": {
+                  "status": "no_event_in_range"
+                }
+              },
+              "earth": {
+                "intervals": [
+                  {
+                    "start_utc": "2026-11-04T00:00:00Z",
+                    "end_utc": "2026-11-05T00:00:00Z",
+                    "state": "visible",
+                    "duration_s": 86400.0
+                  }
+                ],
+                "metrics": {
+                  "visible_duration_s": 86400.0,
+                  "full_duration_s": 0,
+                  "partial_duration_s": 0,
+                  "blocked_duration_s": 0,
+                  "unknown_duration_s": 0,
+                  "visible_percent_of_interval": 100.0,
+                  "longest_visible_s": 86400.0,
+                  "longest_blocked_s": 0.0
+                },
+                "next_setting": {
+                  "status": "no_event_in_range"
+                }
+              },
+              "provenance": {
+                "terrain_reference": "terrain/processed/cfd5a63916e060a1a3a86d32f53e92372d014670c1e984b5dadd2fefa3dc151d",
+                "ephemerides": [
+                  {
+                    "reference": "horizons/cdd3ce63f8fe89ba86658a4909cecbc3373912046e496b7223822e08d60fc08f",
+                    "sha256": {
+                      "raw/10.json": "e3e2646c962f23014412e6679d3d2ff28ad8bfd428a6d51fb99ceaf70638c4b7",
+                      "raw/399.json": "8c7e117abb9d14934815f6c333add90dab6860297b090ec453b404b8bbec2c9f",
+                      "samples.json": "e724aec8b86bd270ed4f11cbd3966ec429a61081611cd68527cc75c11379e411"
+                    }
+                  }
+                ]
+              },
+              "horizon_profile_id": "1ca992b41f6e77f9ec4091451d316faf2a04b40760b575a4d82e4b70ebd9501a",
+              "horizon_quality": {
+                "terrain_model": "piecewise_constant_80m_cells",
+                "subpixel_terrain_resolved": false,
+                "azimuth_interpolation_is_approximate": true,
+                "global_horizon_verified": false
+              },
+              "model": {
+                "durations_are_estimates": true,
+                "temporal_model": "piecewise_linear_clearance",
+                "solar_disk_model": "locally_constant_terrain_horizon",
+                "earth_visibility": "geometric_center_only",
+                "eclipses_modeled": false,
+                "unseen_between_sample_events_possible": true
+              },
+              "analysis_id": "077fa405e9b5f4ba1fe707d774761a1ddf69262eb7b8765e249c1affec36c245",
+              "refinement": {
+                "status": "completed",
+                "passes": [
+                  {
+                    "step_s": 300,
+                    "windows": 0
+                  },
+                  {
+                    "step_s": 60,
+                    "windows": 0
+                  }
+                ],
+                "scope": "detected transition brackets only; not a full fine-grid search"
+              }
+            }
+          },
+          "original_result_sha256": "761aa6a8c741e71ec8ee0c4858cf14c9c33ec67d34815586d5f0d62c85db9739"
+        },
+        "communication": {
+          "id": "a4a9e50f-12f5-4e4b-91b7-2d9a2ea8cc6b",
+          "created": "2026-11-14T21:05:43.521236+00:00",
+          "analysis_id": "c817a988-79c8-4cfe-9a19-71b5a9424838",
+          "request": {
+            "min_elevation_deg": 6.0
+          },
+          "status": "ready",
+          "result": {
+            "analysis_id": "c817a988-79c8-4cfe-9a19-71b5a9424838",
+            "min_elevation_deg": 6.0,
+            "start_utc": "2026-11-04T00:00:00Z",
+            "end_utc": "2026-11-05T00:00:00Z",
+            "stations": [
+              {
+                "station_id": "DSS-14",
+                "complex": "Goldstone",
+                "antenna": "70-m",
+                "latitude_deg": 35.425900866666666,
+                "longitude_deg_east": 243.11046178888887,
+                "height_m": 1001.39,
+                "ellipsoid": "WGS84"
+              },
+              {
+                "station_id": "DSS-43",
+                "complex": "Canberra",
+                "antenna": "70-m",
+                "latitude_deg": -35.402424233333335,
+                "longitude_deg_east": 148.98126730833334,
+                "height_m": 688.867,
+                "ellipsoid": "WGS84"
+              },
+              {
+                "station_id": "DSS-63",
+                "complex": "Madrid",
+                "antenna": "70-m",
+                "latitude_deg": 40.43120975,
+                "longitude_deg_east": 355.7519914555556,
+                "height_m": 864.816,
+                "ellipsoid": "WGS84"
+              }
+            ],
+            "windows": {
+              "stations": {
+                "DSS-14": {
+                  "intervals": [
+                    {
+                      "start_utc": "2026-11-04T00:00:00Z",
+                      "end_utc": "2026-11-04T10:13:42.240027Z",
+                      "state": "unavailable",
+                      "duration_s": 36822.240027
+                    },
+                    {
+                      "start_utc": "2026-11-04T10:13:42.240027Z",
+                      "end_utc": "2026-11-04T21:44:44.791458Z",
+                      "state": "available",
+                      "duration_s": 41462.551431
+                    },
+                    {
+                      "start_utc": "2026-11-04T21:44:44.791458Z",
+                      "end_utc": "2026-11-05T00:00:00Z",
+                      "state": "unavailable",
+                      "duration_s": 8115.208542
+                    }
+                  ],
+                  "metrics": {
+                    "available_duration_s": 41462.551431,
+                    "unavailable_duration_s": 44937.448569,
+                    "unknown_duration_s": 0.0,
+                    "available_percent_of_interval": 47.98906415625,
+                    "longest_available_s": 41462.551431,
+                    "window_count": 1
+                  }
+                },
+                "DSS-43": {
+                  "intervals": [
+                    {
+                      "start_utc": "2026-11-04T00:00:00Z",
+                      "end_utc": "2026-11-04T03:02:54.957753Z",
+                      "state": "available",
+                      "duration_s": 10974.957753
+                    },
+                    {
+                      "start_utc": "2026-11-04T03:02:54.957753Z",
+                      "end_utc": "2026-11-04T17:04:43.545962Z",
+                      "state": "unavailable",
+                      "duration_s": 50508.588209
+                    },
+                    {
+                      "start_utc": "2026-11-04T17:04:43.545962Z",
+                      "end_utc": "2026-11-05T00:00:00Z",
+                      "state": "available",
+                      "duration_s": 24916.454038
+                    }
+                  ],
+                  "metrics": {
+                    "available_duration_s": 35891.411791,
+                    "unavailable_duration_s": 50508.588209,
+                    "unknown_duration_s": 0.0,
+                    "available_percent_of_interval": 41.54098586921296,
+                    "longest_available_s": 24916.454038,
+                    "window_count": 2
+                  }
+                },
+                "DSS-63": {
+                  "intervals": [
+                    {
+                      "start_utc": "2026-11-04T00:00:00Z",
+                      "end_utc": "2026-11-04T02:21:42.481092Z",
+                      "state": "unavailable",
+                      "duration_s": 8502.481092
+                    },
+                    {
+                      "start_utc": "2026-11-04T02:21:42.481092Z",
+                      "end_utc": "2026-11-04T14:05:42.327426Z",
+                      "state": "available",
+                      "duration_s": 42239.846334
+                    },
+                    {
+                      "start_utc": "2026-11-04T14:05:42.327426Z",
+                      "end_utc": "2026-11-05T00:00:00Z",
+                      "state": "unavailable",
+                      "duration_s": 35657.672574
+                    }
+                  ],
+                  "metrics": {
+                    "available_duration_s": 42239.846334,
+                    "unavailable_duration_s": 44160.153666,
+                    "unknown_duration_s": 0.0,
+                    "available_percent_of_interval": 48.88871103472223,
+                    "longest_available_s": 42239.846334,
+                    "window_count": 1
+                  }
+                }
+              },
+              "combined": {
+                "intervals": [
+                  {
+                    "start_utc": "2026-11-04T00:00:00Z",
+                    "end_utc": "2026-11-04T02:21:42.481092Z",
+                    "state": "available",
+                    "duration_s": 8502.481092,
+                    "station_ids": [
+                      "DSS-43"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-04T02:21:42.481092Z",
+                    "end_utc": "2026-11-04T03:02:54.957753Z",
+                    "state": "available",
+                    "duration_s": 2472.476661,
+                    "station_ids": [
+                      "DSS-43",
+                      "DSS-63"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-04T03:02:54.957753Z",
+                    "end_utc": "2026-11-04T10:13:42.240027Z",
+                    "state": "available",
+                    "duration_s": 25847.282274,
+                    "station_ids": [
+                      "DSS-63"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-04T10:13:42.240027Z",
+                    "end_utc": "2026-11-04T14:05:42.327426Z",
+                    "state": "available",
+                    "duration_s": 13920.087399,
+                    "station_ids": [
+                      "DSS-14",
+                      "DSS-63"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-04T14:05:42.327426Z",
+                    "end_utc": "2026-11-04T17:04:43.545962Z",
+                    "state": "available",
+                    "duration_s": 10741.218536,
+                    "station_ids": [
+                      "DSS-14"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-04T17:04:43.545962Z",
+                    "end_utc": "2026-11-04T21:44:44.791458Z",
+                    "state": "available",
+                    "duration_s": 16801.245496,
+                    "station_ids": [
+                      "DSS-14",
+                      "DSS-43"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-04T21:44:44.791458Z",
+                    "end_utc": "2026-11-05T00:00:00Z",
+                    "state": "available",
+                    "duration_s": 8115.208542,
+                    "station_ids": [
+                      "DSS-43"
+                    ]
+                  }
+                ],
+                "metrics": {
+                  "available_duration_s": 86400.0,
+                  "unavailable_duration_s": 0.0,
+                  "unknown_duration_s": 0.0,
+                  "available_percent_of_interval": 100.0,
+                  "longest_available_s": 86400.0,
+                  "window_count": 1
+                }
+              }
+            },
+            "source": {
+              "station_document": "DSN Telecommunications Link Design Handbook 810-005, module 301 Coverage and Geometry, Rev. P",
+              "station_url": "https://deepspace.jpl.nasa.gov/dsndocs/810-005/301/301P.pdf",
+              "ephemeris": "NASA/JPL Horizons API, Moon (301) from coord@399, airless",
+              "dsn_path": "dsn/ff687dfe74fe38b9c663f68003e298a192b92d621be66dc0486270c7c2048baf",
+              "sample_step_s": 300,
+              "interpolation": "Linear in elevation between station samples"
+            },
+            "limitations": [
+              "Geometric line of sight only; not a guaranteed radio link.",
+              "Generic DSN elevation limit; station-specific horizon masks are not applied.",
+              "Antenna keyhole, station scheduling, availability and link budget are not modeled.",
+              "Earth visibility refers to the Earth center above the local terrain horizon."
+            ]
+          },
+          "error": null
+        }
+      },
+      {
+        "analysis": {
+          "id": "9481b76b-7332-4403-9844-d04779fb02c3",
+          "status": "ready",
+          "submission": {
+            "site_id": "mons-mouton-feature-center",
+            "latitude_deg": -84.6,
+            "longitude_deg_east": 31.0,
+            "observer_height_m": 2.0,
+            "start_utc": "2026-11-05T00:00:00Z",
+            "end_utc": "2026-11-06T00:00:00Z",
+            "step_s": 3600,
+            "refine": true,
+            "horizon": {
+              "azimuth_step_deg": 1.0,
+              "search_distance_m": 100000,
+              "radial_step_m": 40,
+              "source_extent": "raw"
+            }
+          },
+          "result": {
+            "analysis": {
+              "request": {
+                "site": {
+                  "site_id": "mons-mouton-feature-center",
+                  "longitude_deg_east": 31.0,
+                  "latitude_deg": -84.6,
+                  "altitude_km": 5.0411572265625,
+                  "reference_frame": "MOON_ME"
+                },
+                "start_utc": "2026-11-05T00:00:00Z",
+                "end_utc": "2026-11-06T00:00:00Z",
+                "step_s": 3600
+              },
+              "sun": {
+                "intervals": [
+                  {
+                    "start_utc": "2026-11-05T00:00:00Z",
+                    "end_utc": "2026-11-06T00:00:00Z",
+                    "state": "dark",
+                    "duration_s": 86400.0
+                  }
+                ],
+                "metrics": {
+                  "visible_duration_s": 0,
+                  "full_duration_s": 0,
+                  "partial_duration_s": 0,
+                  "blocked_duration_s": 86400.0,
+                  "unknown_duration_s": 0,
+                  "visible_percent_of_interval": 0.0,
+                  "longest_visible_s": 0.0,
+                  "longest_blocked_s": 86400.0
+                },
+                "next_setting": {
+                  "status": "no_event_in_range"
+                }
+              },
+              "earth": {
+                "intervals": [
+                  {
+                    "start_utc": "2026-11-05T00:00:00Z",
+                    "end_utc": "2026-11-06T00:00:00Z",
+                    "state": "blocked",
+                    "duration_s": 86400.0
+                  }
+                ],
+                "metrics": {
+                  "visible_duration_s": 0,
+                  "full_duration_s": 0,
+                  "partial_duration_s": 0,
+                  "blocked_duration_s": 86400.0,
+                  "unknown_duration_s": 0,
+                  "visible_percent_of_interval": 0.0,
+                  "longest_visible_s": 0.0,
+                  "longest_blocked_s": 86400.0
+                },
+                "next_setting": {
+                  "status": "no_event_in_range"
+                }
+              },
+              "provenance": {
+                "terrain_reference": "terrain/processed/9ff8f03c93ee5d3c58ef62b13ac50e042ef46affa1d106847b0ff58494544446",
+                "ephemerides": [
+                  {
+                    "reference": "horizons/b2806ec25120561a2b51f5f3933c603835b6b388426803e775eaffbf2ef9f3c9",
+                    "sha256": {
+                      "raw/10.json": "1bfeb6525e3d30d98262437b6b2bcc03937a543a2623723f84afc63854472f2c",
+                      "raw/399.json": "4a11906e42a8524a08c1cf138c90d2acb8b4edd7c24ac381fff40a012fde3ad0",
+                      "samples.json": "aff4fb9fad2b8307276e798ad8cc2c9a7e22c9297bbdf08154a6945b3341675b"
+                    }
+                  }
+                ]
+              },
+              "horizon_profile_id": "407610a04a98db74e83a57be7676c9cc548e1b1db18ad7d8703131c38983ead3",
+              "horizon_quality": {
+                "terrain_model": "piecewise_constant_80m_cells",
+                "subpixel_terrain_resolved": false,
+                "azimuth_interpolation_is_approximate": true,
+                "global_horizon_verified": false
+              },
+              "model": {
+                "durations_are_estimates": true,
+                "temporal_model": "piecewise_linear_clearance",
+                "solar_disk_model": "locally_constant_terrain_horizon",
+                "earth_visibility": "geometric_center_only",
+                "eclipses_modeled": false,
+                "unseen_between_sample_events_possible": true
+              },
+              "analysis_id": "7362d99320a52c0e185ca8becf1ff862ff16eb065ccf6760ac7b2bc4dbaa5578",
+              "refinement": {
+                "status": "completed",
+                "passes": [
+                  {
+                    "step_s": 300,
+                    "windows": 0
+                  },
+                  {
+                    "step_s": 60,
+                    "windows": 0
+                  }
+                ],
+                "scope": "detected transition brackets only; not a full fine-grid search"
+              }
+            }
+          },
+          "original_result_sha256": "44419d048a080e48390d6f4932693c5d90997b0ad9845d1b6e593b85d69a0807"
+        },
+        "communication": {
+          "id": "b44e7e76-74ed-4656-b690-4de800c86b7f",
+          "created": "2026-11-14T21:07:49.915602+00:00",
+          "analysis_id": "9481b76b-7332-4403-9844-d04779fb02c3",
+          "request": {
+            "min_elevation_deg": 6.0
+          },
+          "status": "ready",
+          "result": {
+            "analysis_id": "9481b76b-7332-4403-9844-d04779fb02c3",
+            "min_elevation_deg": 6.0,
+            "start_utc": "2026-11-05T00:00:00Z",
+            "end_utc": "2026-11-06T00:00:00Z",
+            "stations": [
+              {
+                "station_id": "DSS-14",
+                "complex": "Goldstone",
+                "antenna": "70-m",
+                "latitude_deg": 35.425900866666666,
+                "longitude_deg_east": 243.11046178888887,
+                "height_m": 1001.39,
+                "ellipsoid": "WGS84"
+              },
+              {
+                "station_id": "DSS-43",
+                "complex": "Canberra",
+                "antenna": "70-m",
+                "latitude_deg": -35.402424233333335,
+                "longitude_deg_east": 148.98126730833334,
+                "height_m": 688.867,
+                "ellipsoid": "WGS84"
+              },
+              {
+                "station_id": "DSS-63",
+                "complex": "Madrid",
+                "antenna": "70-m",
+                "latitude_deg": 40.43120975,
+                "longitude_deg_east": 355.7519914555556,
+                "height_m": 864.816,
+                "ellipsoid": "WGS84"
+              }
+            ],
+            "windows": {
+              "stations": {
+                "DSS-14": {
+                  "intervals": [
+                    {
+                      "start_utc": "2026-11-05T00:00:00Z",
+                      "end_utc": "2026-11-06T00:00:00Z",
+                      "state": "unavailable",
+                      "duration_s": 86400.0
+                    }
+                  ],
+                  "metrics": {
+                    "available_duration_s": 0.0,
+                    "unavailable_duration_s": 86400.0,
+                    "unknown_duration_s": 0.0,
+                    "available_percent_of_interval": 0.0,
+                    "longest_available_s": 0.0,
+                    "window_count": 0
+                  }
+                },
+                "DSS-43": {
+                  "intervals": [
+                    {
+                      "start_utc": "2026-11-05T00:00:00Z",
+                      "end_utc": "2026-11-06T00:00:00Z",
+                      "state": "unavailable",
+                      "duration_s": 86400.0
+                    }
+                  ],
+                  "metrics": {
+                    "available_duration_s": 0.0,
+                    "unavailable_duration_s": 86400.0,
+                    "unknown_duration_s": 0.0,
+                    "available_percent_of_interval": 0.0,
+                    "longest_available_s": 0.0,
+                    "window_count": 0
+                  }
+                },
+                "DSS-63": {
+                  "intervals": [
+                    {
+                      "start_utc": "2026-11-05T00:00:00Z",
+                      "end_utc": "2026-11-06T00:00:00Z",
+                      "state": "unavailable",
+                      "duration_s": 86400.0
+                    }
+                  ],
+                  "metrics": {
+                    "available_duration_s": 0.0,
+                    "unavailable_duration_s": 86400.0,
+                    "unknown_duration_s": 0.0,
+                    "available_percent_of_interval": 0.0,
+                    "longest_available_s": 0.0,
+                    "window_count": 0
+                  }
+                }
+              },
+              "combined": {
+                "intervals": [
+                  {
+                    "start_utc": "2026-11-05T00:00:00Z",
+                    "end_utc": "2026-11-06T00:00:00Z",
+                    "state": "unavailable",
+                    "duration_s": 86400.0,
+                    "station_ids": []
+                  }
+                ],
+                "metrics": {
+                  "available_duration_s": 0.0,
+                  "unavailable_duration_s": 86400.0,
+                  "unknown_duration_s": 0.0,
+                  "available_percent_of_interval": 0.0,
+                  "longest_available_s": 0.0,
+                  "window_count": 0
+                }
+              }
+            },
+            "source": {
+              "station_document": "DSN Telecommunications Link Design Handbook 810-005, module 301 Coverage and Geometry, Rev. P",
+              "station_url": "https://deepspace.jpl.nasa.gov/dsndocs/810-005/301/301P.pdf",
+              "ephemeris": "NASA/JPL Horizons API, Moon (301) from coord@399, airless",
+              "dsn_path": "dsn/fa3d7436d6f99b4809787703598e13427b864b8255c528a18a2b51f6e6027603",
+              "sample_step_s": 300,
+              "interpolation": "Linear in elevation between station samples"
+            },
+            "limitations": [
+              "Geometric line of sight only; not a guaranteed radio link.",
+              "Generic DSN elevation limit; station-specific horizon masks are not applied.",
+              "Antenna keyhole, station scheduling, availability and link budget are not modeled.",
+              "Earth visibility refers to the Earth center above the local terrain horizon."
+            ]
+          },
+          "error": null
+        }
+      },
+      {
+        "analysis": {
+          "id": "429b549c-07b4-48f3-b087-c918edc1c315",
+          "status": "ready",
+          "submission": {
+            "site_id": "custom",
+            "latitude_deg": -84.40115,
+            "longitude_deg_east": 21.95459,
+            "observer_height_m": 2.0,
+            "start_utc": "2026-11-05T00:00:00Z",
+            "end_utc": "2026-11-06T00:00:00Z",
+            "step_s": 3600,
+            "refine": true,
+            "horizon": {
+              "azimuth_step_deg": 1.0,
+              "search_distance_m": 100000,
+              "radial_step_m": 40,
+              "source_extent": "raw"
+            }
+          },
+          "result": {
+            "analysis": {
+              "request": {
+                "site": {
+                  "site_id": "custom",
+                  "longitude_deg_east": 21.95459,
+                  "latitude_deg": -84.40115,
+                  "altitude_km": 3.817825439453125,
+                  "reference_frame": "MOON_ME"
+                },
+                "start_utc": "2026-11-05T00:00:00Z",
+                "end_utc": "2026-11-06T00:00:00Z",
+                "step_s": 3600
+              },
+              "sun": {
+                "intervals": [
+                  {
+                    "start_utc": "2026-11-05T00:00:00Z",
+                    "end_utc": "2026-11-06T00:00:00Z",
+                    "state": "dark",
+                    "duration_s": 86400.0
+                  }
+                ],
+                "metrics": {
+                  "visible_duration_s": 0,
+                  "full_duration_s": 0,
+                  "partial_duration_s": 0,
+                  "blocked_duration_s": 86400.0,
+                  "unknown_duration_s": 0,
+                  "visible_percent_of_interval": 0.0,
+                  "longest_visible_s": 0.0,
+                  "longest_blocked_s": 86400.0
+                },
+                "next_setting": {
+                  "status": "no_event_in_range"
+                }
+              },
+              "earth": {
+                "intervals": [
+                  {
+                    "start_utc": "2026-11-05T00:00:00Z",
+                    "end_utc": "2026-11-06T00:00:00Z",
+                    "state": "visible",
+                    "duration_s": 86400.0
+                  }
+                ],
+                "metrics": {
+                  "visible_duration_s": 86400.0,
+                  "full_duration_s": 0,
+                  "partial_duration_s": 0,
+                  "blocked_duration_s": 0,
+                  "unknown_duration_s": 0,
+                  "visible_percent_of_interval": 100.0,
+                  "longest_visible_s": 86400.0,
+                  "longest_blocked_s": 0.0
+                },
+                "next_setting": {
+                  "status": "no_event_in_range"
+                }
+              },
+              "provenance": {
+                "terrain_reference": "terrain/processed/cfd5a63916e060a1a3a86d32f53e92372d014670c1e984b5dadd2fefa3dc151d",
+                "ephemerides": [
+                  {
+                    "reference": "horizons/96485ed68a7abbd5c2a0fdfd0273d8069a5f259c66182a504c1a033a1ad7300a",
+                    "sha256": {
+                      "raw/10.json": "976df25ad101f93b8d9b4553afac4318518ce95070ea0f95ea3c6a26051ab9ab",
+                      "raw/399.json": "547ea5f53d1dda3d85954197eb56470bdcd3819c60655ad8b602530810f72743",
+                      "samples.json": "f0cc8c01f45b0d6af7aeb39edd5ec46642a465d5c2cfe3670e53c074152f6c10"
+                    }
+                  }
+                ]
+              },
+              "horizon_profile_id": "1ca992b41f6e77f9ec4091451d316faf2a04b40760b575a4d82e4b70ebd9501a",
+              "horizon_quality": {
+                "terrain_model": "piecewise_constant_80m_cells",
+                "subpixel_terrain_resolved": false,
+                "azimuth_interpolation_is_approximate": true,
+                "global_horizon_verified": false
+              },
+              "model": {
+                "durations_are_estimates": true,
+                "temporal_model": "piecewise_linear_clearance",
+                "solar_disk_model": "locally_constant_terrain_horizon",
+                "earth_visibility": "geometric_center_only",
+                "eclipses_modeled": false,
+                "unseen_between_sample_events_possible": true
+              },
+              "analysis_id": "266baf0b3123ab38674db93f06e167db73a555aef1656dba026c00baaea9e1d0",
+              "refinement": {
+                "status": "completed",
+                "passes": [
+                  {
+                    "step_s": 300,
+                    "windows": 0
+                  },
+                  {
+                    "step_s": 60,
+                    "windows": 0
+                  }
+                ],
+                "scope": "detected transition brackets only; not a full fine-grid search"
+              }
+            }
+          },
+          "original_result_sha256": "74e84e25aa834357abd3336e7944ce528dbfafcf47370645915920b0dd66d4bd"
+        },
+        "communication": {
+          "id": "c526447c-9382-4e08-b5c3-77e59a62c745",
+          "created": "2026-11-14T21:07:49.923864+00:00",
+          "analysis_id": "429b549c-07b4-48f3-b087-c918edc1c315",
+          "request": {
+            "min_elevation_deg": 6.0
+          },
+          "status": "ready",
+          "result": {
+            "analysis_id": "429b549c-07b4-48f3-b087-c918edc1c315",
+            "min_elevation_deg": 6.0,
+            "start_utc": "2026-11-05T00:00:00Z",
+            "end_utc": "2026-11-06T00:00:00Z",
+            "stations": [
+              {
+                "station_id": "DSS-14",
+                "complex": "Goldstone",
+                "antenna": "70-m",
+                "latitude_deg": 35.425900866666666,
+                "longitude_deg_east": 243.11046178888887,
+                "height_m": 1001.39,
+                "ellipsoid": "WGS84"
+              },
+              {
+                "station_id": "DSS-43",
+                "complex": "Canberra",
+                "antenna": "70-m",
+                "latitude_deg": -35.402424233333335,
+                "longitude_deg_east": 148.98126730833334,
+                "height_m": 688.867,
+                "ellipsoid": "WGS84"
+              },
+              {
+                "station_id": "DSS-63",
+                "complex": "Madrid",
+                "antenna": "70-m",
+                "latitude_deg": 40.43120975,
+                "longitude_deg_east": 355.7519914555556,
+                "height_m": 864.816,
+                "ellipsoid": "WGS84"
+              }
+            ],
+            "windows": {
+              "stations": {
+                "DSS-14": {
+                  "intervals": [
+                    {
+                      "start_utc": "2026-11-05T00:00:00Z",
+                      "end_utc": "2026-11-05T11:16:49.521914Z",
+                      "state": "unavailable",
+                      "duration_s": 40609.521914
+                    },
+                    {
+                      "start_utc": "2026-11-05T11:16:49.521914Z",
+                      "end_utc": "2026-11-05T22:10:05.273767Z",
+                      "state": "available",
+                      "duration_s": 39195.751853
+                    },
+                    {
+                      "start_utc": "2026-11-05T22:10:05.273767Z",
+                      "end_utc": "2026-11-06T00:00:00Z",
+                      "state": "unavailable",
+                      "duration_s": 6594.726233
+                    }
+                  ],
+                  "metrics": {
+                    "available_duration_s": 39195.751853,
+                    "unavailable_duration_s": 47204.248147,
+                    "unknown_duration_s": 0.0,
+                    "available_percent_of_interval": 45.36545353356482,
+                    "longest_available_s": 39195.751853,
+                    "window_count": 1
+                  }
+                },
+                "DSS-43": {
+                  "intervals": [
+                    {
+                      "start_utc": "2026-11-05T00:00:00Z",
+                      "end_utc": "2026-11-05T04:07:06.213609Z",
+                      "state": "available",
+                      "duration_s": 14826.213609
+                    },
+                    {
+                      "start_utc": "2026-11-05T04:07:06.213609Z",
+                      "end_utc": "2026-11-05T17:30:12.219240Z",
+                      "state": "unavailable",
+                      "duration_s": 48186.005631
+                    },
+                    {
+                      "start_utc": "2026-11-05T17:30:12.219240Z",
+                      "end_utc": "2026-11-06T00:00:00Z",
+                      "state": "available",
+                      "duration_s": 23387.78076
+                    }
+                  ],
+                  "metrics": {
+                    "available_duration_s": 38213.994369,
+                    "unavailable_duration_s": 48186.005631,
+                    "unknown_duration_s": 0.0,
+                    "available_percent_of_interval": 44.22916014930556,
+                    "longest_available_s": 23387.78076,
+                    "window_count": 2
+                  }
+                },
+                "DSS-63": {
+                  "intervals": [
+                    {
+                      "start_utc": "2026-11-05T00:00:00Z",
+                      "end_utc": "2026-11-05T03:28:55.640442Z",
+                      "state": "unavailable",
+                      "duration_s": 12535.640442
+                    },
+                    {
+                      "start_utc": "2026-11-05T03:28:55.640442Z",
+                      "end_utc": "2026-11-05T14:27:44.195571Z",
+                      "state": "available",
+                      "duration_s": 39528.555129
+                    },
+                    {
+                      "start_utc": "2026-11-05T14:27:44.195571Z",
+                      "end_utc": "2026-11-06T00:00:00Z",
+                      "state": "unavailable",
+                      "duration_s": 34335.804429
+                    }
+                  ],
+                  "metrics": {
+                    "available_duration_s": 39528.555129,
+                    "unavailable_duration_s": 46871.444871,
+                    "unknown_duration_s": 0.0,
+                    "available_percent_of_interval": 45.75064251041667,
+                    "longest_available_s": 39528.555129,
+                    "window_count": 1
+                  }
+                }
+              },
+              "combined": {
+                "intervals": [
+                  {
+                    "start_utc": "2026-11-05T00:00:00Z",
+                    "end_utc": "2026-11-05T03:28:55.640442Z",
+                    "state": "available",
+                    "duration_s": 12535.640442,
+                    "station_ids": [
+                      "DSS-43"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-05T03:28:55.640442Z",
+                    "end_utc": "2026-11-05T04:07:06.213609Z",
+                    "state": "available",
+                    "duration_s": 2290.573167,
+                    "station_ids": [
+                      "DSS-43",
+                      "DSS-63"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-05T04:07:06.213609Z",
+                    "end_utc": "2026-11-05T11:16:49.521914Z",
+                    "state": "available",
+                    "duration_s": 25783.308305,
+                    "station_ids": [
+                      "DSS-63"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-05T11:16:49.521914Z",
+                    "end_utc": "2026-11-05T14:27:44.195571Z",
+                    "state": "available",
+                    "duration_s": 11454.673657,
+                    "station_ids": [
+                      "DSS-14",
+                      "DSS-63"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-05T14:27:44.195571Z",
+                    "end_utc": "2026-11-05T17:30:12.219240Z",
+                    "state": "available",
+                    "duration_s": 10948.023669,
+                    "station_ids": [
+                      "DSS-14"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-05T17:30:12.219240Z",
+                    "end_utc": "2026-11-05T22:10:05.273767Z",
+                    "state": "available",
+                    "duration_s": 16793.054527,
+                    "station_ids": [
+                      "DSS-14",
+                      "DSS-43"
+                    ]
+                  },
+                  {
+                    "start_utc": "2026-11-05T22:10:05.273767Z",
+                    "end_utc": "2026-11-06T00:00:00Z",
+                    "state": "available",
+                    "duration_s": 6594.726233,
+                    "station_ids": [
+                      "DSS-43"
+                    ]
+                  }
+                ],
+                "metrics": {
+                  "available_duration_s": 86400.0,
+                  "unavailable_duration_s": 0.0,
+                  "unknown_duration_s": 0.0,
+                  "available_percent_of_interval": 100.0,
+                  "longest_available_s": 86400.0,
+                  "window_count": 1
+                }
+              }
+            },
+            "source": {
+              "station_document": "DSN Telecommunications Link Design Handbook 810-005, module 301 Coverage and Geometry, Rev. P",
+              "station_url": "https://deepspace.jpl.nasa.gov/dsndocs/810-005/301/301P.pdf",
+              "ephemeris": "NASA/JPL Horizons API, Moon (301) from coord@399, airless",
+              "dsn_path": "dsn/fa3d7436d6f99b4809787703598e13427b864b8255c528a18a2b51f6e6027603",
+              "sample_step_s": 300,
+              "interpolation": "Linear in elevation between station samples"
+            },
+            "limitations": [
+              "Geometric line of sight only; not a guaranteed radio link.",
+              "Generic DSN elevation limit; station-specific horizon masks are not applied.",
+              "Antenna keyhole, station scheduling, availability and link budget are not modeled.",
+              "Earth visibility refers to the Earth center above the local terrain horizon."
+            ]
+          },
+          "error": null
+        }
+      }
+    ],
+    "alternatives": [
+      {
+        "index": 1,
+        "analysis_id": "e430cbda-c6fb-5828-b105-f16eb6579441",
+        "window": {
+          "start_utc": "2026-11-04T00:00:00Z",
+          "end_utc": "2026-11-04T00:30:00Z"
+        }
+      },
+      {
+        "index": 2,
+        "analysis_id": "c817a988-79c8-4cfe-9a19-71b5a9424838",
+        "window": {
+          "start_utc": "2026-11-04T01:00:00Z",
+          "end_utc": "2026-11-04T01:30:00Z"
+        }
+      },
+      {
+        "index": 3,
+        "analysis_id": "9481b76b-7332-4403-9844-d04779fb02c3",
+        "window": {
+          "start_utc": "2026-11-05T00:00:00Z",
+          "end_utc": "2026-11-05T00:30:00Z"
+        }
+      },
+      {
+        "index": 4,
+        "analysis_id": "429b549c-07b4-48f3-b087-c918edc1c315",
+        "window": {
+          "start_utc": "2026-11-05T01:00:00Z",
+          "end_utc": "2026-11-05T01:30:00Z"
+        }
+      }
+    ]
+  }
+}

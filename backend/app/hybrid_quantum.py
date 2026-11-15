@@ -373,6 +373,7 @@ def run_qaoa(
     shots: int = 512,
     seed: int = 17,
     max_qubits: int = 6,
+    on_iteration=None,
 ) -> QaoaResult:
     """Run bounded seeded classical tuning, then sample the noiseless QAOA state.
 
@@ -380,6 +381,7 @@ def run_qaoa(
     exact distribution probabilities and uniform baselines separately. No repair,
     provider API, noise, hardware, queue time or quantum advantage is claimed.
     Raise ValueError for invalid budgets or unsupported/infeasible problems.
+    Optional on_iteration receives detached distributions, not hardware counts.
     """
     started = perf_counter()
     _integer_budget(depth, "depth", 1, 3)
@@ -418,6 +420,21 @@ def run_qaoa(
                 energy,
                 angles.copy(),
                 probabilities.copy(),
+            )
+        if on_iteration is not None:
+            on_iteration(
+                {
+                    "iteration": iteration + 1,
+                    "gammas": tuple(float(a) for a in angles[:depth]),
+                    "betas": tuple(float(a) for a in angles[depth:]),
+                    "probabilities": tuple(float(p) for p in probabilities),
+                    "energy": energy,
+                    "best_gammas": tuple(float(a) for a in best_angles[:depth]),
+                    "best_betas": tuple(float(a) for a in best_angles[depth:]),
+                    "best_probabilities": tuple(float(p) for p in best_probabilities),
+                    "best_energy": best_energy,
+                    "elapsed_s": perf_counter() - started,
+                }
             )
     counts = np.random.default_rng(sampling_seed).multinomial(shots, best_probabilities)
     samples = []

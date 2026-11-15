@@ -15,6 +15,9 @@ import {
 import * as THREE from "three";
 import { Dust, Model, Terrain, smooth } from "./LunarSurface";
 import LaunchSite from "./LaunchSite";
+import Rover, { preloadRoverModel, type RoutePoint } from "./Rover";
+import { DemTerrain, ScanOverlay } from "./RoverScan";
+import { SEARCH_END, sceneMapping, type SurfaceScene } from "./surfaceScene";
 import type { Preset } from "../types";
 import { useTranslate } from "../i18n";
 import {
@@ -24,12 +27,13 @@ import {
   MISSION_PHASES,
   SCENE_LAYOUT,
   SUN_NOMINAL_RADIUS_KM,
-  allPathPoints,
-  headingAt,
-  pathPointsUntil,
+  applyPose,
+  liveFlightView,
   phaseAt,
-  positionAt,
   siteSelectionFromPoint,
+  staticFlightView,
+  type FlightEphemeris,
+  type FlightView,
   surfaceUnitVector,
   type TransferPath,
   type Vec3,
@@ -70,6 +74,12 @@ const SYSTEM_VIEW_YAW = 0.12;
 const SYSTEM_VIEW_PITCH = 0.42;
 /** Earth's atmosphere shell (display thickness ≈ 100 km). */
 const EARTH_ATMOSPHERE_RADIUS_SCENE = SCENE_LAYOUT.earth_radius_scene * 1.016;
+/** Progress at which the spacecraft is captured into lunar orbit. */
+const LUNAR_ORBIT_START_PROGRESS = MISSION_PHASES.find(
+  (phase) => phase.id === "lunar_orbit",
+)!.start_progress;
+/** Illustrative Earth spin while no dated ephemeris is loaded. */
+const EARTH_SPIN_RAD_PER_S = 0.25;
 
 export type CameraMode =
   | "auto"
@@ -180,6 +190,9 @@ function Atmosphere({
     [sunDirection],
   );
   useEffect(() => () => material.dispose(), [material]);
+  useFrame(() => {
+    material.uniforms.sunDirection.value.copy(sunDirection).normalize();
+  });
   return (
     <mesh material={material}>
       <sphereGeometry args={[radius, 96, 64]} />
@@ -264,13 +277,13 @@ function Line({
 }
 
 function Trail({
-  path,
+  view,
   progress,
 }: {
-  path: TransferPath;
+  view: FlightView;
   progress: MutableRefObject<number>;
 }) {
-  const capacity = allPathPoints(path).length + 2;
+  const capacity = view.allPoints.length + 2;
   const line = useMemo(() => {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute(
@@ -294,7 +307,7 @@ function Trail({
     [line],
   );
   useFrame(() => {
-    const points = pathPointsUntil(path, progress.current);
+    const points = view.pointsUntil(progress.current);
     const attribute = line.geometry.getAttribute(
       "position",
     ) as THREE.BufferAttribute;
@@ -307,13 +320,65 @@ function Trail({
   return <primitive object={line} />;
 }
 
+/** Dashed planned path, redrawn each frame so it follows the moving Moon. */
+function PlannedPath({
+  view,
+  progress,
+}: {
+  view: FlightView;
+  progress: MutableRefObject<number>;
+}) {
+  const count = view.allPoints.length;
+  const line = useMemo(() => {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(new Float32Array(count * 3), 3),
+    );
+    return new THREE.Line(
+      geometry,
+      // Solid: dashes recomputed every frame crawl and flicker.
+      new THREE.LineBasicMaterial({
+        color: "#c6d3dc",
+        transparent: true,
+        opacity: 0.22,
+        depthWrite: false,
+      }),
+    );
+  }, [count]);
+  useEffect(
+    () => () => {
+      line.geometry.dispose();
+      (line.material as THREE.Material).dispose();
+    },
+    [line],
+  );
+  const shown = useRef<{ view: FlightView | null; progress: number }>({
+    view: null,
+    progress: -1,
+  });
+  useFrame(() => {
+    const last = shown.current;
+    if (last.view === view && (!view.live || last.progress === progress.current)) return;
+    shown.current = { view, progress: progress.current };
+    const points = view.plannedAt(progress.current);
+    const attribute = line.geometry.getAttribute("position") as THREE.BufferAttribute;
+    const n = Math.min(points.length, count);
+    for (let i = 0; i < n; i++) attribute.setXYZ(i, ...points[i]);
+    attribute.needsUpdate = true;
+    line.geometry.setDrawRange(0, n);
+    line.geometry.computeBoundingSphere();
+  });
+  return <primitive object={line} />;
+}
+
 function Spacecraft({
-  path,
+  view,
   progress,
   spacecraft,
   reduced,
 }: {
-  path: TransferPath;
+  view: FlightView;
   progress: MutableRefObject<number>;
   spacecraft: MutableRefObject<THREE.Vector3>;
   reduced: boolean;
@@ -326,7 +391,7 @@ function Spacecraft({
   useEffect(() => () => glow.dispose(), [glow]);
   useFrame(({ camera, clock }) => {
     const p = progress.current;
-    const position = positionAt(path, p);
+    const position = view.positionAt(p);
     group.current.position.set(...position);
     spacecraft.current.set(...position);
     const phase = phaseAt(p).phase.id;
@@ -346,10 +411,10 @@ function Spacecraft({
       // Keep the lander upright relative to the local surface normal.
       group.current.quaternion.setFromUnitVectors(
         new THREE.Vector3(0, 1, 0),
-        v3(position).normalize(),
+        v3(position).sub(v3(view.moonPose(p).position)).normalize(),
       );
     } else {
-      const heading = headingAt(path, p);
+      const heading = view.headingAt(p);
       look.set(
         position[0] + heading[0],
         position[1] + heading[1],
@@ -537,7 +602,9 @@ function CameraRig({
   spacecraft,
   progress,
   reduced,
+  view,
 }: {
+  view: FlightView | null;
   mode: Exclude<CameraView, "landing" | "launch">;
   lat: number;
   lon: number;
@@ -551,8 +618,24 @@ function CameraRig({
   const desiredTarget = useMemo(() => new THREE.Vector3(), []);
   const desiredPosition = useMemo(() => new THREE.Vector3(), []);
   const first = useRef(true);
+  // Smoothing state relative to the followed point, so a moving Moon is
+  // tracked exactly (no lag jitter) while view changes still ease.
+  const targetLag = useMemo(() => new THREE.Vector3(), []);
+  const direction = useMemo(() => new THREE.Vector3(0, 0, 1), []);
+  const logDistance = useRef(0);
+  const lastMode = useRef(mode);
+  const wanted = useMemo(() => new THREE.Vector3(), []);
   useFrame((_, delta) => {
     const phase = phaseAt(progress.current).phase.id;
+    // Bodies at this moment (fixed layout without a dated ephemeris).
+    const earthAt = view
+      ? v3(view.earthCenter(progress.current))
+      : v3(SCENE_LAYOUT.earth_center_scene);
+    const pose = view?.moonPose(progress.current);
+    const moonAt = pose ? v3(pose.position) : new THREE.Vector3();
+    const moonYaw = pose ? Math.atan2(-pose.x[2], pose.x[0]) : 0;
+    const moonPoint = (local: Vec3) =>
+      pose ? v3(applyPose(pose, local)) : v3(local);
     // Camera direction from yaw (around +Y) and pitch (positive = above).
     let yaw = 0.2,
       pitch = 0.78,
@@ -565,11 +648,21 @@ function CameraRig({
       return Math.atan2(site[0], site[2]) || 0.35;
     };
     if (mode === "system") {
-      desiredTarget.set(SCENE_LAYOUT.earth_center_scene[0] / 2, 0, 0);
+      // Frame Earth with both the Moon now and where the spacecraft will meet
+      // it (lunar orbit insertion), so the whole coast stays in view.
+      const arrival = view
+        ? v3(view.moonPose(Math.max(progress.current, LUNAR_ORBIT_START_PROGRESS)).position)
+        : moonAt;
+      const moonSpan = moonAt.distanceTo(arrival);
+      const moonMid = moonAt.clone().add(arrival).multiplyScalar(0.5);
+      desiredTarget.copy(earthAt).add(moonMid).multiplyScalar(0.5);
       // Fit the true-scale Earth–Moon line to the viewport width instead of a
       // fixed distance, so both bodies appear as large as the frame allows
       // without changing their sizes or separation.
-      yaw = SYSTEM_VIEW_YAW;
+      // Keep the Earth–Moon line across the screen as the Moon moves.
+      yaw =
+        SYSTEM_VIEW_YAW +
+        Math.atan2(-(earthAt.z - moonMid.z), earthAt.x - moonMid.x);
       pitch = SYSTEM_VIEW_PITCH;
       const perspective = camera as THREE.PerspectiveCamera;
       const halfHeight = Math.tan(
@@ -577,27 +670,28 @@ function CameraRig({
       );
       const halfWidth = halfHeight * Math.max(0.3, size.width / size.height);
       distance =
-        (SYSTEM_VIEW_SPAN_SCENE / 2 / halfWidth) * Math.cos(SYSTEM_VIEW_YAW);
+        (SYSTEM_VIEW_SPAN_SCENE / 2 / halfWidth) *
+        Math.cos(SYSTEM_VIEW_YAW) *
+        (1 + (0.6 * moonSpan) / Math.max(1, earthAt.distanceTo(moonMid)));
     } else if (mode === "pole") {
-      desiredTarget.set(0, -SCENE_LAYOUT.moon_radius_scene, 0);
-      yaw = siteYaw();
+      desiredTarget.copy(moonPoint([0, -SCENE_LAYOUT.moon_radius_scene, 0]));
+      yaw = siteYaw() + moonYaw;
       pitch = -1.38;
       distance = 1.25;
     } else if (mode === "moon") {
-      desiredTarget.set(0, -0.35, 0);
-      yaw = siteYaw();
+      desiredTarget.copy(moonPoint([0, -0.35, 0]));
+      yaw = siteYaw() + moonYaw;
       pitch = -1.0;
       distance = 4.6;
     } else {
       // Look over the spacecraft from outside the body it is closest to.
       desiredTarget.copy(spacecraft.current);
-      const earth = v3(SCENE_LAYOUT.earth_center_scene);
       const center =
-        spacecraft.current.distanceTo(earth) /
+        spacecraft.current.distanceTo(earthAt) /
           SCENE_LAYOUT.earth_radius_scene <
-        spacecraft.current.length() / SCENE_LAYOUT.moon_radius_scene
-          ? earth
-          : new THREE.Vector3();
+        spacecraft.current.distanceTo(moonAt) / SCENE_LAYOUT.moon_radius_scene
+          ? earthAt
+          : moonAt;
       const view = spacecraft.current
         .clone()
         .sub(center)
@@ -619,10 +713,31 @@ function CameraRig({
       )
       .multiplyScalar(distance)
       .add(desiredTarget);
-    const k = reduced || first.current ? 1 : 1 - Math.exp(-delta * 3.2);
+    const step = Math.min(delta, 0.05);
+    const k = reduced || first.current ? 1 : 1 - Math.exp(-step * 2.4);
+    if (first.current || reduced) {
+      targetLag.set(0, 0, 0);
+      direction.copy(desiredPosition).sub(desiredTarget).normalize();
+      logDistance.current = Math.log(Math.max(1e-4, distance));
+    } else if (lastMode.current !== mode) {
+      // A new view starts from where the camera is now and eases over.
+      targetLag.copy(target).sub(desiredTarget);
+    }
+    lastMode.current = mode;
     first.current = false;
-    target.lerp(desiredTarget, k);
-    camera.position.lerp(desiredPosition, k);
+    // The look-at point follows the target exactly plus a decaying offset.
+    targetLag.multiplyScalar(1 - k);
+    target.copy(desiredTarget).add(targetLag);
+    // Direction turns on the sphere and distance eases in log space, so a
+    // long zoom (Earth–Moon to close-up) is even and never cuts through.
+    wanted.copy(desiredPosition).sub(desiredTarget).normalize();
+    direction.lerp(wanted, k).normalize();
+    logDistance.current +=
+      (Math.log(Math.max(1e-4, distance)) - logDistance.current) * k;
+    camera.position
+      .copy(direction)
+      .multiplyScalar(Math.exp(logDistance.current))
+      .add(target);
     camera.lookAt(target);
   });
   return null;
@@ -639,16 +754,18 @@ function ProgressEaser({
 }) {
   useFrame((_, delta) => {
     const gap = target - progress.current;
+    // Small steps ease quickly; large jumps (phase buttons, scrubbing) glide
+    // over about a second instead of cutting.
+    const rate = Math.abs(gap) > 0.08 ? 4 : 14;
     progress.current =
-      snap || Math.abs(gap) > 0.08 || Math.abs(gap) < 1e-5
+      snap || Math.abs(gap) < 1e-5
         ? target
-        : progress.current + gap * (1 - Math.exp(-delta * 14));
+        : progress.current + gap * (1 - Math.exp(-Math.min(delta, 0.05) * rate));
   });
   return null;
 }
 
 function System({
-  path,
   lat,
   lon,
   sites,
@@ -659,8 +776,9 @@ function System({
   selectable,
   onPick,
   onPreset,
+  view,
 }: SceneProps & {
-  path: TransferPath | null;
+  view: FlightView | null;
   progress: MutableRefObject<number>;
 }) {
   const [moonMap, moonRelief, earthMap] = useLoader(THREE.TextureLoader, [
@@ -675,7 +793,12 @@ function System({
   const sunGlow = useMemo(() => glowTexture("#fff4cf", "#ffb54700"), []);
   const earthGlow = useMemo(() => softGlowTexture("159, 203, 255"), []);
   const moonGlow = useMemo(() => softGlowTexture("230, 226, 216"), []);
+  // Mutable each frame when a dated ephemeris drives the scene.
   const sunDirection = useMemo(() => v3(SUN_SCENE).normalize(), []);
+  const sunGroup = useRef<THREE.Group>(null!);
+  const sunLight = useRef<THREE.DirectionalLight>(null!);
+  const earthGroup = useRef<THREE.Group>(null!);
+  const basis = useMemo(() => new THREE.Matrix4(), []);
   useEffect(
     () => () => {
       sunGlow.dispose();
@@ -706,28 +829,43 @@ function System({
       ),
     [],
   );
-  const fullPath = useMemo(
-    () => (path ? allPathPoints(path).map(v3) : []),
-    [path],
-  );
   const parkingRing = useMemo(
     () =>
-      Array.from({ length: 129 }, (_, i) => {
-        const a = (i / 128) * Math.PI * 2;
-        const r = SCENE_LAYOUT.parking_orbit_radius_scene;
-        return v3(SCENE_LAYOUT.earth_center_scene).add(
-          new THREE.Vector3(Math.sin(a) * r, 0, Math.cos(a) * r),
-        );
-      }),
-    [],
+      view
+        ? view.parkingRing.map(v3)
+        : Array.from({ length: 129 }, (_, i) => {
+            const a = (i / 128) * Math.PI * 2;
+            const r = SCENE_LAYOUT.parking_orbit_radius_scene;
+            return v3(SCENE_LAYOUT.earth_center_scene).add(
+              new THREE.Vector3(Math.sin(a) * r, 0, Math.cos(a) * r),
+            );
+          }),
+    [view],
   );
+  // Bodies follow the flight view: with a dated ephemeris the Moon moves along
+  // its real orbit (facing Earth), Earth turns by its rotation angle and the
+  // Sun direction follows; otherwise the original fixed layout is kept.
+  const moonFrame = useRef<THREE.Group>(null!);
   useFrame((_, delta) => {
-    if (!reduced) earth.current.rotation.y += delta * 0.05;
+    const p = progress.current;
+    const rotation = view?.earthRotationRad(p) ?? null;
+    if (rotation !== null) earth.current.rotation.y = rotation;
+    else if (!reduced)
+      earth.current.rotation.y += Math.min(delta, 0.05) * EARTH_SPIN_RAD_PER_S;
+    if (!view) return;
+    earthGroup.current.position.set(...view.earthCenter(p));
+    const pose = view.moonPose(p);
+    moonFrame.current.position.set(...pose.position);
+    basis.makeBasis(v3(pose.x), v3(pose.y), v3(pose.z));
+    moonFrame.current.quaternion.setFromRotationMatrix(basis);
+    sunDirection.set(...view.sunDirection(p));
+    sunGroup.current.position.copy(sunDirection).multiplyScalar(SUN_DISTANCE_SCENE);
+    sunLight.current.position.copy(sunGroup.current.position);
   });
   const pick = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
     if (event.delta > 6) return;
-    const point = event.point;
+    const point = moonFrame.current.worldToLocal(event.point.clone());
     onPick(siteSelectionFromPoint([point.x, point.y, point.z]));
   };
   return (
@@ -735,6 +873,7 @@ function System({
       <color attach="background" args={["#03060a"]} />
       <ambientLight intensity={0.22} />
       <directionalLight
+        ref={sunLight}
         position={SUN_SCENE as unknown as [number, number, number]}
         intensity={3.1}
         color="#fff3df"
@@ -751,7 +890,7 @@ function System({
           opacity={0.75}
         />
       </points>
-      <group position={SUN_SCENE as unknown as [number, number, number]}>
+      <group ref={sunGroup} position={SUN_SCENE as unknown as [number, number, number]}>
         <mesh>
           <sphereGeometry args={[SUN_RADIUS_SCENE, 48, 32]} />
           <meshBasicMaterial color="#fff1c9" />
@@ -768,11 +907,12 @@ function System({
         </sprite>
       </group>
       <group
+        ref={earthGroup}
         position={
           SCENE_LAYOUT.earth_center_scene as unknown as [number, number, number]
         }
       >
-        <group rotation={[0, 0, (23.4 * Math.PI) / 180]}>
+        <group rotation={view?.earthTilt ?? [0, 0, (23.4 * Math.PI) / 180]}>
           <mesh ref={earth}>
             <sphereGeometry args={[SCENE_LAYOUT.earth_radius_scene, 96, 64]} />
             <meshStandardMaterial map={earthMap} roughness={0.85} />
@@ -788,12 +928,13 @@ function System({
           strength={0.55}
         />
       </group>
+      <Line points={parkingRing} color="#9ac9e5" opacity={0.18} />
+      <group ref={moonFrame}>
       <DistantGlow
         radius={SCENE_LAYOUT.moon_radius_scene}
         texture={moonGlow}
         strength={0.4}
       />
-      <Line points={parkingRing} color="#9ac9e5" opacity={0.18} />
       <mesh
         onClick={pick}
         onPointerOver={() => {
@@ -818,7 +959,6 @@ function System({
         dashed
         dashSize={0.04}
       />
-      <ScienceOrbiter reduced={reduced} />
       {sites.map((site) => (
         <mesh
           key={site.site_id}
@@ -835,18 +975,14 @@ function System({
       {Number.isFinite(lat) && Number.isFinite(lon) && (
         <SiteMarker lat={lat} lon={lon} condition={condition} reduced={reduced} />
       )}
-      {path && (
+      <ScienceOrbiter reduced={reduced} />
+      </group>
+      {view && (
         <>
-          <Line
-            points={fullPath}
-            color="#c6d3dc"
-            opacity={0.28}
-            dashed
-            dashSize={0.3}
-          />
-          <Trail path={path} progress={progress} />
+          <PlannedPath view={view} progress={progress} />
+          <Trail view={view} progress={progress} />
           <Spacecraft
-            path={path}
+            view={view}
             progress={progress}
             spacecraft={spacecraft}
             reduced={reduced}
@@ -866,6 +1002,7 @@ function System({
         spacecraft={spacecraft}
         progress={progress}
         reduced={reduced}
+        view={view}
       />
     </>
   );
@@ -881,12 +1018,40 @@ function LandingSite({
   progress,
   reduced,
   compact,
+  roverPath,
+  roverDrive,
+  roverScan,
+  roverScene,
+  roverTarget,
 }: {
   progress: MutableRefObject<number>;
   reduced: boolean;
   compact: boolean;
+  roverPath: RoutePoint[] | null;
+  roverDrive: MutableRefObject<number>;
+  roverScan: MutableRefObject<number>;
+  roverScene: SurfaceScene | null;
+  roverTarget: string;
 }) {
   const lander = useRef<THREE.Group>(null!);
+  // Fetch the rover model during the descent so it is ready at touchdown.
+  useEffect(() => {
+    preloadRoverModel();
+  }, []);
+  // Real LOLA DEM window from the backend route scene, when loaded.
+  const mapping = useMemo(
+    () => (roverScene ? sceneMapping(roverScene) : null),
+    [roverScene],
+  );
+  const reach = roverScene && mapping
+    ? (Math.max(roverScene.rows, roverScene.cols) * roverScene.pixel_m * mapping.scale) / 2
+    : 0;
+  const overview = useRef(0);
+  // After touchdown the camera eases from the lander to the driving rover.
+  const roverFocus = useMemo(() => new THREE.Vector3(), []);
+  const roverLook = useMemo(() => new THREE.Vector3(), []);
+  const cameraLook = useRef<THREE.Vector3 | null>(null);
+  const follow = useRef(0);
   const plume = useRef<THREE.Mesh>(null!);
   const user = useOrbitInput("landing");
   const look = useMemo(() => new THREE.Vector3(), []);
@@ -908,7 +1073,7 @@ function LandingSite({
     const descent = descentAt(p);
     const height = (1 - descent) * 5;
     const landerX = (1 - descent) * -1.6;
-    lander.current.position.set(landerX, height, 0);
+    lander.current.position.set(landerX, height + (mapping ? mapping.ground(0, 0) : 0), 0);
     lander.current.rotation.set(0, -0.4 + descent * 0.35, (1 - descent) * 0.12);
     plume.current.visible = descent < 1;
     plume.current.position.set(landerX, height + 0.2, 0);
@@ -921,6 +1086,26 @@ function LandingSite({
     if (descent >= 1 && !reduced) settledTime.current += Math.min(delta, 0.05);
     else if (descent < 1) settledTime.current = 0;
     look.set(landerX * 0.5, 0.9 + height * 0.75, 0);
+    const driving = descent >= 1 && roverPath !== null;
+    follow.current = THREE.MathUtils.clamp(
+      follow.current + (driving ? 1 : -1) * Math.min(delta, 0.05) * 0.8,
+      0,
+      1,
+    );
+    // While the antenna scan plays, the camera rises for an overview.
+    const scanning = driving && mapping !== null && roverScan.current < SEARCH_END;
+    overview.current = THREE.MathUtils.clamp(
+      overview.current + (scanning ? 1 : -1) * Math.min(delta, 0.05) * 0.7,
+      0,
+      1,
+    );
+    if (follow.current > 0) {
+      const weight = smooth(0, 1, follow.current);
+      roverLook.copy(roverFocus).setY(roverFocus.y + 0.45);
+      look.lerp(roverLook, weight);
+    }
+    if (!cameraLook.current) cameraLook.current = look.clone();
+    else cameraLook.current.lerp(look, 1 - Math.exp(-Math.min(delta, 0.05) * 6));
     offset.set(
       4.2 - descent * 1.6,
       5.8 - descent * 3.4 + height * 0.5,
@@ -928,16 +1113,19 @@ function LandingSite({
     );
     spherical.setFromVector3(offset);
     spherical.theta += user.current.yaw + settledTime.current * 0.06;
+    const rise = smooth(0, 1, overview.current);
     spherical.phi = THREE.MathUtils.clamp(
-      spherical.phi - user.current.pitch,
+      THREE.MathUtils.lerp(spherical.phi, 0.55, rise) - user.current.pitch,
       0.2,
       1.5,
     );
     spherical.radius *=
       (compact ? 1.25 : 1) *
-      THREE.MathUtils.clamp(user.current.zoom, 0.35, 2.4);
-    camera.position.setFromSpherical(spherical).add(look);
-    camera.lookAt(look);
+      THREE.MathUtils.clamp(user.current.zoom, 0.35, 2.4) *
+      (1 - 0.25 * smooth(0, 1, follow.current)) *
+      (1 + 1.6 * rise);
+    camera.position.setFromSpherical(spherical).add(cameraLook.current);
+    camera.lookAt(cameraLook.current);
   });
   return (
     <>
@@ -953,10 +1141,10 @@ function LandingSite({
         color="#fff1dc"
         castShadow
         shadow-mapSize={[compact ? 1024 : 2048, compact ? 1024 : 2048]}
-        shadow-camera-left={-18}
-        shadow-camera-right={18}
-        shadow-camera-top={18}
-        shadow-camera-bottom={-18}
+        shadow-camera-left={mapping ? -30 : -18}
+        shadow-camera-right={mapping ? 30 : 18}
+        shadow-camera-top={mapping ? 30 : 18}
+        shadow-camera-bottom={mapping ? -30 : -18}
         shadow-normalBias={0.04}
         shadow-bias={-0.0001}
       />
@@ -978,10 +1166,32 @@ function LandingSite({
           sizeAttenuation
         />
       </points>
-      <Terrain />
+      {roverScene && mapping ? (
+        <>
+          <DemTerrain scene={roverScene} mapping={mapping} />
+          <ScanOverlay
+            scene={roverScene}
+            mapping={mapping}
+            target={roverTarget}
+            scan={roverScan}
+          />
+        </>
+      ) : (
+        <Terrain />
+      )}
       <group ref={lander}>
         <Model path="/nasa/apollo.glb" size={2.3} grounded />
       </group>
+      {roverPath && (
+        <Rover
+          path={roverPath}
+          drive={roverDrive}
+          focus={roverFocus}
+          scan={roverScan}
+          mapping={mapping}
+          reach={reach}
+        />
+      )}
       <mesh ref={plume} rotation={[Math.PI, 0, 0]}>
         <coneGeometry args={[0.13, 0.65, 24]} />
         <meshBasicMaterial
@@ -1071,11 +1281,50 @@ export default function MissionScene(
     compact: boolean;
     progressValue: number;
     onFailure: () => void;
+    /** Dated Moon/Sun/Earth-rotation samples from /flight-ephemeris, if loaded. */
+    flight?: FlightEphemeris | null;
+    /** Backend surface route driven after touchdown, if any. */
+    roverPath?: RoutePoint[] | null;
+    /** Travelled share of the rover route, 0–1. */
+    roverDrive?: number;
+    /** Antenna scan / A* playback progress, 0–1. */
+    roverScan?: number;
+    /** Backend DEM window and A* order for the route, if loaded. */
+    roverScene?: SurfaceScene | null;
+    roverTarget?: string;
   },
 ) {
-  const { visible, animate, compact, onFailure, progressValue, ...scene } =
-    props;
+  const {
+    visible,
+    animate,
+    compact,
+    onFailure,
+    progressValue,
+    roverPath = null,
+    roverDrive = 0,
+    roverScan = 1,
+    roverScene = null,
+    roverTarget = "",
+    flight = null,
+    path,
+    ...scene
+  } = props;
+  const view = useMemo(() => {
+    if (!path) return null;
+    if (flight) {
+      try {
+        return liveFlightView(path, flight);
+      } catch {
+        // Malformed samples: keep the fixed layout rather than a broken scene.
+      }
+    }
+    return staticFlightView(path, SUN_SCENE);
+  }, [path, flight]);
   const progress = useRef(progressValue);
+  const drive = useRef(roverDrive);
+  drive.current = roverDrive;
+  const scan = useRef(roverScan);
+  scan.current = roverScan;
   const { t } = useTranslate();
   return (
     <Canvas
@@ -1095,6 +1344,10 @@ export default function MissionScene(
           scene.cameraMode,
           scene.condition,
           visible,
+          roverPath,
+          roverDrive,
+          roverScan,
+          roverScene,
         ]}
       />
       <ProgressEaser
@@ -1114,9 +1367,14 @@ export default function MissionScene(
             progress={progress}
             reduced={scene.reduced}
             compact={compact}
+            roverPath={roverPath}
+            roverDrive={drive}
+            roverScan={scan}
+            roverScene={roverScene}
+            roverTarget={roverTarget}
           />
         ) : (
-          <System {...scene} progress={progress} />
+          <System {...scene} view={view} progress={progress} />
         )}
       </Suspense>
     </Canvas>

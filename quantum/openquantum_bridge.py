@@ -376,7 +376,15 @@ class OpenQuantumGateway:
         return p
 
     def prepare(
-        self, scenario, circuit, *, backend_code, organization_id, shots, trial
+        self,
+        scenario,
+        circuit,
+        *,
+        backend_code,
+        organization_id,
+        shots,
+        trial,
+        initial_layout=None,
     ):
         _shots(shots)
         if not isinstance(trial, str) or not re.fullmatch(
@@ -393,11 +401,27 @@ class OpenQuantumGateway:
         backend = self._backend(backend_code)
         self.account_snapshot(organization_id)
         provider_backend = self.service.return_backend(backend_code)
+        placement = {}
+        if initial_layout is not None:
+            if (
+                not isinstance(initial_layout, (tuple, list))
+                or len(initial_layout) != width
+                or any(
+                    type(q) is not int or not 0 <= q < provider_backend.num_qubits
+                    for q in initial_layout
+                )
+                or len(set(initial_layout)) != width
+            ):
+                raise ValueError(
+                    "Initial layout requires distinct valid physical indices for each logical qubit"
+                )
+            placement["initial_layout"] = list(initial_layout)
         native = transpile(
             circuit,
             backend=provider_backend,
             optimization_level=1,
             seed_transpiler=17,
+            **placement,
         )
         native = _trim_idle_tail(native)
         # Match SDK 1.2.1's upload normalization before hashing the evidence.

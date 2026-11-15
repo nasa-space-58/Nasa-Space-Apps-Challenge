@@ -1,0 +1,374 @@
+{
+  "schema_version": "h11-hardware-evidence-v1",
+  "provider": "OpenQuantum / Rigetti",
+  "provider_job_url": "https://www.openquantum.com/jobs/007a1e27-1073-41a3-bd6c-1e0bcd336dde",
+  "attribution_url": "https://www.openquantum.com/citation",
+  "report": {
+    "job_id": "007a1e27-1073-41a3-bd6c-1e0bcd336dde",
+    "status": "Completed",
+    "backend_code": "rigetti:cepheus-1-108q",
+    "problem_fingerprint": "9b1c50723114ff451325c571c8818ccc46ae9b8e85322e9cacb1283d4f3c569f",
+    "circuit_sha256": "2c02b546f35e5b630a5f9438a6e0c032c0fe66a99791d223f619743c72980ec0",
+    "shots": 256,
+    "quoted_credits": 1.0,
+    "submitted_utc": "2026-11-14T23:29:22.237152+00:00",
+    "observed_utc": "2026-11-14T23:42:34.211953+00:00",
+    "execution_mode": "hardware",
+    "counts": {
+      "1000": 27,
+      "1001": 17,
+      "1010": 20,
+      "1011": 14,
+      "1100": 15,
+      "1101": 9,
+      "1110": 25,
+      "1111": 10,
+      "0000": 25,
+      "0001": 10,
+      "0010": 24,
+      "0011": 4,
+      "0100": 13,
+      "0101": 13,
+      "0110": 22,
+      "0111": 8
+    },
+    "analysis": {
+      "execution_mode": "hardware",
+      "problem_fingerprint": "9b1c50723114ff451325c571c8818ccc46ae9b8e85322e9cacb1283d4f3c569f",
+      "shots": 256,
+      "logical_qubits": 4,
+      "samples": [
+        {
+          "basis_index": 0,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-0",
+            "relay-1:jpl-l2-s-0"
+          ],
+          "count": 25,
+          "observed_frequency": 0.09765625,
+          "frequency_interval_95": [
+            0.06702402222215342,
+            0.14018486224554
+          ],
+          "feasible": false,
+          "optimal": false,
+          "exact_score": "-2"
+        },
+        {
+          "basis_index": 1,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-190",
+            "relay-1:jpl-l2-s-0"
+          ],
+          "count": 10,
+          "observed_frequency": 0.0390625,
+          "frequency_interval_95": [
+            0.0213540358427329,
+            0.07039983179986732
+          ],
+          "feasible": false,
+          "optimal": false,
+          "exact_score": "-4"
+        },
+        {
+          "basis_index": 2,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-240",
+            "relay-1:jpl-l2-s-0"
+          ],
+          "count": 24,
+          "observed_frequency": 0.09375,
+          "frequency_interval_95": [
+            0.0638098481830768,
+            0.13570203516294374
+          ],
+          "feasible": true,
+          "optimal": true,
+          "exact_score": "-5"
+        },
+        {
+          "basis_index": 3,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-95",
+            "relay-1:jpl-l2-s-0"
+          ],
+          "count": 4,
+          "observed_frequency": 0.015625,
+          "frequency_interval_95": [
+            0.006092598203366294,
+            0.039479262709196654
+          ],
+          "feasible": false,
+          "optimal": false,
+          "exact_score": "-3"
+        },
+        {
+          "basis_index": 4,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-0",
+            "relay-1:jpl-l2-s-190"
+          ],
+          "count": 13,
+          "observed_frequency": 0.05078125,
+          "frequency_interval_95": [
+            0.029913811386553534,
+            0.08493105962106533
+          ],
+          "feasible": false,
+          "optimal": false,
+          "exact_score": "-4"
+        },
+        {
+          "basis_index": 5,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-190",
+            "relay-1:jpl-l2-s-190"
+          ],
+          "count": 13,
+          "observed_frequency": 0.05078125,
+          "frequency_interval_95": [
+            0.029913811386553534,
+            0.08493105962106533
+          ],
+          "feasible": false,
+          "optimal": false,
+          "exact_score": "-6"
+        },
+        {
+          "basis_index": 6,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-240",
+            "relay-1:jpl-l2-s-190"
+          ],
+          "count": 22,
+          "observed_frequency": 0.0859375,
+          "frequency_interval_95": [
+            0.05743557903626671,
+            0.12668230206640807
+          ],
+          "feasible": true,
+          "optimal": false,
+          "exact_score": "-7"
+        },
+        {
+          "basis_index": 7,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-95",
+            "relay-1:jpl-l2-s-190"
+          ],
+          "count": 8,
+          "observed_frequency": 0.03125,
+          "frequency_interval_95": [
+            0.015918258891511296,
+            0.06044160650774316
+          ],
+          "feasible": false,
+          "optimal": false,
+          "exact_score": "-5"
+        },
+        {
+          "basis_index": 8,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-0",
+            "relay-1:jpl-l2-s-240"
+          ],
+          "count": 27,
+          "observed_frequency": 0.10546875,
+          "frequency_interval_95": [
+            0.07350191137657121,
+            0.14910097533446798
+          ],
+          "feasible": true,
+          "optimal": true,
+          "exact_score": "-5"
+        },
+        {
+          "basis_index": 9,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-190",
+            "relay-1:jpl-l2-s-240"
+          ],
+          "count": 17,
+          "observed_frequency": 0.06640625,
+          "frequency_interval_95": [
+            0.04187072285916844,
+            0.10376215263514196
+          ],
+          "feasible": true,
+          "optimal": false,
+          "exact_score": "-7"
+        },
+        {
+          "basis_index": 10,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-240",
+            "relay-1:jpl-l2-s-240"
+          ],
+          "count": 20,
+          "observed_frequency": 0.078125,
+          "frequency_interval_95": [
+            0.05114064056843023,
+            0.11758323829089878
+          ],
+          "feasible": false,
+          "optimal": false,
+          "exact_score": "-8"
+        },
+        {
+          "basis_index": 11,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-95",
+            "relay-1:jpl-l2-s-240"
+          ],
+          "count": 14,
+          "observed_frequency": 0.0546875,
+          "frequency_interval_95": [
+            0.03285229140400938,
+            0.08968958072528235
+          ],
+          "feasible": true,
+          "optimal": false,
+          "exact_score": "-6"
+        },
+        {
+          "basis_index": 12,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-0",
+            "relay-1:jpl-l2-s-95"
+          ],
+          "count": 15,
+          "observed_frequency": 0.05859375,
+          "frequency_interval_95": [
+            0.03582660763317509,
+            0.09441226561778955
+          ],
+          "feasible": false,
+          "optimal": false,
+          "exact_score": "-3"
+        },
+        {
+          "basis_index": 13,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-190",
+            "relay-1:jpl-l2-s-95"
+          ],
+          "count": 9,
+          "observed_frequency": 0.03515625,
+          "frequency_interval_95": [
+            0.018604096092635542,
+            0.0654527704282918
+          ],
+          "feasible": false,
+          "optimal": false,
+          "exact_score": "-5"
+        },
+        {
+          "basis_index": 14,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-240",
+            "relay-1:jpl-l2-s-95"
+          ],
+          "count": 25,
+          "observed_frequency": 0.09765625,
+          "frequency_interval_95": [
+            0.06702402222215342,
+            0.14018486224554
+          ],
+          "feasible": true,
+          "optimal": false,
+          "exact_score": "-6"
+        },
+        {
+          "basis_index": 15,
+          "selected_option_ids": [
+            "relay-0:jpl-l2-s-95",
+            "relay-1:jpl-l2-s-95"
+          ],
+          "count": 10,
+          "observed_frequency": 0.0390625,
+          "frequency_interval_95": [
+            0.0213540358427329,
+            0.07039983179986732
+          ],
+          "feasible": false,
+          "optimal": false,
+          "exact_score": "-4"
+        }
+      ],
+      "repair_applied": false,
+      "sampled_feasible_rate": 0.50390625,
+      "sampled_optimal_rate": 0.19921875,
+      "optimal_rate_interval_95": [
+        0.15489813913670408,
+        0.2524327744944842
+      ],
+      "best_plan": {
+        "schema_version": 1,
+        "plan_id": "h7-80dd5da61cb906ab283382f78c8e9f0af75e7e022871e0e5aa5876d399cc5117",
+        "scenario_id": "h11-relay-selection",
+        "scenario_revision": 1,
+        "input_fingerprint": "9b1c50723114ff451325c571c8818ccc46ae9b8e85322e9cacb1283d4f3c569f",
+        "state_revisions": {},
+        "selected_option_ids": [
+          "relay-0:jpl-l2-s-240",
+          "relay-1:jpl-l2-s-0"
+        ],
+        "execution_mode": "hardware",
+        "solver_name": "h7-observed-qaoa",
+        "validation_status": "unvalidated"
+      },
+      "optimum_gap": 0.0
+    }
+  },
+  "physical_qubits": 4,
+  "compiled_operations": {
+    "cx": 34,
+    "rz": 15,
+    "swap": 8,
+    "h": 4,
+    "rx": 4,
+    "measure": 4
+  },
+  "local_reference": {
+    "sampled_feasible_rate": 0.8125,
+    "sampled_optimal_rate": 0.21484375,
+    "gammas": [
+      -1.051425623260452
+    ],
+    "betas": [
+      0.3096601509537403
+    ],
+    "depth": 1,
+    "seed": 17
+  },
+  "original_geometry_validation": {
+    "status": "feasible",
+    "orbit_ids": [
+      "jpl-l2-s-240",
+      "jpl-l2-s-0"
+    ],
+    "sites": [
+      {
+        "site_id": "mons-mouton-feature-center",
+        "covered_s": 609600.0,
+        "coverage_fraction": 0.8819444444444444,
+        "maximum_gap_s": 81600.0,
+        "unknown_s": 0
+      },
+      {
+        "site_id": "malapert-massif-r23",
+        "covered_s": 691200.0,
+        "coverage_fraction": 1.0,
+        "maximum_gap_s": 0.0,
+        "unknown_s": 0
+      }
+    ],
+    "issues": []
+  },
+  "raw_results_repaired": false,
+  "limitations": [
+    "One provider-reported QPU trial with locally trained parameters; no quantum advantage claim.",
+    "Geometry uses the documented sampled CR3BP and ideal synchronous-frame assumptions, not a flight or RF-link guarantee.",
+    "Observed collection time includes delayed retrieval and is not device execution time."
+  ]
+}

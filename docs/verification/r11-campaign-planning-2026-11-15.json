@@ -1,0 +1,254 @@
+{
+  "date_utc": "2026-11-15",
+  "description": "R11 campaign planning results from the local backend API. Examples are synthetic teaching inputs; the real-evidence case uses one stored Task 3 analysis, the cached LOLA DEM and the R4 Apollo LM profile.",
+  "examples": {
+    "infeasible-mandatory": {
+      "joint_status": "infeasible",
+      "joint_score": null,
+      "joint_selections": null,
+      "joint_outcomes": [],
+      "variables": 47,
+      "constraints": 83,
+      "independent_selections": {
+        "crew-2": "crew-2.ridge-a.20261201T000000Z",
+        "rover-2": "rover-2.ridge-a.20261201T000000Z",
+        "science-2": "science-2.ridge-a.20261201T000000Z"
+      },
+      "independent_status": "infeasible",
+      "independent_score_not_achievable": 26.914,
+      "independent_issue_codes": [
+        "exclusive_link",
+        "station_capacity"
+      ],
+      "accepted_candidates": 4,
+      "rejected_landings": 0,
+      "conflict_sets": [
+        {
+          "mission_ids": [
+            "crew-2",
+            "science-2"
+          ],
+          "detail": "Mandatory missions crew-2, science-2 cannot all be completed together (downlink: crew-2 2.16e+10 bits, science-2 1.44e+10 bits; usable stations: dss-alpha). Dropping any one of them restores a feasible plan; allow cancellation or deferral, add station time or relax a deadline."
+        }
+      ],
+      "mission_explanations": {
+        "crew-2": "Not planned: part of the minimal conflicting set. Mandatory missions crew-2, science-2 cannot all be completed together (downlink: crew-2 2.16e+10 bits, science-2 1.44e+10 bits; usable stations: dss-alpha). Dropping any one of them restores a feasible plan; allow cancellation or deferral, add station time or relax a deadline.",
+        "rover-2": "Not planned: no joint plan exists for the mandatory missions.",
+        "science-2": "Not planned: part of the minimal conflicting set. Mandatory missions crew-2, science-2 cannot all be completed together (downlink: crew-2 2.16e+10 bits, science-2 1.44e+10 bits; usable stations: dss-alpha). Dropping any one of them restores a feasible plan; allow cancellation or deferral, add station time or relax a deadline."
+      },
+      "input_fingerprint": "5daef173229d359be53fba75433f0e82a44d281b29e5dccfff48f2a08f0d5ecf"
+    },
+    "relay-support": {
+      "joint_status": "optimal",
+      "joint_score": 32.152,
+      "joint_selections": {
+        "crater-3": "crater-3.crater-floor.20261201T060000Z",
+        "relay-3": "relay-3.relay-ridge.20261201T000000Z"
+      },
+      "joint_outcomes": [
+        {
+          "mission_id": "crater-3",
+          "status": "nominal",
+          "required_bits": 5400000000.0,
+          "delivered_bits": 5400000000.0,
+          "relayed_bits": 5400000000.0
+        },
+        {
+          "mission_id": "relay-3",
+          "status": "nominal",
+          "required_bits": 7200000000.0,
+          "delivered_bits": 7200000000.0,
+          "relayed_bits": 0.0
+        }
+      ],
+      "variables": 58,
+      "constraints": 127,
+      "independent_selections": {
+        "crater-3": null,
+        "relay-3": "relay-3.relay-ridge.20261201T000000Z"
+      },
+      "independent_status": "feasible",
+      "independent_score_not_achievable": -0.427,
+      "independent_issue_codes": [],
+      "accepted_candidates": 3,
+      "rejected_landings": 0,
+      "conflict_sets": [],
+      "mission_explanations": {
+        "crater-3": "Lands at crater-floor 2026-12-01T06:00:00Z, within its nominal window. 5.4e+09 bits are relayed through relay-3.",
+        "relay-3": "Lands at relay-ridge 2026-12-01T00:00:00Z, within its nominal window."
+      },
+      "input_fingerprint": "afa7f784abd5f5a95a450ae13e02c6d83c4e0b7d266cb40418636314f4d56c39"
+    },
+    "shared-dsn-conflict": {
+      "joint_status": "optimal",
+      "joint_score": 28.122,
+      "joint_selections": {
+        "clps-1": "clps-1.rim-b.20261201T120000Z",
+        "crew-1": "crew-1.ridge-a.20261201T000000Z",
+        "rover-1": "rover-1.rim-b.20261201T180000Z"
+      },
+      "joint_outcomes": [
+        {
+          "mission_id": "clps-1",
+          "status": "deferred",
+          "required_bits": 21600000000.0,
+          "delivered_bits": 21600000000.0,
+          "relayed_bits": 0.0
+        },
+        {
+          "mission_id": "crew-1",
+          "status": "nominal",
+          "required_bits": 57600000000.0,
+          "delivered_bits": 57600000000.0,
+          "relayed_bits": 0.0
+        },
+        {
+          "mission_id": "rover-1",
+          "status": "nominal",
+          "required_bits": 14400000000.0,
+          "delivered_bits": 14400000000.0,
+          "relayed_bits": 0.0
+        }
+      ],
+      "variables": 426,
+      "constraints": 566,
+      "independent_selections": {
+        "clps-1": "clps-1.rim-b.20261201T000000Z",
+        "crew-1": "crew-1.ridge-a.20261201T000000Z",
+        "rover-1": "rover-1.rim-b.20261201T000000Z"
+      },
+      "independent_status": "infeasible",
+      "independent_score_not_achievable": 28.872,
+      "independent_issue_codes": [
+        "dependency_lag",
+        "exclusive_link",
+        "station_capacity"
+      ],
+      "accepted_candidates": 18,
+      "rejected_landings": 7,
+      "conflict_sets": [],
+      "mission_explanations": {
+        "clps-1": "Lands at rim-b 2026-12-01T12:00:00Z, after its nominal landing window closed at 2026-12-01T12:00:00Z: no nominal option fits with the other missions.",
+        "crew-1": "Lands at ridge-a 2026-12-01T00:00:00Z, within its nominal window.",
+        "rover-1": "Lands at rim-b 2026-12-01T18:00:00Z, within its nominal window."
+      },
+      "input_fingerprint": "91b1751835e6cb58b90ab6c7edfd51f0a095618c7305719f1df38ee21f989eb9"
+    }
+  },
+  "real_evidence": {
+    "analysis_id": "1f1523f8-245b-4093-9d70-c676c743d48a",
+    "site": {
+      "site_id": "malapert-massif-r23",
+      "latitude_deg": -85.9948,
+      "longitude_deg_east": 359.76422,
+      "reference_frame": "MOON_ME"
+    },
+    "terrain": {
+      "max_landing_slope_deg": 5.600167779378432,
+      "unknown_landing_fraction": 0.0,
+      "hazard_distance_m": 288.44410203711914,
+      "source_ids": [
+        "terrain-safety:malapert-massif-r23"
+      ]
+    },
+    "descents": [
+      {
+        "vehicle_id": "apollo-lm-11",
+        "feasible": true,
+        "propellant_used_kg": 7368.730821733325,
+        "source_ids": [
+          "descent:apollo-lm-11:malapert-massif-r23"
+        ]
+      }
+    ],
+    "sunlight_states": [
+      "dark",
+      "partial"
+    ],
+    "station_geometry": [],
+    "sources": [
+      "analysis:1f1523f8-245b-4093-9d70-c676c743d48a",
+      "dem:LDEM_80S_80MPP_ADJ",
+      "descent:apollo-lm-11:malapert-massif-r23",
+      "terrain-safety:malapert-massif-r23"
+    ],
+    "joint_status": "optimal",
+    "joint_score": -1.0,
+    "joint_selections": {
+      "lm-1": null
+    },
+    "joint_outcomes": [
+      {
+        "mission_id": "lm-1",
+        "status": "cancelled",
+        "required_bits": 3600000000.0,
+        "delivered_bits": 0.0,
+        "relayed_bits": 0.0
+      }
+    ],
+    "variables": 3,
+    "constraints": 3,
+    "independent_selections": {
+      "lm-1": null
+    },
+    "independent_status": "feasible",
+    "independent_score_not_achievable": -1.0,
+    "independent_issue_codes": [],
+    "accepted_candidates": 2,
+    "rejected_landings": 0,
+    "conflict_sets": [],
+    "mission_explanations": {
+      "lm-1": "Cancelled (penalty 1): Even alone, lm-1 can deliver at most 0 of the 3.6e+09 required bits through direct station links before its deadline."
+    },
+    "input_fingerprint": "7e3183e8a7e908a038c81d6a69e2bd0e806b6699a99d9bd41461392dddcf5ffd",
+    "candidates": [
+      {
+        "option_id": "lm-1.malapert-massif-r23.20261104T000000Z",
+        "fuel_kg": 7368.730821733325,
+        "propellant_margin_kg": 492.529895491675,
+        "generated_energy_j": 0.0,
+        "energy_margin_j": 90000000.0,
+        "score": 21.364887578682506
+      },
+      {
+        "option_id": "lm-1.malapert-massif-r23.20261104T060000Z",
+        "fuel_kg": 7368.730821733325,
+        "propellant_margin_kg": 492.529895491675,
+        "generated_energy_j": 0.0,
+        "energy_margin_j": 90000000.0,
+        "score": 21.314887578682505
+      }
+    ],
+    "rejections": [],
+    "slope_limit_5_deg": {
+      "joint_status": "infeasible",
+      "joint_score": null,
+      "joint_selections": null,
+      "joint_outcomes": [],
+      "variables": 0,
+      "constraints": 0,
+      "independent_selections": {
+        "lm-1": null
+      },
+      "independent_status": "infeasible",
+      "independent_score_not_achievable": 0.0,
+      "independent_issue_codes": [
+        "cancel_not_allowed"
+      ],
+      "accepted_candidates": 0,
+      "rejected_landings": 2,
+      "conflict_sets": [
+        {
+          "mission_ids": [
+            "lm-1"
+          ],
+          "detail": "lm-1 has no option that passes the evidence checks (rejections: terrain_slope: 2)."
+        }
+      ],
+      "mission_explanations": {
+        "lm-1": "Not planned: part of the minimal conflicting set. lm-1 has no option that passes the evidence checks (rejections: terrain_slope: 2)."
+      },
+      "input_fingerprint": "a045ca26f77c419fb3106d0b2bb389835e308d4dded4f146e9c1413906ac77cf"
+    }
+  }
+}

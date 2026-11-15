@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslate, type Translate } from "../i18n";
 import "./risk.css";
 
 // R6 (S10): renders the backend Monte Carlo; every number comes from the API.
@@ -50,23 +51,14 @@ export type RiskResult = {
 
 const OK = "#199e70";
 const FAIL = "#e66767";
-const SOURCE_LABELS: Record<string, string> = {
-  thrust: "Engine thrust",
-  isp: "Specific impulse",
-  pdi_downrange: "PDI position",
-  pdi_speed: "PDI speed",
-  terrain_height: "Terrain height (DEM)",
-  navigation_down: "Navigation · downrange",
-  navigation_cross: "Navigation · crossrange",
+// Labels for backend source and cause ids; unknown ids fall back to the raw id.
+const sourceLabel = (t: Translate, id: string) => {
+  const text = t(`risk.sources.${id}`);
+  return text === `risk.sources.${id}` ? id : text;
 };
-const CAUSE_LABELS: Record<string, string> = {
-  propellant_exhausted: "Propellant exhausted",
-  propellant_reserve: "Reserve not kept",
-  touchdown_position: "Missed guidance target",
-  vertical_speed: "Hard landing (vertical speed)",
-  horizontal_speed: "Sliding landing (horizontal speed)",
-  hazard_slope: "Landed on steep terrain",
-  hazard_unknown: "Landed on unknown terrain",
+const causeLabel = (t: Translate, id: string) => {
+  const text = t(`risk.causes.${id}`);
+  return text === `risk.causes.${id}` ? id : text;
 };
 const pct = (v: number) => `${(100 * v).toFixed(v > 0 && v < 0.01 ? 1 : 0)} %`;
 
@@ -80,13 +72,14 @@ async function call(path: string, init?: RequestInit) {
         ? detail
         : Array.isArray(detail)
           ? detail.map((d: { msg: string }) => d.msg).join("; ")
-          : "Request failed",
+          : "request_failed",
     );
   }
   return body;
 }
 
 function DispersionPlot({ result }: { result: RiskResult }) {
+  const { t } = useTranslate();
   const { points, ellipse_1sigma: one, ellipse_3sigma: three } = result.landing;
   const S = 360,
     C = S / 2,
@@ -123,12 +116,12 @@ function DispersionPlot({ result }: { result: RiskResult }) {
       <svg
         viewBox={`0 0 ${S} ${S}`}
         role="img"
-        aria-label={`Landing dispersion of ${points.length} simulated touchdowns around the target, with 1-sigma and 3-sigma ellipses; ${result.success.count} of ${result.runs} runs succeeded.`}
+        aria-label={t("risk.plotLabel", { points: points.length, ok: result.success.count, runs: result.runs })}
       >
         <line x1={PAD} x2={S - PAD} y1={C} y2={C} className="risk-axis" />
         <line x1={C} x2={C} y1={PAD} y2={S - PAD} className="risk-axis" />
         <text x={C + 6} y={PAD + 10} className="risk-tick">
-          ↑ direction of travel
+          ↑ {t("risk.travel")}
         </text>
         {ellipse(three, "risk-ellipse three")}
         {ellipse(one, "risk-ellipse one")}
@@ -150,13 +143,13 @@ function DispersionPlot({ result }: { result: RiskResult }) {
       </svg>
       <figcaption className="risk-legend">
         <span>
-          <i className="dot" style={{ background: OK }} /> successful touchdown
+          <i className="dot" style={{ background: OK }} /> {t("risk.legend.success")}
         </span>
         <span>
-          <b style={{ color: FAIL }}>✕</b> failed touchdown
+          <b style={{ color: FAIL }}>✕</b> {t("risk.legend.failure")}
         </span>
         <span>
-          <i className="ring" /> target · dashed 1σ · solid 3σ ellipse
+          <i className="ring" /> {t("risk.legend.ellipses")}
         </span>
       </figcaption>
     </figure>
@@ -164,6 +157,7 @@ function DispersionPlot({ result }: { result: RiskResult }) {
 }
 
 function Histogram({ result }: { result: RiskResult }) {
+  const { t } = useTranslate();
   const { edges_kg: edges, counts } = result.propellant.histogram;
   const W = 360,
     H = 120,
@@ -175,7 +169,7 @@ function Histogram({ result }: { result: RiskResult }) {
       className="risk-histogram"
       viewBox={`0 0 ${W} ${H}`}
       role="img"
-      aria-label={`Propellant remaining at touchdown, from ${edges[0].toFixed(0)} to ${edges[edges.length - 1].toFixed(0)} kg.`}
+      aria-label={t("risk.histogramLabel", { min: edges[0].toFixed(0), max: edges[edges.length - 1].toFixed(0) })}
     >
       {counts.map((c, i) => (
         <rect
@@ -198,7 +192,12 @@ function Histogram({ result }: { result: RiskResult }) {
 }
 
 export default function RiskPanel({ base }: { base: Record<string, unknown> }) {
+  const { t } = useTranslate();
   const [runs, setRuns] = useState("200");
+  // Advanced uncertainty inputs; defaults match the backend UncertaintySettings.
+  const [isp, setIsp] = useState("0.5");
+  const [pdiDown, setPdiDown] = useState("500");
+  const [pdiSpeed, setPdiSpeed] = useState("1");
   const [seed, setSeed] = useState("2026");
   const [navigation, setNavigation] = useState("100");
   const [terrain, setTerrain] = useState("2");
@@ -225,12 +224,16 @@ export default function RiskPanel({ base }: { base: Record<string, unknown> }) {
               navigation_sigma_m: Number(navigation),
               terrain_height_sigma_m: Number(terrain),
               thrust_sigma_fraction: Number(thrust) / 100,
+              isp_sigma_fraction: Number(isp) / 100,
+              pdi_downrange_sigma_m: Number(pdiDown),
+              pdi_speed_sigma_mps: Number(pdiSpeed),
             },
           }),
         }),
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Request failed");
+      const message = e instanceof Error ? e.message : "request_failed";
+      setError(message === "request_failed" ? t("risk.requestFailed") : message);
     } finally {
       setBusy(false);
     }
@@ -244,8 +247,8 @@ export default function RiskPanel({ base }: { base: Record<string, unknown> }) {
   const cells = result?.hazard.ellipse_3sigma_cells;
 
   return (
-    <div className="risk-panel" aria-label="Landing risk">
-      <h3>Risk &amp; uncertainty · Monte Carlo</h3>
+    <div className="risk-panel" aria-label={t("risk.label")}>
+      <h3>{t("risk.title")}</h3>
       <form
         className="risk-controls"
         onSubmit={(e) => {
@@ -255,8 +258,8 @@ export default function RiskPanel({ base }: { base: Record<string, unknown> }) {
       >
         <fieldset disabled={busy}>
           <label>
-            Runs
-            <select aria-label="Monte Carlo runs" value={runs} onChange={(e) => setRuns(e.target.value)}>
+            {t("risk.runs")}
+            <select aria-label={t("risk.runs")} value={runs} onChange={(e) => setRuns(e.target.value)}>
               {["100", "200", "500"].map((n) => (
                 <option key={n} value={n}>
                   {n}
@@ -265,33 +268,45 @@ export default function RiskPanel({ base }: { base: Record<string, unknown> }) {
             </select>
           </label>
           <label>
-            Seed
-            <input aria-label="Random seed" type="number" min="0" step="1" value={seed} onChange={(e) => setSeed(e.target.value)} />
-          </label>
-          <label>
-            Navigation error 1σ · m
+            {t("risk.navigation")}
             <input type="number" min="0" max="5000" step="any" value={navigation} onChange={(e) => setNavigation(e.target.value)} />
           </label>
           <label>
-            Terrain height error 1σ · m
+            {t("risk.terrain")}
             <input type="number" min="0" max="50" step="any" value={terrain} onChange={(e) => setTerrain(e.target.value)} />
           </label>
           <label>
-            Thrust error 1σ · %
+            {t("risk.thrust")}
             <input type="number" min="0" max="20" step="any" value={thrust} onChange={(e) => setThrust(e.target.value)} />
           </label>
-          <label>
-            Approach azimuth · °
-            <input type="number" min="0" max="359.9" step="any" value={azimuth} onChange={(e) => setAzimuth(e.target.value)} />
-          </label>
+          <details className="advanced-settings">
+            <summary>{t("common.advancedSettings")}</summary>
+            <label>
+              {t("risk.isp")}
+              <input type="number" min="0" max="10" step="any" value={isp} onChange={(e) => setIsp(e.target.value)} />
+            </label>
+            <label>
+              {t("risk.pdiDown")}
+              <input type="number" min="0" max="20000" step="any" value={pdiDown} onChange={(e) => setPdiDown(e.target.value)} />
+            </label>
+            <label>
+              {t("risk.pdiSpeed")}
+              <input type="number" min="0" max="50" step="any" value={pdiSpeed} onChange={(e) => setPdiSpeed(e.target.value)} />
+            </label>
+            <label>
+              {t("risk.azimuth")}
+              <input type="number" min="0" max="359.9" step="any" value={azimuth} onChange={(e) => setAzimuth(e.target.value)} />
+            </label>
+            <label>
+              {t("risk.seed")}
+              <input aria-label={t("risk.seed")} type="number" min="0" step="1" value={seed} onChange={(e) => setSeed(e.target.value)} />
+            </label>
+          </details>
           <button type="submit" className="text-button">
-            {busy ? `Flying ${runs} descents…` : "Run Monte Carlo ↗"}
+            {busy ? t("risk.running", { runs }) : t("risk.run")}
           </button>
         </fieldset>
-        <p className="field-help">
-          Uses the site, vehicle, orbit and reserve above. Same seed and inputs reproduce the same
-          result. Error sizes are planning assumptions, not certified vehicle values.
-        </p>
+        <p className="field-help">{t("risk.help")}</p>
       </form>
       {error && (
         <div className="alert" role="alert">
@@ -305,53 +320,61 @@ export default function RiskPanel({ base }: { base: Record<string, unknown> }) {
             role="status"
           >
             <strong>
-              {pct(result.success.rate)} of {result.runs} simulated landings succeed
+              {t("risk.verdict", { rate: pct(result.success.rate), runs: result.runs })}
             </strong>
             <p>
-              95 % confidence {pct(result.success.wilson95[0])}–{pct(result.success.wilson95[1])} · seed{" "}
-              {result.seed} · result {result.result_id.slice(0, 10)}
+              {t("risk.confidence", {
+                low: pct(result.success.wilson95[0]),
+                high: pct(result.success.wilson95[1]),
+                seed: result.seed,
+                id: result.result_id.slice(0, 10),
+              })}
               {result.dominant_failure_source && (
                 <>
                   {" "}
-                  · main driver of failures:{" "}
-                  <b>{SOURCE_LABELS[result.dominant_failure_source] ?? result.dominant_failure_source}</b>
+                  · {t("risk.mainDriver")}{" "}
+                  <b>{sourceLabel(t, result.dominant_failure_source)}</b>
                 </>
               )}
             </p>
           </div>
           <div className="communication-metrics">
             <div>
-              <span className="metric-label">3σ LANDING ELLIPSE</span>
+              <span className="metric-label">{t("risk.metrics.ellipse")}</span>
               <strong>
                 {(2 * result.landing.ellipse_3sigma.semi_major_m).toFixed(0)} ×{" "}
                 {(2 * result.landing.ellipse_3sigma.semi_minor_m).toFixed(0)} m
               </strong>
-              <small>{pct(result.landing.within_3sigma_fraction)} of landings inside</small>
+              <small>{t("risk.metrics.inside", { share: pct(result.landing.within_3sigma_fraction) })}</small>
             </div>
             <div>
-              <span className="metric-label">STEEP TERRAIN IN ELLIPSE</span>
-              <strong>{cells && cells.steep_fraction !== null ? pct(cells.steep_fraction) : "not evaluated"}</strong>
+              <span className="metric-label">{t("risk.metrics.steep")}</span>
+              <strong>{cells && cells.steep_fraction !== null ? pct(cells.steep_fraction) : t("risk.metrics.notEvaluated")}</strong>
               <small>
                 {cells
-                  ? `${cells.count} DEM cells > ${result.hazard.slope_limit_deg}° · unknown ${pct(cells.unknown_fraction ?? 0)}`
-                  : "terrain not cached"}
+                  ? t("risk.metrics.cells", {
+                      count: cells.count,
+                      limit: result.hazard.slope_limit_deg,
+                      unknown: pct(cells.unknown_fraction ?? 0),
+                    })
+                  : t("risk.metrics.noTerrain")}
               </small>
             </div>
             <div>
-              <span className="metric-label">FUEL ABOVE RESERVE (P5)</span>
+              <span className="metric-label">{t("risk.metrics.fuel")}</span>
               <strong>{result.propellant.margin_above_reserve_kg.p05.toFixed(0)} kg</strong>
-              <small>median {result.propellant.margin_above_reserve_kg.p50.toFixed(0)} kg</small>
+              <small>{t("risk.metrics.median", { kg: result.propellant.margin_above_reserve_kg.p50.toFixed(0) })}</small>
             </div>
           </div>
           <div className="risk-grid">
             <DispersionPlot result={result} />
             <div>
-              <h4>Why landings fail</h4>
+              <h4>{t("risk.whyFail")}</h4>
               {causes.length ? (
                 <ul className="risk-causes">
                   {causes.map(([cause, n]) => (
                     <li key={cause}>
-                      <span>{CAUSE_LABELS[cause] ?? cause}</span>
+                      <span>{causeLabel(t, cause)}</span>
                       <b>
                         {n} · {pct(n / result.runs)}
                       </b>
@@ -359,36 +382,33 @@ export default function RiskPanel({ base }: { base: Record<string, unknown> }) {
                   ))}
                 </ul>
               ) : (
-                <p className="muted">No failures in this sample.</p>
+                <p className="muted">{t("risk.noFailures")}</p>
               )}
-              <h4>Which uncertainty matters</h4>
+              <h4>{t("risk.whichMatters")}</h4>
               <ul className="risk-sensitivity">
                 {result.sensitivity.map((s) => (
                   <li key={s.source} className={s.enabled ? "" : "off"}>
-                    <span>{SOURCE_LABELS[s.source] ?? s.source}</span>
+                    <span>{sourceLabel(t, s.source)}</span>
                     {s.enabled && s.failure_association !== null ? (
-                      <span className="risk-meter" aria-label={`association ${s.failure_association.toFixed(2)}`}>
+                      <span className="risk-meter" aria-label={t("risk.association", { value: s.failure_association.toFixed(2) })}>
                         <i style={{ width: `${Math.min(s.failure_association, 1) * 100}%` }} />
                         <em style={{ left: `${Math.min(result.noise_threshold, 1) * 100}%` }} />
                       </span>
                     ) : (
-                      <small>{s.enabled ? "no failures to explain" : "off"}</small>
+                      <small>{s.enabled ? t("risk.nothingToExplain") : t("risk.off")}</small>
                     )}
-                    {s.significant && <b>significant</b>}
+                    {s.significant && <b>{t("risk.significant")}</b>}
                   </li>
                 ))}
               </ul>
-              <p className="field-help">
-                Bar: rank correlation with failure. The tick marks the noise level 2/√runs; shorter bars are
-                not distinguishable from chance.
-              </p>
-              <h4>Propellant left at touchdown</h4>
+              <p className="field-help">{t("risk.barHelp")}</p>
+              <h4>{t("risk.propellantLeft")}</h4>
               <Histogram result={result} />
             </div>
           </div>
           <details className="communication-limits">
             <summary>
-              Monte Carlo model & assumptions <span>+</span>
+              {t("risk.assumptions")} <span>+</span>
             </summary>
             <ul>
               {result.assumptions.map((a) => (

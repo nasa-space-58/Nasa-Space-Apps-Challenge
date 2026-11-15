@@ -11,14 +11,20 @@ import {
   type ReactNode,
 } from "react";
 import PolarMap from "./PolarMap";
+import SurfaceOps from "./SurfaceOps";
+import "./flight-readout.css";
+import type { RoverState } from "./Rover";
 import type { Preset } from "../types";
 import {
   COVERAGE_MAX_LATITUDE_DEG,
   LANDING_CLOSEUP_START_PROGRESS,
   LAUNCH_CLOSEUP_END_PROGRESS,
   MISSION_PHASES,
+  MOON_MEAN_RADIUS_KM,
   buildTransferPath,
+  liveFlightView,
   phaseAt,
+  type FlightEphemeris,
   type SiteSelection,
 } from "../missionPath";
 import type { CameraMode, CameraView, SiteCondition } from "./MissionScene";
@@ -27,6 +33,58 @@ import { useTranslate, type Translate } from "../i18n";
 const MissionScene = lazy(() => import("./MissionScene"));
 /** Wall-clock length of one illustrative flight playback. */
 const FLIGHT_PLAYBACK_S = 45;
+/** Wait for the date to settle before requesting dated flight positions. */
+const FLIGHT_REQUEST_DELAY_MS = 600;
+const FLIGHT_POLL_MS = 1500;
+const LANDING_UTC = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
+
+type FlightJob = { id: string; status: string; result: FlightEphemeris | null; error: string | null };
+
+/**
+ * Dated Moon/Sun/Earth-rotation samples for a flight landing at landingUtc,
+ * from the backend's JPL Horizons job. Null while loading or on failure.
+ */
+function useFlightEphemeris(landingUtc: string | undefined) {
+  const [flight, setFlight] = useState<FlightEphemeris | null>(null);
+  const [state, setState] = useState<"off" | "loading" | "ready" | "failed">("off");
+  useEffect(() => {
+    setFlight(null);
+    if (!landingUtc || !LANDING_UTC.test(landingUtc)) {
+      setState("off");
+      return;
+    }
+    setState("loading");
+    let live = true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const settle = (job: FlightJob) => {
+      if (!live) return;
+      if (job.status === "ready" && job.result) {
+        setFlight(job.result);
+        setState("ready");
+      } else if (job.status === "failed") setState("failed");
+      else timer = setTimeout(() => poll(job.id), FLIGHT_POLL_MS);
+    };
+    const fail = () => live && setState("failed");
+    const poll = (id: string) =>
+      fetch(`/api/flight-ephemeris/${encodeURIComponent(id)}`)
+        .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+        .then(settle, fail);
+    timer = setTimeout(() => {
+      fetch("/api/flight-ephemeris", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ landing_utc: landingUtc }),
+      })
+        .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
+        .then(settle, fail);
+    }, FLIGHT_REQUEST_DELAY_MS);
+    return () => {
+      live = false;
+      if (timer) clearTimeout(timer);
+    };
+  }, [landingUtc]);
+  return { flight, state };
+}
 const TICK_MS = 50;
 const cameraModes: CameraMode[] = [
   "auto",
@@ -45,7 +103,18 @@ const PANEL_MAX_SHARE = 0.75;
 const PANEL_KEY_STEP_PX = 32;
 const PANEL_WIDTH_STORAGE_KEY = "lunar-panel-width-px";
 
-export type StageModule = { id: string; label: string; content: ReactNode };
+/**
+ * A mission-control module. `group` places it in one of the four numbered steps
+ * ("results", "compare", "descent"), under "Learn" or in the "Advanced" menu.
+ */
+export type StageModule = {
+  id: string;
+  label: string;
+  content: ReactNode;
+  group: "results" | "compare" | "descent" | "learn" | "advanced";
+};
+/** The numbered steps of mission control, in order. */
+const STEP_GROUPS = ["plan", "results", "compare", "descent"] as const;
 
 const clampPanelWidth = (width_px: number, container_px: number) =>
   Math.round(
@@ -83,6 +152,8 @@ export default function MissionStage({
   visible,
   compact,
   launchKey,
+  landingUtc,
+  analysisId,
   condition,
   siteStatus,
   onSelect,
@@ -104,6 +175,10 @@ export default function MissionStage({
   visible: boolean;
   compact: boolean;
   launchKey: number;
+  /** Landing time of the flight (observation start), "YYYY-MM-DDTHH:MM:SSZ". */
+  landingUtc?: string;
+  /** Completed analysis used for post-landing sky checks and space weather. */
+  analysisId?: string;
   condition: SiteCondition;
   siteStatus?: ReactNode;
   onSelect: (latitude_deg: number, longitude_deg_east: number) => void;
@@ -120,7 +195,7 @@ export default function MissionStage({
   /** Content of the "Plan" tab, above the flight simulation controls. */
   children: ReactNode;
 }) {
-  const { t } = useTranslate();
+  const { t, locale } = useTranslate();
   const lockedNotice = t("missionStage.locked");
   const phaseLabel = (id: string) => t(`missionPhases.${id}.label`);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -156,18 +231,77 @@ export default function MissionStage({
     handle.addEventListener("pointerup", stop);
     handle.addEventListener("pointercancel", stop);
   };
-  const tabs = [{ id: "plan", label: t("missionStage.plan") }, ...modules];
+  const groupOf = (id: string) =>
+    id === "plan" ? "plan" : (modules.find((m) => m.id === id)?.group ?? "plan");
+  const activeGroup = groupOf(activeModule);
+  const lastInGroup = useRef<Record<string, string>>({});
+  lastInGroup.current[activeGroup] = activeModule;
+  const openGroup = (group: string) => {
+    if (group === "plan") return onModuleChange("plan");
+    const remembered = lastInGroup.current[group];
+    const target =
+      modules.find((m) => m.id === remembered && m.group === group) ??
+      modules.find((m) => m.group === group);
+    if (target) onModuleChange(target.id);
+  };
+  const steps = STEP_GROUPS.filter(
+    (g) => g === "plan" || modules.some((m) => m.group === g),
+  );
+  const learn = modules.find((m) => m.group === "learn");
+  const advanced = modules.filter((m) => m.group === "advanced");
+  const siblings =
+    activeGroup === "plan" ? [] : modules.filter((m) => m.group === activeGroup);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const [flying, setFlying] = useState(false);
   const [cameraMode, setCameraMode] = useState<CameraMode>("auto");
   const [notice, setNotice] = useState("");
   const [focusMoon, setFocusMoon] = useState(false);
+  const [rover, setRover] = useState<RoverState | null>(null);
   const path = useMemo(() => {
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90)
       return null;
     return buildTransferPath(lat, lon);
   }, [lat, lon]);
   const active = phaseAt(progress);
+  const { flight, state: flightState } = useFlightEphemeris(landingUtc);
+  const flightView = useMemo(() => {
+    if (!path || !flight) return null;
+    try {
+      return liveFlightView(path, flight);
+    } catch {
+      return null;
+    }
+  }, [path, flight]);
+  // Display-only readouts: backend positions converted back to km, and the
+  // illustrative spacecraft's distances (labelled as such).
+  const readout = (() => {
+    if (!flightView) return null;
+    const utc = flightView.utcAt(progress);
+    if (utc === null) return null;
+    const km = (a: readonly number[], b: readonly number[]) =>
+      Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]) * MOON_MEAN_RADIUS_KM;
+    const earth = flightView.earthCenter(progress);
+    const moon = flightView.moonPose(progress).position;
+    const craft = flightView.positionAt(progress);
+    const elapsed_s = Math.max(0, (utc - Date.parse(flight!.window.launch_utc)) / 1000);
+    const days = Math.floor(elapsed_s / 86400);
+    const clock = new Date((elapsed_s % 86400) * 1000).toISOString().slice(11, 19);
+    return {
+      utc: new Date(utc).toLocaleString(locale, {
+        timeZone: "UTC",
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }),
+      met: `T+ ${days} ${t("missionStage.flightData.days")} ${clock}`,
+      earthMoon: Math.round(km(earth, moon)).toLocaleString(locale),
+      craftEarth: Math.round(km(craft, earth)).toLocaleString(locale),
+      craftMoon: Math.round(km(craft, moon)).toLocaleString(locale),
+    };
+  })();
   // Auto camera: with true-scale distances the wide Earth–Moon view only
   // suits the coast, so the spacecraft close-up covers Earth orbit and early
   // descent; lift-off opens on the launch close-up and the final descent and
@@ -189,6 +323,20 @@ export default function MissionStage({
               ? "landing"
               : "spacecraft";
   const picking = cameraView === "pole" || cameraView === "moon";
+  // Launch, space and landing are separate 3-D scenes: a short fade hides
+  // the cut between them.
+  const sceneFamily =
+    cameraView === "launch" || cameraView === "landing" ? cameraView : "space";
+  const [fadeKey, setFadeKey] = useState(0);
+  const lastFamily = useRef(sceneFamily);
+  useEffect(() => {
+    if (lastFamily.current === sceneFamily) return;
+    lastFamily.current = sceneFamily;
+    if (!reduced) setFadeKey((key) => key + 1);
+  }, [sceneFamily, reduced]);
+  // Post-landing operations start once touchdown is complete and stay alive
+  // across camera changes; the rover is drawn only in the landing close-up.
+  const landed = webgl && active.phase.id === "landed" && progress >= 1;
 
   // A new target restarts the illustrative flight from Earth orbit.
   useEffect(() => {
@@ -282,6 +430,7 @@ export default function MissionStage({
         role="region"
         aria-label={t("missionStage.viewLabel")}
       >
+        {fadeKey > 0 && <div key={fadeKey} className="stage-fade" aria-hidden="true" />}
         {webgl ? (
           <SceneBoundary fallback={fallback}>
             <Suspense fallback={<div className="stage-loading">{t("missionStage.loading")}</div>}>
@@ -305,6 +454,12 @@ export default function MissionStage({
                   else onPreset(site);
                 }}
                 onFailure={onSceneFailure}
+                flight={flight}
+                roverPath={landed ? (rover?.path ?? null) : null}
+                roverDrive={rover?.drive ?? 0}
+                roverScan={rover?.scan ?? 1}
+                roverScene={landed ? (rover?.scene ?? null) : null}
+                roverTarget={rover?.targetId ?? ""}
               />
             </Suspense>
           </SceneBoundary>
@@ -329,6 +484,27 @@ export default function MissionStage({
               <strong>{phaseLabel(active.phase.id)}</strong>
               <p>{t(`missionPhases.${active.phase.id}.description`)}</p>
             </>
+          )}
+          {readout ? (
+            <dl className="flight-readout">
+              <dt>{t("missionStage.flightData.utc")}</dt>
+              <dd>{readout.utc} UTC</dd>
+              <dt>{t("missionStage.flightData.met")}</dt>
+              <dd>{readout.met}</dd>
+              <dt>{t("missionStage.flightData.earthMoon")}</dt>
+              <dd>{readout.earthMoon} km</dd>
+              <dt>{t("missionStage.flightData.craftEarth")}</dt>
+              <dd>{readout.craftEarth} km</dd>
+              <dt>{t("missionStage.flightData.craftMoon")}</dt>
+              <dd>{readout.craftMoon} km</dd>
+            </dl>
+          ) : (
+            flightState !== "off" &&
+            flightState !== "ready" && (
+              <small className="flight-note">
+                {t(`missionStage.flightData.${flightState}`)}
+              </small>
+            )
           )}
         </div>
         {webgl && (
@@ -376,6 +552,17 @@ export default function MissionStage({
             </small>
           )}
         </div>
+        {landed && (
+          <SceneBoundary fallback={null}>
+            <SurfaceOps
+              lat={lat}
+              lon={lon}
+              analysisId={analysisId}
+              reduced={reduced}
+              onRover={setRover}
+            />
+          </SceneBoundary>
+        )}
         {notice && (
           <div className="stage-notice" role="status">
             {notice}
@@ -416,39 +603,98 @@ export default function MissionStage({
             e.preventDefault();
           }}
         />
-        <div className="panel-bar">
-          <div className="panel-tabs" role="tablist" aria-label={t("missionStage.modules")}>
-            {tabs.map((tab) => (
+        <nav className="panel-bar menu-bar" aria-label={t("missionStage.modules")}>
+          <div className="menu-top">
+            <span className="menu-title">{t("missionStage.menuTitle")}</span>
+            <div className="panel-bar-end">
+              {status}
               <button
-                key={tab.id}
+                type="button"
+                className="panel-collapse"
+                onClick={() => setPanelOpen(false)}
+                aria-label={t("missionStage.hidePanel")}
+              >
+                ›
+              </button>
+            </div>
+          </div>
+          <div className="step-tabs" role="tablist" aria-label={t("missionStage.modules")}>
+            {steps.map((group, index) => (
+              <button
+                key={group}
                 type="button"
                 role="tab"
-                id={`tab-${tab.id}`}
-                aria-selected={activeModule === tab.id}
-                aria-controls={`tabpanel-${tab.id}`}
-                onClick={() => onModuleChange(tab.id)}
+                id={`step-${group}`}
+                aria-selected={activeGroup === group}
+                onClick={() => {
+                  setAdvancedOpen(false);
+                  openGroup(group);
+                }}
               >
-                {tab.label}
+                <b>{index + 1}</b>
+                <span>{t(`missionStage.steps.${group}`)}</span>
               </button>
             ))}
           </div>
-          <div className="panel-bar-end">
-            {status}
-            <button
-              type="button"
-              className="panel-collapse"
-              onClick={() => setPanelOpen(false)}
-              aria-label={t("missionStage.hidePanel")}
-            >
-              ›
-            </button>
-          </div>
-        </div>
+          {(learn || advanced.length > 0) && (
+            <div className="menu-extra">
+              {learn && (
+                <button
+                  type="button"
+                  id="step-learn"
+                  aria-pressed={activeGroup === "learn"}
+                  onClick={() => {
+                    setAdvancedOpen(false);
+                    onModuleChange(learn.id);
+                  }}
+                >
+                  <span aria-hidden="true">✦</span> {t("missionStage.learn")}
+                </button>
+              )}
+              {advanced.length > 0 && (
+                <div className="advanced-menu">
+                  <button
+                    type="button"
+                    aria-expanded={advancedOpen}
+                    aria-haspopup="menu"
+                    data-active={activeGroup === "advanced" || undefined}
+                    onClick={() => setAdvancedOpen((open) => !open)}
+                  >
+                    <span aria-hidden="true">⚙</span> {t("missionStage.advanced")}
+                    {activeGroup === "advanced"
+                      ? `: ${advanced.find((m) => m.id === activeModule)?.label ?? ""}`
+                      : ""}{" "}
+                    <span aria-hidden="true">{advancedOpen ? "▴" : "▾"}</span>
+                  </button>
+                  {advancedOpen && (
+                    <div className="advanced-list" role="menu">
+                      <p>{t("missionStage.advancedHint")}</p>
+                      {advanced.map((m) => (
+                        <button
+                          key={m.id}
+                          type="button"
+                          role="menuitem"
+                          aria-current={activeModule === m.id || undefined}
+                          onClick={() => {
+                            setAdvancedOpen(false);
+                            onModuleChange(m.id);
+                          }}
+                        >
+                          {m.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </nav>
         <div
           className="panel-body"
           role="tabpanel"
           id="tabpanel-plan"
-          aria-labelledby="tab-plan"
+          aria-labelledby="step-plan"
           hidden={activeModule !== "plan"}
         >
         {children}
@@ -527,13 +773,38 @@ export default function MissionStage({
           </div>
         </section>
         </div>
+        {siblings.length > 1 && (
+          <div
+            className="sub-tabs"
+            role="tablist"
+            aria-label={
+              activeGroup === "advanced"
+                ? t("missionStage.advanced")
+                : t(`missionStage.steps.${activeGroup}`)
+            }
+          >
+            {siblings.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                role="tab"
+                id={`tab-${m.id}`}
+                aria-selected={activeModule === m.id}
+                aria-controls={`tabpanel-${m.id}`}
+                onClick={() => onModuleChange(m.id)}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        )}
         {modules.map((module) => (
           <div
             key={module.id}
             className="panel-body"
             role="tabpanel"
             id={`tabpanel-${module.id}`}
-            aria-labelledby={`tab-${module.id}`}
+            aria-label={module.label}
             hidden={activeModule !== module.id}
           >
             {module.content}

@@ -1,0 +1,2311 @@
+{
+  "sha256": "aa647413e42d37a2e790d3513e584ddf51db37d879f9f1dd022c7823d1316206",
+  "payload": {
+    "version": "h10-scaling-v1",
+    "hardware_jobs": 0,
+    "credits_spent": 0,
+    "environment": {
+      "python": "3.12.4",
+      "numpy": "2.5.4",
+      "scipy": "1.18.1",
+      "platform": "macOS-27.2.1-arm64-arm-64bit",
+      "machine": "arm64",
+      "processor": "arm",
+      "cpu_model": "Apple M5",
+      "cpu_model_source": "sysctl machdep.cpu.brand_string; same host as recorded experiment"
+    },
+    "budget": {
+      "repeats": 3,
+      "max_evaluations": 65536,
+      "time_limit_s": 0.5
+    },
+    "points": [
+      {
+        "missions": 3,
+        "options": 2,
+        "seed": 17,
+        "utilities": [
+          [
+            75,
+            85
+          ],
+          [
+            11,
+            17
+          ],
+          [
+            46,
+            56
+          ]
+        ],
+        "capacities": [
+          2,
+          2
+        ],
+        "fingerprint": "159713d488998e161d9ad6c7cef2cd9053c677352ae2b3263d840b9ab4dac3e0",
+        "combinations": "8",
+        "logical_qubits": 3,
+        "one_hot_variables": 6,
+        "measurement_kind": "measured",
+        "exact_runs": [
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 8,
+            "feasible_count": 6,
+            "selection": [
+              1,
+              0,
+              1
+            ],
+            "score": 152,
+            "elapsed_s": 2.2332998923957348e-05
+          },
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 8,
+            "feasible_count": 6,
+            "selection": [
+              1,
+              0,
+              1
+            ],
+            "score": 152,
+            "elapsed_s": 1.091699959943071e-05
+          },
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 8,
+            "feasible_count": 6,
+            "selection": [
+              1,
+              0,
+              1
+            ],
+            "score": 152,
+            "elapsed_s": 7.874994480516762e-06
+          }
+        ],
+        "milp_runs": [
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              0,
+              1
+            ],
+            "score": 152,
+            "validation": {
+              "feasible": true,
+              "score": 152,
+              "occupancy": [
+                1,
+                2
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.004477791000681464,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              0,
+              1
+            ],
+            "score": 152,
+            "validation": {
+              "feasible": true,
+              "score": 152,
+              "occupancy": [
+                1,
+                2
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.000581749998673331,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              0,
+              1
+            ],
+            "score": 152,
+            "validation": {
+              "feasible": true,
+              "score": 152,
+              "occupancy": [
+                1,
+                2
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.0004413330025272444,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          }
+        ],
+        "exact_median_s": 1.091699959943071e-05,
+        "milp_median_s": 0.000581749998673331
+      },
+      {
+        "missions": 6,
+        "options": 2,
+        "seed": 17,
+        "utilities": [
+          [
+            75,
+            85
+          ],
+          [
+            11,
+            17
+          ],
+          [
+            46,
+            56
+          ],
+          [
+            77,
+            37
+          ],
+          [
+            4,
+            22
+          ],
+          [
+            46,
+            39
+          ]
+        ],
+        "capacities": [
+          3,
+          3
+        ],
+        "fingerprint": "ed358e88043c8bdeb541d173798683fb998015b03d729d436f91ae2bc98eee1e",
+        "combinations": "64",
+        "logical_qubits": 6,
+        "one_hot_variables": 12,
+        "measurement_kind": "measured",
+        "exact_runs": [
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 64,
+            "feasible_count": 20,
+            "selection": [
+              1,
+              0,
+              1,
+              0,
+              1,
+              0
+            ],
+            "score": 297,
+            "elapsed_s": 7.370799721684307e-05
+          },
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 64,
+            "feasible_count": 20,
+            "selection": [
+              1,
+              0,
+              1,
+              0,
+              1,
+              0
+            ],
+            "score": 297,
+            "elapsed_s": 6.920900341356173e-05
+          },
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 64,
+            "feasible_count": 20,
+            "selection": [
+              1,
+              0,
+              1,
+              0,
+              1,
+              0
+            ],
+            "score": 297,
+            "elapsed_s": 6.670899892924353e-05
+          }
+        ],
+        "milp_runs": [
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              0,
+              1,
+              0,
+              1,
+              0
+            ],
+            "score": 297,
+            "validation": {
+              "feasible": true,
+              "score": 297,
+              "occupancy": [
+                3,
+                3
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.005370124999899417,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              0,
+              1,
+              0,
+              1,
+              0
+            ],
+            "score": 297,
+            "validation": {
+              "feasible": true,
+              "score": 297,
+              "occupancy": [
+                3,
+                3
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.004282458001398481,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              0,
+              1,
+              0,
+              1,
+              0
+            ],
+            "score": 297,
+            "validation": {
+              "feasible": true,
+              "score": 297,
+              "occupancy": [
+                3,
+                3
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.004137291005463339,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          }
+        ],
+        "exact_median_s": 6.920900341356173e-05,
+        "milp_median_s": 0.004282458001398481
+      },
+      {
+        "missions": 10,
+        "options": 2,
+        "seed": 17,
+        "utilities": [
+          [
+            75,
+            85
+          ],
+          [
+            11,
+            17
+          ],
+          [
+            46,
+            56
+          ],
+          [
+            77,
+            37
+          ],
+          [
+            4,
+            22
+          ],
+          [
+            46,
+            39
+          ],
+          [
+            92,
+            43
+          ],
+          [
+            64,
+            62
+          ],
+          [
+            10,
+            74
+          ],
+          [
+            5,
+            2
+          ]
+        ],
+        "capacities": [
+          5,
+          5
+        ],
+        "fingerprint": "071ba517dfca944f4eb8995f8133d96e67a501bc873f41e21ad2fad53df71966",
+        "combinations": "1024",
+        "logical_qubits": 10,
+        "one_hot_variables": 20,
+        "measurement_kind": "measured",
+        "exact_runs": [
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 1024,
+            "feasible_count": 252,
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "score": 538,
+            "elapsed_s": 0.0013281669962452725
+          },
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 1024,
+            "feasible_count": 252,
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "score": 538,
+            "elapsed_s": 0.0013302500010468066
+          },
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 1024,
+            "feasible_count": 252,
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "score": 538,
+            "elapsed_s": 0.0013622089973068796
+          }
+        ],
+        "milp_runs": [
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "score": 538,
+            "validation": {
+              "feasible": true,
+              "score": 538,
+              "occupancy": [
+                5,
+                5
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.00388737500179559,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "score": 538,
+            "validation": {
+              "feasible": true,
+              "score": 538,
+              "occupancy": [
+                5,
+                5
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.003319082999951206,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0
+            ],
+            "score": 538,
+            "validation": {
+              "feasible": true,
+              "score": 538,
+              "occupancy": [
+                5,
+                5
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.0033425830042688176,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          }
+        ],
+        "exact_median_s": 0.0013302500010468066,
+        "milp_median_s": 0.0033425830042688176
+      },
+      {
+        "missions": 16,
+        "options": 2,
+        "seed": 17,
+        "utilities": [
+          [
+            75,
+            85
+          ],
+          [
+            11,
+            17
+          ],
+          [
+            46,
+            56
+          ],
+          [
+            77,
+            37
+          ],
+          [
+            4,
+            22
+          ],
+          [
+            46,
+            39
+          ],
+          [
+            92,
+            43
+          ],
+          [
+            64,
+            62
+          ],
+          [
+            10,
+            74
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            59,
+            26
+          ],
+          [
+            37,
+            61
+          ],
+          [
+            16,
+            9
+          ],
+          [
+            71,
+            100
+          ],
+          [
+            69,
+            84
+          ],
+          [
+            42,
+            4
+          ]
+        ],
+        "capacities": [
+          8,
+          8
+        ],
+        "fingerprint": "06be43b578bf4527581999dada728e1bfc2bd5cdcb05859da17657c651bf1d91",
+        "combinations": "65536",
+        "logical_qubits": 16,
+        "one_hot_variables": 32,
+        "measurement_kind": "measured",
+        "exact_runs": [
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 65536,
+            "feasible_count": 12870,
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              1,
+              1,
+              0
+            ],
+            "score": 900,
+            "elapsed_s": 0.10530874999676598
+          },
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 65536,
+            "feasible_count": 12870,
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              1,
+              1,
+              0
+            ],
+            "score": 900,
+            "elapsed_s": 0.10535299999901326
+          },
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 65536,
+            "feasible_count": 12870,
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              1,
+              1,
+              0
+            ],
+            "score": 900,
+            "elapsed_s": 0.1078054589961539
+          }
+        ],
+        "milp_runs": [
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              1,
+              1,
+              0
+            ],
+            "score": 900,
+            "validation": {
+              "feasible": true,
+              "score": 900,
+              "occupancy": [
+                8,
+                8
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.002741042000707239,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              1,
+              1,
+              0
+            ],
+            "score": 900,
+            "validation": {
+              "feasible": true,
+              "score": 900,
+              "occupancy": [
+                8,
+                8
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.002570040996943135,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              0,
+              1,
+              0,
+              0,
+              1,
+              0,
+              1,
+              1,
+              0
+            ],
+            "score": 900,
+            "validation": {
+              "feasible": true,
+              "score": 900,
+              "occupancy": [
+                8,
+                8
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.004223333002300933,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          }
+        ],
+        "exact_median_s": 0.10535299999901326,
+        "milp_median_s": 0.002741042000707239
+      },
+      {
+        "missions": 24,
+        "options": 2,
+        "seed": 17,
+        "utilities": [
+          [
+            75,
+            85
+          ],
+          [
+            11,
+            17
+          ],
+          [
+            46,
+            56
+          ],
+          [
+            77,
+            37
+          ],
+          [
+            4,
+            22
+          ],
+          [
+            46,
+            39
+          ],
+          [
+            92,
+            43
+          ],
+          [
+            64,
+            62
+          ],
+          [
+            10,
+            74
+          ],
+          [
+            5,
+            2
+          ],
+          [
+            59,
+            26
+          ],
+          [
+            37,
+            61
+          ],
+          [
+            16,
+            9
+          ],
+          [
+            71,
+            100
+          ],
+          [
+            69,
+            84
+          ],
+          [
+            42,
+            4
+          ],
+          [
+            66,
+            57
+          ],
+          [
+            75,
+            61
+          ],
+          [
+            49,
+            1
+          ],
+          [
+            70,
+            18
+          ],
+          [
+            48,
+            17
+          ],
+          [
+            58,
+            47
+          ],
+          [
+            41,
+            57
+          ],
+          [
+            15,
+            46
+          ]
+        ],
+        "capacities": [
+          12,
+          12
+        ],
+        "fingerprint": "7ebda667f6c39074007e3e88b519e555892721f4c536aca71adbed00e13e8ce1",
+        "combinations": "16777216",
+        "logical_qubits": 24,
+        "one_hot_variables": 48,
+        "measurement_kind": "measured",
+        "exact_runs": [
+          {
+            "status": "limit_reached",
+            "complete": false,
+            "evaluated": 65536,
+            "feasible_count": 1820,
+            "selection": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              1,
+              1,
+              1,
+              1,
+              0,
+              1,
+              1,
+              0,
+              0,
+              1,
+              1,
+              1,
+              1
+            ],
+            "score": 1250,
+            "elapsed_s": 0.13821875000576256
+          },
+          {
+            "status": "limit_reached",
+            "complete": false,
+            "evaluated": 65536,
+            "feasible_count": 1820,
+            "selection": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              1,
+              1,
+              1,
+              1,
+              0,
+              1,
+              1,
+              0,
+              0,
+              1,
+              1,
+              1,
+              1
+            ],
+            "score": 1250,
+            "elapsed_s": 0.13742295900010504
+          },
+          {
+            "status": "limit_reached",
+            "complete": false,
+            "evaluated": 65536,
+            "feasible_count": 1820,
+            "selection": [
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1,
+              0,
+              1,
+              1,
+              1,
+              1,
+              0,
+              1,
+              1,
+              0,
+              0,
+              1,
+              1,
+              1,
+              1
+            ],
+            "score": 1250,
+            "elapsed_s": 0.14170991600258276
+          }
+        ],
+        "milp_runs": [
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            "score": 1364,
+            "validation": {
+              "feasible": true,
+              "score": 1364,
+              "occupancy": [
+                12,
+                12
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.0026397089968668297,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            "score": 1364,
+            "validation": {
+              "feasible": true,
+              "score": 1364,
+              "occupancy": [
+                12,
+                12
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.0024609169995528646,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              0,
+              1,
+              1,
+              1,
+              0,
+              1,
+              0,
+              1,
+              1,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              0,
+              1,
+              1
+            ],
+            "score": 1364,
+            "validation": {
+              "feasible": true,
+              "score": 1364,
+              "occupancy": [
+                12,
+                12
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.0026091670006280765,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          }
+        ],
+        "exact_median_s": 0.13821875000576256,
+        "milp_median_s": 0.0026091670006280765
+      },
+      {
+        "missions": 3,
+        "options": 4,
+        "seed": 17,
+        "utilities": [
+          [
+            75,
+            85,
+            11,
+            17
+          ],
+          [
+            46,
+            56,
+            77,
+            37
+          ],
+          [
+            4,
+            22,
+            46,
+            39
+          ]
+        ],
+        "capacities": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "fingerprint": "d2cc378e997f02ae511188ec2033ed90704f97b54039430eafacec5af6fd9808",
+        "combinations": "64",
+        "logical_qubits": 6,
+        "one_hot_variables": 12,
+        "measurement_kind": "measured",
+        "exact_runs": [
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 64,
+            "feasible_count": 24,
+            "selection": [
+              1,
+              2,
+              3
+            ],
+            "score": 201,
+            "elapsed_s": 6.316699727904052e-05
+          },
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 64,
+            "feasible_count": 24,
+            "selection": [
+              1,
+              2,
+              3
+            ],
+            "score": 201,
+            "elapsed_s": 6.229199789231643e-05
+          },
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 64,
+            "feasible_count": 24,
+            "selection": [
+              1,
+              2,
+              3
+            ],
+            "score": 201,
+            "elapsed_s": 5.88750044698827e-05
+          }
+        ],
+        "milp_runs": [
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              2,
+              3
+            ],
+            "score": 201,
+            "validation": {
+              "feasible": true,
+              "score": 201,
+              "occupancy": [
+                0,
+                1,
+                1,
+                1
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.004649374997825362,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              2,
+              3
+            ],
+            "score": 201,
+            "validation": {
+              "feasible": true,
+              "score": 201,
+              "occupancy": [
+                0,
+                1,
+                1,
+                1
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.004262624999682885,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              2,
+              3
+            ],
+            "score": 201,
+            "validation": {
+              "feasible": true,
+              "score": 201,
+              "occupancy": [
+                0,
+                1,
+                1,
+                1
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.004304207999666687,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          }
+        ],
+        "exact_median_s": 6.229199789231643e-05,
+        "milp_median_s": 0.004304207999666687
+      },
+      {
+        "missions": 6,
+        "options": 4,
+        "seed": 17,
+        "utilities": [
+          [
+            75,
+            85,
+            11,
+            17
+          ],
+          [
+            46,
+            56,
+            77,
+            37
+          ],
+          [
+            4,
+            22,
+            46,
+            39
+          ],
+          [
+            92,
+            43,
+            64,
+            62
+          ],
+          [
+            10,
+            74,
+            5,
+            2
+          ],
+          [
+            59,
+            26,
+            37,
+            61
+          ]
+        ],
+        "capacities": [
+          2,
+          2,
+          2,
+          2
+        ],
+        "fingerprint": "a2e0aabb1d878442c9b771d01bc5ee292d3c5cacef017ca42f561c5fc0b50b95",
+        "combinations": "4096",
+        "logical_qubits": 12,
+        "one_hot_variables": 24,
+        "measurement_kind": "measured",
+        "exact_runs": [
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 4096,
+            "feasible_count": 1440,
+            "selection": [
+              1,
+              2,
+              2,
+              0,
+              1,
+              3
+            ],
+            "score": 435,
+            "elapsed_s": 0.004608750001352746
+          },
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 4096,
+            "feasible_count": 1440,
+            "selection": [
+              1,
+              2,
+              2,
+              0,
+              1,
+              3
+            ],
+            "score": 435,
+            "elapsed_s": 0.004612707998603582
+          },
+          {
+            "status": "optimal",
+            "complete": true,
+            "evaluated": 4096,
+            "feasible_count": 1440,
+            "selection": [
+              1,
+              2,
+              2,
+              0,
+              1,
+              3
+            ],
+            "score": 435,
+            "elapsed_s": 0.004550292003841605
+          }
+        ],
+        "milp_runs": [
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              2,
+              2,
+              0,
+              1,
+              3
+            ],
+            "score": 435,
+            "validation": {
+              "feasible": true,
+              "score": 435,
+              "occupancy": [
+                1,
+                2,
+                2,
+                1
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.0038916659977985546,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              2,
+              2,
+              0,
+              1,
+              3
+            ],
+            "score": 435,
+            "validation": {
+              "feasible": true,
+              "score": 435,
+              "occupancy": [
+                1,
+                2,
+                2,
+                1
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.003765292000025511,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              2,
+              2,
+              0,
+              1,
+              3
+            ],
+            "score": 435,
+            "validation": {
+              "feasible": true,
+              "score": 435,
+              "occupancy": [
+                1,
+                2,
+                2,
+                1
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.0037883330005570315,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          }
+        ],
+        "exact_median_s": 0.004608750001352746,
+        "milp_median_s": 0.0037883330005570315
+      },
+      {
+        "missions": 10,
+        "options": 4,
+        "seed": 17,
+        "utilities": [
+          [
+            75,
+            85,
+            11,
+            17
+          ],
+          [
+            46,
+            56,
+            77,
+            37
+          ],
+          [
+            4,
+            22,
+            46,
+            39
+          ],
+          [
+            92,
+            43,
+            64,
+            62
+          ],
+          [
+            10,
+            74,
+            5,
+            2
+          ],
+          [
+            59,
+            26,
+            37,
+            61
+          ],
+          [
+            16,
+            9,
+            71,
+            100
+          ],
+          [
+            69,
+            84,
+            42,
+            4
+          ],
+          [
+            66,
+            57,
+            75,
+            61
+          ],
+          [
+            49,
+            1,
+            70,
+            18
+          ]
+        ],
+        "capacities": [
+          3,
+          3,
+          3,
+          3
+        ],
+        "fingerprint": "9aec5f077c6d89a445d9b1913d3b356217b73608ed6541f3d3c9fab3699f2c56",
+        "combinations": "1048576",
+        "logical_qubits": 20,
+        "one_hot_variables": 40,
+        "measurement_kind": "measured",
+        "exact_runs": [
+          {
+            "status": "limit_reached",
+            "complete": false,
+            "evaluated": 65536,
+            "feasible_count": 10080,
+            "selection": [
+              0,
+              0,
+              2,
+              0,
+              1,
+              3,
+              3,
+              1,
+              2,
+              2
+            ],
+            "score": 723,
+            "elapsed_s": 0.08790320900152437
+          },
+          {
+            "status": "limit_reached",
+            "complete": false,
+            "evaluated": 65536,
+            "feasible_count": 10080,
+            "selection": [
+              0,
+              0,
+              2,
+              0,
+              1,
+              3,
+              3,
+              1,
+              2,
+              2
+            ],
+            "score": 723,
+            "elapsed_s": 0.08642916600365425
+          },
+          {
+            "status": "limit_reached",
+            "complete": false,
+            "evaluated": 65536,
+            "feasible_count": 10080,
+            "selection": [
+              0,
+              0,
+              2,
+              0,
+              1,
+              3,
+              3,
+              1,
+              2,
+              2
+            ],
+            "score": 723,
+            "elapsed_s": 0.08790404200408375
+          }
+        ],
+        "milp_runs": [
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              2,
+              3,
+              0,
+              1,
+              3,
+              3,
+              1,
+              2,
+              2
+            ],
+            "score": 757,
+            "validation": {
+              "feasible": true,
+              "score": 757,
+              "occupancy": [
+                1,
+                3,
+                3,
+                3
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.003577333001885563,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              2,
+              3,
+              0,
+              1,
+              3,
+              3,
+              1,
+              2,
+              2
+            ],
+            "score": 757,
+            "validation": {
+              "feasible": true,
+              "score": 757,
+              "occupancy": [
+                1,
+                3,
+                3,
+                3
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.003464207999058999,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              2,
+              3,
+              0,
+              1,
+              3,
+              3,
+              1,
+              2,
+              2
+            ],
+            "score": 757,
+            "validation": {
+              "feasible": true,
+              "score": 757,
+              "occupancy": [
+                1,
+                3,
+                3,
+                3
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.0036980410004616715,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          }
+        ],
+        "exact_median_s": 0.08790320900152437,
+        "milp_median_s": 0.003577333001885563
+      },
+      {
+        "missions": 16,
+        "options": 4,
+        "seed": 17,
+        "utilities": [
+          [
+            75,
+            85,
+            11,
+            17
+          ],
+          [
+            46,
+            56,
+            77,
+            37
+          ],
+          [
+            4,
+            22,
+            46,
+            39
+          ],
+          [
+            92,
+            43,
+            64,
+            62
+          ],
+          [
+            10,
+            74,
+            5,
+            2
+          ],
+          [
+            59,
+            26,
+            37,
+            61
+          ],
+          [
+            16,
+            9,
+            71,
+            100
+          ],
+          [
+            69,
+            84,
+            42,
+            4
+          ],
+          [
+            66,
+            57,
+            75,
+            61
+          ],
+          [
+            49,
+            1,
+            70,
+            18
+          ],
+          [
+            48,
+            17,
+            58,
+            47
+          ],
+          [
+            41,
+            57,
+            15,
+            46
+          ],
+          [
+            73,
+            92,
+            23,
+            82
+          ],
+          [
+            35,
+            41,
+            81,
+            21
+          ],
+          [
+            25,
+            36,
+            65,
+            87
+          ],
+          [
+            27,
+            35,
+            86,
+            100
+          ]
+        ],
+        "capacities": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "fingerprint": "3a363c9e32962abdec6a8cf318ee6846072ffbfadf3b1eef8dbdb628591ba336",
+        "combinations": "4294967296",
+        "logical_qubits": 32,
+        "one_hot_variables": 64,
+        "measurement_kind": "measured",
+        "exact_runs": [
+          {
+            "status": "limit_reached",
+            "complete": false,
+            "evaluated": 65536,
+            "feasible_count": 0,
+            "selection": null,
+            "score": null,
+            "elapsed_s": 0.10915087500325171
+          },
+          {
+            "status": "limit_reached",
+            "complete": false,
+            "evaluated": 65536,
+            "feasible_count": 0,
+            "selection": null,
+            "score": null,
+            "elapsed_s": 0.10941533399454784
+          },
+          {
+            "status": "limit_reached",
+            "complete": false,
+            "evaluated": 65536,
+            "feasible_count": 0,
+            "selection": null,
+            "score": null,
+            "elapsed_s": 0.10834274999797344
+          }
+        ],
+        "milp_runs": [
+          {
+            "status": "optimal",
+            "selection": [
+              0,
+              2,
+              3,
+              0,
+              1,
+              0,
+              3,
+              1,
+              0,
+              2,
+              2,
+              1,
+              1,
+              2,
+              3,
+              3
+            ],
+            "score": 1211,
+            "validation": {
+              "feasible": true,
+              "score": 1211,
+              "occupancy": [
+                4,
+                4,
+                4,
+                4
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.0032940420060185716,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              0,
+              2,
+              3,
+              0,
+              1,
+              0,
+              3,
+              1,
+              0,
+              2,
+              2,
+              1,
+              1,
+              2,
+              3,
+              3
+            ],
+            "score": 1211,
+            "validation": {
+              "feasible": true,
+              "score": 1211,
+              "occupancy": [
+                4,
+                4,
+                4,
+                4
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.003128625001409091,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              0,
+              2,
+              3,
+              0,
+              1,
+              0,
+              3,
+              1,
+              0,
+              2,
+              2,
+              1,
+              1,
+              2,
+              3,
+              3
+            ],
+            "score": 1211,
+            "validation": {
+              "feasible": true,
+              "score": 1211,
+              "occupancy": [
+                4,
+                4,
+                4,
+                4
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.0032628330009174533,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          }
+        ],
+        "exact_median_s": 0.10915087500325171,
+        "milp_median_s": 0.0032628330009174533
+      },
+      {
+        "missions": 24,
+        "options": 4,
+        "seed": 17,
+        "utilities": [
+          [
+            75,
+            85,
+            11,
+            17
+          ],
+          [
+            46,
+            56,
+            77,
+            37
+          ],
+          [
+            4,
+            22,
+            46,
+            39
+          ],
+          [
+            92,
+            43,
+            64,
+            62
+          ],
+          [
+            10,
+            74,
+            5,
+            2
+          ],
+          [
+            59,
+            26,
+            37,
+            61
+          ],
+          [
+            16,
+            9,
+            71,
+            100
+          ],
+          [
+            69,
+            84,
+            42,
+            4
+          ],
+          [
+            66,
+            57,
+            75,
+            61
+          ],
+          [
+            49,
+            1,
+            70,
+            18
+          ],
+          [
+            48,
+            17,
+            58,
+            47
+          ],
+          [
+            41,
+            57,
+            15,
+            46
+          ],
+          [
+            73,
+            92,
+            23,
+            82
+          ],
+          [
+            35,
+            41,
+            81,
+            21
+          ],
+          [
+            25,
+            36,
+            65,
+            87
+          ],
+          [
+            27,
+            35,
+            86,
+            100
+          ],
+          [
+            79,
+            57,
+            81,
+            24
+          ],
+          [
+            16,
+            66,
+            25,
+            67
+          ],
+          [
+            23,
+            52,
+            82,
+            28
+          ],
+          [
+            56,
+            63,
+            22,
+            48
+          ],
+          [
+            74,
+            66,
+            68,
+            55
+          ],
+          [
+            93,
+            13,
+            51,
+            91
+          ],
+          [
+            43,
+            2,
+            99,
+            32
+          ],
+          [
+            6,
+            18,
+            96,
+            35
+          ]
+        ],
+        "capacities": [
+          6,
+          6,
+          6,
+          6
+        ],
+        "fingerprint": "feb58814fdaafb7171d0c7a4073914a198da2559409f059b858fe294b9509fc5",
+        "combinations": "281474976710656",
+        "logical_qubits": 48,
+        "one_hot_variables": 96,
+        "measurement_kind": "measured",
+        "exact_runs": [
+          {
+            "status": "limit_reached",
+            "complete": false,
+            "evaluated": 65536,
+            "feasible_count": 0,
+            "selection": null,
+            "score": null,
+            "elapsed_s": 0.14451874999940628
+          },
+          {
+            "status": "limit_reached",
+            "complete": false,
+            "evaluated": 65536,
+            "feasible_count": 0,
+            "selection": null,
+            "score": null,
+            "elapsed_s": 0.14580666599795222
+          },
+          {
+            "status": "limit_reached",
+            "complete": false,
+            "evaluated": 65536,
+            "feasible_count": 0,
+            "selection": null,
+            "score": null,
+            "elapsed_s": 0.14388699999835808
+          }
+        ],
+        "milp_runs": [
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              2,
+              3,
+              0,
+              1,
+              3,
+              3,
+              1,
+              0,
+              2,
+              0,
+              1,
+              1,
+              2,
+              3,
+              3,
+              0,
+              3,
+              2,
+              1,
+              0,
+              0,
+              2,
+              2
+            ],
+            "score": 1866,
+            "validation": {
+              "feasible": true,
+              "score": 1866,
+              "occupancy": [
+                6,
+                6,
+                6,
+                6
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.003028541999810841,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              2,
+              3,
+              0,
+              1,
+              3,
+              3,
+              1,
+              0,
+              2,
+              0,
+              1,
+              1,
+              2,
+              3,
+              3,
+              0,
+              3,
+              2,
+              1,
+              0,
+              0,
+              2,
+              2
+            ],
+            "score": 1866,
+            "validation": {
+              "feasible": true,
+              "score": 1866,
+              "occupancy": [
+                6,
+                6,
+                6,
+                6
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.0028577499979292043,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          },
+          {
+            "status": "optimal",
+            "selection": [
+              1,
+              2,
+              3,
+              0,
+              1,
+              3,
+              3,
+              1,
+              0,
+              2,
+              0,
+              1,
+              1,
+              2,
+              3,
+              3,
+              0,
+              3,
+              2,
+              1,
+              0,
+              0,
+              2,
+              2
+            ],
+            "score": 1866,
+            "validation": {
+              "feasible": true,
+              "score": 1866,
+              "occupancy": [
+                6,
+                6,
+                6,
+                6
+              ]
+            },
+            "mip_gap": 0.0,
+            "elapsed_s": 0.0030857919991831295,
+            "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)"
+          }
+        ],
+        "exact_median_s": 0.14451874999940628,
+        "milp_median_s": 0.003028541999810841
+      }
+    ],
+    "projections": [
+      {
+        "missions": 8,
+        "options": 2,
+        "combinations": "256",
+        "estimated_exact_s": 0.0003493439871817827,
+        "measurement_kind": "extrapolated",
+        "source_fingerprint": "159713d488998e161d9ad6c7cef2cd9053c677352ae2b3263d840b9ab4dac3e0"
+      },
+      {
+        "missions": 12,
+        "options": 2,
+        "combinations": "4096",
+        "estimated_exact_s": 0.0055895037949085236,
+        "measurement_kind": "extrapolated",
+        "source_fingerprint": "159713d488998e161d9ad6c7cef2cd9053c677352ae2b3263d840b9ab4dac3e0"
+      },
+      {
+        "missions": 16,
+        "options": 2,
+        "combinations": "65536",
+        "estimated_exact_s": 0.08943206071853638,
+        "measurement_kind": "extrapolated",
+        "source_fingerprint": "159713d488998e161d9ad6c7cef2cd9053c677352ae2b3263d840b9ab4dac3e0"
+      },
+      {
+        "missions": 24,
+        "options": 2,
+        "combinations": "16777216",
+        "estimated_exact_s": 22.894607543945312,
+        "measurement_kind": "extrapolated",
+        "source_fingerprint": "159713d488998e161d9ad6c7cef2cd9053c677352ae2b3263d840b9ab4dac3e0"
+      },
+      {
+        "missions": 32,
+        "options": 2,
+        "combinations": "4294967296",
+        "estimated_exact_s": 5861.01953125,
+        "measurement_kind": "extrapolated",
+        "source_fingerprint": "159713d488998e161d9ad6c7cef2cd9053c677352ae2b3263d840b9ab4dac3e0"
+      }
+    ],
+    "scope": "Synthetic capacitated slot assignment; MILP only, CP-SAT not measured. Encoding-size estimates are not QPU runs or speedup evidence.",
+    "measured_at_utc": "2026-11-14T21:39:53.438209+00:00"
+  }
+}

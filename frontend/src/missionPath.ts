@@ -395,3 +395,286 @@ export function allPathPoints(path: TransferPath): Vec3[] {
     i === 0 ? path.segments[id] : path.segments[id].slice(1),
   );
 }
+
+// ---------------------------------------------------------------------------
+// Flight views: where Earth, the Moon, the Sun and the spacecraft are drawn
+// at a given mission progress. The static view is the original fixed layout
+// (Moon at the origin, Earth on +X). The live view places bodies from the
+// backend's JPL Horizons geocentric vectors (Earth at the origin) and moves
+// the illustrative path with them. No ephemeris is computed here: samples
+// are only interpolated and mapped to scene axes for display.
+// ---------------------------------------------------------------------------
+
+/** Backend /flight-ephemeris result (subset used by the scene). */
+export type FlightEphemeris = {
+  window: {
+    launch_utc: string;
+    landing_utc: string;
+    phases: { id: FlightSegment; start_utc: string; end_utc: string }[];
+  };
+  samples: {
+    utc: string;
+    moon_geocentric_km: Vec3;
+    sun_geocentric_km: Vec3;
+    earth_rotation_deg: number;
+  }[];
+};
+
+/** Moon frame in world coordinates: origin and unit axes (x towards Earth). */
+export type MoonPose = { position: Vec3; x: Vec3; y: Vec3; z: Vec3 };
+
+export type FlightView = {
+  live: boolean;
+  earthCenter: (progress: number) => Vec3;
+  moonPose: (progress: number) => MoonPose;
+  sunDirection: (progress: number) => Vec3;
+  /** Earth's rotation about its axis in radians, or null for the static spin. */
+  earthRotationRad: (progress: number) => number | null;
+  /** Earth's equator tilt as an X-axis (live) or Z-axis (static) rotation. */
+  earthTilt: [number, number, number];
+  positionAt: (progress: number) => Vec3;
+  headingAt: (progress: number) => Vec3;
+  pointsUntil: (progress: number) => Vec3[];
+  /** The whole planned path as drawn at a progress (moves with the Moon). */
+  plannedAt: (progress: number) => Vec3[];
+  allPoints: Vec3[];
+  parkingRing: Vec3[];
+  /** UTC milliseconds at a progress, or null without dated ephemeris. */
+  utcAt: (progress: number) => number | null;
+};
+
+/** Obliquity of the ecliptic at J2000.0 (IAU 2006: 84381.406″). */
+const OBLIQUITY_J2000_RAD = (84381.406 / 3600) * RAD_PER_DEG;
+const STATIC_EARTH_TILT_RAD = 23.4 * RAD_PER_DEG;
+const IDENTITY_POSE = (center: Vec3): MoonPose => ({
+  position: center,
+  x: [1, 0, 0],
+  y: [0, 1, 0],
+  z: [0, 0, 1],
+});
+const cross = (a: Vec3, b: Vec3): Vec3 => [
+  a[1] * b[2] - a[2] * b[1],
+  a[2] * b[0] - a[0] * b[2],
+  a[0] * b[1] - a[1] * b[0],
+];
+const dot = (a: Vec3, b: Vec3) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const lerp3 = (a: Vec3, b: Vec3, t: number): Vec3 => [
+  a[0] + (b[0] - a[0]) * t,
+  a[1] + (b[1] - a[1]) * t,
+  a[2] + (b[2] - a[2]) * t,
+];
+/** Moon-frame point to world through a pose. */
+export const applyPose = (pose: MoonPose, v: Vec3): Vec3 =>
+  add(
+    pose.position,
+    add(add(scale(pose.x, v[0]), scale(pose.y, v[1])), scale(pose.z, v[2])),
+  );
+const rotateByPose = (pose: MoonPose, v: Vec3): Vec3 =>
+  add(add(scale(pose.x, v[0]), scale(pose.y, v[1])), scale(pose.z, v[2]));
+
+function ringAround(center: Vec3, radius: number, rotate: (v: Vec3) => Vec3) {
+  return Array.from({ length: 129 }, (_, i) => {
+    const a = (i / 128) * Math.PI * 2;
+    return add(center, rotate([Math.sin(a) * radius, 0, Math.cos(a) * radius]));
+  });
+}
+
+function pointsUntilFrom(
+  segments: Record<FlightSegment, Vec3[]>,
+  position: (progress: number) => Vec3,
+  progress: number,
+): Vec3[] {
+  const { phase, index, phase_progress } = phaseAt(progress);
+  const all = () =>
+    flightOrder.flatMap((id, i) =>
+      i === 0 ? segments[id] : segments[id].slice(1),
+    );
+  if (phase.id === "landed") return all();
+  const points: Vec3[] = [];
+  for (let i = 0; i < index; i++) {
+    const segment = segments[flightOrder[i]];
+    points.push(...(i === 0 ? segment : segment.slice(1)));
+  }
+  const current = segments[phase.id];
+  const completed = Math.floor(phase_progress * (current.length - 1));
+  points.push(...current.slice(index === 0 ? 0 : 1, completed + 1));
+  points.push(position(progress));
+  return points;
+}
+
+/** The original fixed layout: nothing moves except the spacecraft. */
+export function staticFlightView(path: TransferPath, sun_direction: Vec3): FlightView {
+  const earth = path.layout.earth_center_scene;
+  const sun = unit(sun_direction);
+  return {
+    live: false,
+    earthCenter: () => earth,
+    moonPose: () => IDENTITY_POSE(path.layout.moon_center_scene),
+    sunDirection: () => sun,
+    earthRotationRad: () => null,
+    earthTilt: [0, 0, STATIC_EARTH_TILT_RAD],
+    positionAt: (p) => positionAt(path, p),
+    headingAt: (p) => headingAt(path, p),
+    pointsUntil: (p) => pathPointsUntil(path, p),
+    plannedAt: () => allPathPoints(path),
+    allPoints: allPathPoints(path),
+    parkingRing: ringAround(earth, path.layout.parking_orbit_radius_scene, (v) => v),
+    utcAt: () => null,
+  };
+}
+
+/** Ecliptic J2000 km (x equinox, z north) to scene units (x, y up, z). */
+const eclipticToScene = (km: Vec3): Vec3 =>
+  scale([km[0], km[2], -km[1]], 1 / MOON_MEAN_RADIUS_KM);
+
+/**
+ * Bodies from dated Horizons samples, with the illustrative path re-anchored:
+ * Earth segments ride with Earth (fixed in the translunar-injection
+ * orientation), the coast aims at where the Moon will be at lunar orbit
+ * insertion, and lunar segments ride with the moving Moon.
+ */
+export function liveFlightView(path: TransferPath, flight: FlightEphemeris): FlightView {
+  const times = flight.samples.map((s) => Date.parse(s.utc));
+  if (times.length < 2 || times.some((t, i) => i > 0 && !(t > times[i - 1])))
+    throw new RangeError("Flight ephemeris needs at least two increasing samples");
+  const moonKm = flight.samples.map((s) => eclipticToScene(s.moon_geocentric_km));
+  const sunKm = flight.samples.map((s) => eclipticToScene(s.sun_geocentric_km));
+  // Unwrap the rotation angle so interpolation never runs backwards.
+  const era: number[] = [];
+  flight.samples.forEach((s, i) => {
+    let value = s.earth_rotation_deg * RAD_PER_DEG;
+    if (i > 0) while (value < era[i - 1]) value += 2 * Math.PI;
+    era.push(value);
+  });
+  const sampleAt = (ms: number) => {
+    let i = 1;
+    while (i < times.length - 1 && times[i] < ms) i++;
+    const t = Math.max(0, Math.min(1, (ms - times[i - 1]) / (times[i] - times[i - 1])));
+    return { i, t };
+  };
+  const phases = new Map(
+    flight.window.phases.map((p) => [p.id, [Date.parse(p.start_utc), Date.parse(p.end_utc)]]),
+  );
+  const landing = Date.parse(flight.window.landing_utc);
+  const launch = Date.parse(flight.window.launch_utc);
+  const timeOf = (segment: FlightSegment, fraction: number) => {
+    const [start, end] = phases.get(segment) ?? [launch, landing];
+    return start + (end - start) * fraction;
+  };
+  const utcAt = (progress: number) => {
+    const { phase, phase_progress } = phaseAt(progress);
+    return phase.id === "landed" ? landing : timeOf(phase.id, phase_progress);
+  };
+  const moonAt = (ms: number): MoonPose => {
+    const { i, t } = sampleAt(ms);
+    const position = lerp3(moonKm[i - 1], moonKm[i], t);
+    const x = unit(scale(position, -1));
+    const up: Vec3 = [0, 1, 0];
+    const y = unit(sub(up, scale(x, dot(up, x))));
+    return { position, x, y, z: cross(x, y) };
+  };
+  const earthCenter: Vec3 = [0, 0, 0];
+  const earthOffset = path.layout.earth_center_scene;
+  const tliPose = moonAt(timeOf("translunar_coast", 0));
+  const fromEarthFrame = (v: Vec3) => rotateByPose(tliPose, sub(v, earthOffset));
+  const loiPose = moonAt(timeOf("lunar_orbit", 0));
+  const { evaluate } = path;
+  const step = 1e-4;
+  const departure = fromEarthFrame(evaluate.parking_orbit(1));
+  const departureHeading = unit(
+    rotateByPose(tliPose, sub(evaluate.parking_orbit(1), evaluate.parking_orbit(1 - step))),
+  );
+  const capture = applyPose(loiPose, evaluate.lunar_orbit(0));
+  const captureHeading = unit(
+    rotateByPose(loiPose, sub(evaluate.lunar_orbit(step), evaluate.lunar_orbit(0))),
+  );
+  const separation = norm(sub(capture, departure));
+  const c1 = add(departure, scale(departureHeading, separation * 0.4));
+  const c2 = sub(capture, scale(captureHeading, separation * 0.25));
+  const orbitRadius = path.layout.lunar_orbit_radius_scene;
+  const parkingRadius = path.layout.parking_orbit_radius_scene;
+  const outside = (point: Vec3, center: Vec3, radius: number): Vec3 => {
+    const offset = sub(point, center);
+    const d = norm(offset);
+    return d < radius ? add(center, scale(unit(offset), radius)) : point;
+  };
+  const world: Record<FlightSegment, (f: number) => Vec3> = {
+    launch: (f) => fromEarthFrame(evaluate.launch(f)),
+    parking_orbit: (f) => fromEarthFrame(evaluate.parking_orbit(f)),
+    translunar_coast: (f) => {
+      const g = 1 - f;
+      const raw = add(
+        add(scale(departure, g * g * g), scale(c1, 3 * g * g * f)),
+        add(scale(c2, 3 * g * f * f), scale(capture, f * f * f)),
+      );
+      const moon = moonAt(timeOf("translunar_coast", f)).position;
+      return outside(outside(raw, moon, orbitRadius), earthCenter, parkingRadius);
+    },
+    lunar_orbit: (f) =>
+      applyPose(moonAt(timeOf("lunar_orbit", f)), evaluate.lunar_orbit(f)),
+    descent: (f) => applyPose(moonAt(timeOf("descent", f)), evaluate.descent(f)),
+  };
+  const samples = path.segments.launch.length;
+  const segments = Object.fromEntries(
+    flightOrder.map((id) => [
+      id,
+      Array.from({ length: samples }, (_, i) => world[id](i / (samples - 1))),
+    ]),
+  ) as Record<FlightSegment, Vec3[]>;
+  const position = (progress: number): Vec3 => {
+    const { phase, phase_progress } = phaseAt(progress);
+    if (phase.id === "landed")
+      return applyPose(moonAt(landing), path.site_scene);
+    return world[phase.id](phase_progress);
+  };
+  // Lunar segments are drawn in the Moon's frame at the shown time (never
+  // before insertion), so the orbit stays wrapped around the moving Moon
+  // instead of smearing along its geocentric track. After insertion the
+  // coast's far end bends smoothly to stay attached to the drawn orbit.
+  const loiMs = timeOf("lunar_orbit", 0);
+  const coastSamples = segments.translunar_coast;
+  const segmentsAt = (progress: number): Record<FlightSegment, Vec3[]> => {
+    const pose = moonAt(Math.max(utcAt(progress), loiMs));
+    const shift = sub(applyPose(pose, evaluate.lunar_orbit(0)), capture);
+    const last = coastSamples.length - 1;
+    return {
+      launch: segments.launch,
+      parking_orbit: segments.parking_orbit,
+      translunar_coast: coastSamples.map((v, i) =>
+        add(v, scale(shift, smoothstep(i / last))),
+      ),
+      lunar_orbit: path.segments.lunar_orbit.map((v) => applyPose(pose, v)),
+      descent: path.segments.descent.map((v) => applyPose(pose, v)),
+    };
+  };
+  const joined = (parts: Record<FlightSegment, Vec3[]>) =>
+    flightOrder.flatMap((id, i) => (i === 0 ? parts[id] : parts[id].slice(1)));
+  return {
+    live: true,
+    earthCenter: () => earthCenter,
+    moonPose: (p) => moonAt(utcAt(p)),
+    sunDirection: (p) => {
+      const { i, t } = sampleAt(utcAt(p));
+      return unit(lerp3(sunKm[i - 1], sunKm[i], t));
+    },
+    earthRotationRad: (p) => {
+      const { i, t } = sampleAt(utcAt(p));
+      return era[i - 1] + (era[i] - era[i - 1]) * t;
+    },
+    // The north celestial pole lies at ecliptic longitude 90°, i.e. scene
+    // +Y tilted towards −Z: a negative rotation about the equinox (X) axis.
+    earthTilt: [-OBLIQUITY_J2000_RAD, 0, 0],
+    positionAt: position,
+    headingAt: (p) => {
+      const ahead = position(Math.min(1, p + 1e-4));
+      const behind = position(Math.max(0, p - 1e-4));
+      const delta = sub(ahead, behind);
+      return norm(delta) > 0 ? unit(delta) : [0, 0, 0];
+    },
+    pointsUntil: (p) => pointsUntilFrom(segmentsAt(p), position, p),
+    plannedAt: (p) => joined(segmentsAt(p)),
+    allPoints: joined(segments),
+    parkingRing: ringAround(earthCenter, parkingRadius, (v) => rotateByPose(tliPose, v)),
+    utcAt,
+  };
+}

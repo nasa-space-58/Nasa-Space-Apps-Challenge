@@ -353,6 +353,28 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     )
 
     space_weather = SpaceWeatherStore(store)
+    from app.flight_ephemeris import (
+        FlightEphemerisStore,
+        execute_flight_ephemeris,
+        register_flight_ephemeris_routes,
+    )
+
+    flights = FlightEphemerisStore(store)
+
+    async def flight_worker():
+        # Separate loop: the flight scene must not wait behind long analyses.
+        while True:
+            pending = flights.pending()
+            if pending:
+                await asyncio.to_thread(
+                    lambda: asyncio.run(
+                        execute_flight_ephemeris(
+                            flights, pending[0], data_dir, broker_url
+                        )
+                    )
+                )
+            else:
+                await asyncio.sleep(0.5)
 
     async def worker():
         while True:
@@ -391,9 +413,14 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
         store.recover()
         communications.recover()
         space_weather.recover()
-        task = asyncio.create_task(worker()) if start_worker else None
+        flights.recover()
+        tasks = (
+            [asyncio.create_task(worker()), asyncio.create_task(flight_worker())]
+            if start_worker
+            else []
+        )
         yield
-        if task:
+        for task in tasks:
             task.cancel()
             try:
                 await task
@@ -409,6 +436,8 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     register_search_routes(app, searches)
     register_communication_routes(app, store, communications)
     register_space_weather_routes(app, store, space_weather)
+    app.state.flights = flights
+    register_flight_ephemeris_routes(app, flights)
     register_recommendation_routes(app, recommendations)
     from app.descent import register_descent_routes
 
@@ -448,6 +477,16 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
         assistant_settings,
         assistant_client,
     )
+
+    from app.solver_arena import register_arena_routes
+
+    register_arena_routes(app)
+    from app.shared_antenna import register_campaign_routes
+
+    register_campaign_routes(app)
+    from app.research_api import register_research_routes
+
+    register_research_routes(app)
 
     @app.get("/health")
     def health():
@@ -490,10 +529,16 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
             raise HTTPException(409, {"status": job["status"], "error": job["error"]})
         return job["result"]
 
+    from app.campaign_planning import register_campaign_routes
+
+    register_campaign_routes(app, store, communications, data_dir)
     from app.comparison import register_comparison_routes
 
     register_comparison_routes(app, store)
     from app.release_r1 import register_r1_routes
 
     register_r1_routes(app, store, searches)
+    from app.recovery_api import register_recovery_routes
+
+    register_recovery_routes(app)
     return app

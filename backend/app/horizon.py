@@ -7,7 +7,6 @@ recazl; azimuth is clockwise from local north. No atmosphere/refraction model.
 
 import hashlib
 import json
-import math
 from pathlib import Path
 import re
 
@@ -302,20 +301,9 @@ def interpolate_horizon(profile: dict, azimuth_deg: float) -> float | None:
     This interpolates computed rays, not terrain. It provides no sub-grid peak
     guarantee. Exact ray queries return that ray, even if a neighbor is unknown.
     """
-    if not math.isfinite(azimuth_deg):
-        raise HorizonError("Azimuth must be finite")
-    azimuth_deg %= 360
-    directions = profile["directions"]
-    angles = np.array([item["azimuth_deg"] for item in directions])
-    index = int(np.searchsorted(angles, azimuth_deg, side="right")) - 1
-    left = directions[index]
-    if azimuth_deg == left["azimuth_deg"]:
-        return left["elevation_deg"]
-    right = directions[(index + 1) % len(directions)]
-    if left["elevation_deg"] is None or right["elevation_deg"] is None:
-        return None
-    width_deg = (right["azimuth_deg"] - left["azimuth_deg"]) % 360
-    fraction = ((azimuth_deg - left["azimuth_deg"]) % 360) / width_deg
-    return left["elevation_deg"] + fraction * (
-        right["elevation_deg"] - left["elevation_deg"]
-    )
+    from shared.horizon_geometry import interpolate_horizon as interpolate
+
+    try:
+        return interpolate(profile, azimuth_deg)
+    except ValueError as exc:
+        raise HorizonError(str(exc)) from exc

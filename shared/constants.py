@@ -20,3 +20,13 @@ FOOT_M = 0.3048
 POUND_FORCE_N = 4.4482216152605
 POUND_MASS_KG = 0.45359237
 NAUTICAL_MILE_M = 1852.0
+
+# Earth Rotation Angle (radians/turns) as a linear function of UT1, IERS
+# Conventions (2010), TN36, eq. 5.15: ERA = 2*pi*(0.7790572732640 +
+# 1.00273781191135448 * (JD_UT1 - 2451545.0)). https://iers-conventions.obspm.fr/
+ERA_AT_J2000_TURNS = 0.7790572732640
+ERA_RATE_TURNS_PER_UT1_DAY = 1.00273781191135448
+J2000_JULIAN_DATE = 2451545.0
+UNIX_EPOCH_JULIAN_DATE = 2440587.5
+# |UT1 - UTC| is kept below 0.9 s by leap seconds (IERS); using UTC for UT1
+# shifts Earth's displayed rotation by at most ~0.004 deg.
