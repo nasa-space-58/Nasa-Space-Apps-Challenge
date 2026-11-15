@@ -422,6 +422,39 @@ def plan_mission_routes(
     return output
 
 
+MAX_TERRAIN_CELLS = 160
+TERRAIN_MARGIN_M = 600.0
+
+
+def route_extent(routes: list[dict], margin_m: float) -> dict:
+    """Bounds of every path point and route end point, widened by margin_m.
+
+    Returns down_min_m, down_max_m, cross_min_m and cross_max_m in the route
+    frame. Raises ValueError for an empty route list or a negative margin.
+    """
+    raise NotImplementedError
+
+
+def route_terrain(
+    terrain: LocalTerrain,
+    approach_azimuth_deg: float,
+    extent: dict,
+    primary_height_m: float,
+    max_cells: int = MAX_TERRAIN_CELLS,
+) -> dict:
+    """DEM heights resampled onto a regular grid in the route frame.
+
+    Row i, column j is the cell centre at down0_m + i * spacing_m and
+    cross0_m + j * spacing_m. Heights are bilinear between DEM cell centres
+    and relative to the primary site height (m), so they share the paths'
+    altitude reference; a sample is None when any of its four DEM neighbours
+    is unknown or outside the window. The spacing is at least one DEM pixel
+    and keeps rows and columns at most max_cells while covering the extent.
+    Returns down0_m, cross0_m, spacing_m, rows, cols and heights_m.
+    """
+    raise NotImplementedError
+
+
 def register_mission_route_routes(app, analyses, data_dir: Path) -> None:
     """POST /analyses/{analysis_id}/mission-routes."""
 

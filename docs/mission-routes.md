@@ -30,6 +30,16 @@ route view; "Watch flight" returns to the illustrative flight. The flown
 (faulted) descent of the run is drawn in white from the divert time onward,
 along-track only, so it can be compared with the plans.
 
+## Terrain view
+
+The endpoint also returns `terrain`: the cached LOLA DEM resampled
+(bilinear) onto a regular grid in the route frame that covers every path and
+landing point plus a margin, at most 160 x 160 cells and never finer than the
+80 m DEM. Heights are relative to the primary site height, the same reference
+as the path altitudes, so the interface can draw the routes over the real
+terrain at true scale. Unknown or uncovered samples are `null`, never zero.
+The planar frame flattens the Moon's curvature (about 29 m over 10 km).
+
 ## Frame
 
 All paths share one local planar frame at the primary target: `down_m` along
