@@ -266,3 +266,7 @@ On `feature/mission-run-route-candidates` from main `91ba1ae`. Starting a missio
 ### Mission run route set main push exception (user, 2026-11-15)
 
 At the user's explicit request, `feature/mission-run-route-candidates` was fast-forwarded directly onto `main` from `91ba1ae` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### Mission run outlook (user, 2026-11-15)
+
+On `feature/mission-run-differentiation` from main `99506ea`; push only this branch, no merge into main/tahakrcc. Skeleton `d38369e`, frozen tests `178e38a` (`backend/tests/test_mission_run_outlook.py`). The verdict still stops at the first failed gate; the additive `surface_outlook` (autonomous what-if to the window end), `baseline` (fault-free reference and deltas) and `context` (limitations such as Earth never visible) keep scenarios distinguishable. Never present the outlook as a second verdict. See docs/mission-run.md.

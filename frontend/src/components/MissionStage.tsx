@@ -32,7 +32,7 @@ import {
 } from "../missionPath";
 import type { CameraMode, CameraView, SiteCondition } from "./MissionScene";
 import { useTranslate, type Translate } from "../i18n";
-import { touchdownOutcome, useMissionRun } from "../missionRunStore";
+import { runHighlights, touchdownOutcome, useMissionRun } from "../missionRunStore";
 import "./mission-run.css";
 import SplitSimulator from "./SplitSimulator";
 import { useComparisonPlayback } from "../comparisonPlayback";
@@ -609,6 +609,9 @@ export default function MissionStage({
                 {t(`missionRun.events.${missionRun.failure.code}`)}
               </span>
             )}
+            {runHighlights(missionRun).map((h) => (
+              <small key={h.key}>{t(h.key, h.params)}</small>
+            ))}
           </button>
         )}
         {!preview && !cleanView && <div className="scene-source">{landed && rover?.source ? (rover.source === "demo" ? "DEMO · A*" : "LOLA DEM · A*") : t("missionStage.illustrative")}</div>}

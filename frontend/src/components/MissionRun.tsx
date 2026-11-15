@@ -104,12 +104,14 @@ function Chart({
   label,
   unit,
   marker,
+  verdict,
 }: {
   points: [number, number][];
   ceiling?: number;
   label: string;
   unit: string;
   marker?: number | null;
+  verdict?: number | null;
 }) {
   if (points.length < 2) return null;
   const w = 320, h = 96;
@@ -127,6 +129,9 @@ function Chart({
         <polyline points={points.map(([x, y]) => `${sx(x)},${sy(y)}`).join(" ")} />
         {marker !== null && marker !== undefined && (
           <line x1={sx(marker)} x2={sx(marker)} y1={0} y2={h} className="run-chart-marker" />
+        )}
+        {verdict !== null && verdict !== undefined && (
+          <line x1={sx(verdict)} x2={sx(verdict)} y1={0} y2={h} className="run-chart-verdict" />
         )}
       </svg>
       <figcaption>
@@ -413,6 +418,23 @@ export default function MissionRun({
 
       {run && (
         <div className={`run-result run-${run.outcome}`} aria-live="polite">
+          {!!run.context?.limitations.length && (
+            <div className="run-limits" role="note">
+              <ul>
+                {[...new Set(run.context.limitations.map((l) => l.code))].map((code) => {
+                  const kinds = run.context!.limitations.filter((l) => l.code === code && l.fault);
+                  return (
+                    <li key={code}>
+                      {t(`missionRun.limits.${code}`, {
+                        faults: kinds.map((l) => faultLabel(l.fault!)).join(", "),
+                      })}
+                    </li>
+                  );
+                })}
+              </ul>
+              <small>{t("missionRun.limits.hint")}</small>
+            </div>
+          )}
           <div className="run-outcome">
             <strong>{t(`missionRun.outcome.${run.outcome}`)}</strong>
             <span>
@@ -442,6 +464,37 @@ export default function MissionRun({
               </li>
             ))}
           </ol>
+          {run.baseline && (
+            <div className="run-delta">
+              <h4>{t("missionRun.delta.heading")}</h4>
+              <dl>
+                {(
+                  [
+                    ["propellant", run.descent?.propellant_margin_kg, run.baseline.delta.propellant_margin_kg, "kg", 0],
+                    ["offset", run.touchdown_site?.offset_m, run.baseline.delta.touchdown_offset_m, "m", 0],
+                    ["delay", null, run.baseline.delta.landing_delay_h, "h", 1],
+                    ["energy", run.surface_outlook?.power.min_energy_wh, run.baseline.delta.min_energy_wh, "Wh", 0],
+                    ["contact", null, run.baseline.delta.first_contact_shift_h, "h", 1],
+                  ] as [string, number | null | undefined, number | null, string, number][]
+                ).map(([key, value, delta, unit, digits]) => (
+                  <div key={key} className={delta !== null && Math.abs(delta) >= 10 ** -digits / 2 ? "changed" : undefined}>
+                    <dt>{t(`missionRun.delta.${key}`)}</dt>
+                    <dd>
+                      {value !== null && value !== undefined && `${value.toFixed(digits)} ${unit} · `}
+                      {delta === null
+                        ? t("missionRun.delta.none")
+                        : `${delta > 0 ? "+" : delta < 0 ? "−" : "±"}${Math.abs(delta).toFixed(digits)} ${unit}`}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              {run.surface_outlook?.power.depleted_at_utc && (
+                <p className="small">
+                  {t("missionRun.delta.batteryDied", { at: fmt(run.surface_outlook.power.depleted_at_utc) })}
+                </p>
+              )}
+            </div>
+          )}
           {routeSet && (
             <MissionRoutes
               set={routeSet}
@@ -470,15 +523,23 @@ export default function MissionRun({
               marker={run.descent.exhausted_at?.t_s ?? null}
             />
           )}
-          {run.power && (
-            <Chart
-              label={t("missionRun.batteryChart")}
-              unit="Wh · UTC"
-              ceiling={run.power.trace[0]?.capacity_wh}
-              points={run.power.trace.map((r) => [Date.parse(r.utc), r.energy_wh])}
-              marker={run.power.depleted_at_utc ? Date.parse(run.power.depleted_at_utc) : null}
-            />
-          )}
+          {(run.surface_outlook ?? run.power) && (() => {
+            const power = run.surface_outlook?.power ?? run.power!;
+            const verdict = run.failure && run.surface_outlook ? Date.parse(run.failure.at_utc) : null;
+            return (
+              <>
+                <Chart
+                  label={t("missionRun.batteryChart")}
+                  unit="Wh · UTC"
+                  ceiling={power.trace[0]?.capacity_wh}
+                  points={power.trace.map((r) => [Date.parse(r.utc), r.energy_wh])}
+                  marker={power.depleted_at_utc ? Date.parse(power.depleted_at_utc) : null}
+                  verdict={verdict}
+                />
+                {verdict !== null && <p className="muted small">{t("missionRun.outlook.verdictMarker")}</p>}
+              </>
+            );
+          })()}
           <h4>{t("missionRun.timeline")}</h4>
           <ol className="run-events">
             {run.events.map((e, i) => (
@@ -488,6 +549,26 @@ export default function MissionRun({
               </li>
             ))}
           </ol>
+          {run.failure && run.surface_outlook && (
+            <>
+              <h4>{t("missionRun.outlook.heading")}</h4>
+              <p className="muted small">{t("missionRun.outlook.intro")}</p>
+              <ol className="run-events run-outlook">
+                {run.surface_outlook.findings.map((e, i) => (
+                  <li key={i} className={`event-${e.gate}`}>
+                    <time>{fmt(e.utc)}</time>
+                    <span>{t(`missionRun.events.${e.kind}`, { fault: e.fault ? faultLabel(e.fault) : "" })}</span>
+                  </li>
+                ))}
+                {!run.surface_outlook.power.depleted_at_utc && (
+                  <li className="event-power">
+                    <time>{fmt(run.surface_outlook.evaluated_until_utc)}</time>
+                    <span>{t("missionRun.outlook.survived")}</span>
+                  </li>
+                )}
+              </ol>
+            </>
+          )}
           <p className="muted small">{t("missionRun.disclaimer")}</p>
         </div>
       )}

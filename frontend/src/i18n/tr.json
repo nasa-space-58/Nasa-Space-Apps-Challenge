@@ -2179,7 +2179,9 @@
       "contact_gap": "İletişim boşluğu sınırı aşıldı",
       "window_end": "Analiz penceresinin sonu",
       "crash": "Çarpma",
-      "nominal_plan_infeasible": "Nominal iniş planı uygulanamaz"
+      "nominal_plan_infeasible": "Nominal iniş planı uygulanamaz",
+      "first_contact": "Dünya ile ilk temas",
+      "fault_cleared": "Arıza bitti: {fault}"
     },
     "scene": {
       "crash": "Çarpma",
@@ -2244,6 +2246,38 @@
         "slope": "İniş alanı eğimi {value}°, {limit}° sınırını aşıyor (devrilme riski).",
         "unknown_terrain": "İniş alanının %{pct}'inde eğim bilinmiyor; bilinmeyen arazi düz sayılmaz."
       }
+    },
+    "limits": {
+      "earth_never_visible": "Bu pencerede Dünya hiç görünmüyor; arızasız senaryo dahil her iniş \"ilk temas yok\" ile başarısız olur.",
+      "fault_not_reached": "Araç yüzeyde çalışmaya başlamadığı için şu arızalar hiç devreye girmedi: {faults}.",
+      "fault_after_window": "Şu arızalar analiz penceresi bittikten sonra başlıyor, etkisi yok: {faults}.",
+      "fault_after_mission_end": "Şu arızalar hükümden sonra başlıyor; etkileri sadece aşağıdaki \"kendi başına\" bölümünde görünür: {faults}.",
+      "fault_exceeds_window": "Şu arızalar pencere bittiğinde hâlâ sürüyor; tam etkileri için daha uzun bir pencere gerekir: {faults}.",
+      "hint": "Farkları görmek için 3 veya 7 günlük bir pencere ya da Dünya'nın göründüğü bir tarih seçin."
+    },
+    "delta": {
+      "heading": "Arızasız senaryoya göre fark",
+      "propellant": "Kalan yakıt",
+      "offset": "İniş noktası kayması",
+      "delay": "İniş gecikmesi",
+      "energy": "En düşük batarya",
+      "contact": "İlk temas kayması",
+      "none": "yok",
+      "batteryDied": "Batarya {at} UTC'de bitiyor; arızasız senaryoda bitmiyor."
+    },
+    "outlook": {
+      "heading": "Temas olmasa da lander kendi başına",
+      "intro": "Hüküm ilk hatada verilir. Bu liste, lander'ın temas olmadan pencere sonuna kadar çalışmaya devam etseydi neler yaşayacağını gösterir; hükmü değiştirmez.",
+      "verdictMarker": "Kesikli kırmızı çizgi hüküm anı; sonrası lander'ın kendi başına devam ettiği kısım.",
+      "survived": "Pencere sonu: lander hâlâ çalışıyor"
+    },
+    "highlight": {
+      "battery": "Batarya inişten {h} saat sonra bitiyor",
+      "offset": "İniş {m} m kaydı",
+      "fuel": "Yakıt {kg} kg",
+      "energy": "En düşük batarya {wh} Wh",
+      "contact": "İlk temas {h} saat gecikti",
+      "delay": "İniş {h} saat ertelendi"
     }
   },
   "liveResults": {

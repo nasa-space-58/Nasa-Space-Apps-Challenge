@@ -2117,7 +2117,9 @@
       "contact_gap": "Contact-gap limit exceeded",
       "window_end": "End of the analysis window",
       "crash": "Crash",
-      "nominal_plan_infeasible": "Nominal descent plan infeasible"
+      "nominal_plan_infeasible": "Nominal descent plan infeasible",
+      "first_contact": "First Earth contact",
+      "fault_cleared": "Fault ended: {fault}"
     },
     "scene": {
       "crash": "Crash",
@@ -2182,6 +2184,38 @@
         "slope": "Landing-area slope {value}° exceeds the {limit}° limit (tip-over risk).",
         "unknown_terrain": "{pct} % of the landing area has unknown slope; unknown terrain is never treated as flat."
       }
+    },
+    "limits": {
+      "earth_never_visible": "Earth is never visible in this window; every landing, including the fault-free one, fails on \"no first contact\".",
+      "fault_not_reached": "The lander never operated on the surface, so these faults never activated: {faults}.",
+      "fault_after_window": "These faults start after the analysis window ends and have no effect: {faults}.",
+      "fault_after_mission_end": "These faults start after the verdict; their effect appears only in the \"on its own\" section below: {faults}.",
+      "fault_exceeds_window": "These faults are still active when the window ends; a longer window shows their full effect: {faults}.",
+      "hint": "To see the differences, choose a 3- or 7-day window or a date when Earth is visible."
+    },
+    "delta": {
+      "heading": "Difference from the fault-free run",
+      "propellant": "Propellant left",
+      "offset": "Touchdown offset",
+      "delay": "Landing delay",
+      "energy": "Lowest battery",
+      "contact": "First-contact shift",
+      "none": "n/a",
+      "batteryDied": "The battery runs out at {at} UTC; it does not in the fault-free run."
+    },
+    "outlook": {
+      "heading": "The lander on its own, without contact",
+      "intro": "The verdict is given at the first failure. This list shows what the lander would go through if it kept operating without contact until the window end; it does not change the verdict.",
+      "verdictMarker": "The dashed red line is the verdict time; after it the lander continues on its own.",
+      "survived": "Window end: the lander is still running"
+    },
+    "highlight": {
+      "battery": "Battery runs out {h} h after landing",
+      "offset": "Landed {m} m off target",
+      "fuel": "Propellant {kg} kg",
+      "energy": "Lowest battery {wh} Wh",
+      "contact": "First contact {h} h later",
+      "delay": "Landing delayed {h} h"
     }
   },
   "liveResults": {

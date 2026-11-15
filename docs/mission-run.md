@@ -78,6 +78,43 @@ browser (localStorage) and sent as custom faults.
   touchdown, it dies within the first hours of darkness. A transmitter outage
   ends it with a 72 h contact gap.
 
+## Surface outlook, baseline and window context
+
+The verdict above stops at the first failed gate. In a window where Earth
+never rises, every landed run therefore fails the first-contact gate one hour
+after touchdown, and surface faults that start later (a stuck heater at 6 h,
+a transmitter fault at 2 h) cannot change the verdict. Three additive response
+fields keep these scenarios distinguishable without changing the verdict
+(`failure`, `gates`, `power`, `communication`, `mission_end_utc`):
+
+- `surface_outlook`: a what-if continuation in which the lander keeps running
+  autonomously, without contact, from touchdown to the window end. Power uses
+  the pessimistic run (unknown sunlight generates nothing). The run stops at
+  battery depletion, and contact counts only while the lander is alive. It
+  lists time-ordered `findings`: first contact, the missed first-contact
+  deadline, every contact gap above the limit (not just the first), surface
+  faults starting and ending, and battery depletion. It is `null` after a
+  crash, a tip-over or a landing at the window end.
+- `baseline`: the fault-free run for the same analysis and vehicle (landing at
+  the window start), with a `delta` per quantity: propellant margin,
+  touchdown offset, landing delay, lowest battery energy and first-contact
+  shift. A delta is `null` when either side lacks the quantity.
+- `context`: hours of Earth and Sun visibility in the window, the verdict time
+  and `limitations`:
+  - `earth_never_visible`: no visible, boundary or unknown Earth interval;
+  - per surface fault, `fault_not_reached`: no surface phase;
+  - `fault_after_window`: starts at or after the window end;
+  - `fault_after_mission_end`: starts after the verdict, visible only in the
+    outlook;
+  - `fault_exceeds_window`: still active at the window end.
+
+The outlook is an illustration, not a second verdict. A lander without contact
+cannot be confirmed by the ground, whatever the outlook shows. The curated
+surface faults last up to 80 h, so a 3–7 day window at a date when Earth is
+visible shows their full effect. Tests: `backend/tests/test_mission_run_outlook.py`
+(frozen at `178e38a`); the interface shows the limitations banner, the delta
+card, the full battery trace with the verdict marked, and the findings.
+
 ## Assumptions and limits
 
 The vehicle power values (4 kWh battery, 900 W array, 350 W base load) are
