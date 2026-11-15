@@ -274,3 +274,7 @@ On `feature/mission-run-differentiation` from main `99506ea`; push only this bra
 ### Mission run outlook main push exception (user, 2026-11-15)
 
 At the user's explicit request, `feature/mission-run-differentiation` was fast-forwarded directly onto `main` from `99506ea` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### Recommend page redesign main push exception (user, 2026-11-15)
+
+At the user's explicit request, `ui/compare-recommend-redesign` (guided Recommend module: numbered setup with no sites preselected and always visible, ranked site cards, explained rejections and a what-if block; API and scoring unchanged) was fast-forwarded directly onto `main` from `b85b02d` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
