@@ -1,3 +1,4 @@
+import UnifiedMissionWorkspace from "./components/UnifiedMissionWorkspace";
 import {
   Component,
   lazy,
@@ -52,6 +53,8 @@ const routes: Record<View, string> = {
 /** Former standalone pages are mission-control panel tabs; their hashes still open them. */
 const MODULE_HASHES: Record<string, string> = {
   "#/solver-arena": "arena",
+  "#/campaign": "campaign",
+  "#/recovery": "recovery",
   "#/shared-antenna": "shared-antenna",
   "#/scaling": "scaling",
   "#/relays": "relays",
@@ -856,7 +859,7 @@ export default function App() {
     { id: "scaling", label: t("research.scaling"), content: <ResearchLab kind="scaling" active={view === "mission" && panel === "scaling" && pageVisible} /> },
     { id: "relays", label: t("research.relays"), content: <ResearchLab kind="relays" active={view === "mission" && panel === "relays" && pageVisible} /> },
     { id: "shared-antenna", label: t("sharedAntenna.tab"), content: <SharedAntenna active={view === "mission" && panel === "shared-antenna" && pageVisible} /> },
-    { id: "arena", label: t("arena.tab"), content: <SolverArena active={view === "mission" && panel === "arena" && pageVisible} /> },
+    { id: "arena", label: t("arena.tab"), content: <UnifiedMissionWorkspace view="comparison"><SolverArena active={view === "mission" && panel === "arena" && pageVisible} /></UnifiedMissionWorkspace> },
     { id: "results", label: t("app.modules.results"), content: resultsModule },
     ...(comparisonBase
       ? [{ id: "comparison", label: t("app.modules.compare"), content: comparisonBase ? (
@@ -885,8 +888,8 @@ export default function App() {
       content: <Recommendations sites={sites} />,
     },
     { id: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} /> },
-    { id: "campaign", label: t("app.modules.campaign"), content: <MissionPlanner /> },
-    { id: "recovery", label: t("app.modules.recovery"), content: <SelfHealing /> },
+    { id: "campaign", label: t("app.modules.campaign"), content: <UnifiedMissionWorkspace view="plan"><MissionPlanner /></UnifiedMissionWorkspace> },
+    { id: "recovery", label: t("app.modules.recovery"), content: <UnifiedMissionWorkspace view="recovery"><SelfHealing /></UnifiedMissionWorkspace> },
     {
       id: "classroom",
       label: t("app.modules.classroom"),

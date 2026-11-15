@@ -106,4 +106,4 @@ The full classical synthetic pilot and event replan are implemented; see [stage 
 
 ## Stage 4 delivery
 
-The bounded local H2/H6 proposal path now completes and admits full R11 plans; see [stage 4 scope, matched comparison and measured outcome](unified-quantum-proposals.md). No strict full-plan improvement was observed in the recorded small pilot, and the classical incumbent stays selected. General domain adapters, live coordination and shared views remain later work.
+The bounded local H2/H6 proposal path now completes and admits full R11 plans; see [stage 4 scope, matched comparison and measured outcome](unified-quantum-proposals.md). No strict full-plan improvement was observed in the recorded small pilot, and the classical incumbent stays selected. General domain adapters and live telemetry remain later work. Stage 5 now supplies durable synthetic event coordination and shared views; see [scope and limits](unified-event-coordination.md).
