@@ -1975,7 +1975,8 @@
       "replanned": "Replanned route",
       "PRIMARY": "Primary plan",
       "flown": "Flown run"
-    }
+    },
+    "routeTerrain": "Real LOLA 80 m terrain around the target at true scale (no height exaggeration). Lines: calculated routes from the divert point; poles: landing points; crosses: cells rejected by the terrain check. Drag to orbit, scroll to zoom."
   },
   "missionRun": {
     "title": "Mission simulation",

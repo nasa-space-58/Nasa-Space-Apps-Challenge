@@ -432,7 +432,22 @@ def route_extent(routes: list[dict], margin_m: float) -> dict:
     Returns down_min_m, down_max_m, cross_min_m and cross_max_m in the route
     frame. Raises ValueError for an empty route list or a negative margin.
     """
-    raise NotImplementedError
+    if not routes:
+        raise ValueError("No routes to bound")
+    if not margin_m >= 0:
+        raise ValueError("The margin must be non-negative")
+    points = [
+        (p["down_m"], p["cross_m"])
+        for r in routes
+        for p in [*r["trajectory"], {"down_m": r["down_m"], "cross_m": r["cross_m"]}]
+    ]
+    downs, crosses = zip(*points)
+    return {
+        "down_min_m": float(min(downs)) - margin_m,
+        "down_max_m": float(max(downs)) + margin_m,
+        "cross_min_m": float(min(crosses)) - margin_m,
+        "cross_max_m": float(max(crosses)) + margin_m,
+    }
 
 
 def route_terrain(
@@ -452,7 +467,48 @@ def route_terrain(
     and keeps rows and columns at most max_cells while covering the extent.
     Returns down0_m, cross0_m, spacing_m, rows, cols and heights_m.
     """
-    raise NotImplementedError
+    if max_cells < 2:
+        raise ValueError("The grid needs at least two cells per axis")
+    down_span = extent["down_max_m"] - extent["down_min_m"]
+    cross_span = extent["cross_max_m"] - extent["cross_min_m"]
+    spacing = max(terrain.pixel_m, max(down_span, cross_span) / (max_cells - 1))
+    rows = math.ceil(down_span / spacing - 1e-9) + 1
+    cols = math.ceil(cross_span / spacing - 1e-9) + 1
+    down = extent["down_min_m"] + spacing * np.arange(rows)
+    cross = extent["cross_min_m"] + spacing * np.arange(cols)
+    travel, right = _approach_basis(
+        terrain.north_unit_xy, terrain.east_unit_xy, approach_azimuth_deg
+    )
+    d, c = np.meshgrid(down, cross, indexing="ij")
+    x = terrain.site_xy_m[0] + d * travel[0] + c * right[0]
+    y = terrain.site_xy_m[1] + d * travel[1] + c * right[1]
+    inverse = ~terrain.transform
+    u = inverse.a * x + inverse.b * y + inverse.c - 0.5  # column, centres at .5
+    v = inverse.d * x + inverse.e * y + inverse.f - 0.5
+    heights = np.asarray(terrain.heights_m, dtype=float)
+    n_rows, n_cols = heights.shape
+    c0, r0 = np.floor(u).astype(int), np.floor(v).astype(int)
+    inside = (c0 >= 0) & (c0 + 1 < n_cols) & (r0 >= 0) & (r0 + 1 < n_rows)
+    c0, r0 = np.where(inside, c0, 0), np.where(inside, r0, 0)
+    fu, fv = u - c0, v - r0
+    value = (
+        heights[r0, c0] * (1 - fu) * (1 - fv)
+        + heights[r0, c0 + 1] * fu * (1 - fv)
+        + heights[r0 + 1, c0] * (1 - fu) * fv
+        + heights[r0 + 1, c0 + 1] * fu * fv
+    ) - float(primary_height_m)
+    known = inside & np.isfinite(value)
+    return {
+        "down0_m": float(down[0]),
+        "cross0_m": float(cross[0]),
+        "spacing_m": float(spacing),
+        "rows": rows,
+        "cols": cols,
+        "heights_m": [
+            [float(value[i, j]) if known[i, j] else None for j in range(cols)]
+            for i in range(rows)
+        ],
+    }
 
 
 def register_mission_route_routes(app, analyses, data_dir: Path) -> None:
@@ -484,4 +540,14 @@ def register_mission_route_routes(app, analyses, data_dir: Path) -> None:
             result = plan_mission_routes(body, site, terrain, height)
         except MissionRoutesError as exc:
             raise HTTPException(422, str(exc)) from exc
-        return {"analysis_id": analysis_id, **result}
+        # Display terrain: a wider window that holds every path and landing point.
+        extent = route_extent(result["routes"], TERRAIN_MARGIN_M)
+        reach_m = max(abs(v) for v in extent.values())
+        display = load_local_terrain(
+            data_dir,
+            site["latitude_deg"],
+            site["longitude_deg_east"],
+            reach_m * math.sqrt(2) + 2 * DEM_PIXEL_M,
+        )
+        grid = route_terrain(display, body.approach_azimuth_deg, extent, height)
+        return {"analysis_id": analysis_id, **result, "terrain": grid}

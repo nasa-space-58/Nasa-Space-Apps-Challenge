@@ -6,7 +6,9 @@ export type PlotPoint = { x: number; y: number; z: number; time?: number; id?: s
 export type PlotLine = { id: string; color: string; points: PlotPoint[]; dashed?: boolean };
 /** Mission-run route colours: primary green, reachable backup yellow, rejected red, flown run white. */
 export const ROUTE_COLORS = { primary: "#4fd18b", backup: "#f2c94c", rejected: "#ff6b5e", flown: "#f4f7fb" } as const;
-export type AnalysisPreview = { kind: AnalysisKind; lines: PlotLine[]; points: PlotPoint[]; obstacles: PlotPoint[]; events: number[]; selected?: string; stale?: boolean };
+/** Backend DEM grid in the mission route frame (heights relative to the primary site, null unknown). */
+export type RouteGrid = { down0_m: number; cross0_m: number; spacing_m: number; rows: number; cols: number; heights_m: (number | null)[][] };
+export type AnalysisPreview = { kind: AnalysisKind; lines: PlotLine[]; points: PlotPoint[]; obstacles: PlotPoint[]; events: number[]; selected?: string; stale?: boolean; terrain?: RouteGrid; terrainOnly?: string[] };
 const Context = createContext<{
   candidateId: string | null;
   setCandidateId: React.Dispatch<React.SetStateAction<string | null>>;
@@ -62,6 +64,10 @@ export function previewFor(kind: AnalysisKind, value: unknown): AnalysisPreview 
     const flown = rows(d.flown).flatMap(p => finite(p.t_s) && p.t_s >= start && finite(p.downrange_m) && finite(p.altitude_m) ? [{x:p.downrange_m,y:p.altitude_m,z:0,time:p.t_s}] : []);
     if (flown.length > 1) result.lines.push({id:"flown",color:ROUTE_COLORS.flown,points:flown});
     result.points = routes.flatMap(r => finite(r.down_m) && finite(r.cross_m) ? [{x:r.down_m,y:0,z:r.cross_m,id:String(r.id),color:colorOf(r)}] : []);
+    result.terrainOnly = routes.filter(r => r.evaluated === "terrain_only").map(r => String(r.id));
+    const grid = obj(d.terrain);
+    if (finite(grid.down0_m) && finite(grid.cross0_m) && finite(grid.spacing_m) && finite(grid.rows) && finite(grid.cols) && Array.isArray(grid.heights_m))
+      result.terrain = grid as unknown as RouteGrid;
   }
   if (kind === "surface") result.lines = rows(d.routes).map((r,i)=>({id:String(r.target_id),color:r.reachable===false?red:[gold,blue,green][i%3],points:rows(r.path).flatMap(p=>finite(p.north_m)&&finite(p.east_m)?[{x:p.east_m,y:0,z:-p.north_m}]:[])}));
   return result;

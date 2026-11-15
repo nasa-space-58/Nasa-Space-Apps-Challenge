@@ -2037,7 +2037,8 @@
       "replanned": "Yeniden planlanan rota",
       "PRIMARY": "Ana plan",
       "flown": "Uçulan koşu"
-    }
+    },
+    "routeTerrain": "Hedef çevresindeki gerçek LOLA 80 m arazi, gerçek ölçekte (yükseklik abartısı yok). Çizgiler: sapma noktasından hesaplanan rotalar; direkler: iniş noktaları; çarpılar: arazi kontrolünde elenen hücreler. Döndürmek için sürükleyin, yakınlaştırmak için kaydırın."
   },
   "missionRun": {
     "title": "Görev simülasyonu",

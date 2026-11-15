@@ -1,4 +1,5 @@
 import AnalysisScene from "./AnalysisScene";
+import RouteTerrainScene from "./RouteTerrainScene";
 import type { AnalysisPreview } from "../analysisView";
 import {
   Suspense,
@@ -1454,7 +1455,7 @@ export default function MissionScene(
         snap={!animate}
       />
       <Suspense fallback={null}>
-        {analysisPreview ? <AnalysisScene preview={analysisPreview} progress={analysisProgress} onSelect={id=>onAnalysisSelect?.(id)}/> : scene.cameraMode === "launch" ? (
+        {analysisPreview?.kind === "routes" && analysisPreview.terrain ? <RouteTerrainScene preview={analysisPreview} progress={analysisProgress} onSelect={id=>onAnalysisSelect?.(id)}/> : analysisPreview ? <AnalysisScene preview={analysisPreview} progress={analysisProgress} onSelect={id=>onAnalysisSelect?.(id)}/> : scene.cameraMode === "launch" ? (
           <LaunchCloseup
             progress={progress}
             reduced={scene.reduced}

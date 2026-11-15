@@ -20,13 +20,17 @@ reasons it was chosen, kept as a backup or rejected.
   `plan_alternatives(trajectories=True)` in `backend/app/alternatives.py`
   (default behaviour and `result_id` unchanged).
 - Interface: `frontend/src/components/MissionRun.tsx` and the analysis scene.
-- Tests: `backend/tests/test_mission_routes.py`. Skeleton `0b272e0`, frozen
-  tests `58af088`.
+- Tests: `backend/tests/test_mission_routes.py` (skeleton `0b272e0`, frozen
+  `58af088`) and `backend/tests/test_mission_route_terrain.py` (skeleton
+  `c4b60e2`, frozen `c7cf970`).
 
 The interface sends the route request in parallel with the run and reuses
 the result for later runs of the same analysis, because the route set does
-not depend on faults. When the run returns, the scene switches to the local
-route view; "Watch flight" returns to the illustrative flight. The flown
+not depend on faults. When the run returns, the scene switches to the route terrain view
+(`frontend/src/components/RouteTerrainScene.tsx`): the real DEM grid at true
+scale, every path from the divert point down to its landing point, a pole at
+each landing point and a cross at each terrain-rejected cell. The lander
+model follows the selected route (else the flown run) with the playback bar; "Watch flight" returns to the illustrative flight. The flown
 (faulted) descent of the run is drawn in white from the divert time onward,
 along-track only, so it can be compared with the plans.
 
@@ -52,7 +56,9 @@ shifted by its terrain height difference to the primary.
 With the defaults (Apollo 11 LM, high-gate divert, 3 km search radius, up to
 8 backups and 6 terrain rejections), Haworth, Malapert and the Shackleton rim
 each give 1 primary, 8 reachable backups and 6 cells rejected for slope, in
-about 3.6 s. Flown rejections (propellant, reserve, thrust, tolerance) appear
+about 3.6 s. At Haworth the terrain grid is 140 x 80 cells at 80 m spacing
+(relief -243 m to +90 m relative to the target), and the whole response is
+about 360 KB. Flown rejections (propellant, reserve, thrust, tolerance) appear
 with a tighter vehicle or a low-gate divert; the tests cover them with a
 660 kg shorter propellant load.
 

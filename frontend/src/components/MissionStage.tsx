@@ -586,7 +586,7 @@ export default function MissionStage({
         </div>
         {preview && !cleanView && <div className="stage-hud analysis-caption">
           <strong>{t(`workspace.kind.${preview.kind}`)}</strong>
-          <p>{t(preview.stale ? "workspace.stale" : "workspace.localFrame")}</p>
+          <p>{t(preview.stale ? "workspace.stale" : preview.terrain ? "workspace.routeTerrain" : "workspace.localFrame")}</p>
           {preview.lines.map(line=><button key={line.id} aria-pressed={preview.selected===line.id} onClick={()=>setPreview({...preview,selected:line.id})}><i style={{background:line.color}}/>{t(`workspace.line.${line.id}`) === `workspace.line.${line.id}` ? line.id : t(`workspace.line.${line.id}`)}</button>)}
           {preview.selected && <small>{t("workspace.selected")}: {preview.selected}</small>}
           {!preview.lines.length && <p>{t("workspace.dots")}</p>}
