@@ -1,3 +1,4 @@
+import MissionResilience from "./components/MissionResilience";
 import UnifiedMissionWorkspace from "./components/UnifiedMissionWorkspace";
 import {
   Component,
@@ -55,6 +56,7 @@ const MODULE_HASHES: Record<string, string> = {
   "#/solver-arena": "arena",
   "#/campaign": "campaign",
   "#/recovery": "recovery",
+  "#/resilience": "resilience",
   "#/shared-antenna": "shared-antenna",
   "#/scaling": "scaling",
   "#/relays": "relays",
@@ -856,6 +858,7 @@ export default function App() {
     </section>
   );
   const stageModules = [
+    { id: "resilience", label: t("resilience.title"), content: <MissionResilience active={view === "mission" && panel === "resilience" && pageVisible} /> },
     { id: "scaling", label: t("research.scaling"), content: <ResearchLab kind="scaling" active={view === "mission" && panel === "scaling" && pageVisible} /> },
     { id: "relays", label: t("research.relays"), content: <ResearchLab kind="relays" active={view === "mission" && panel === "relays" && pageVisible} /> },
     { id: "shared-antenna", label: t("sharedAntenna.tab"), content: <SharedAntenna active={view === "mission" && panel === "shared-antenna" && pageVisible} /> },
