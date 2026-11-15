@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import HorizonPlot from "./components/HorizonPlot";
-import MissionStage from "./components/MissionStage";
+import MissionStage, { type StageModule } from "./components/MissionStage";
 import Comparison from "./components/Comparison";
 import WindowSearch from "./components/WindowSearch";
 import DateScrubber from "./components/DateScrubber";
@@ -774,67 +774,6 @@ export default function App() {
       {result && job && (
         <Communication key={job.id} jobId={job.id} current={frame?.utc} />
       )}
-      {result && job && <SpaceWeather key={`sw-${job.id}`} jobId={job.id} />}
-      {result && (
-        <div className="panel trace-panel">
-          <details>
-            <summary>
-              {t("app.trace.summary")} <span>+</span>
-            </summary>
-            <div className="trace-content">
-              <p>
-                <b>{t("common.sun")}:</b>{" "}
-                {t("app.trace.sun", {
-                  longest: h(result.analysis.sun.metrics.longest_visible_s),
-                  unknown: h(result.analysis.sun.metrics.unknown_duration_s),
-                })}
-              </p>
-              <p>
-                <b>{t("common.earth")}:</b>{" "}
-                {t("app.trace.earth", {
-                  longest: h(result.analysis.earth.metrics.longest_visible_s),
-                  blocked: h(result.analysis.earth.metrics.longest_blocked_s),
-                  unknown: h(result.analysis.earth.metrics.unknown_duration_s),
-                })}
-              </p>
-              <p>
-                {t("app.trace.grid", {
-                  radius: (
-                    result.horizon.settings.search_distance_m / 1000
-                  ).toFixed(0),
-                  spacing: result.horizon.settings.azimuth_step_deg,
-                  height:
-                    result.horizon.observer_height_above_terrain_m.toFixed(1),
-                })}
-              </p>
-              <p>
-                {t("app.trace.limits", {
-                  offset: result.analysis.spatial_sensitivity.offset_deg,
-                })}
-              </p>
-              <p>
-                {t("app.trace.refinement", {
-                  status: result.analysis.refinement.status.replaceAll("_", " "),
-                  count: result.analysis.provenance.ephemerides.length,
-                })}
-              </p>
-              <code>
-                {t("app.trace.analysis")} {result.analysis.analysis_id}
-              </code>
-              <button className="text-button" onClick={openSources}>
-                {t("app.trace.viewSources")} ↗
-              </button>
-            </div>
-          </details>
-        </div>
-      )}
-      {result && job && (
-        <ExportPanel
-          jobId={job.id}
-          result={result}
-          frameIndex={frameIndex}
-        />
-      )}
       {result && job && (
         <button
           className="primary add-comparison"
@@ -848,50 +787,134 @@ export default function App() {
           {t("app.results.addComparison")} ↗
         </button>
       )}
+      {/* Secondary results stay closed until opened. */}
+      <div className="tool-cards">
+        {result && job && (
+          <details className="tool-card">
+            <summary>
+              <b>{t("app.results.cards.weather.title")}</b>
+              <span>{t("app.results.cards.weather.desc")}</span>
+            </summary>
+            <SpaceWeather key={`sw-${job.id}`} jobId={job.id} />
+          </details>
+        )}
+        <details className="tool-card">
+          <summary>
+            <b>{t("app.results.cards.share.title")}</b>
+            <span>{t("app.results.cards.share.desc")}</span>
+          </summary>
+          {result && job && (
+            <ExportPanel jobId={job.id} result={result} frameIndex={frameIndex} />
+          )}
+          <ScenarioTransfer onOpen={openSearchResult} />
+        </details>
+        {result && (
+          <details className="tool-card">
+            <summary>
+              <b>{t("app.results.cards.trace.title")}</b>
+              <span>{t("app.results.cards.trace.desc")}</span>
+            </summary>
+          <div className="trace-content">
+            <p>
+              <b>{t("common.sun")}:</b>{" "}
+              {t("app.trace.sun", {
+                longest: h(result.analysis.sun.metrics.longest_visible_s),
+                unknown: h(result.analysis.sun.metrics.unknown_duration_s),
+              })}
+            </p>
+            <p>
+              <b>{t("common.earth")}:</b>{" "}
+              {t("app.trace.earth", {
+                longest: h(result.analysis.earth.metrics.longest_visible_s),
+                blocked: h(result.analysis.earth.metrics.longest_blocked_s),
+                unknown: h(result.analysis.earth.metrics.unknown_duration_s),
+              })}
+            </p>
+            <p>
+              {t("app.trace.grid", {
+                radius: (
+                  result.horizon.settings.search_distance_m / 1000
+                ).toFixed(0),
+                spacing: result.horizon.settings.azimuth_step_deg,
+                height:
+                  result.horizon.observer_height_above_terrain_m.toFixed(1),
+              })}
+            </p>
+            <p>
+              {t("app.trace.limits", {
+                offset: result.analysis.spatial_sensitivity.offset_deg,
+              })}
+            </p>
+            <p>
+              {t("app.trace.refinement", {
+                status: result.analysis.refinement.status.replaceAll("_", " "),
+                count: result.analysis.provenance.ephemerides.length,
+              })}
+            </p>
+            <code>
+              {t("app.trace.analysis")} {result.analysis.analysis_id}
+            </code>
+            <button className="text-button" onClick={openSources}>
+              {t("app.trace.viewSources")} ↗
+            </button>
+          </div>
+          </details>
+        )}
+      </div>
       <p className="results-footnote">{t("app.results.footnote")}</p>
-      <ScenarioTransfer onOpen={openSearchResult} />
     </section>
   );
-  const stageModules = [
-    { id: "scaling", label: t("research.scaling"), content: <ResearchLab kind="scaling" active={view === "mission" && panel === "scaling" && pageVisible} /> },
-    { id: "relays", label: t("research.relays"), content: <ResearchLab kind="relays" active={view === "mission" && panel === "relays" && pageVisible} /> },
-    { id: "shared-antenna", label: t("sharedAntenna.tab"), content: <SharedAntenna active={view === "mission" && panel === "shared-antenna" && pageVisible} /> },
-    { id: "arena", label: t("arena.tab"), content: <SolverArena active={view === "mission" && panel === "arena" && pageVisible} /> },
-    { id: "results", label: t("app.modules.results"), content: resultsModule },
-    ...(comparisonBase
-      ? [{ id: "comparison", label: t("app.modules.compare"), content: comparisonBase ? (
-      <Comparison
-        key={comparisonBase.id}
-        aId={comparisonBase.id}
-        initialBId={sharedB}
-        initialCursor={Number(shared.current.get("cursor") || 0)}
-        a={comparisonBase.result}
-        sites={sites}
-        onClose={() => {
-          setComparisonBase(null);
-          setPanel("results");
-        }}
-      />
-    ) : null }]
-      : []),
-    {
-      id: "window-search",
-      label: t("app.modules.timeSearch"),
-      content: <WindowSearch sites={sites} onChoose={openSearchResult} />,
-    },
+  // Grouped into four numbered steps; research tools live in the Advanced menu.
+  const stageModules: StageModule[] = [
+    { id: "results", group: "results", label: t("app.modules.results"), content: resultsModule },
     {
       id: "recommendations",
+      group: "compare",
       label: t("app.modules.recommend"),
       content: <Recommendations sites={sites} />,
     },
-    { id: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} /> },
-    { id: "campaign", label: t("app.modules.campaign"), content: <MissionPlanner /> },
-    { id: "recovery", label: t("app.modules.recovery"), content: <SelfHealing /> },
+    {
+      id: "window-search",
+      group: "compare",
+      label: t("app.modules.timeSearch"),
+      content: <WindowSearch sites={sites} onChoose={openSearchResult} />,
+    },
+    ...(comparisonBase
+      ? [
+          {
+            id: "comparison",
+            group: "compare" as const,
+            label: t("app.modules.compare"),
+            content: (
+              <Comparison
+                key={comparisonBase.id}
+                aId={comparisonBase.id}
+                initialBId={sharedB}
+                initialCursor={Number(shared.current.get("cursor") || 0)}
+                a={comparisonBase.result}
+                sites={sites}
+                onClose={() => {
+                  setComparisonBase(null);
+                  setPanel("results");
+                }}
+              />
+            ),
+          },
+        ]
+      : []),
+    { id: "descent", group: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} /> },
     {
       id: "classroom",
+      group: "learn",
       label: t("app.modules.classroom"),
       content: <Classroom onOpen={openSearchResult} />,
     },
+    { id: "campaign", group: "advanced", label: t("app.modules.campaign"), content: <MissionPlanner /> },
+    { id: "recovery", group: "advanced", label: t("app.modules.recovery"), content: <SelfHealing /> },
+    { id: "scaling", group: "advanced", label: t("research.scaling"), content: <ResearchLab kind="scaling" active={view === "mission" && panel === "scaling" && pageVisible} /> },
+    { id: "relays", group: "advanced", label: t("research.relays"), content: <ResearchLab kind="relays" active={view === "mission" && panel === "relays" && pageVisible} /> },
+    { id: "shared-antenna", group: "advanced", label: t("sharedAntenna.tab"), content: <SharedAntenna active={view === "mission" && panel === "shared-antenna" && pageVisible} /> },
+    { id: "arena", group: "advanced", label: t("arena.tab"), content: <SolverArena active={view === "mission" && panel === "arena" && pageVisible} /> },
   ];
 
   return (

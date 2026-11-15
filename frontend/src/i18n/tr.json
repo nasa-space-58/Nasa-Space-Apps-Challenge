@@ -52,7 +52,21 @@
       "awaitsDetail": "Araziyi, ışığı ve görünürlüğü ortaya çıkarmak için bir bölge ve zaman seçin.",
       "runExample": "Malapert örneğini çalıştır",
       "addComparison": "Karşılaştırma ekle",
-      "footnote": "Ufuk bir bakış açısıdır, bir vaat değil. Sonuçlar örneklenen araziyi ve gözlem penceresini tanımlar."
+      "footnote": "Ufuk bir bakış açısıdır, bir vaat değil. Sonuçlar örneklenen araziyi ve gözlem penceresini tanımlar.",
+      "cards": {
+        "weather": {
+          "title": "Uzay havası",
+          "desc": "Güneş fırtınası ve radyasyon riskinin gözlem penceresine etkisi."
+        },
+        "share": {
+          "title": "Paylaş ve dışa aktar",
+          "desc": "Sonucu CSV, grafik ya da rapor olarak indir; bağlantı veya senaryo dosyası paylaş."
+        },
+        "trace": {
+          "title": "Hesap ayrıntıları ve sınırlar",
+          "desc": "Hangi veri ve varsayımlarla hesaplandığı, kaynaklar ve modelin sınırları."
+        }
+      }
     },
     "playback": {
       "eyebrow": "GÖZLEM ZAMANI",
@@ -213,7 +227,8 @@
   "common": {
     "sun": "Güneş",
     "earth": "Dünya",
-    "terrain": "Arazi"
+    "terrain": "Arazi",
+    "advancedSettings": "Gelişmiş ayarlar"
   },
   "jobState": {
     "pending": "Kuyrukta bekliyor",
@@ -481,7 +496,16 @@
       "craftMoon": "Araç–Ay (temsili rota)",
       "loading": "Gerçek Ay/Güneş konumları JPL Horizons'tan alınıyor…",
       "failed": "Gerçek konumlar alınamadı; sabit temsili düzen gösteriliyor."
-    }
+    },
+    "steps": {
+      "plan": "Yer ve zaman",
+      "results": "Sonuçlar",
+      "compare": "Karşılaştır ve öner",
+      "descent": "İniş ve yüzey"
+    },
+    "learn": "Öğren",
+    "advanced": "Gelişmiş",
+    "advancedHint": "Uzmanlar için planlama ve araştırma araçları"
   },
   "missionPhases": {
     "launch": {
@@ -790,7 +814,27 @@
     },
     "pdiStart": "Motorlu iniş {km} km geriden {speed} m/s hızla başlar; {n} motorlu aşama.",
     "touchdown": "Temas: bölgeden {error} m uzakta, dikey {vertical} m/s, yatay {horizontal} m/s. Bölge 1737,4 km kürenin {height} m üzerinde.",
-    "assumptions": "Fiziksel varsayımlar ve kaynaklar"
+    "assumptions": "Fiziksel varsayımlar ve kaynaklar",
+    "more": {
+      "title": "Daha fazla analiz",
+      "hint": "Yukarıdaki iniş planını kullanır. Açmak için bir başlığa dokunun.",
+      "risk": {
+        "title": "Risk ve belirsizlik",
+        "desc": "Belirsizlikler altında inişin ne sıklıkla başarılı olduğunu yüzlerce simülasyonla gösterir."
+      },
+      "backups": {
+        "title": "Yedek iniş noktaları",
+        "desc": "Plan bozulursa inişin ortasında ulaşılabilecek güvenli alternatif noktaları bulur."
+      },
+      "twin": {
+        "title": "Dijital ikiz",
+        "desc": "Aracın sensörlerle bildiği ile gerçekte olanı arıza senaryolarında karşılaştırır."
+      },
+      "surface": {
+        "title": "İnişten sonra: yüzey rotaları",
+        "desc": "Gezginin bilim hedeflerine dik yamaçlardan kaçınarak gideceği rotaları planlar."
+      }
+    }
   },
   "recommendations": {
     "criterion": {
@@ -1437,5 +1481,229 @@
       "legendRoute": "Seçilen rota",
       "truncated": "İncelenen hücrelerin yalnızca ilk kısmı gösteriliyor."
     }
+  },
+  "risk": {
+    "label": "İniş riski",
+    "title": "Risk ve belirsizlik · Monte Carlo",
+    "runs": "Simülasyon sayısı",
+    "seed": "Rastgelelik tohumu (seed)",
+    "navigation": "Navigasyon hatası 1σ · m",
+    "terrain": "Arazi yüksekliği hatası 1σ · m",
+    "thrust": "İtki hatası 1σ · %",
+    "isp": "Özgül itki (Isp) hatası 1σ · %",
+    "pdiDown": "İniş başlangıcı (PDI) konum hatası 1σ · m",
+    "pdiSpeed": "İniş başlangıcı (PDI) hız hatası 1σ · m/s",
+    "azimuth": "Yaklaşma yönü · °",
+    "run": "Simülasyonları çalıştır ↗",
+    "running": "{runs} iniş simüle ediliyor…",
+    "help": "Yukarıdaki nokta, araç, yörünge ve rezervi kullanır. Aynı tohum ve girdiler aynı sonucu verir. Hata büyüklükleri planlama varsayımıdır, onaylı araç değerleri değildir.",
+    "requestFailed": "İstek başarısız oldu",
+    "verdict": "Başarılı iniş oranı: {rate} ({runs} simülasyon)",
+    "confidence": "%95 güven aralığı {low}–{high} · tohum {seed} · sonuç {id}",
+    "mainDriver": "başarısızlıkların ana nedeni:",
+    "metrics": {
+      "ellipse": "3σ İNİŞ ELİPSİ",
+      "inside": "elips içinde kalan iniş: {share}",
+      "steep": "ELİPS İÇİNDE DİK ARAZİ",
+      "notEvaluated": "değerlendirilmedi",
+      "cells": "{count} hücre > {limit}° · bilinmeyen {unknown}",
+      "noTerrain": "arazi verisi yok",
+      "fuel": "REZERV ÜSTÜ YAKIT (P5)",
+      "median": "medyan {kg} kg"
+    },
+    "whyFail": "İnişler neden başarısız oluyor",
+    "noFailures": "Bu örnekte başarısız iniş yok.",
+    "whichMatters": "Hangi belirsizlik önemli",
+    "association": "ilişki {value}",
+    "nothingToExplain": "açıklanacak başarısızlık yok",
+    "off": "kapalı",
+    "significant": "anlamlı",
+    "barHelp": "Çubuk: başarısızlıkla sıra korelasyonu. Çizgi, 2/√simülasyon gürültü seviyesini gösterir; daha kısa çubuklar şanstan ayırt edilemez.",
+    "propellantLeft": "Temasta kalan yakıt",
+    "assumptions": "Monte Carlo modeli ve varsayımlar",
+    "travel": "hareket yönü",
+    "legend": {
+      "success": "başarılı iniş",
+      "failure": "başarısız iniş",
+      "ellipses": "hedef · kesikli 1σ · düz 3σ elips"
+    },
+    "plotLabel": "Hedef çevresinde {points} simüle iniş noktası, 1σ ve 3σ elipslerle; başarılı: {ok} / {runs}.",
+    "histogramLabel": "Temasta kalan yakıt, {min} ile {max} kg arası.",
+    "sources": {
+      "thrust": "Motor itkisi",
+      "isp": "Özgül itki",
+      "pdi_downrange": "PDI konumu",
+      "pdi_speed": "PDI hızı",
+      "terrain_height": "Arazi yüksekliği (DEM)",
+      "navigation_down": "Navigasyon · menzil yönü",
+      "navigation_cross": "Navigasyon · yan yön"
+    },
+    "causes": {
+      "propellant_exhausted": "Yakıt bitti",
+      "propellant_reserve": "Rezerv korunamadı",
+      "touchdown_position": "Güdüm hedefi kaçırıldı",
+      "vertical_speed": "Sert iniş (dikey hız)",
+      "horizontal_speed": "Kayarak iniş (yatay hız)",
+      "hazard_slope": "Dik araziye iniş",
+      "hazard_unknown": "Bilinmeyen araziye iniş"
+    }
+  },
+  "backups": {
+    "label": "Yedek iniş planları",
+    "title": "Yedek iniş noktaları",
+    "divertFrom": "Yön değiştirme noktası",
+    "highGate": "Yüksek kapı (yaklaşık 2 km yukarıda)",
+    "lowGate": "Alçak kapı (yaklaşık 150 m yukarıda)",
+    "radius": "Arama yarıçapı · m",
+    "count": "Yedek sayısı",
+    "spacing": "Aday aralığı · m",
+    "separation": "Noktalar arası en az mesafe · m",
+    "slope": "En büyük eğim · °",
+    "run": "Yedek noktaları bul ↗",
+    "running": "Yedekler aranıyor…",
+    "help": "Yedekler arazi koşullarını geçer; yön değiştirme noktasından yakıt, rezerv, temas toleransı ve motor itkisi açısından kontrol edilir.",
+    "verdict": "{gate} noktasından ulaşılabilen yedek: {reachable} / {count}",
+    "gates": {
+      "high_gate": "Yüksek kapı (yaklaşmanın başı)",
+      "low_gate": "Alçak kapı (son inişin başı)"
+    },
+    "divertState": "Yön değiştirme: {altitude} m irtifa, {speed} m/s, temasa {seconds} s. Yedek olarak işaretlenen: {marked}.",
+    "none": "yok",
+    "primary": "Ana nokta",
+    "plannedSite": "planlanan nokta",
+    "slopeShort": "eğim",
+    "unknown": "bilinmiyor",
+    "toTouchdown": "temasa {seconds} s",
+    "hover": "hover {seconds} s",
+    "reachable": "Ulaşılabilir",
+    "unreachable": "Ulaşılamaz",
+    "mark": "yedek olarak işaretle",
+    "assumptions": "Yedek modeli ve varsayımlar",
+    "mapLabel": "Ortada ana nokta ve {count} yedek nokta; {reachable} tanesi ulaşılabilir. Ayrıntılar tabloda.",
+    "table": {
+      "caption": "Ana nokta ve yedekler, aynı ölçütlerle",
+      "site": "Nokta",
+      "safety": "Güvenlik",
+      "divert": "Yön değiştirme",
+      "fuel": "Rezerv üstü yakıt",
+      "status": "Durum"
+    }
+  },
+  "twin": {
+    "label": "İniş dijital ikizi",
+    "title": "Dijital ikiz · araç ne biliyor, gerçekte ne oluyor",
+    "scenario": "Arıza senaryosu",
+    "presets": {
+      "nominal": "Arıza yok",
+      "lost": "450. saniyede navigasyon sensörü kayboluyor",
+      "thrust": "520. saniyede motor itkisi %25 düşüyor",
+      "leak": "600. saniyede 700 kg yakıt sızıntısı",
+      "obstacle": "640. saniyede hedefte kaya alanı"
+    },
+    "positionSigma": "Konum ölçüm hatası 1σ · m",
+    "speedSigma": "Hız ölçüm hatası 1σ · m/s",
+    "thrustNoise": "İtki gürültüsü 1σ · %",
+    "energy": "Batarya enerjisi · MJ",
+    "load": "Elektrik yükü · W",
+    "run": "İkizi uçur ↗",
+    "running": "İkiz uçuruluyor…",
+    "help": "Güdüm gerçeğe değil, kendi gürültülü tahminine göre yön verir. İkiz yeniden plan yapmaz; bir arızanın özgün plana etkisini görürsünüz. Tüm telemetri simülasyondur.",
+    "success": "Tolerans içinde iniyor",
+    "failure": "İniş başarısız",
+    "fromTarget": "hedefe {m} m",
+    "planValid": "Özgün plan geçerli kaldı.",
+    "planInvalid": "Özgün plan geçersiz oldu: {reasons}.",
+    "replay": "Tekrar oynatma kimliği {id}.",
+    "metrics": {
+      "versus": "ARIZASIZ UÇUŞA GÖRE",
+      "errorChange": "iniş noktası hatasındaki değişim",
+      "propellant": "YAKIT",
+      "left": "{kg} kg kaldı · rezerv payı {margin} kg",
+      "navError": "TEMASTA NAVİGASYON HATASI",
+      "speeds": "dikey {vertical} m/s · yatay {horizontal} m/s"
+    },
+    "log": {
+      "applied": "{event} uygulandı",
+      "invalidated": "Plan geçersiz — {reason}",
+      "noEffect": "Plana etkisi yok — {reason}",
+      "notReached": "{event} temastan önce gerçekleşmedi"
+    },
+    "events": {
+      "thrust_loss": "Motor itkisi kaybı",
+      "sensor_degradation": "Navigasyon sensörü değişimi",
+      "propellant_leak": "Yakıt sızıntısı",
+      "comm_outage": "Yer bağlantısı kesintisi",
+      "obstacle_detected": "Engel algılandı (sentetik)"
+    },
+    "chartLabel": "İniş boyunca navigasyon tahmin hatası ve beklenen büyüklüğü; arıza anları işaretli.",
+    "axis": "güçlü iniş başlangıcından beri geçen süre · 0–{seconds} s",
+    "legend": {
+      "error": "gerçek tahmin hatası (yalnızca simülasyonda bilinir)",
+      "std": "aracın beklediği hata"
+    },
+    "assumptions": "İkiz modeli ve varsayımlar"
+  },
+  "surfaceRoutes": {
+    "label": "İniş sonrası keşif",
+    "title": "İnişten sonra · bilim hedeflerine yüzey rotaları",
+    "north": "K",
+    "target": "Hedef",
+    "bearing": "Yön · °",
+    "distance": "Uzaklık · m",
+    "remove": "Kaldır",
+    "nameLabel": "Hedef {n} adı",
+    "bearingLabel": "Hedef {n} yönü",
+    "distanceLabel": "Hedef {n} uzaklığı",
+    "removeLabel": "Hedef {n}'i kaldır",
+    "add": "Hedef ekle",
+    "defaults": {
+      "north": "Kuzey sırt",
+      "east": "Doğu yamaç",
+      "south": "Güney"
+    },
+    "slope": "Gezginin çıkabileceği en büyük eğim · °",
+    "speed": "Gezinme hızı · m/s",
+    "useSky": "Güneş ve Dünya görünürlüğünü son nokta analiziyle kontrol et",
+    "needAnalysis": "Güneş ve Dünya kontrolü için önce Görev kontrolünde bir nokta analizi çalıştırın",
+    "observerHeight": "Gözlem yüksekliği · m",
+    "waypoints": "Rota başına kontrol noktası",
+    "run": "Rotaları planla ↗",
+    "running": "Rota hesaplanıyor…",
+    "help": "Yönler kuzeyden saat yönünde ölçülür. Eğim sınırı ve hız planlama varsayımıdır, belirli bir gezgine ait değildir. Güneş kontrolünde her nokta için ayrı arazi ufku hesaplanır (nokta başına yaklaşık 2 s).",
+    "metrics": {
+      "efficiency": "GÖREV VERİMİ",
+      "efficiencyHelp": "0–1 · ulaşılabilirlik, dolambaçsızlık",
+      "efficiencyWithSun": "0–1 · ulaşılabilirlik, dolambaçsızlık, güneş",
+      "reachable": "ULAŞILABİLEN HEDEF",
+      "directness": "dolambaçsızlık %{pct}",
+      "sunlit": "GÜNEŞ ALAN ROTA NOKTASI",
+      "departure": "çıkış {utc} UTC",
+      "noAnalysis": "nokta analizi yok"
+    },
+    "notChecked": "kontrol edilmedi",
+    "legend": {
+      "sunlit": "güneş alan nokta",
+      "shadow": "gölgedeki nokta",
+      "unknown": "bilinmiyor / kontrol edilmedi"
+    },
+    "table": {
+      "caption": "İniş noktasından rotalar",
+      "route": "Rota",
+      "terrain": "Arazi",
+      "sky": "Güneş / Dünya"
+    },
+    "detour": "dolambaç",
+    "maxSlope": "en fazla {deg}°",
+    "climb": "tırmanış {m} m",
+    "sunlitPoints": "güneş alan nokta: {lit}/{total}",
+    "earthHidden": "Dünya görünmüyor: {hidden}/{total}",
+    "sun": {
+      "full": "güneşli",
+      "partial": "kısmen güneşli",
+      "dark": "gölgede",
+      "unknown": "bilinmiyor"
+    },
+    "assumptions": "Rota modeli ve varsayımlar",
+    "mapLabel": "İniş noktasından {count} hedefe rotalar, kuzey yukarıda; ayrıntılar tabloda."
   }
 }

@@ -103,7 +103,18 @@ const PANEL_MAX_SHARE = 0.75;
 const PANEL_KEY_STEP_PX = 32;
 const PANEL_WIDTH_STORAGE_KEY = "lunar-panel-width-px";
 
-export type StageModule = { id: string; label: string; content: ReactNode };
+/**
+ * A mission-control module. `group` places it in one of the four numbered steps
+ * ("results", "compare", "descent"), under "Learn" or in the "Advanced" menu.
+ */
+export type StageModule = {
+  id: string;
+  label: string;
+  content: ReactNode;
+  group: "results" | "compare" | "descent" | "learn" | "advanced";
+};
+/** The numbered steps of mission control, in order. */
+const STEP_GROUPS = ["plan", "results", "compare", "descent"] as const;
 
 const clampPanelWidth = (width_px: number, container_px: number) =>
   Math.round(
@@ -220,7 +231,27 @@ export default function MissionStage({
     handle.addEventListener("pointerup", stop);
     handle.addEventListener("pointercancel", stop);
   };
-  const tabs = [{ id: "plan", label: t("missionStage.plan") }, ...modules];
+  const groupOf = (id: string) =>
+    id === "plan" ? "plan" : (modules.find((m) => m.id === id)?.group ?? "plan");
+  const activeGroup = groupOf(activeModule);
+  const lastInGroup = useRef<Record<string, string>>({});
+  lastInGroup.current[activeGroup] = activeModule;
+  const openGroup = (group: string) => {
+    if (group === "plan") return onModuleChange("plan");
+    const remembered = lastInGroup.current[group];
+    const target =
+      modules.find((m) => m.id === remembered && m.group === group) ??
+      modules.find((m) => m.group === group);
+    if (target) onModuleChange(target.id);
+  };
+  const steps = STEP_GROUPS.filter(
+    (g) => g === "plan" || modules.some((m) => m.group === g),
+  );
+  const learn = modules.find((m) => m.group === "learn");
+  const advanced = modules.filter((m) => m.group === "advanced");
+  const siblings =
+    activeGroup === "plan" ? [] : modules.filter((m) => m.group === activeGroup);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const [flying, setFlying] = useState(false);
   const [cameraMode, setCameraMode] = useState<CameraMode>("auto");
@@ -561,20 +592,70 @@ export default function MissionStage({
           }}
         />
         <div className="panel-bar">
-          <div className="panel-tabs" role="tablist" aria-label={t("missionStage.modules")}>
-            {tabs.map((tab) => (
+          <div className="panel-tabs step-tabs" role="tablist" aria-label={t("missionStage.modules")}>
+            {steps.map((group, index) => (
               <button
-                key={tab.id}
+                key={group}
                 type="button"
                 role="tab"
-                id={`tab-${tab.id}`}
-                aria-selected={activeModule === tab.id}
-                aria-controls={`tabpanel-${tab.id}`}
-                onClick={() => onModuleChange(tab.id)}
+                id={`step-${group}`}
+                aria-selected={activeGroup === group}
+                onClick={() => {
+                  setAdvancedOpen(false);
+                  openGroup(group);
+                }}
               >
-                {tab.label}
+                <b>{index + 1}</b> {t(`missionStage.steps.${group}`)}
               </button>
             ))}
+            {learn && (
+              <button
+                type="button"
+                role="tab"
+                id="step-learn"
+                className="step-extra"
+                aria-selected={activeGroup === "learn"}
+                onClick={() => {
+                  setAdvancedOpen(false);
+                  onModuleChange(learn.id);
+                }}
+              >
+                {t("missionStage.learn")}
+              </button>
+            )}
+            {advanced.length > 0 && (
+              <div className="advanced-menu">
+                <button
+                  type="button"
+                  className="step-extra"
+                  aria-expanded={advancedOpen}
+                  aria-haspopup="menu"
+                  data-active={activeGroup === "advanced" || undefined}
+                  onClick={() => setAdvancedOpen((open) => !open)}
+                >
+                  {t("missionStage.advanced")} ▾
+                </button>
+                {advancedOpen && (
+                  <div className="advanced-list" role="menu">
+                    <p>{t("missionStage.advancedHint")}</p>
+                    {advanced.map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        role="menuitem"
+                        aria-current={activeModule === m.id || undefined}
+                        onClick={() => {
+                          setAdvancedOpen(false);
+                          onModuleChange(m.id);
+                        }}
+                      >
+                        {m.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <div className="panel-bar-end">
             {status}
@@ -592,7 +673,7 @@ export default function MissionStage({
           className="panel-body"
           role="tabpanel"
           id="tabpanel-plan"
-          aria-labelledby="tab-plan"
+          aria-labelledby="step-plan"
           hidden={activeModule !== "plan"}
         >
         {children}
@@ -671,13 +752,38 @@ export default function MissionStage({
           </div>
         </section>
         </div>
+        {siblings.length > 1 && (
+          <div
+            className="sub-tabs"
+            role="tablist"
+            aria-label={
+              activeGroup === "advanced"
+                ? t("missionStage.advanced")
+                : t(`missionStage.steps.${activeGroup}`)
+            }
+          >
+            {siblings.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                role="tab"
+                id={`tab-${m.id}`}
+                aria-selected={activeModule === m.id}
+                aria-controls={`tabpanel-${m.id}`}
+                onClick={() => onModuleChange(m.id)}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        )}
         {modules.map((module) => (
           <div
             key={module.id}
             className="panel-body"
             role="tabpanel"
             id={`tabpanel-${module.id}`}
-            aria-labelledby={`tab-${module.id}`}
+            aria-label={module.label}
             hidden={activeModule !== module.id}
           >
             {module.content}

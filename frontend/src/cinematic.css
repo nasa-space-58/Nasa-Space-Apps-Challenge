@@ -1573,3 +1573,176 @@ body.panel-resizing canvas {
   align-items: center;
   gap: 18px;
 }
+
+/* Simplified mission control: four numbered steps, Learn, and an Advanced menu. */
+.step-tabs {
+  align-items: stretch;
+  gap: 4px;
+}
+.step-tabs > button,
+.step-tabs .advanced-menu > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 12px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: #a7b6c0;
+  font: 500 13px "DM Sans", sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  cursor: pointer;
+}
+.step-tabs > button b {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #ffffff30;
+  font: 600 11px "DM Sans", sans-serif;
+}
+.step-tabs > button[aria-selected="true"] {
+  color: #f3eee4;
+  border-bottom-color: var(--gold);
+}
+.step-tabs > button[aria-selected="true"] b {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #10171e;
+}
+.step-tabs .step-extra {
+  color: #7f8e98;
+}
+.step-tabs .step-extra:hover,
+.step-tabs > button:hover {
+  color: #f3eee4;
+}
+.advanced-menu {
+  position: relative;
+}
+.advanced-menu > button[data-active] {
+  color: #f3eee4;
+  border-bottom-color: var(--gold);
+}
+.advanced-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  min-width: 240px;
+  padding: 10px;
+  background: #0a0f13;
+  border: 1px solid #ffffff20;
+  box-shadow: 0 12px 32px #0008;
+}
+.advanced-list p {
+  margin: 0 0 8px;
+  color: #7f8e98;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.advanced-list button {
+  display: block;
+  width: 100%;
+  padding: 8px 10px;
+  border: 0;
+  background: transparent;
+  color: #d5dde2;
+  font: 14px "DM Sans", sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+.advanced-list button:hover,
+.advanced-list button[aria-current] {
+  background: #17232c;
+  color: #f3eee4;
+}
+.sub-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 16px 0;
+}
+.sub-tabs button {
+  padding: 6px 12px;
+  border: 1px solid #ffffff20;
+  border-radius: 999px;
+  background: transparent;
+  color: #a7b6c0;
+  font: 13px "DM Sans", sans-serif;
+  cursor: pointer;
+}
+.sub-tabs button[aria-selected="true"] {
+  background: #f3eee4;
+  border-color: #f3eee4;
+  color: #10171e;
+}
+
+/* Descent: deeper analyses as collapsible cards. */
+.tool-cards {
+  margin-top: 28px;
+}
+.tool-cards > h3 {
+  margin: 0 0 4px;
+  font: 600 16px "DM Sans", sans-serif;
+}
+.tool-card {
+  margin-top: 10px;
+  border: 1px solid #ffffff1c;
+  background: #0d141a;
+}
+.tool-card > summary {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+.tool-card > summary::-webkit-details-marker {
+  display: none;
+}
+.tool-card > summary b {
+  font: 600 15px "DM Sans", sans-serif;
+  color: #f3eee4;
+}
+.tool-card > summary b::after {
+  content: " +";
+  color: var(--gold);
+}
+.tool-card[open] > summary b::after {
+  content: " −";
+}
+.tool-card > summary span {
+  color: #9aa9b3;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.tool-card[open] {
+  padding-bottom: 12px;
+}
+.tool-card > div {
+  padding: 0 16px;
+}
+/* The card summary already names the panel. */
+.tool-card > div > h3:first-child {
+  display: none;
+}
+
+/* Shared: collapsed "advanced settings" inside panel forms. */
+.advanced-settings {
+  grid-column: 1 / -1;
+  border-top: 1px solid #ffffff14;
+  padding-top: 8px;
+}
+.advanced-settings > summary {
+  cursor: pointer;
+  color: #9aa9b3;
+  font-size: 13px;
+  padding: 4px 0 8px;
+}
+.advanced-settings[open] {
+  display: grid;
+  gap: 10px;
+}

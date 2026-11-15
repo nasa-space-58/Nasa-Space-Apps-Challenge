@@ -654,10 +654,27 @@ export default function Descent({ sites }: { sites: Preset[] }) {
             </>
           )}
           {routes && <RouteOptimizer result={routes} />}
-          <RiskPanel base={planBase} />
-          <BackupPlans base={planBase} />
-          <TwinPanel base={planBase} />
-          <SurfaceRoutes site={planBase} />
+          {/* Deeper analyses stay closed until the user opens one. */}
+          <div className="tool-cards">
+            <h3>{t("descent.more.title")}</h3>
+            <p className="field-help">{t("descent.more.hint")}</p>
+            {(
+              [
+                ["risk", <RiskPanel base={planBase} />],
+                ["backups", <BackupPlans base={planBase} />],
+                ["twin", <TwinPanel base={planBase} />],
+                ["surface", <SurfaceRoutes site={planBase} />],
+              ] as const
+            ).map(([id, panel]) => (
+              <details className="tool-card" key={id}>
+                <summary>
+                  <b>{t(`descent.more.${id}.title`)}</b>
+                  <span>{t(`descent.more.${id}.desc`)}</span>
+                </summary>
+                {panel}
+              </details>
+            ))}
+          </div>
         </div>
       </div>
     </section>
