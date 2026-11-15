@@ -211,3 +211,7 @@ R13 (additional quantum application benchmarks) starts from `main` `456f4ef` on 
 ### H11 and current main integration (user, 2026-11-15)
 
 The user explicitly authorized integrating the latest main with the completed H10/H11 branch and publishing the combined version to main after resolving conflicts and passing checks. This one-time authorization supersedes the earlier H10/H11 manual-merge boundary. Preserve both teams' features and the unrelated local H6 notebook edit. No new quantum submission or credit spending is authorized by this integration.
+
+### UI simplification and rover scan main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/rover-scan-route` (which contains `ui/simplify-interface`) was fast-forwarded directly onto `main` from `e92174e` without a PR, overriding the no-direct-push rule for this one push only. It adds the simplified mission-control menu, the R8 route scene payload (skeleton `6b3d52c`, frozen tests `93583cf`), the real-DEM rover scan and the CC BY 4.0 Sketchfab rover model (attribution in `frontend/public/models/manifest.json`). The default rules for `main` still apply afterwards.
