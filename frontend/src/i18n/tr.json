@@ -2263,7 +2263,8 @@
       "energy": "En düşük batarya",
       "contact": "İlk temas kayması",
       "none": "yok",
-      "batteryDied": "Batarya {at} UTC'de bitiyor; arızasız senaryoda bitmiyor."
+      "batteryDied": "Batarya {at} UTC'de bitiyor; arızasız senaryoda bitmiyor.",
+      "batteryDiedBoth": "Batarya {at} UTC'de bitiyor; arızasız senaryoda {base} UTC'de."
     },
     "outlook": {
       "heading": "Temas olmasa da lander kendi başına",

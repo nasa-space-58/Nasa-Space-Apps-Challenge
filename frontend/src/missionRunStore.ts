@@ -103,7 +103,9 @@ export function runHighlights(run: MissionRunResult): { key: string; params: Rec
   const delta = run.baseline?.delta;
   const outlook = run.surface_outlook;
   const depleted = outlook?.power.depleted_at_utc;
-  if (outlook && depleted && !run.baseline?.depleted_at_utc) {
+  const baseDepleted = run.baseline?.depleted_at_utc;
+  // Report the battery only when it runs out earlier than in the fault-free run.
+  if (outlook && depleted && (!baseDepleted || Date.parse(baseDepleted) - Date.parse(depleted) > 360000)) {
     const hours = (Date.parse(depleted) - Date.parse(outlook.landing_utc)) / 3600000;
     out.push({ key: "missionRun.highlight.battery", params: { h: hours.toFixed(1) } });
   }

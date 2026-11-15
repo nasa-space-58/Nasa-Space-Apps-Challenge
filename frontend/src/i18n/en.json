@@ -2201,7 +2201,8 @@
       "energy": "Lowest battery",
       "contact": "First-contact shift",
       "none": "n/a",
-      "batteryDied": "The battery runs out at {at} UTC; it does not in the fault-free run."
+      "batteryDied": "The battery runs out at {at} UTC; it does not in the fault-free run.",
+      "batteryDiedBoth": "The battery runs out at {at} UTC; in the fault-free run at {base} UTC."
     },
     "outlook": {
       "heading": "The lander on its own, without contact",

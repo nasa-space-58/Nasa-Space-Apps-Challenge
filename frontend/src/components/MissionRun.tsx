@@ -490,7 +490,12 @@ export default function MissionRun({
               </dl>
               {run.surface_outlook?.power.depleted_at_utc && (
                 <p className="small">
-                  {t("missionRun.delta.batteryDied", { at: fmt(run.surface_outlook.power.depleted_at_utc) })}
+                  {run.baseline.depleted_at_utc
+                    ? t("missionRun.delta.batteryDiedBoth", {
+                        at: fmt(run.surface_outlook.power.depleted_at_utc),
+                        base: fmt(run.baseline.depleted_at_utc),
+                      })
+                    : t("missionRun.delta.batteryDied", { at: fmt(run.surface_outlook.power.depleted_at_utc) })}
                 </p>
               )}
             </div>
