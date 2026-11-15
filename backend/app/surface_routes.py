@@ -51,6 +51,8 @@ DEFAULT_OBSERVER_HEIGHT_M = 2.0
 MAX_TARGET_DISTANCE_M = 8000.0
 MAX_TARGETS = 5
 MAX_PATH_POINTS = 200
+DEFAULT_SCENE_MARGIN_M = 400.0
+DEFAULT_MAX_EXPLORED_CELLS = 4000
 MAX_ANALYSIS_OFFSET_M = 10000.0
 SOLAR_RADIUS_DEG = 959.63 / 3600
 NEIGHBOURS = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
@@ -92,6 +94,13 @@ class RouteRequest(BaseModel):
     analysis_job_id: str | None = Field(default=None, max_length=64)
     departure_utc: str | None = None
     waypoints_per_route: int = Field(default=5, ge=2, le=8, strict=True)
+    # Optional 3-D scene payload: the terrain window around the routes and the
+    # A* search order, for visualizing the planner on the real DEM.
+    include_scene: bool = False
+    scene_margin_m: float = Field(default=DEFAULT_SCENE_MARGIN_M, ge=0, le=2000)
+    max_explored_cells: int = Field(
+        default=DEFAULT_MAX_EXPLORED_CELLS, ge=100, le=20000, strict=True
+    )
 
     @model_validator(mode="after")
     def unique_targets(self):
@@ -114,12 +123,16 @@ def astar(
     start: tuple[int, int],
     goal: tuple[int, int],
     pixel_m: float,
+    explored: list[tuple[int, int]] | None = None,
 ) -> list[tuple[int, int]] | None:
     """Shortest 3-D path over 8-connected passable cells; None when unreachable.
 
     Includes start and goal. Deterministic for equal costs. Start or goal
-    outside the grid or impassable returns None.
+    outside the grid or impassable returns None. When `explored` is a list,
+    every expanded (closed) cell is appended to it in expansion order.
     """
+    if explored is not None:
+        raise NotImplementedError
     heights = np.asarray(heights_m, dtype=float)
     rows, cols = heights.shape
 
@@ -299,6 +312,16 @@ def _sky_state(frames, arrival, target, profile) -> dict:
     }
 
 
+def scene_window(
+    rows: int,
+    cols: int,
+    cells: list[tuple[int, int]],
+    margin_cells: int,
+) -> tuple[int, int, int, int]:
+    """Clipped (row0, col0, row1, col1) box, end-exclusive, around `cells`."""
+    raise NotImplementedError
+
+
 def plan_routes(
     request: RouteRequest,
     terrain: LocalTerrain,
@@ -312,6 +335,8 @@ def plan_routes(
     communication are reported as not evaluated. Raises RouteError when the
     landing cell is impassable or outside the terrain.
     """
+    if request.include_scene:
+        raise NotImplementedError
     heights = np.asarray(terrain.heights_m, dtype=float)
     rows, cols = heights.shape
     slopes = slope_grid_deg(heights, terrain.pixel_m)
