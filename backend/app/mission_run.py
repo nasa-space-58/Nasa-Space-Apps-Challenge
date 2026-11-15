@@ -871,15 +871,44 @@ def run_mission(
     terrain_at: Callable[[float, float], dict],
     scenarios: dict[str, FaultScenario] | None = None,
 ) -> dict:
+    """The gated verdict plus the surface outlook, baseline and window context."""
+    faults = effective_faults(
+        request, scenarios if scenarios is not None else load_scenarios()
+    )
+    result = _run_verdict(request, analysis, terrain_height_m, terrain_at, faults)
+    landed = result["landing_utc"] is not None and (result["failure"] or {}).get(
+        "gate"
+    ) not in ("descent", "touchdown_terrain")
+    end = utc(analysis["request"]["end_utc"])
+    outlook = None
+    if landed and utc(result["landing_utc"]) < end:
+        outlook = surface_outlook(
+            analysis["sun"]["intervals"],
+            analysis["earth"]["intervals"],
+            utc(result["landing_utc"]),
+            end,
+            request,
+            faults,
+        )
+    result["surface_outlook"] = outlook
+    result["baseline"] = mission_baseline(analysis, request, result)
+    result["context"] = window_context(analysis, result, faults)
+    return result
+
+
+def _run_verdict(
+    request: MissionRunRequest,
+    analysis: dict,
+    terrain_height_m: float,
+    terrain_at: Callable[[float, float], dict],
+    faults: tuple,
+) -> dict:
     """Evaluate all gates in order and report the first failure with its cause.
 
     `analysis` is a completed visibility analysis (request, sun, earth);
     `terrain_at(lat, lon)` returns R3 terrain safety for a touchdown point and
     may raise TerrainSafetyError when the point is outside coverage.
     """
-    faults = effective_faults(
-        request, scenarios if scenarios is not None else load_scenarios()
-    )
     window = analysis["request"]
     site = window["site"]
     latitude, longitude = site["latitude_deg"], site["longitude_deg_east"]
@@ -1261,7 +1290,93 @@ def surface_outlook(
     and kinds from OUTLOOK_FINDING_KINDS. This is a what-if continuation; it
     never changes the verdict.
     """
-    raise NotImplementedError
+    low = power_trace(sun_intervals, landing_utc, end_utc, request.power, faults, "none")
+    high = power_trace(sun_intervals, landing_utc, end_utc, request.power, faults, "full")
+    depleted = low["depleted_at_utc"]
+    until = utc(depleted) if depleted is not None else end_utc
+    findings = []
+    if until > landing_utc:
+        contact = contact_check(
+            earth_intervals, landing_utc, until, request.communication, faults, False
+        )
+    else:
+        contact = {"windows": [], "first_contact_utc": None, "longest_gap_h": 0.0}
+    windows = [(utc(w["start_utc"]), utc(w["end_utc"])) for w in contact["windows"]]
+    rules = request.communication
+    if windows:
+        findings.append(
+            _finding(windows[0][0], "communication", "first_contact", "First Earth contact.")
+        )
+    deadline = landing_utc + rules.first_contact_deadline_h * HOUR
+    if deadline <= until and (not windows or windows[0][0] > deadline):
+        findings.append(
+            _finding(
+                deadline,
+                "communication",
+                "first_contact_deadline",
+                f"No Earth contact within {rules.first_contact_deadline_h:g} h of touchdown.",
+            )
+        )
+    if windows:
+        limit = rules.max_contact_gap_h * HOUR
+        gaps = [(a[1], b[0]) for a, b in zip(windows, windows[1:])]
+        gaps.append((windows[-1][1], until))
+        for a, b in gaps:
+            if b - a > limit:
+                findings.append(
+                    _finding(
+                        a + limit,
+                        "communication",
+                        "contact_gap",
+                        f"No Earth contact for more than {rules.max_contact_gap_h:g} h after {stamp(a)}.",
+                    )
+                )
+    for fault in faults:
+        if FAULT_PHASES.get(fault.kind, "surface") != "surface":
+            continue
+        begin, finish = _fault_window(fault, landing_utc)
+        gate = "communication" if fault.kind == "communication_outage" else "power"
+        if begin < until:
+            findings.append(
+                _finding(begin, gate, "fault_activated", f"Fault {fault.kind} active.", fault.kind)
+            )
+            if finish is not None and finish < until:
+                findings.append(
+                    _finding(finish, gate, "fault_cleared", f"Fault {fault.kind} ended.", fault.kind)
+                )
+    if depleted is not None:
+        findings.append(
+            _finding(
+                until,
+                "power",
+                "battery_depleted",
+                "Battery depleted; the lander shuts down.",
+            )
+        )
+    findings.sort(key=lambda f: (utc(f["utc"]), GATES.index(f["gate"])))
+    return {
+        "landing_utc": stamp(landing_utc),
+        "evaluated_until_utc": stamp(until),
+        "power": {
+            "trace": low["trace"],
+            "min_energy_wh": low["min_energy_wh"],
+            "depleted_at_utc": depleted,
+            "optimistic_depleted_at_utc": high["depleted_at_utc"],
+        },
+        "communication": {
+            "windows": contact["windows"],
+            "first_contact_utc": contact["first_contact_utc"],
+            "longest_gap_h": contact["longest_gap_h"],
+        },
+        "findings": findings,
+    }
+
+
+def _finding(moment, gate, kind, detail, fault=None) -> dict:
+    row = {"utc": stamp(moment), "gate": gate, "kind": kind, "detail": detail}
+    if fault is not None:
+        row["fault"] = fault
+    return row
 
 
 def mission_baseline(analysis: dict, request: MissionRunRequest, result: dict) -> dict:
@@ -1275,7 +1390,42 @@ def mission_baseline(analysis: dict, request: MissionRunRequest, result: dict) -
     `result` is the scenario run with `surface_outlook` set; a delta is None
     when either side lacks the quantity (e.g. no touchdown after a crash).
     """
-    raise NotImplementedError
+    window = analysis["request"]
+    start, end = utc(window["start_utc"]), utc(window["end_utc"])
+    nominal = surface_outlook(
+        analysis["sun"]["intervals"], analysis["earth"]["intervals"], start, end, request, ()
+    )
+    descent = result.get("descent") or {}
+    margin = descent.get("nominal_propellant_margin_kg")
+    outlook = result.get("surface_outlook")
+    site = result.get("touchdown_site")
+
+    def diff(a, b):
+        return None if a is None or b is None else a - b
+
+    first = nominal["communication"]["first_contact_utc"]
+    scenario_first = outlook["communication"]["first_contact_utc"] if outlook else None
+    landing = result.get("landing_utc")
+    return {
+        "landing_utc": stamp(start),
+        "propellant_margin_kg": margin,
+        "touchdown_offset_m": 0.0,
+        "min_energy_wh": nominal["power"]["min_energy_wh"],
+        "depleted_at_utc": nominal["power"]["depleted_at_utc"],
+        "first_contact_utc": first,
+        "delta": {
+            "propellant_margin_kg": diff(descent.get("propellant_margin_kg"), margin),
+            "touchdown_offset_m": site["offset_m"] if site else None,
+            "landing_delay_h": (utc(landing) - start) / HOUR if landing else None,
+            "min_energy_wh": diff(
+                outlook["power"]["min_energy_wh"] if outlook else None,
+                nominal["power"]["min_energy_wh"],
+            ),
+            "first_contact_shift_h": (utc(scenario_first) - utc(first)) / HOUR
+            if first and scenario_first
+            else None,
+        },
+    }
 
 
 def window_context(analysis: dict, result: dict, faults: tuple) -> dict:
@@ -1287,7 +1437,57 @@ def window_context(analysis: dict, result: dict, faults: tuple) -> dict:
     surface fault: never reached (no touchdown), starting at or after the window
     end, starting at or after the verdict time, or still active at the window end.
     """
-    raise NotImplementedError
+    window = analysis["request"]
+    end = utc(window["end_utc"])
+    earth, sun = analysis["earth"]["intervals"], analysis["sun"]["intervals"]
+
+    def hours(intervals, states):
+        return sum(
+            (utc(r["end_utc"]) - utc(r["start_utc"])) / HOUR
+            for r in intervals
+            if r["state"] in states
+        )
+
+    failure = result.get("failure")
+    verdict = utc(failure["at_utc"]) if failure else end
+    landed = result.get("surface_outlook") is not None
+    landing = utc(result["landing_utc"]) if landed else None
+    limitations = []
+    if not any(r["state"] in ("visible", "boundary", "unknown") for r in earth):
+        limitations.append(
+            {
+                "code": "earth_never_visible",
+                "detail": "Earth is never visible in this window; every landing fails the first-contact rule.",
+            }
+        )
+    for fault in faults:
+        if FAULT_PHASES.get(fault.kind, "surface") != "surface":
+            continue
+
+        def add(code, detail, kind=fault.kind):
+            limitations.append({"code": code, "fault": kind, "detail": detail})
+
+        if landing is None:
+            add("fault_not_reached", "The lander never reached the surface.")
+            continue
+        begin, finish = _fault_window(fault, landing)
+        if begin >= end:
+            add("fault_after_window", "The fault starts after the analysed window ends.")
+            continue
+        if verdict < end and begin >= verdict:
+            add(
+                "fault_after_mission_end",
+                "The fault starts after the verdict; its effect appears only in the surface outlook.",
+            )
+        if finish is not None and finish > end:
+            add("fault_exceeds_window", "The fault is still active when the analysed window ends.")
+    return {
+        "surface_window_h": (end - landing) / HOUR if landing else None,
+        "earth_visible_h": hours(earth, ("visible",)),
+        "sun_visible_h": hours(sun, ("full", "partial")),
+        "verdict_utc": stamp(verdict),
+        "limitations": limitations,
+    }
 
 
 def register_mission_run_routes(app, analyses, data_dir: Path) -> None:
