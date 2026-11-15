@@ -234,3 +234,7 @@ Continue on `codex/unified-quantum-stage1`; implement the full classical mission
 ### Unified planner stage 4 (user, 2026-11-15)
 
 Continue on `codex/unified-quantum-stage1`; connect bounded local quantum proposals to full campaign/physical admission, test and push only this branch. No main/tahakrcc merges or real quantum credits. Preserve the local H6 notebook. Skeleton `8f45b95`; frozen tests `94fb31a`, `d90ddd9`, `bb3df22`. Default mode stays classical, experiments are explicitly local, and unchanged R10/R13 NO-GO policy cannot be bypassed. See docs/unified-quantum-proposals.md for supported scope and attribution rules.
+
+### Branch consolidation and scene refresh (user, 2026-11-15)
+
+The user authorized consolidating the latest GitHub branches into main, cleaning up branch clutter, and implementing the agreed rounded-control / scene-first interface. This authorization supersedes earlier branch-specific no-merge and delivery restrictions for this integration. Preserve active worktrees and unrelated local files. H8–H11 and healthinfo were already squash-integrated via PRs #19 and #18. The divergent early R12 implementation is archived rather than replacing the current H5/H6 and R12 event stack. See docs/verification/branch-consolidation-2026-11-15.md for exact tips, preserved branches and verification. No paid assistant or quantum provider calls are authorized.
