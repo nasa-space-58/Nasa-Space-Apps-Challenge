@@ -976,8 +976,6 @@
     "rerank": "Re-rank after this delay",
     "selected": "{n} of 6 selected · at least 2",
     "removeCustomN": "Remove custom site {n}",
-    "editSetup": "Change candidates or window",
-    "hideSetup": "Hide setup",
     "prioritiesBelow": "Tune the priority weights under “What if…” below this result.",
     "constraintsSummary": "slope ≤ {slope}° · DSN ≥ {dsn}°",
     "emptyResult": "The ranking appears here: the recommended site first, each score split by criterion, and every rejection with its reason.",

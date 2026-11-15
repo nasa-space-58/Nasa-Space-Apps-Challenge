@@ -284,7 +284,6 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
   const [weights, setWeights] = useState<Weights>(defaults);
   const [rec, setRec] = useState<Recommendation | null>(null);
   const [rescored, setRescored] = useState<Rescore | null>(null);
-  const [setupOpen, setSetupOpen] = useState(false);
   useEffect(() => {
     if (!rec) return;
     const ranking = rescored?.current ?? rec.ranking;
@@ -343,7 +342,6 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
         body: JSON.stringify(body),
       });
       remember(created.id);
-      setSetupOpen(false);
       setRec(created);
       poll(created.id);
     } catch (e) {
@@ -434,7 +432,6 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
   const shownCriteria = CRITERIA.filter((c) => c !== "fuel" || includeDescent);
   const weightTotal = shownCriteria.reduce((sum, c) => sum + weights[c], 0);
   const locked = busy || running;
-  const setupVisible = !rec || setupOpen;
 
   const priorities = (
     <div className="rec-priorities">
@@ -518,211 +515,199 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
             </>
           )}
           {rec.error && <p className="alert">{rec.error}</p>}
-          {!running && (
-            <button
-              type="button"
-              className="text-button"
-              aria-expanded={setupVisible}
-              onClick={() => setSetupOpen(!setupOpen)}
-            >
-              {setupOpen ? t("recommendations.hideSetup") : t("recommendations.editSetup")}
-            </button>
-          )}
         </div>
       )}
 
-      {setupVisible && (
-        <form
-          className="panel rec-setup"
-          onSubmit={(e) => {
-            e.preventDefault();
-            submit();
-          }}
-        >
-          <fieldset disabled={locked}>
-            <legend>
-              <span className="rec-step">1</span> {t("recommendations.candidates")}
-              <small>{t("recommendations.selected", { n: count })}</small>
-            </legend>
-            <div className="rec-chips">
-              {sites.map((s) => (
-                <label className="rec-chip" key={s.site_id}>
-                  <input
-                    type="checkbox"
-                    checked={picked.includes(s.site_id)}
-                    disabled={!picked.includes(s.site_id) && count >= 6}
-                    onChange={(e) =>
-                      setPicked(
-                        e.target.checked
-                          ? [...picked, s.site_id]
-                          : picked.filter((id) => id !== s.site_id),
-                      )
-                    }
-                  />
-                  <span>{siteLabel(t, s)}</span>
-                </label>
-              ))}
-            </div>
-            {custom.map((c, i) => (
-              <div className="rec-custom" key={i}>
-                <label>
-                  {t("recommendations.customLat", { n: i + 1 })} · °
-                  <input
-                    type="number"
-                    step="any"
-                    min="-90"
-                    max="-80"
-                    value={c.lat}
-                    onChange={(e) =>
-                      setCustom(custom.map((x, j) => (j === i ? { ...x, lat: e.target.value } : x)))
-                    }
-                  />
-                </label>
-                <label>
-                  {t("app.form.longitude")} · °E
-                  <input
-                    type="number"
-                    step="any"
-                    min="0"
-                    max="359.999"
-                    value={c.lon}
-                    onChange={(e) =>
-                      setCustom(custom.map((x, j) => (j === i ? { ...x, lon: e.target.value } : x)))
-                    }
-                  />
-                </label>
-                <button
-                  type="button"
-                  className="rec-remove"
-                  aria-label={t("recommendations.removeCustomN", { n: i + 1 })}
-                  onClick={() => setCustom(custom.filter((_, j) => j !== i))}
-                >
-                  ×
-                </button>
-              </div>
+      <form
+        className="panel rec-setup"
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit();
+        }}
+      >
+        <fieldset disabled={locked}>
+          <legend>
+            <span className="rec-step">1</span> {t("recommendations.candidates")}
+            <small>{t("recommendations.selected", { n: count })}</small>
+          </legend>
+          <div className="rec-chips">
+            {sites.map((s) => (
+              <label className="rec-chip" key={s.site_id}>
+                <input
+                  type="checkbox"
+                  checked={picked.includes(s.site_id)}
+                  disabled={!picked.includes(s.site_id) && count >= 6}
+                  onChange={(e) =>
+                    setPicked(
+                      e.target.checked
+                        ? [...picked, s.site_id]
+                        : picked.filter((id) => id !== s.site_id),
+                    )
+                  }
+                />
+                <span>{siteLabel(t, s)}</span>
+              </label>
             ))}
-            <button
-              type="button"
-              className="text-button"
-              disabled={count >= 6}
-              onClick={() => setCustom([...custom, { lat: "-85.5", lon: "0" }])}
-            >
-              + {t("recommendations.addCustom")}
-            </button>
-          </fieldset>
-
-          <fieldset disabled={locked}>
-            <legend>
-              <span className="rec-step">2</span> {t("recommendations.window")}
-            </legend>
-            <div className="rec-window">
+          </div>
+          {custom.map((c, i) => (
+            <div className="rec-custom" key={i}>
               <label>
-                {t("recommendations.start")} · UTC
+                {t("recommendations.customLat", { n: i + 1 })} · °
                 <input
-                  aria-label={t("recommendations.startLabel")}
-                  type="datetime-local"
-                  value={start}
-                  onChange={(e) => setStart(e.target.value)}
+                  type="number"
+                  step="any"
+                  min="-90"
+                  max="-80"
+                  value={c.lat}
+                  onChange={(e) =>
+                    setCustom(custom.map((x, j) => (j === i ? { ...x, lat: e.target.value } : x)))
+                  }
                 />
               </label>
-              <div className="rec-segment" role="radiogroup" aria-label={t("recommendations.duration")}>
-                <span>{t("recommendations.duration")}</span>
-                <div>
-                  {DURATIONS.map((h) => (
-                    <button
-                      type="button"
-                      key={h}
-                      role="radio"
-                      aria-checked={hours === h}
-                      onClick={() => setHours(h)}
-                    >
-                      {h === "24" ? t("app.form.hours", { n: 24 }) : t("app.form.days", { n: Number(h) / 24 })}
-                    </button>
-                  ))}
-                </div>
+              <label>
+                {t("app.form.longitude")} · °E
+                <input
+                  type="number"
+                  step="any"
+                  min="0"
+                  max="359.999"
+                  value={c.lon}
+                  onChange={(e) =>
+                    setCustom(custom.map((x, j) => (j === i ? { ...x, lon: e.target.value } : x)))
+                  }
+                />
+              </label>
+              <button
+                type="button"
+                className="rec-remove"
+                aria-label={t("recommendations.removeCustomN", { n: i + 1 })}
+                onClick={() => setCustom(custom.filter((_, j) => j !== i))}
+              >
+                ×
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            className="text-button"
+            disabled={count >= 6}
+            onClick={() => setCustom([...custom, { lat: "-85.5", lon: "0" }])}
+          >
+            + {t("recommendations.addCustom")}
+          </button>
+        </fieldset>
+
+        <fieldset disabled={locked}>
+          <legend>
+            <span className="rec-step">2</span> {t("recommendations.window")}
+          </legend>
+          <div className="rec-window">
+            <label>
+              {t("recommendations.start")} · UTC
+              <input
+                aria-label={t("recommendations.startLabel")}
+                type="datetime-local"
+                value={start}
+                onChange={(e) => setStart(e.target.value)}
+              />
+            </label>
+            <div className="rec-segment" role="radiogroup" aria-label={t("recommendations.duration")}>
+              <span>{t("recommendations.duration")}</span>
+              <div>
+                {DURATIONS.map((h) => (
+                  <button
+                    type="button"
+                    key={h}
+                    role="radio"
+                    aria-checked={hours === h}
+                    onClick={() => setHours(h)}
+                  >
+                    {h === "24" ? t("app.form.hours", { n: 24 }) : t("app.form.days", { n: Number(h) / 24 })}
+                  </button>
+                ))}
               </div>
             </div>
-            <label className="checkbox-label">
-              <input type="checkbox" checked={refine} onChange={(e) => setRefine(e.target.checked)} />
-              {t("recommendations.refine")}
-            </label>
-          </fieldset>
+          </div>
+          <label className="checkbox-label">
+            <input type="checkbox" checked={refine} onChange={(e) => setRefine(e.target.checked)} />
+            {t("recommendations.refine")}
+          </label>
+        </fieldset>
 
+        <fieldset disabled={locked}>
+          <legend>
+            <span className="rec-step">3</span> {t("recommendations.priorities")}
+          </legend>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              aria-label={t("recommendations.includeDescentLabel")}
+              checked={includeDescent}
+              onChange={(e) => {
+                setIncludeDescent(e.target.checked);
+                if (e.target.checked && weights.fuel === 0) setWeights({ ...weights, fuel: 1 });
+              }}
+            />
+            {t("recommendations.includeDescent")}
+          </label>
+          {!finished && priorities}
+          {finished && <p className="field-help">{t("recommendations.prioritiesBelow")}</p>}
+        </fieldset>
+
+        <details className="rec-constraints">
+          <summary>
+            {t("recommendations.hard")}
+            <small>{t("recommendations.constraintsSummary", { slope, dsn: dsnLimit })}</small>
+          </summary>
           <fieldset disabled={locked}>
-            <legend>
-              <span className="rec-step">3</span> {t("recommendations.priorities")}
-            </legend>
-            <label className="checkbox-label">
+            <label>
+              {t("recommendations.slope")} · °
               <input
-                type="checkbox"
-                aria-label={t("recommendations.includeDescentLabel")}
-                checked={includeDescent}
-                onChange={(e) => {
-                  setIncludeDescent(e.target.checked);
-                  if (e.target.checked && weights.fuel === 0) setWeights({ ...weights, fuel: 1 });
-                }}
+                aria-label={t("recommendations.slopeLabel")}
+                type="number"
+                min="1"
+                max="45"
+                step="0.5"
+                value={slope}
+                onChange={(e) => setSlope(e.target.value)}
               />
-              {t("recommendations.includeDescent")}
             </label>
-            {!finished && priorities}
-            {finished && <p className="field-help">{t("recommendations.prioritiesBelow")}</p>}
+            <label>
+              {t("recommendations.minSun")}
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={minSun}
+                onChange={(e) => setMinSun(e.target.value)}
+              />
+            </label>
+            <label>
+              {t("recommendations.minComm")}
+              <input
+                type="number"
+                min="0"
+                step="0.5"
+                value={minComm}
+                onChange={(e) => setMinComm(e.target.value)}
+              />
+            </label>
+            <label>
+              {t("recommendations.dsnLimit")}
+              <select value={dsnLimit} onChange={(e) => setDsnLimit(Number(e.target.value))}>
+                <option value={6}>{t("recommendations.limit6")}</option>
+                <option value={10}>{t("recommendations.limit10")}</option>
+              </select>
+            </label>
+            <p className="field-help">{t("recommendations.slopeNote")}</p>
           </fieldset>
+        </details>
 
-          <details className="rec-constraints">
-            <summary>
-              {t("recommendations.hard")}
-              <small>{t("recommendations.constraintsSummary", { slope, dsn: dsnLimit })}</small>
-            </summary>
-            <fieldset disabled={locked}>
-              <label>
-                {t("recommendations.slope")} · °
-                <input
-                  aria-label={t("recommendations.slopeLabel")}
-                  type="number"
-                  min="1"
-                  max="45"
-                  step="0.5"
-                  value={slope}
-                  onChange={(e) => setSlope(e.target.value)}
-                />
-              </label>
-              <label>
-                {t("recommendations.minSun")}
-                <input
-                  type="number"
-                  min="0"
-                  max="100"
-                  value={minSun}
-                  onChange={(e) => setMinSun(e.target.value)}
-                />
-              </label>
-              <label>
-                {t("recommendations.minComm")}
-                <input
-                  type="number"
-                  min="0"
-                  step="0.5"
-                  value={minComm}
-                  onChange={(e) => setMinComm(e.target.value)}
-                />
-              </label>
-              <label>
-                {t("recommendations.dsnLimit")}
-                <select value={dsnLimit} onChange={(e) => setDsnLimit(Number(e.target.value))}>
-                  <option value={6}>{t("recommendations.limit6")}</option>
-                  <option value={10}>{t("recommendations.limit10")}</option>
-                </select>
-              </label>
-              <p className="field-help">{t("recommendations.slopeNote")}</p>
-            </fieldset>
-          </details>
-
-          <button type="submit" className="primary" disabled={locked || count < 2 || count > 6}>
-            {t("recommendations.rank")} ↗
-          </button>
-          {count < 2 && <p className="field-help">{t("recommendations.empty")}</p>}
-        </form>
-      )}
+        <button type="submit" className="primary" disabled={locked || count < 2 || count > 6}>
+          {t("recommendations.rank")} ↗
+        </button>
+        {count < 2 && <p className="field-help">{t("recommendations.empty")}</p>}
+      </form>
 
       {!rec && <p className="rec-empty muted">{t("recommendations.emptyResult")}</p>}
 

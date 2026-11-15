@@ -988,8 +988,6 @@
     "rerank": "Bu gecikmeden sonra yeniden sırala",
     "selected": "6 adaydan {n} seçili · en az 2",
     "removeCustomN": "Özel yer {n} kaldır",
-    "editSetup": "Adayları veya zaman penceresini değiştir",
-    "hideSetup": "Ayarları gizle",
     "prioritiesBelow": "Öncelik ağırlıklarını bu sonucun altındaki “Ya şöyle olsaydı…” bölümünden ayarlayın.",
     "constraintsSummary": "eğim ≤ {slope}° · DSN ≥ {dsn}°",
     "emptyResult": "Sıralama burada görünür: önce önerilen yer, her puan kriterlere bölünmüş hâlde ve her reddin gerekçesi.",
