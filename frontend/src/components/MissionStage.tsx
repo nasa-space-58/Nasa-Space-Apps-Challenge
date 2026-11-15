@@ -165,6 +165,7 @@ export default function MissionStage({
   onSelect,
   onPreset,
   onSceneFailure,
+  onArrived,
   timeline,
   status,
   modules,
@@ -191,6 +192,8 @@ export default function MissionStage({
   onSelect: (latitude_deg: number, longitude_deg_east: number) => void;
   onPreset: (site: Preset) => void;
   onSceneFailure: () => void;
+  /** Called once each time the flight reaches a successful touchdown. */
+  onArrived?: () => void;
   /** Rendered directly below the 3D viewport, e.g. the start-date strip. */
   timeline?: ReactNode;
   /** Short connection/job state shown in the panel header. */
@@ -376,6 +379,11 @@ export default function MissionStage({
   const touchdown = touchdownOutcome(missionRun);
   const arrived = active.phase.id === "landed" && progress >= 1;
   const landed = webgl && arrived && touchdown === "landed";
+  const wasArrived = useRef(arrived);
+  useEffect(() => {
+    if (arrived && !wasArrived.current && touchdown === "landed") onArrived?.();
+    wasArrived.current = arrived;
+  }, [arrived]);
   const stageLabel = (id: string) =>
     id === "landed" && touchdown !== "landed"
       ? t(`missionRun.scene.${touchdown}`)

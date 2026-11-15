@@ -2051,5 +2051,121 @@
       "crash": "Crash",
       "tip_over": "Tipped over"
     }
+  },
+  "liveResults": {
+    "nowEyebrow": "AT THIS MOMENT",
+    "endEyebrow": "END OF THE WINDOW",
+    "speed": "Playback speed",
+    "soFar": "SO FAR",
+    "final": "FINAL",
+    "remaining": "Stays like this for {hours} more",
+    "untilEnd": "Stays like this until the end of the window",
+    "elevation": "Elevation {elevation}° · terrain horizon {horizon}°",
+    "noElevation": "No sample at this moment",
+    "state": {
+      "sun": {
+        "visible": "Sun visible",
+        "blocked": "Sun hidden by terrain",
+        "unknown": "Sun uncertain"
+      },
+      "earth": {
+        "visible": "Earth visible",
+        "blocked": "Earth hidden by terrain",
+        "unknown": "Earth uncertain"
+      }
+    },
+    "situation": {
+      "both": {
+        "title": "Sun and Earth are both visible",
+        "detail": "Solar panels can charge and a direct link to Earth is geometrically possible."
+      },
+      "sun_only": {
+        "title": "Sun visible, Earth hidden",
+        "detail": "Solar panels can charge, but there is no direct line of sight to Earth: a relay or waiting is needed for contact."
+      },
+      "earth_only": {
+        "title": "Earth visible, Sun hidden",
+        "detail": "Direct Earth contact is geometrically possible, but the site is in shadow and runs on batteries."
+      },
+      "neither": {
+        "title": "Neither Sun nor Earth is visible",
+        "detail": "Shadow and no direct Earth line of sight: batteries only and no direct contact."
+      },
+      "unknown": {
+        "title": "Not enough data at this moment",
+        "detail": "At least one body is too close to the terrain horizon or lacks data to classify."
+      }
+    },
+    "ofElapsed": "{percent} of the time elapsed · window total {total}",
+    "sunsetsSoFar": "Sunsets so far: {count}",
+    "jumpEnd": "Skip to the final results",
+    "summaryTitle": "FINAL RESULTS",
+    "summaryWindow": "whole {hours} window",
+    "joint": {
+      "both": "Sun + Earth",
+      "sun_only": "Sun only",
+      "earth_only": "Earth only",
+      "neither": "Neither",
+      "unknown": "Uncertain"
+    },
+    "facts": {
+      "longestSun": "Longest continuous sunlight",
+      "longestEarthGap": "Longest Earth blackout",
+      "sunsets": "Sunsets in window",
+      "earthsets": "Earthsets in window",
+      "unknown": "Uncertain time (Sun + Earth)"
+    },
+    "summaryNote": "Durations come from the analysed, terrain-relative visibility intervals. Geometric visibility is not a power, thermal or radio-link guarantee."
+  },
+  "savedLibrary": {
+    "title": "SAVED RESULTS",
+    "count": "{n} saved",
+    "nameLabel": "Result name",
+    "save": "Save result",
+    "update": "Update saved result",
+    "savedMessage": "Saved in this browser. The analysis itself stays on the server.",
+    "unavailable": "This saved analysis could not be loaded from the server.",
+    "pickHelp": "Tick two results to compare them side by side.",
+    "pick": "Select {name} for comparison",
+    "ok": "OK",
+    "shown": "SHOWN",
+    "dark": "Longest dark",
+    "open": "Open",
+    "compareWithShown": "Compare with shown",
+    "rename": "Rename",
+    "delete": "Delete",
+    "confirmDelete": "Remove \"{name}\" from saved results?",
+    "comparePicked": "Compare selected ({n}/2)",
+    "bestNote": "Highlighted values are the best among saved results (most sunlight, most Earth visibility, shortest darkness).",
+    "empty": "No saved results yet. Save the shown analysis to build your shortlist.",
+    "comparisons": "Saved comparisons"
+  },
+  "comparisonLive": {
+    "title": "WHO SEES WHAT NOW",
+    "endTitle": "AT THE END OF BOTH WINDOWS",
+    "differs": "The scenarios differ at this moment",
+    "same": "Both scenarios see the same",
+    "sunLead": {
+      "A": "A has collected more sunlight so far.",
+      "B": "B has collected more sunlight so far.",
+      "tie": "Sunlight so far is equal."
+    },
+    "earthLead": {
+      "A": "A has had Earth in view longer.",
+      "B": "B has had Earth in view longer.",
+      "tie": "Earth visibility so far is equal."
+    },
+    "pickSaved": "Or choose B from saved results",
+    "pickSavedNone": "— choose a saved result —",
+    "tie": "EQUAL",
+    "better": "{label} BETTER",
+    "verdictEyebrow": "VERDICT",
+    "verdictTie": "Neither scenario is better on all three key metrics",
+    "verdictWinner": "Scenario {label} is better on {wins} of {total} key metrics",
+    "verdictNote": "Key metrics: total sunlight, longest darkness and Earth visibility over the whole window.",
+    "saveName": "Comparison name",
+    "save": "Save comparison",
+    "update": "Update saved comparison",
+    "savedMessage": "Comparison saved. Reopen it from Saved results."
   }
 }

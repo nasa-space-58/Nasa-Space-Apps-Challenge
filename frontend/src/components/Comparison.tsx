@@ -1,8 +1,11 @@
 import ExportPanel from "./ExportPanel";
+import "./results-live.css";
 import { useEffect, useState } from "react";
 import HorizonPlot from "./HorizonPlot";
 import type { Result, Preset, Frame } from "../types";
 import { errorText, siteLabel, useTranslate, type Translate } from "../i18n";
+import { situationOf, tallyUntil, visibilityOf, type Visibility } from "../resultProgress";
+import { saveComparison, savedName, useLibrary } from "../savedLibrary";
 
 type Submission = {
   site_id: string;
@@ -205,6 +208,78 @@ function Scenario({
   );
 }
 
+const MARK: Record<Visibility, string> = { visible: "●", blocked: "○", unknown: "◌" };
+
+/** What each scenario sees at the shared cursor and what it has gathered so far. */
+function CompareNow({
+  a,
+  b,
+  aFrame,
+  bFrame,
+  elapsed_s,
+  atEnd,
+}: {
+  a: Result;
+  b: Result;
+  aFrame?: Frame;
+  bFrame?: Frame;
+  elapsed_s: number;
+  atEnd: boolean;
+}) {
+  const { t } = useTranslate();
+  const h = (seconds: number) => t("units.hours", { value: (seconds / 3600).toFixed(1) });
+  const rows = (["A", "B"] as const).map((label) => {
+    const result = label === "A" ? a : b;
+    const frame = label === "A" ? aFrame : bFrame;
+    const start = Date.parse(result.analysis.request.start_utc),
+      end = Date.parse(result.analysis.request.end_utc);
+    const cursor = atEnd ? end : Math.min(end, start + elapsed_s * 1000);
+    const sun = visibilityOf(frame?.sun.state),
+      earth = visibilityOf(frame?.earth.state);
+    return {
+      label,
+      sun,
+      earth,
+      situation: situationOf(sun, earth),
+      sunSoFar: tallyUntil(result.analysis.sun.intervals, start, cursor).visible_s,
+      earthSoFar: tallyUntil(result.analysis.earth.intervals, start, cursor).visible_s,
+    };
+  });
+  const [ra, rb] = rows;
+  const lead = (x: number, y: number) => (Math.abs(x - y) < 60 ? "tie" : x > y ? "A" : "B");
+  const sunLead = lead(ra.sunSoFar, rb.sunSoFar),
+    earthLead = lead(ra.earthSoFar, rb.earthSoFar);
+  const differs = ra.sun !== rb.sun || ra.earth !== rb.earth;
+  return (
+    <div className="panel compare-now" aria-live="polite">
+      <div className="panel-heading">
+        <span>{atEnd ? t("comparisonLive.endTitle") : t("comparisonLive.title")}</span>
+        <small>{differs ? t("comparisonLive.differs") : t("comparisonLive.same")}</small>
+      </div>
+      <div className="compare-now-grid">
+        {rows.map((row) => (
+          <div key={row.label} className={`compare-now-row situation-${row.situation}`}>
+            <b className="compare-now-label">{row.label}</b>
+            <span className={`now-chip sun ${row.sun}`}>
+              {MARK[row.sun]} {t(`liveResults.state.sun.${row.sun}`)}
+            </span>
+            <span className={`now-chip earth ${row.earth}`}>
+              {MARK[row.earth]} {t(`liveResults.state.earth.${row.earth}`)}
+            </span>
+            <small>{t(`liveResults.situation.${row.situation}.title`)}</small>
+            <span className="now-sofar">
+              <i className="sun-dot" /> {h(row.sunSoFar)} · <i className="earth-dot" /> {h(row.earthSoFar)}
+            </span>
+          </div>
+        ))}
+      </div>
+      <p className="compare-now-lead">
+        {t(`comparisonLive.sunLead.${sunLead}`)} {t(`comparisonLive.earthLead.${earthLead}`)}
+      </p>
+    </div>
+  );
+}
+
 export default function Comparison({
   aId,
   a,
@@ -237,6 +312,24 @@ export default function Comparison({
   const [playing, setPlaying] = useState(false);
   const [tab, setTab] = useState("A");
   const [retry, setRetry] = useState(0);
+  const library = useLibrary();
+  const [saveName, setSaveName] = useState("");
+  const [savedMessage, setSavedMessage] = useState("");
+  const pickSaved = (id: string) => {
+    if (!id || id === aId) return;
+    setError("");
+    setB(null);
+    setComparison(null);
+    setPlaying(false);
+    api(`/analyses/${id}`)
+      .then((other) => {
+        setDraft(other.submission);
+        if (base)
+          setMode(other.submission.start_utc === base.start_utc ? "sites" : "dates");
+        setBId(id);
+      })
+      .catch((e) => setError(errorText(e, t, "comparison.loadFailed")));
+  };
   useEffect(() => {
     let active = true;
     api(`/analyses/${aId}`)
@@ -399,12 +492,28 @@ export default function Comparison({
       draft.longitude_deg_east !== b.analysis.request.site.longitude_deg_east)
   );
   const point = comparison?.cursor[cursor];
-  const metrics = [
-    ["sun", "visible_duration_s", t("comparison.metric.sunlight"), "h"],
-    ["sun", "longest_blocked_s", t("comparison.metric.darkness"), "h"],
-    ["earth", "visible_duration_s", t("comparison.metric.earth"), "h"],
-    ["sun", "visible_percent_of_interval", t("comparison.metric.percent"), "pp"],
+  // Last element: whether a larger value is better for the mission.
+  const metrics: [string, string, string, string, boolean][] = [
+    ["sun", "visible_duration_s", t("comparison.metric.sunlight"), "h", true],
+    ["sun", "longest_blocked_s", t("comparison.metric.darkness"), "h", false],
+    ["earth", "visible_duration_s", t("comparison.metric.earth"), "h", true],
+    ["sun", "visible_percent_of_interval", t("comparison.metric.percent"), "pp", true],
   ];
+  const winnerOf = (raw: number, higherBetter: boolean, unit: string) =>
+    Math.abs(unit === "h" ? raw / 3600 : raw) < 0.005 ? "tie" : raw > 0 === higherBetter ? "B" : "A";
+  const wins = comparison
+    ? metrics.slice(0, 3).map(([target, metric, , unit, better]) =>
+        winnerOf(comparison.deltas[target][metric], better, unit),
+      )
+    : [];
+  const aWins = wins.filter((w) => w === "A").length,
+    bWins = wins.filter((w) => w === "B").length;
+  const atEnd = !!comparison && cursor >= comparison.cursor.length - 1;
+  const pairSaved = !!bId && library.comparisons.some((c) => c.a_id === aId && c.b_id === bId);
+  const pairName = () =>
+    `${savedName(library, aId) ?? a.analysis.request.site.site_id.replaceAll("-", " ")} ↔ ${
+      (bId && savedName(library, bId)) ?? b?.analysis.request.site.site_id.replaceAll("-", " ") ?? "B"
+    }`;
   return (
     <section
       id="comparison"
@@ -569,6 +678,24 @@ export default function Comparison({
                     </div>
                   </>
                 )}
+                {library.results.some((r) => r.id !== aId) && (
+                  <label>
+                    {t("comparisonLive.pickSaved")}
+                    <select
+                      value={bId && library.results.some((r) => r.id === bId) ? bId : ""}
+                      onChange={(e) => pickSaved(e.target.value)}
+                    >
+                      <option value="">{t("comparisonLive.pickSavedNone")}</option>
+                      {library.results
+                        .filter((r) => r.id !== aId)
+                        .map((r) => (
+                          <option key={r.id} value={r.id}>
+                            {r.name}
+                          </option>
+                        ))}
+                    </select>
+                  </label>
+                )}
                 <p className="field-help">{t("comparison.sameSettings")}</p>
                 <button className="primary" type="submit">
                   {busy ? t("comparison.processing") : t("comparison.run")} ↗
@@ -612,12 +739,18 @@ export default function Comparison({
             />
           )}
           <div className="compare-deltas">
-            {metrics.map(([target, metric, label, unit]) => {
+            {metrics.map(([target, metric, label, unit, better]) => {
               const raw = comparison.deltas[target][metric];
               const value = unit === "h" ? raw / 3600 : raw;
+              const winner = winnerOf(raw, better, unit);
               return (
-                <div className="metric-card" key={metric + target}>
-                  <span className="metric-label">{label} · B − A</span>
+                <div className={`metric-card winner-${winner}`} key={metric + target}>
+                  <span className="metric-label">
+                    {label} · B − A
+                    <span className="winner-badge">
+                      {winner === "tie" ? t("comparisonLive.tie") : t("comparisonLive.better", { label: winner })}
+                    </span>
+                  </span>
                   <strong>
                     {value > 0 ? "+" : ""}
                     {value.toFixed(2)}{" "}
@@ -639,6 +772,50 @@ export default function Comparison({
             {comparison.explanations.map((text) => (
               <p key={text}>{text}</p>
             ))}
+          </div>
+          <div className="panel compare-verdict">
+            <div>
+              <p className="eyebrow">{t("comparisonLive.verdictEyebrow")}</p>
+              <strong>
+                {aWins === bWins
+                  ? t("comparisonLive.verdictTie")
+                  : t("comparisonLive.verdictWinner", {
+                      label: aWins > bWins ? "A" : "B",
+                      wins: Math.max(aWins, bWins),
+                      total: wins.length,
+                    })}
+              </strong>
+              <small>{t("comparisonLive.verdictNote")}</small>
+            </div>
+            <form
+              className="saved-save"
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!bId) return;
+                saveComparison(aId, bId, saveName || pairName());
+                setSaveName("");
+                setSavedMessage(t("comparisonLive.savedMessage"));
+              }}
+            >
+              <input
+                aria-label={t("comparisonLive.saveName")}
+                placeholder={pairName()}
+                maxLength={80}
+                value={saveName}
+                onChange={(e) => {
+                  setSaveName(e.target.value);
+                  setSavedMessage("");
+                }}
+              />
+              <button type="submit" className="primary">
+                {pairSaved ? t("comparisonLive.update") : t("comparisonLive.save")}
+              </button>
+            </form>
+            {savedMessage && (
+              <p className="field-help" role="status">
+                {savedMessage}
+              </p>
+            )}
           </div>
           <div className="panel comparison-player">
             <div className="playback-heading">
@@ -699,6 +876,14 @@ export default function Comparison({
             </div>
             <p className="field-help">{t("comparison.playbackNote")}</p>
           </div>
+          <CompareNow
+            a={a}
+            b={b}
+            aFrame={point.a_index === null ? undefined : a.frames[point.a_index]}
+            bFrame={point.b_index === null ? undefined : b.frames[point.b_index]}
+            elapsed_s={point.elapsed_s}
+            atEnd={atEnd}
+          />
           <div
             className="compare-tabs"
             role="tablist"

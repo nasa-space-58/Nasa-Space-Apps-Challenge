@@ -29,6 +29,8 @@ import MissionRun from "./components/MissionRun";
 import MissionPlanner from "./components/MissionPlanner";
 import SelfHealing from "./components/SelfHealing";
 import AssistantPanel from "./components/AssistantPanel";
+import LiveResults, { type PlaybackSpeed } from "./components/LiveResults";
+import SavedLibrary from "./components/SavedLibrary";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
 import { LanguageToggle, siteLabel, useTranslate, type Translate } from "./i18n";
 
@@ -225,6 +227,7 @@ export default function App() {
   } | null>(null);
   const [frameIndex, setFrameIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState<PlaybackSpeed>(1);
   const [error, setError] = useState("");
   const [apiError, setApiError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -393,10 +396,10 @@ export default function App() {
           }
           return index + 1;
         }),
-      600,
+      600 / speed,
     );
     return () => clearInterval(timer);
-  }, [playing, result]);
+  }, [playing, result, speed]);
   useEffect(() => {
     if (reduced) setPlaying(false);
   }, [reduced]);
@@ -528,6 +531,7 @@ export default function App() {
     id: string,
     compare: boolean,
     otherId?: string,
+    showFinal = false,
   ) => {
     const [selected, view] = await Promise.all([
       api(`/analyses/${id}`),
@@ -552,7 +556,7 @@ export default function App() {
     setPlaying(false);
     setJob(selected);
     setResult(view);
-    setFrameIndex(0);
+    setFrameIndex(showFinal ? Math.max(0, view.frames.length - 1) : 0);
     setError("");
     localStorage.setItem("lunar-analysis-id", id);
     setComparisonBase(compare ? { id, result: view } : null);
@@ -575,6 +579,26 @@ export default function App() {
     }
   };
 
+  const togglePlay = () => {
+    if (!result) return;
+    if (!playing && frameIndex >= result.frames.length - 1) setFrameIndex(0);
+    setPlaying(!playing);
+  };
+  const compareSaved = async (aId: string, bId: string) => {
+    if (job && result && aId === job.id) {
+      setPlaying(false);
+      setSharedB(bId);
+      setComparisonBase({ id: aId, result });
+      setPanel("comparison");
+    } else await openSearchResult(aId, true, bId);
+  };
+  // After touchdown the observation window plays so the results follow the landed site.
+  const startSurfacePlayback = () => {
+    if (!result) return;
+    setFrameIndex(reduced ? result.frames.length - 1 : 0);
+    setPlaying(!reduced);
+    if (panel === "plan") setPanel("results");
+  };
   const resultsModule = (
     <section className="analysis-results" aria-labelledby="analysis-title">
       <div className="analysis-intro">
@@ -593,47 +617,21 @@ export default function App() {
         </div>
         <span className="outline-tag">MOON_ME / UTC</span>
       </div>
-      <div className="metric-grid">
-        <div className="metric-card">
-          <span className="metric-label">
-            <i className="sun-dot" /> {t("app.results.sunlight")}
-          </span>
-          <strong>
-            {result
-              ? `${result.analysis.sun.metrics.visible_percent_of_interval.toFixed(1)}%`
-              : "—"}
-          </strong>
-          <small>
-            {result
-              ? t("app.results.sunlightDetail", {
-                  hours: h(result.analysis.sun.metrics.visible_duration_s),
-                })
-              : t("app.results.ofWindow")}
-          </small>
-        </div>
-        <div className="metric-card">
-          <span className="metric-label">
-            <i className="earth-dot" /> {t("app.results.earth")}
-          </span>
-          <strong>
-            {result
-              ? `${result.analysis.earth.metrics.visible_percent_of_interval.toFixed(1)}%`
-              : "—"}
-          </strong>
-          <small>
-            {result
-              ? t("app.results.earthDetail", {
-                  hours: h(result.analysis.earth.metrics.visible_duration_s),
-                })
-              : t("app.results.earthEmpty")}
-          </small>
-        </div>
-        <div className="metric-card">
-          <span className="metric-label">{t("app.results.longestDark")}</span>
-          <strong>{h(result?.analysis.sun.metrics.longest_blocked_s)}</strong>
-          <small>{t("app.results.longestDarkDetail")}</small>
-        </div>
-      </div>
+      {result && (
+        <LiveResults
+          result={result}
+          frame={frame}
+          frameIndex={frameIndex}
+          playing={playing}
+          speed={speed}
+          onSpeed={setSpeed}
+          onTogglePlay={togglePlay}
+          onJumpEnd={() => {
+            setPlaying(false);
+            setFrameIndex(result.frames.length - 1);
+          }}
+        />
+      )}
       <div className="panel horizon-panel">
         <div className="panel-heading">
           <span>{t("app.results.localHorizon")}</span>
@@ -703,11 +701,7 @@ export default function App() {
           <button
             className="play-button"
             disabled={!result?.frames.length}
-            onClick={() => {
-              if (result && frameIndex === result.frames.length - 1)
-                setFrameIndex(0);
-              setPlaying(!playing);
-            }}
+            onClick={togglePlay}
             aria-label={playing ? t("app.playback.pause") : t("app.playback.play")}
           >
             {playing ? "Ⅱ" : "▷"}
@@ -795,6 +789,11 @@ export default function App() {
           {t("app.results.addComparison")} ↗
         </button>
       )}
+      <SavedLibrary
+        current={result && job ? { id: job.id, result } : null}
+        onOpen={(id) => openSearchResult(id, false, undefined, true)}
+        onCompare={compareSaved}
+      />
       {/* Secondary results stay closed until opened. */}
       <div className="tool-cards">
         {result && job && (
@@ -895,7 +894,7 @@ export default function App() {
             label: t("app.modules.compare"),
             content: (
               <Comparison
-                key={comparisonBase.id}
+                key={`${comparisonBase.id}:${sharedB ?? ""}`}
                 aId={comparisonBase.id}
                 initialBId={sharedB}
                 initialCursor={Number(shared.current.get("cursor") || 0)}
@@ -1258,6 +1257,7 @@ export default function App() {
             setResolved("");
           }}
           onSceneFailure={() => setWebgl(false)}
+          onArrived={startSurfacePlayback}
           modules={stageModules}
           activeModule={panel}
           onModuleChange={setPanel}

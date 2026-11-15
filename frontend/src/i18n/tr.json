@@ -2101,5 +2101,121 @@
       "crash": "Çarpma",
       "tip_over": "Devrildi"
     }
+  },
+  "liveResults": {
+    "nowEyebrow": "ŞU AN",
+    "endEyebrow": "PENCERENİN SONU",
+    "speed": "Oynatma hızı",
+    "soFar": "ŞİMDİYE KADAR",
+    "final": "SONUÇ",
+    "remaining": "{hours} daha böyle sürecek",
+    "untilEnd": "Pencerenin sonuna kadar böyle sürecek",
+    "elevation": "Yükseklik {elevation}° · arazi ufku {horizon}°",
+    "noElevation": "Bu anda örnek yok",
+    "state": {
+      "sun": {
+        "visible": "Güneş görünüyor",
+        "blocked": "Güneş arazinin arkasında",
+        "unknown": "Güneş belirsiz"
+      },
+      "earth": {
+        "visible": "Dünya görünüyor",
+        "blocked": "Dünya arazinin arkasında",
+        "unknown": "Dünya belirsiz"
+      }
+    },
+    "situation": {
+      "both": {
+        "title": "Güneş de Dünya da görünüyor",
+        "detail": "Güneş panelleri şarj olabilir ve Dünya ile doğrudan bağlantı geometrik olarak mümkün."
+      },
+      "sun_only": {
+        "title": "Güneş görünüyor, Dünya görünmüyor",
+        "detail": "Güneş panelleri şarj olabilir ama Dünya'ya doğrudan görüş hattı yok: iletişim için röle ya da bekleme gerekir."
+      },
+      "earth_only": {
+        "title": "Dünya görünüyor, Güneş görünmüyor",
+        "detail": "Dünya ile doğrudan iletişim geometrik olarak mümkün ama bölge gölgede, enerji bataryadan gelir."
+      },
+      "neither": {
+        "title": "Ne Güneş ne Dünya görünüyor",
+        "detail": "Gölge ve Dünya'ya doğrudan görüş yok: yalnızca batarya, doğrudan iletişim yok."
+      },
+      "unknown": {
+        "title": "Bu anda yeterli veri yok",
+        "detail": "En az bir gök cismi arazi ufkuna çok yakın ya da sınıflandırmak için veri eksik."
+      }
+    },
+    "ofElapsed": "Geçen sürenin {percent} kadarı · pencere toplamı {total}",
+    "sunsetsSoFar": "Şimdiye kadarki gün batımı: {count}",
+    "jumpEnd": "Sonuçlara atla",
+    "summaryTitle": "SONUÇ ÖZETİ",
+    "summaryWindow": "{hours} pencerenin tamamı",
+    "joint": {
+      "both": "Güneş + Dünya",
+      "sun_only": "Yalnız Güneş",
+      "earth_only": "Yalnız Dünya",
+      "neither": "Hiçbiri",
+      "unknown": "Belirsiz"
+    },
+    "facts": {
+      "longestSun": "En uzun kesintisiz güneş",
+      "longestEarthGap": "En uzun Dünya kesintisi",
+      "sunsets": "Penceredeki gün batımı",
+      "earthsets": "Penceredeki Dünya batımı",
+      "unknown": "Belirsiz süre (Güneş + Dünya)"
+    },
+    "summaryNote": "Süreler analiz edilen, araziye göre görünürlük aralıklarından gelir. Geometrik görünürlük güç, ısı ya da radyo bağlantısı garantisi değildir."
+  },
+  "savedLibrary": {
+    "title": "KAYITLI SONUÇLAR",
+    "count": "{n} kayıt",
+    "nameLabel": "Sonuç adı",
+    "save": "Sonucu kaydet",
+    "update": "Kaydı güncelle",
+    "savedMessage": "Bu tarayıcıya kaydedildi. Analizin kendisi sunucuda saklanır.",
+    "unavailable": "Bu kayıtlı analiz sunucudan yüklenemedi.",
+    "pickHelp": "Yan yana karşılaştırmak için iki sonuç işaretle.",
+    "pick": "{name} sonucunu karşılaştırma için seç",
+    "ok": "Tamam",
+    "shown": "GÖSTERİLEN",
+    "dark": "En uzun karanlık",
+    "open": "Aç",
+    "compareWithShown": "Gösterilenle karşılaştır",
+    "rename": "Yeniden adlandır",
+    "delete": "Sil",
+    "confirmDelete": "\"{name}\" kayıtlı sonuçlardan silinsin mi?",
+    "comparePicked": "Seçilenleri karşılaştır ({n}/2)",
+    "bestNote": "Vurgulanan değerler kayıtlılar arasındaki en iyisidir (en çok güneş, en çok Dünya görünürlüğü, en kısa karanlık).",
+    "empty": "Henüz kayıtlı sonuç yok. Kısa listeni oluşturmak için gösterilen analizi kaydet.",
+    "comparisons": "Kayıtlı karşılaştırmalar"
+  },
+  "comparisonLive": {
+    "title": "ŞU AN KİM NE GÖRÜYOR",
+    "endTitle": "İKİ PENCERENİN SONUNDA",
+    "differs": "Senaryolar bu anda farklı",
+    "same": "İki senaryo da aynı şeyi görüyor",
+    "sunLead": {
+      "A": "Şimdiye kadar A daha çok güneş topladı.",
+      "B": "Şimdiye kadar B daha çok güneş topladı.",
+      "tie": "Şimdiye kadarki güneş süresi eşit."
+    },
+    "earthLead": {
+      "A": "Dünya, A'dan daha uzun süre görüldü.",
+      "B": "Dünya, B'den daha uzun süre görüldü.",
+      "tie": "Şimdiye kadarki Dünya görünürlüğü eşit."
+    },
+    "pickSaved": "Ya da B'yi kayıtlı sonuçlardan seç",
+    "pickSavedNone": "— kayıtlı bir sonuç seç —",
+    "tie": "EŞİT",
+    "better": "{label} DAHA İYİ",
+    "verdictEyebrow": "KARAR",
+    "verdictTie": "Üç temel ölçütte de açık bir üstün senaryo yok",
+    "verdictWinner": "{label} senaryosu {total} temel ölçütün {wins} tanesinde daha iyi",
+    "verdictNote": "Temel ölçütler: tüm penceredeki toplam güneş, en uzun karanlık ve Dünya görünürlüğü.",
+    "saveName": "Karşılaştırma adı",
+    "save": "Karşılaştırmayı kaydet",
+    "update": "Kaydı güncelle",
+    "savedMessage": "Karşılaştırma kaydedildi. Kayıtlı sonuçlardan yeniden açabilirsin."
   }
 }
