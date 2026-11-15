@@ -282,6 +282,11 @@ def plan_mission(config: MissionConfig, view: PlannerView) -> dict:
                 solver="classical_finite_enumeration")
 
 
+def validate_active_action(config: MissionConfig, view: PlannerView, action: dict) -> list[str]:
+    """Check immediate action limits before continuing controls for one tick."""
+    raise NotImplementedError
+
+
 def _initial(c):
     return dict(fuel_kg=c.terminal.initial_state.propellant_kg, energy_wh=c.initial_energy_wh,
                 temperature_c=c.initial_temperature_c, available_thrust_n=c.terminal.vehicle.max_thrust_n,
