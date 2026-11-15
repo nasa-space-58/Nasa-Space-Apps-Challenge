@@ -1,6 +1,6 @@
 {
   "retrieved_utc": "2026-11-14",
-  "purpose": "Illustrative mission-control launch close-up only; not a trajectory simulation",
+  "purpose": "Illustrative mission-control 3-D assets only; not trajectory or vehicle simulations",
   "assets": [
     {
       "file": "rocket-in-stages.glb",
@@ -13,6 +13,19 @@
       "bytes": 440132,
       "sha256": "cc98851da697255729a4e85e2345d5d23a0f1b18ad06d90c9fde43eaf226a47a",
       "usage": "Three-stage launch vehicle with separable stages and fairing halves"
+    },
+    {
+      "file": "lunar-rover.glb",
+      "name": "Lunar Rover",
+      "publisher": "Versal (Sketchfab)",
+      "source_page": "https://sketchfab.com/3d-models/lunar-rover-82cab6e9ada74d12a98bd6a342e83048",
+      "license_page": "http://creativecommons.org/licenses/by/4.0/",
+      "license_summary": "CC BY 4.0: sharing and adaptation allowed with attribution to the author, a license link and an indication of changes.",
+      "changes": "Untextured source materials replaced at runtime by per-part colours; wheels and high-gain dish animated in the scene.",
+      "retrieved_utc": "2026-11-15",
+      "bytes": 28241572,
+      "sha256": "3f5e6c6f1afe217fece63939be940e2b957fd412eb9daf9bbe60050c49abb9d4",
+      "usage": "Rover driven along the backend R8 route in the landing close-up; not to scale with the terrain"
     }
   ]
 }

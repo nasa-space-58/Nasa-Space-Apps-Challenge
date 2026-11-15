@@ -8,9 +8,11 @@ import {
   type MutableRefObject,
   type ReactNode,
 } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
-import { Model, terrainHeight } from "./LunarSurface";
+import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { terrainHeight } from "./LunarSurface";
 import { PULSE_END, SEARCH_END, type SceneMapping, type SurfaceScene } from "./surfaceScene";
 
 /** A backend R8 route cell, metres north/east of the landing cell. */
@@ -38,11 +40,12 @@ const RIDE_HEIGHT_SCENE = 0.02;
  * public/models/manifest.json). The procedural rover is used until it exists.
  */
 const ROVER_MODEL_URL = "/models/lunar-rover.glb";
-/** Yaw that turns the model's nose onto +z (set once the file is checked). */
-const ROVER_MODEL_YAW = 0;
-const ROVER_MODEL_SIZE = 1.05;
+/** The model's nose (antenna and TV camera end) points to -z; turn it onto +z. */
+const ROVER_MODEL_YAW = Math.PI;
+/** Longest model dimension in scene units (wheel radius about 0.13). */
+const ROVER_MODEL_SIZE = 1.3;
 /** Antenna height above the ground for the scan pulses (scene units). */
-const DISH_HEIGHT_SCENE = 0.72;
+const DISH_HEIGHT_SCENE = 0.62;
 const PULSE_RINGS = 3;
 
 /**
@@ -165,6 +168,137 @@ function RoverModel({
       {wheels.map((position, i) => (
         <Wheel key={i} position={position} spin={spin} />
       ))}
+    </group>
+  );
+}
+
+/** Material look per model part, chosen by the nearest named ancestor. */
+const PART_LOOKS: [RegExp, { color: string; metalness: number; roughness: number }][] = [
+  [/^(llant|tira|ring|arito)/, { color: "#9a958a", metalness: 0.75, roughness: 0.5 }],
+  [/^guard/, { color: "#55606b", metalness: 0.2, roughness: 0.6 }],
+  [/^celdas_sol/, { color: "#1d3352", metalness: 0.5, roughness: 0.25 }],
+  [/^(tela_anten|estructura)/, { color: "#ece8dd", metalness: 0.15, roughness: 0.75 }],
+  [/^(cable|cinta|correas|Spline)/, { color: "#1c1c1c", metalness: 0, roughness: 0.8 }],
+  [/^(bolsa|tela_tapa)/, { color: "#cdbf9b", metalness: 0, roughness: 0.95 }],
+  [/^lente/, { color: "#101215", metalness: 0.4, roughness: 0.15 }],
+];
+const DEFAULT_LOOK = { color: "#c3c5c6", metalness: 0.55, roughness: 0.42 };
+/** Parts of each wheel that roll (fenders and supports stay fixed). */
+const WHEEL_NODE = /^neuma/;
+const FIXED_WHEEL_PART = /^(guard|sopor)/;
+/** High-gain dish parts that sweep around the mast while scanning. */
+const DISH_PART = /^(tela_anten|estructura|base_$|punta_rece|base_recep|contrapeso|rosca$)/;
+
+/**
+ * Re-parents `parts` (siblings) under a pivot at `centre` (scene-root space)
+ * so they can turn about `axis` (scene-root space). Returns the pivot and the
+ * axis in the pivot's parent frame.
+ */
+function pivotFor(parts: THREE.Object3D[], centre: THREE.Vector3, axis: THREE.Vector3) {
+  const parent = parts[0].parent!;
+  const local = parent.worldToLocal(centre.clone());
+  const origin = parent.worldToLocal(new THREE.Vector3());
+  const localAxis = parent.worldToLocal(axis.clone()).sub(origin).normalize();
+  const pivot = new THREE.Group();
+  pivot.position.copy(local);
+  parent.add(pivot);
+  for (const part of parts) {
+    part.position.sub(local);
+    pivot.add(part);
+  }
+  return { pivot, axis: localAxis };
+}
+
+/** The Sketchfab LRV model with rolling wheels and a sweeping dish. */
+function RoverGlb({
+  spin,
+  scan,
+}: {
+  spin: MutableRefObject<number>;
+  scan: MutableRefObject<number>;
+}) {
+  const gltf = useLoader(GLTFLoader, ROVER_MODEL_URL, (loader) => {
+    loader.setDRACOLoader(new DRACOLoader().setDecoderPath("/draco/"));
+  });
+  const rig = useMemo(() => {
+    const model = gltf.scene.clone(true);
+    model.updateMatrixWorld(true);
+    const materials = new Map<string, THREE.MeshStandardMaterial>();
+    const look = (object: THREE.Object3D) => {
+      for (let node: THREE.Object3D | null = object; node; node = node.parent) {
+        const match = PART_LOOKS.find(([pattern]) => pattern.test(node!.name));
+        if (match) return match;
+      }
+      return null;
+    };
+    model.traverse((object) => {
+      if (!(object instanceof THREE.Mesh)) return;
+      const match = look(object);
+      const key = match ? match[0].source : "default";
+      if (!materials.has(key))
+        materials.set(
+          key,
+          new THREE.MeshStandardMaterial({ ...(match ? match[1] : DEFAULT_LOOK), side: THREE.DoubleSide }),
+        );
+      object.material = materials.get(key)!;
+      object.castShadow = true;
+      object.receiveShadow = true;
+    });
+    const box = new THREE.Box3().setFromObject(model);
+    const size = box.getSize(new THREE.Vector3());
+    const wheels: { pivot: THREE.Group; axis: THREE.Vector3 }[] = [];
+    const wheelNodes: THREE.Object3D[] = [];
+    model.traverse((object) => {
+      if (WHEEL_NODE.test(object.name) && object.children.length) wheelNodes.push(object);
+    });
+    for (const wheel of wheelNodes) {
+      const parts = wheel.children.filter((c) => !FIXED_WHEEL_PART.test(c.name));
+      if (!parts.length) continue;
+      const centre = new THREE.Box3();
+      for (const part of parts) centre.expandByObject(part);
+      wheels.push(pivotFor(parts, centre.getCenter(new THREE.Vector3()), new THREE.Vector3(1, 0, 0)));
+    }
+    const dishParts: THREE.Object3D[] = [];
+    model.traverse((object) => {
+      if (DISH_PART.test(object.name)) dishParts.push(object);
+    });
+    let dish: { pivot: THREE.Group; axis: THREE.Vector3 } | null = null;
+    const sameParent = dishParts.filter((p) => p.parent === dishParts[0]?.parent);
+    if (sameParent.length) {
+      const bounds = new THREE.Box3();
+      for (const part of sameParent) bounds.expandByObject(part);
+      const centre = bounds.getCenter(new THREE.Vector3());
+      // Turn about the mast, not the dish's own centre.
+      const mast = model.getObjectByName("Tubo1");
+      if (mast) {
+        const axle = new THREE.Box3().setFromObject(mast).getCenter(new THREE.Vector3());
+        centre.set(axle.x, centre.y, axle.z);
+      }
+      dish = pivotFor(sameParent, centre, new THREE.Vector3(0, 1, 0));
+    }
+    return {
+      model,
+      wheels,
+      dish,
+      materials: [...materials.values()],
+      scale: ROVER_MODEL_SIZE / Math.max(size.x, size.y, size.z),
+      offset: new THREE.Vector3(
+        -(box.min.x + box.max.x) / 2,
+        -box.min.y,
+        -(box.min.z + box.max.z) / 2,
+      ),
+    };
+  }, [gltf]);
+  useEffect(() => () => rig.materials.forEach((m) => m.dispose()), [rig]);
+  useFrame(({ clock }) => {
+    // The model's nose points to −z, so forward rolling is a negative turn.
+    for (const wheel of rig.wheels) wheel.pivot.quaternion.setFromAxisAngle(wheel.axis, -spin.current);
+    if (rig.dish && scan.current < SEARCH_END)
+      rig.dish.pivot.quaternion.setFromAxisAngle(rig.dish.axis, clock.elapsedTime * 1.2);
+  });
+  return (
+    <group rotation={[0, ROVER_MODEL_YAW, 0]} scale={rig.scale}>
+      <primitive object={rig.model} position={rig.offset} />
     </group>
   );
 }
@@ -377,9 +511,7 @@ export default function Rover({
         {hasModel ? (
           <ModelBoundary fallback={procedural}>
             <Suspense fallback={procedural}>
-              <group rotation={[0, ROVER_MODEL_YAW, 0]}>
-                <Model path={ROVER_MODEL_URL} size={ROVER_MODEL_SIZE} grounded />
-              </group>
+              <RoverGlb spin={spin} scan={scan} />
             </Suspense>
           </ModelBoundary>
         ) : (

@@ -1393,7 +1393,8 @@
       "sample": "Son ölçüm noktası: {km} km · {utc}",
       "noSample": "Henüz ölçüm noktasına varılmadı",
       "noAnalysis": "Güneş/Dünya durumu için önce Analizi çalıştırın.",
-      "note": "Rota NASA LOLA 80 m arazisinde backend tarafından hesaplanır. 3B zemin bu gerçek arazi penceresidir ve yükseklikler gerçek oranındadır; gezgin modeli ölçekli değildir, tarama animasyonunun hızı yalnızca gösterim içindir. Güneş/Dünya durumu yalnızca örneklenen noktalarda değerlendirilir."
+      "note": "Rota NASA LOLA 80 m arazisinde backend tarafından hesaplanır. 3B zemin bu gerçek arazi penceresidir ve yükseklikler gerçek oranındadır; gezgin modeli ölçekli değildir, tarama animasyonunun hızı yalnızca gösterim içindir. Güneş/Dünya durumu yalnızca örneklenen noktalarda değerlendirilir.",
+      "modelCredit": "3B gezgin modeli: “Lunar Rover”, Versal (Sketchfab), CC BY 4.0; renkler ve hareketler bu uygulamada eklendi."
     },
     "sun": {
       "full": "Tam güneşte",

@@ -1393,7 +1393,8 @@
       "sample": "Last sampled point: {km} km · {utc}",
       "noSample": "No sampled point reached yet",
       "noAnalysis": "Run the analysis first for Sun/Earth status.",
-      "note": "The backend computes the route on NASA LOLA 80 m terrain. The 3-D ground is that real terrain window at true height proportions; the rover model is not to scale and the scan animation pace is display-only. Sun/Earth state is evaluated only at sampled points."
+      "note": "The backend computes the route on NASA LOLA 80 m terrain. The 3-D ground is that real terrain window at true height proportions; the rover model is not to scale and the scan animation pace is display-only. Sun/Earth state is evaluated only at sampled points.",
+      "modelCredit": "3-D rover model: “Lunar Rover” by Versal (Sketchfab), CC BY 4.0; colours and motion added in this app."
     },
     "sun": {
       "full": "Fully sunlit",

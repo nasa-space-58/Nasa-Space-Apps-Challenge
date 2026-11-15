@@ -428,6 +428,24 @@ export default function SurfaceOps({
               </>
             )}
             <p className="ops-foot">{t("surfaceOps.rover.note")}</p>
+            <p className="ops-foot">
+              <a
+                className="ops-link"
+                href="https://sketchfab.com/3d-models/lunar-rover-82cab6e9ada74d12a98bd6a342e83048"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t("surfaceOps.rover.modelCredit")}
+              </a>{" "}
+              <a
+                className="ops-link"
+                href="https://creativecommons.org/licenses/by/4.0/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                ↗ CC BY 4.0
+              </a>
+            </p>
           </article>
 
           <article className="ops-card">
