@@ -15,5 +15,11 @@
   },
   "assets": "No model assets modified",
   "visual_review": "Pending user review; no screenshots or frontend tests performed per repository instructions",
-  "main_merge": "Not performed; requires user visual review"
+  "main_merge": "Not performed; requires user visual review",
+  "main_integrated": "891dec1",
+  "post_integration": {
+    "frontend": "TypeScript + Vite passed",
+    "affected_backend_tests": "56 passed, 1 existing deprecation warning (Artemis regions and analysis API)",
+    "full_suite_scope": "2057 passed before integration; affected tests rerun after integration"
+  }
 }

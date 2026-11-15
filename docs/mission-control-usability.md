@@ -1,6 +1,6 @@
 # Mission control usability review
 
-Branch: `ui/mission-control-usability`, based on main `36cf387`.
+Branch: `ui/mission-control-usability`, based on main `36cf387`; subsequently integrated main `891dec1` to preserve the new Artemis presets, translated site names and assistant updates.
 
 ## Changes
 
