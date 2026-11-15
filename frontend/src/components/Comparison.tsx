@@ -6,6 +6,13 @@ import type { Result, Preset, Frame } from "../types";
 import { errorText, siteLabel, useTranslate, type Translate } from "../i18n";
 import { situationOf, tallyUntil, visibilityOf, type Visibility } from "../resultProgress";
 import { saveComparison, savedName, useLibrary } from "../savedLibrary";
+import {
+  setComparisonIndex,
+  setComparisonPair,
+  setComparisonPlaying,
+  stepComparison,
+  useComparisonPlayback,
+} from "../comparisonPlayback";
 
 type Submission = {
   site_id: string;
@@ -308,10 +315,18 @@ export default function Comparison({
   const [phase, setPhase] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [cursor, setCursor] = useState(0);
-  const [playing, setPlaying] = useState(false);
   const [tab, setTab] = useState("A");
   const [retry, setRetry] = useState(0);
+  const playback = useComparisonPlayback();
+  const live = playback && playback.aId === aId && playback.bId === bId ? playback : null;
+  const cursor = live?.index ?? 0;
+  const playing = live?.playing ?? false;
+  const setCursor = setComparisonIndex;
+  const setPlaying = setComparisonPlaying;
+  useEffect(() => () => setComparisonPair(null), []);
+  useEffect(() => {
+    if (!comparison) setComparisonPair(null);
+  }, [comparison]);
   const library = useLibrary();
   const [saveName, setSaveName] = useState("");
   const [savedMessage, setSavedMessage] = useState("");
@@ -395,10 +410,9 @@ export default function Comparison({
           if (active) {
             setB(view);
             setComparison(match);
-            setCursor(
-              Number.isInteger(initialCursor)
-                ? Math.max(0, Math.min(initialCursor, match.cursor.length - 1))
-                : 0,
+            setComparisonPair(
+              { aId, bId, a, b: view, alignment: match.alignment, cursor: match.cursor },
+              Number.isInteger(initialCursor) ? initialCursor : 0,
             );
             setBusy(false);
             setPhase(match.status);
@@ -420,17 +434,7 @@ export default function Comparison({
   }, [aId, bId, retry]);
   useEffect(() => {
     if (!playing || !comparison) return;
-    const timer = setInterval(
-      () =>
-        setCursor((index) => {
-          if (index >= comparison.cursor.length - 1) {
-            setPlaying(false);
-            return index;
-          }
-          return index + 1;
-        }),
-      700,
-    );
+    const timer = setInterval(stepComparison, 700);
     return () => clearInterval(timer);
   }, [playing, comparison]);
   useEffect(() => {
@@ -875,6 +879,7 @@ export default function Comparison({
               </span>
             </div>
             <p className="field-help">{t("comparison.playbackNote")}</p>
+            <p className="field-help split-hint">{t("splitSim.hint")}</p>
           </div>
           <CompareNow
             a={a}

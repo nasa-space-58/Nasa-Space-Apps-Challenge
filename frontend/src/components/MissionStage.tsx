@@ -34,6 +34,8 @@ import type { CameraMode, CameraView, SiteCondition } from "./MissionScene";
 import { useTranslate, type Translate } from "../i18n";
 import { touchdownOutcome, useMissionRun } from "../missionRunStore";
 import "./mission-run.css";
+import SplitSimulator from "./SplitSimulator";
+import { useComparisonPlayback } from "../comparisonPlayback";
 
 const MissionScene = lazy(() => import("./MissionScene"));
 /** Wall-clock length of one illustrative flight playback. */
@@ -222,6 +224,11 @@ export default function MissionStage({
   const [layersOpen, setLayersOpen] = useState(false);
   const [showCandidates, setShowCandidates] = useState(true);
   const {preview,setPreview,candidateId,setCandidateId} = useAnalysisView();
+  const comparisonPlayback = useComparisonPlayback();
+  const [singleScene, setSingleScene] = useState(false);
+  const canSplit = !!comparisonPlayback && activeModule === "comparison" && !inspector && !preview;
+  const split = canSplit && !singleScene;
+  useEffect(() => setSingleScene(false), [comparisonPlayback?.aId, comparisonPlayback?.bId]);
   const [previewProgress,setPreviewProgress] = useState(0);
   const [previewPlaying,setPreviewPlaying] = useState(false);
   useEffect(() => { setPreviewProgress(0); setPreviewPlaying(false); if(preview) setFlying(false); }, [preview?.kind, preview?.lines]);
@@ -481,6 +488,26 @@ export default function MissionStage({
         role="region"
         aria-label={t("missionStage.viewLabel")}
       >
+        {split && comparisonPlayback ? (
+          <>
+            <SplitSimulator
+              playback={comparisonPlayback}
+              webgl={webgl}
+              visible={visible}
+              reduced={reduced}
+              compact={compact}
+            />
+            <div className="stage-hud scene-toolbar">
+              <button aria-pressed={false} onClick={() => setSingleScene(true)}>{t("splitSim.single")}</button>
+              <button aria-label={t("splitSim.fullscreen")} aria-pressed={fullscreen} onClick={async () => {
+                try {
+                  if (document.fullscreenElement) await document.exitFullscreen();
+                  else await stageRef.current?.requestFullscreen();
+                } catch { setNotice(t("splitSim.noFullscreen")); }
+              }}>⛶</button>
+            </div>
+          </>
+        ) : (<>
         {fadeKey > 0 && <div key={fadeKey} className="stage-fade" aria-hidden="true" />}
         {webgl ? (
           <SceneBoundary fallback={fallback}>
@@ -549,6 +576,7 @@ export default function MissionStage({
               <button onClick={() => setLayersOpen(false)}>{tr ? "Kapat" : "Close"}</button>
             </div>}
           </div>}
+          {canSplit && <button onClick={() => setSingleScene(false)}>{t("splitSim.split")}</button>}
           <button aria-pressed={cleanView} onClick={() => setCleanView(!cleanView)}>{tr ? (cleanView ? "Kontroller" : "Sade görünüm") : (cleanView ? "Controls" : "Clean view")}</button>
           <button aria-label={tr ? "Tam ekranı değiştir" : "Toggle fullscreen"} aria-pressed={fullscreen} onClick={async () => {
             try {
@@ -593,6 +621,7 @@ export default function MissionStage({
           <span>{Math.round(progress * 100)}%</span>
           {landed && <button onClick={() => inspect("surface")}>{tr ? "Keşif aracı" : "Rover"} ↗</button>}
         </div>}
+        </>)}
         {notice && (
           <div className="stage-notice" role="status">
             {notice}

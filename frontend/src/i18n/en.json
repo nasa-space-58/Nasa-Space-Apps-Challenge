@@ -2167,5 +2167,18 @@
     "save": "Save comparison",
     "update": "Update saved comparison",
     "savedMessage": "Comparison saved. Reopen it from Saved results."
+  },
+  "splitSim": {
+    "label": "Split A/B simulator",
+    "paneLabel": "Local sky of scenario {label}",
+    "single": "Single scene",
+    "split": "Split A/B view",
+    "fullscreen": "Toggle fullscreen",
+    "noFullscreen": "Fullscreen is unavailable in this browser.",
+    "speed": "Playback speed",
+    "soFar": "so far",
+    "noScene": "3D view unavailable; the readout below still follows the cursor.",
+    "note": "Each side plays its own window from its own start. Terrain horizon and Sun/Earth positions are backend samples; all elevation angles are drawn ×{factor} so low polar angles stay readable. Illustration, not a rendering of the DEM.",
+    "hint": "The 3D view is split: A and B each play their own day in sync with this cursor."
   }
 }

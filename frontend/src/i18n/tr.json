@@ -2217,5 +2217,18 @@
     "save": "Karşılaştırmayı kaydet",
     "update": "Kaydı güncelle",
     "savedMessage": "Karşılaştırma kaydedildi. Kayıtlı sonuçlardan yeniden açabilirsin."
+  },
+  "splitSim": {
+    "label": "Bölünmüş A/B simülatörü",
+    "paneLabel": "{label} senaryosunun yerel gökyüzü",
+    "single": "Tek sahne",
+    "split": "Bölünmüş A/B görünümü",
+    "fullscreen": "Tam ekranı değiştir",
+    "noFullscreen": "Bu tarayıcıda tam ekran açılamadı.",
+    "speed": "Oynatma hızı",
+    "soFar": "şu ana kadar",
+    "noScene": "3B görünüm kullanılamıyor; alttaki değerler imleci izlemeye devam ediyor.",
+    "note": "Her taraf kendi penceresini kendi başlangıcından oynatır. Arazi ufku ve Güneş/Dünya konumları backend örnekleridir; düşük kutup açıları okunabilsin diye tüm yükseklik açıları ×{factor} çizilir. Bu bir illüstrasyondur, DEM görüntüsü değildir.",
+    "hint": "3B görünüm ikiye bölündü: A ve B bu imleçle senkron olarak kendi günlerini oynatıyor."
   }
 }
