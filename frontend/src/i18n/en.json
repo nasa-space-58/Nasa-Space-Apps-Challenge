@@ -1520,5 +1520,163 @@
       "hazard_slope": "Landed on steep terrain",
       "hazard_unknown": "Landed on unknown terrain"
     }
+  },
+  "backups": {
+    "label": "Backup landing plans",
+    "title": "Alternative landing plans · backups",
+    "divertFrom": "Divert from",
+    "highGate": "High gate (≈2 km up)",
+    "lowGate": "Low gate (≈150 m up)",
+    "radius": "Search radius · m",
+    "count": "Backups",
+    "spacing": "Candidate spacing · m",
+    "separation": "Minimum separation · m",
+    "slope": "Maximum slope · °",
+    "run": "Find backup sites ↗",
+    "running": "Searching backups…",
+    "help": "Backups pass the terrain hard constraints and are checked for fuel, reserve, touchdown tolerance and engine thrust from the divert point.",
+    "verdict": "{reachable} of {count} backups reachable from the {gate}",
+    "gates": {
+      "high_gate": "high gate (start of approach)",
+      "low_gate": "low gate (start of terminal descent)"
+    },
+    "divertState": "Divert at {altitude} m altitude, {speed} m/s, {seconds} s before touchdown. Marked as backup: {marked}.",
+    "none": "none",
+    "primary": "Primary",
+    "plannedSite": "planned site",
+    "slopeShort": "slope",
+    "unknown": "unknown",
+    "toTouchdown": "{seconds} s to touchdown",
+    "hover": "hover {seconds} s",
+    "reachable": "Reachable",
+    "unreachable": "Not reachable",
+    "mark": "mark as backup",
+    "assumptions": "Backup model & assumptions",
+    "mapLabel": "Primary site at the centre and {count} backup sites; {reachable} are reachable. Details are in the table.",
+    "table": {
+      "caption": "Primary and backups, same metrics",
+      "site": "Site",
+      "safety": "Safety",
+      "divert": "Divert",
+      "fuel": "Fuel above reserve",
+      "status": "Status"
+    }
+  },
+  "twin": {
+    "label": "Descent digital twin",
+    "title": "Digital twin · what the lander knows vs what is true",
+    "scenario": "Fault scenario",
+    "presets": {
+      "nominal": "No fault",
+      "lost": "Navigation sensor lost at 450 s",
+      "thrust": "Engine −25 % at 520 s",
+      "leak": "700 kg propellant leak at 600 s",
+      "obstacle": "Boulder field on the target at 640 s"
+    },
+    "positionSigma": "Position measurement error 1σ · m",
+    "speedSigma": "Speed measurement error 1σ · m/s",
+    "thrustNoise": "Thrust noise 1σ · %",
+    "energy": "Battery energy · MJ",
+    "load": "Electrical load · W",
+    "run": "Fly the twin ↗",
+    "running": "Flying the twin…",
+    "help": "Guidance steers on its own noisy estimate, not the truth. The twin does not replan, so you see what a fault does to the original plan. All telemetry is simulated.",
+    "success": "Lands within tolerance",
+    "failure": "Landing fails",
+    "fromTarget": "{m} m from the target",
+    "planValid": "The original plan stayed valid.",
+    "planInvalid": "The original plan became invalid: {reasons}.",
+    "replay": "Replay ID {id}.",
+    "metrics": {
+      "versus": "VS. NO-FAULT FLIGHT",
+      "errorChange": "landing-point error change",
+      "propellant": "PROPELLANT",
+      "left": "{kg} kg left · reserve margin {margin} kg",
+      "navError": "NAVIGATION ERROR AT TOUCHDOWN",
+      "speeds": "vertical {vertical} m/s · horizontal {horizontal} m/s"
+    },
+    "log": {
+      "applied": "{event} applied",
+      "invalidated": "Plan invalidated — {reason}",
+      "noEffect": "No effect on the plan — {reason}",
+      "notReached": "{event} not reached before touchdown"
+    },
+    "events": {
+      "thrust_loss": "Engine thrust loss",
+      "sensor_degradation": "Navigation sensor change",
+      "propellant_leak": "Propellant leak",
+      "comm_outage": "Ground link outage",
+      "obstacle_detected": "Obstacle detected (synthetic)"
+    },
+    "chartLabel": "Navigation estimate error and its expected size over the descent, with fault times marked.",
+    "axis": "time since powered descent start · 0–{seconds} s",
+    "legend": {
+      "error": "actual estimate error (known only in simulation)",
+      "std": "expected error the vehicle believes"
+    },
+    "assumptions": "Twin model & assumptions"
+  },
+  "surfaceRoutes": {
+    "label": "Post-landing exploration",
+    "title": "After landing · surface routes to science targets",
+    "north": "N",
+    "target": "Target",
+    "bearing": "Bearing · °",
+    "distance": "Distance · m",
+    "remove": "Remove",
+    "nameLabel": "Target {n} name",
+    "bearingLabel": "Target {n} bearing",
+    "distanceLabel": "Target {n} distance",
+    "removeLabel": "Remove target {n}",
+    "add": "Add target",
+    "defaults": {
+      "north": "North rim",
+      "east": "East slope",
+      "south": "South"
+    },
+    "slope": "Mobility slope limit · °",
+    "speed": "Traverse speed · m/s",
+    "useSky": "Check sunlight & Earth with the latest site analysis",
+    "needAnalysis": "Run a site analysis in Mission control to check sunlight & Earth",
+    "observerHeight": "Observer height · m",
+    "waypoints": "Checked points per route",
+    "run": "Plan routes ↗",
+    "running": "Routing…",
+    "help": "Bearings are clockwise from north. The slope limit and speed are planning assumptions, not a specific rover. With sunlight checks, each sampled point gets its own terrain horizon (about 2 s per point).",
+    "metrics": {
+      "efficiency": "MISSION EFFICIENCY",
+      "efficiencyHelp": "0–1 · reachability, directness",
+      "efficiencyWithSun": "0–1 · reachability, directness, sunlight",
+      "reachable": "TARGETS REACHABLE",
+      "directness": "directness {pct} %",
+      "sunlit": "SUNLIT ROUTE POINTS",
+      "departure": "departure {utc} UTC",
+      "noAnalysis": "no site analysis"
+    },
+    "notChecked": "not checked",
+    "legend": {
+      "sunlit": "sunlit point",
+      "shadow": "point in shadow",
+      "unknown": "unknown / not checked"
+    },
+    "table": {
+      "caption": "Routes from the landing site",
+      "route": "Route",
+      "terrain": "Terrain",
+      "sky": "Sun / Earth"
+    },
+    "detour": "detour",
+    "maxSlope": "max {deg}°",
+    "climb": "climb {m} m",
+    "sunlitPoints": "{lit}/{total} points sunlit",
+    "earthHidden": "Earth hidden at {hidden}/{total}",
+    "sun": {
+      "full": "sunlit",
+      "partial": "partly sunlit",
+      "dark": "in shadow",
+      "unknown": "unknown"
+    },
+    "assumptions": "Route model & assumptions",
+    "mapLabel": "Routes from the landing site to {count} targets, north up; details are in the table."
   }
 }
