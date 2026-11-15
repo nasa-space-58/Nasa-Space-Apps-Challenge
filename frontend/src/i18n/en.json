@@ -1513,6 +1513,8 @@
     "preparation": "Preparation",
     "baseline": "Classical baseline",
     "proposal": "Proposal calculation",
-    "completion": "Full-plan completion"
+    "completion": "Full-plan completion",
+    "source": "Accepted plan source",
+    "quantumCompleted": "Quantum proposal + classical completion"
   }
 }

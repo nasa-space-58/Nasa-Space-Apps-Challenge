@@ -378,6 +378,18 @@ export default function UnifiedMissionWorkspace({
                 {plan ? t("unified.validated") : t("unified.noPlan")}
               </dd>
             </div>
+            <div>
+              <dt>{t("unified.source")}</dt>
+              <dd>
+                {plan
+                  ? t(
+                      plan.source === "classical"
+                        ? "unified.classical"
+                        : "unified.quantumCompleted",
+                    )
+                  : "—"}
+              </dd>
+            </div>
           </dl>
           <div className="unified-identity">
             <span>
@@ -438,7 +450,7 @@ export default function UnifiedMissionWorkspace({
                     step="0.1"
                     min={lastEvent + 0.1}
                     max="9.9"
-                    value={elapsed}
+                    value={Number.isFinite(elapsed) ? elapsed : ""}
                     onChange={(e) => setElapsed(e.target.valueAsNumber)}
                     required
                   />
@@ -449,7 +461,7 @@ export default function UnifiedMissionWorkspace({
                     type="number"
                     min="-50000"
                     max="50000"
-                    value={start}
+                    value={Number.isFinite(start) ? start : ""}
                     onChange={(e) => setStart(e.target.valueAsNumber)}
                     required
                   />
@@ -460,7 +472,7 @@ export default function UnifiedMissionWorkspace({
                     type="number"
                     min="-50000"
                     max="50000"
-                    value={end}
+                    value={Number.isFinite(end) ? end : ""}
                     onChange={(e) => setEnd(e.target.valueAsNumber)}
                     required
                   />

@@ -1513,6 +1513,8 @@
     "preparation": "Hazırlık",
     "baseline": "Klasik temel hesap",
     "proposal": "Öneri hesabı",
-    "completion": "Tam plan tamamlama"
+    "completion": "Tam plan tamamlama",
+    "source": "Kabul edilen planın kaynağı",
+    "quantumCompleted": "Kuantum önerisi + klasik tamamlama"
   }
 }
