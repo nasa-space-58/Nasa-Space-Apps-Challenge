@@ -1223,6 +1223,73 @@ def run_mission(
     )
 
 
+OUTLOOK_FINDING_KINDS = (
+    "fault_activated",
+    "fault_cleared",
+    "first_contact",
+    "first_contact_deadline",
+    "contact_gap",
+    "battery_depleted",
+)
+LIMITATION_CODES = (
+    "earth_never_visible",
+    "fault_not_reached",
+    "fault_after_window",
+    "fault_after_mission_end",
+    "fault_exceeds_window",
+)
+
+
+def surface_outlook(
+    sun_intervals: list[dict],
+    earth_intervals: list[dict],
+    landing_utc: datetime,
+    end_utc: datetime,
+    request: MissionRunRequest,
+    faults: tuple,
+) -> dict:
+    """Autonomous surface evolution from touchdown to the window end.
+
+    Unlike the verdict, which stops at the first failed gate, the lander keeps
+    running without Earth contact. Power uses the pessimistic run (unknown
+    sunlight generates nothing); it stops at battery depletion, and contact is
+    evaluated only while the lander is alive. Returns
+    {landing_utc, evaluated_until_utc,
+     power: {trace, min_energy_wh, depleted_at_utc, optimistic_depleted_at_utc},
+     communication: {windows, first_contact_utc, longest_gap_h},
+     findings: [{utc, gate, kind, detail, fault?}]} with findings in time order
+    and kinds from OUTLOOK_FINDING_KINDS. This is a what-if continuation; it
+    never changes the verdict.
+    """
+    raise NotImplementedError
+
+
+def mission_baseline(analysis: dict, request: MissionRunRequest, result: dict) -> dict:
+    """Fault-free reference for the same analysis and vehicle, and the scenario delta.
+
+    The baseline lands at the window start with no faults. Returns
+    {landing_utc, propellant_margin_kg, touchdown_offset_m, min_energy_wh,
+     depleted_at_utc, first_contact_utc,
+     delta: {propellant_margin_kg, touchdown_offset_m, landing_delay_h,
+             min_energy_wh, first_contact_shift_h}}.
+    `result` is the scenario run with `surface_outlook` set; a delta is None
+    when either side lacks the quantity (e.g. no touchdown after a crash).
+    """
+    raise NotImplementedError
+
+
+def window_context(analysis: dict, result: dict, faults: tuple) -> dict:
+    """Why scenarios may look alike in this analysis window.
+
+    Returns {surface_window_h, earth_visible_h, sun_visible_h, verdict_utc,
+    limitations: [{code, detail, fault?}]} with codes from LIMITATION_CODES:
+    Earth never visible (no visible, boundary or unknown interval), and per
+    surface fault: never reached (no touchdown), starting at or after the window
+    end, starting at or after the verdict time, or still active at the window end.
+    """
+    raise NotImplementedError
+
+
 def register_mission_run_routes(app, analyses, data_dir: Path) -> None:
     """GET /mission-faults and POST /analyses/{analysis_id}/mission-run."""
 
