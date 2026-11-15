@@ -52,7 +52,21 @@
       "awaitsDetail": "Choose a region and time to reveal the terrain, light and visibility.",
       "runExample": "Run the Malapert example",
       "addComparison": "Add comparison",
-      "footnote": "A horizon is a perspective, not a promise. Results describe the sampled terrain and observation window."
+      "footnote": "A horizon is a perspective, not a promise. Results describe the sampled terrain and observation window.",
+      "cards": {
+        "weather": {
+          "title": "Space weather",
+          "desc": "How solar storms and radiation risk affect the observation window."
+        },
+        "share": {
+          "title": "Share and export",
+          "desc": "Download CSV, chart or report; share a link or a scenario file."
+        },
+        "trace": {
+          "title": "Calculation details and limits",
+          "desc": "Data and assumptions behind the result, sources and model limits."
+        }
+      }
     },
     "playback": {
       "eyebrow": "OBSERVATION TIME",

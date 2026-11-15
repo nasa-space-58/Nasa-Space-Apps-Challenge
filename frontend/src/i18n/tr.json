@@ -52,7 +52,21 @@
       "awaitsDetail": "Araziyi, ışığı ve görünürlüğü ortaya çıkarmak için bir bölge ve zaman seçin.",
       "runExample": "Malapert örneğini çalıştır",
       "addComparison": "Karşılaştırma ekle",
-      "footnote": "Ufuk bir bakış açısıdır, bir vaat değil. Sonuçlar örneklenen araziyi ve gözlem penceresini tanımlar."
+      "footnote": "Ufuk bir bakış açısıdır, bir vaat değil. Sonuçlar örneklenen araziyi ve gözlem penceresini tanımlar.",
+      "cards": {
+        "weather": {
+          "title": "Uzay havası",
+          "desc": "Güneş fırtınası ve radyasyon riskinin gözlem penceresine etkisi."
+        },
+        "share": {
+          "title": "Paylaş ve dışa aktar",
+          "desc": "Sonucu CSV, grafik ya da rapor olarak indir; bağlantı veya senaryo dosyası paylaş."
+        },
+        "trace": {
+          "title": "Hesap ayrıntıları ve sınırlar",
+          "desc": "Hangi veri ve varsayımlarla hesaplandığı, kaynaklar ve modelin sınırları."
+        }
+      }
     },
     "playback": {
       "eyebrow": "GÖZLEM ZAMANI",
