@@ -138,10 +138,9 @@ export default function SurfaceOps({
   reduced: boolean;
   onRover: (rover: RoverState | null) => void;
 }) {
-  const { t, locale } = useTranslate();
+  const { t } = useTranslate();
   const [demoSeed, setDemoSeed] = useState<number | null>(null);
   const demo = useMemo(() => demoSeed === null ? null : demoRover(demoSeed), [demoSeed]);
-  const tr = locale.startsWith("tr");
   const [open, setOpen] = useState(true);
   const [routes, setRoutes] = useState<RouteResult | null>(null);
   const [routeError, setRouteError] = useState("");
@@ -320,7 +319,7 @@ export default function SurfaceOps({
       >
         <span className="eyebrow">{t("surfaceOps.eyebrow")}</span>
         <strong>{t("surfaceOps.title")}</strong>
-        {route && <small className="ops-summary">{route.target_id} · {Math.round(drive * 100)}% · {scanning ? (tr ? "Tarama" : "Scanning") : playing ? (tr ? "Keşif" : "Exploring") : (tr ? "Beklemede" : "Standby")}</small>}
+        {route && <small className="ops-summary">{route.target_id} · {Math.round(drive * 100)}% · {scanning ? t("surfaceOps.scanning") : playing ? t("surfaceOps.exploring") : t("surfaceOps.standby")}</small>}
         <span aria-hidden="true">{open ? "−" : "+"}</span>
       </button>
       {open && (
@@ -328,12 +327,12 @@ export default function SurfaceOps({
           <article className="ops-card">
             <h3>{t("surfaceOps.rover.title")}</h3>
             <div className="ops-controls">
-              <button type="button" onClick={() => { setDemoSeed(Math.floor(Math.random() * 1000000)); setChoice(0); setElapsed(0); setScan(reduced ? 1 : 0); setPlaying(!reduced); }}>{tr ? "Yeni krater keşfi · Demo" : "New crater exploration · Demo"}</button>
-              {demo && routes?.scene && <button type="button" onClick={() => { setDemoSeed(null); setChoice(0); setElapsed(0); setScan(reduced ? 1 : 0); }}>{tr ? "API rotalarına dön" : "Return to API routes"}</button>}
+              <button type="button" onClick={() => { setDemoSeed(Math.floor(Math.random() * 1000000)); setChoice(0); setElapsed(0); setScan(reduced ? 1 : 0); setPlaying(!reduced); }}>{t("surfaceOps.newCraterExplorationDemo")}</button>
+              {demo && routes?.scene && <button type="button" onClick={() => { setDemoSeed(null); setChoice(0); setElapsed(0); setScan(reduced ? 1 : 0); }}>{t("surfaceOps.returnToApiRoutes")}</button>}
             </div>
-            {demo && routes && !routes.scene && <p className="ops-note">{tr ? "API arazi tarama haritası sağlamıyor. 3D keşif, görünen kraterleri tarayan demo planlayıcıyla çalışıyor; kırmızı bölgelerden kaçınılıyor." : "The API does not provide a terrain scan map. 3D exploration uses the labelled demo planner on the visible craters, avoiding red areas."}</p>}
+            {demo && routes && !routes.scene && <p className="ops-note">{t("surfaceOps.theApiDoesNotProvide")}</p>}
             {demo && routeError && <p className="ops-note">API: {routeError}</p>}
-            {demo && <p className="ops-note">{tr ? "DEMO · Sahnedeki kraterler üzerinde A* ve rastgele maliyet örnekleme. Kuantum hesaplama değildir. Mesafe ve süre temsili ölçek kullanır." : "DEMO · A* and sampled costs on the scene’s crater terrain. Not quantum computation. Distances and times use illustrative scale."}</p>}
+            {demo && <p className="ops-note">{t("surfaceOps.demoAAndSampledCosts")}</p>}
             {!covered && !demo ? (
               <p className="ops-note">{t("surfaceOps.rover.outside")}</p>
             ) : routeError && !demo ? (
@@ -424,8 +423,8 @@ export default function SurfaceOps({
                     {truncated && <p className="ops-foot">{t("surfaceOps.scan.truncated")}</p>}
                   </div>
                 )}
-                <p className="ops-foot">{tr ? "Altın: seçilen rota · Turkuaz: diğer hesaplanan rotalar" : "Gold: selected route · Teal: other calculated routes"}</p>
-                <p className="ops-telemetry" aria-live="off">● {scan < 1 ? (tr ? "Anten taraması" : "Antenna sweep") : drive >= 1 ? (tr ? "Hedefe ulaşıldı" : "Target reached") : (drive * 8) % 1 < .24 ? (tr ? "Telemetri aktarımı · animasyon" : "Telemetry uplink · animation") : (tr ? "Yüzey keşfi" : "Surface traverse")}</p>
+                <p className="ops-foot">{t("surfaceOps.goldSelectedRouteTealOther")}</p>
+                <p className="ops-telemetry" aria-live="off">● {scan < 1 ? t("surfaceOps.antennaSweep") : drive >= 1 ? t("surfaceOps.targetReached") : (drive * 8) % 1 < .24 ? t("surfaceOps.telemetryUplinkAnimation") : t("surfaceOps.surfaceTraverse")}</p>
                 <dl className="ops-grid">
                   <dt>{t("surfaceOps.rover.distance")}</dt>
                   <dd>

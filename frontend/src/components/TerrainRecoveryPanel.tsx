@@ -86,14 +86,6 @@ const PRESETS: { id: string; label: string; events: object[] }[] = [
     ],
   },
 ];
-const ACTION_LABEL: Record<string, string> = {
-  continue: "Continue — plan re-validated",
-  retarget: "Retarget to a backup",
-  abort_required: "Abort required (not simulated)",
-  budget_exhausted: "Budget exhausted — kept current plan",
-  no_time_to_replan: "Too late to replan",
-  stale_result_rejected: "Stale result rejected",
-};
 const OK = "#199e70";
 const FAIL = "#e66767";
 
@@ -114,23 +106,22 @@ async function call(path: string, init?: RequestInit) {
 }
 
 function OutcomeCard({ title, outcome }: { title: string; outcome: Outcome }) {
-  const { locale, t } = useTranslate();
-  const tr = locale.startsWith("tr");
+  const { t } = useTranslate();
   const moved = Math.hypot(outcome.target_offset_m.down_m, outcome.target_offset_m.cross_m);
   return (
     <div className={`panel descent-verdict ${outcome.success ? "ok" : "blocked"}`}>
       <span className="metric-label">{title}</span>
       <strong>
         {outcome.abort_required
-          ? (tr ? "✕ İptal gerekli · manevra modellenmedi" : "✕ Abort required · maneuver not modeled")
+          ? t("terrainRecovery.abortRequiredManeuverNotModeled")
           : outcome.success
-            ? (tr ? "✓ İniş kontrolleri geçti" : "✓ Landing checks passed")
-            : (tr ? "✕ İniş başarısız" : "✕ Landing fails")}
+            ? t("terrainRecovery.landingChecksPassed")
+            : t("terrainRecovery.landingFails")}
       </strong>
       <p>
-        {moved > 1 ? (tr ? `Hedef ${moved.toFixed(0)} m değişti. ` : `Target moved ${moved.toFixed(0)} m. `) : (tr ? "Özgün hedef. " : "Original target. ")}
-        {outcome.final.position_error_m.toFixed(outcome.final.position_error_m < 10 ? 1 : 0)} m {tr ? "hedef sapması" : "from target"} ·{" "}
-        {Math.abs(outcome.final.vertical_speed_mps).toFixed(2)} m/s {tr ? "düşey hız · arazi skoru" : "down · terrain score"}{" "}
+        {moved > 1 ? t("terrainRecovery.targetMoved", { m: moved.toFixed(0) }) : t("terrainRecovery.originalTarget")}
+        {outcome.final.position_error_m.toFixed(outcome.final.position_error_m < 10 ? 1 : 0)} m {t("terrainRecovery.fromTarget")} ·{" "}
+        {Math.abs(outcome.final.vertical_speed_mps).toFixed(2)} m/s {t("terrainRecovery.downTerrainScore")}{" "}
         {outcome.target_safety_score !== null ? outcome.target_safety_score.toFixed(2) : "—"}
       </p>
       {outcome.reasons.slice(0, 3).map((r) => (
@@ -141,8 +132,7 @@ function OutcomeCard({ title, outcome }: { title: string; outcome: Outcome }) {
 }
 
 function TrajectoryChart({ result }: { result: Result }) {
-  const { locale, t } = useTranslate();
-  const tr = locale.startsWith("tr");
+  const { t } = useTranslate();
   // Both flights in the original-target frame (downrange of the original target).
   const frame = (rows: TimelineRow[]) =>
     rows
@@ -171,28 +161,28 @@ function TrajectoryChart({ result }: { result: Result }) {
         <line x1={L} x2={W - R} y1={y(0)} y2={y(0)} className="grid" />
         <line x1={x(0)} x2={x(0)} y1={T} y2={H - B} className="heal-target-line" />
         <text x={x(0) - 4} y={T + 10} className="direct-label" textAnchor="end">
-          {tr ? "özgün hedef" : "original target"}
+          {t("terrainRecovery.originalTarget2")}
         </text>
         {Math.abs(target) > 1 && (
           <>
             <line x1={x(target)} x2={x(target)} y1={T} y2={H - B} className="heal-new-target-line" />
             <text x={x(target) - 4} y={T + 24} className="direct-label" textAnchor="end">
-              {tr ? "yeni hedef" : "new target"}
+              {t("terrainRecovery.newTarget")}
             </text>
           </>
         )}
         <polyline points={line(original)} className="heal-original-path" />
         <polyline points={line(healed)} className="heal-healed-path" />
         <text x={L} y={H - 8} className="axis-title">
-          {tr ? "uçuş doğrultusu" : "downrange"} · {(x0 / 1000).toFixed(1)} – {(x1 / 1000).toFixed(1)} km · {tr ? "yükseklik" : "altitude"} 0–{Math.round(y1)} m
+          {t("terrainRecovery.downrange")} · {(x0 / 1000).toFixed(1)} – {(x1 / 1000).toFixed(1)} km · {t("terrainRecovery.altitude")} 0–{Math.round(y1)} m
         </text>
       </svg>
       <div className="risk-legend">
         <span>
-          <i className="twin-swatch std" /> {tr ? "özgün plan" : "original plan"}
+          <i className="twin-swatch std" /> {t("terrainRecovery.originalPlan")}
         </span>
         <span>
-          <i className="heal-swatch" /> {tr ? "yeniden planlama" : "with recovery"}
+          <i className="heal-swatch" /> {t("terrainRecovery.withRecovery")}
         </span>
       </div>
     </div>
@@ -200,8 +190,7 @@ function TrajectoryChart({ result }: { result: Result }) {
 }
 
 function DecisionMap({ result, selected }: { result: Result; selected: number }) {
-  const { locale, t } = useTranslate();
-  const tr = locale.startsWith("tr");
+  const { t } = useTranslate();
   const first = result.decisions[selected];
   const status = new Map(first?.considered.map((c) => [c.id, c.reachable]) ?? []);
   const selectedTarget = result.candidates.find(c => c.id === first?.chosen);
@@ -228,7 +217,7 @@ function DecisionMap({ result, selected }: { result: Result; selected: number })
         <line x1={C} x2={C} y1={PAD} y2={S - PAD} className="risk-axis" />
         <line x1={PAD} x2={S - PAD} y1={C} y2={C} className="risk-axis" />
         <text x={C + 6} y={PAD + 8} className="risk-tick">
-          ↑ {tr ? "uçuş yönü" : "direction of travel"}
+          ↑ {t("terrainRecovery.directionOfTravel")}
         </text>
         {result.obstacles.map((o, i) => (
           <circle key={i} cx={px(o.cross_m)} cy={py(o.down_m)} r={o.radius_m * scale} className="heal-obstacle" />
@@ -263,16 +252,16 @@ function DecisionMap({ result, selected }: { result: Result; selected: number })
       </svg>
       <figcaption className="risk-legend">
         <span>
-          <i className="square" /> {tr ? "özgün hedef" : "original target"}
+          <i className="square" /> {t("terrainRecovery.originalTarget2")}
         </span>
         <span>
-          <i className="dot" style={{ background: OK }} /> {tr ? "erişilebilir yedek" : "reachable backup"}
+          <i className="dot" style={{ background: OK }} /> {t("terrainRecovery.reachableBackup")}
         </span>
         <span>
-          <b style={{ color: FAIL }}>✕</b> {tr ? "elendi" : "rejected"}
+          <b style={{ color: FAIL }}>✕</b> {t("terrainRecovery.rejected")}
         </span>
         <span>
-          <i className="ring" /> {tr ? "seçilen hedef · taralı: senaryo engeli" : "chosen target · shaded: simulated obstacle"}
+          <i className="ring" /> {t("terrainRecovery.chosenTargetShadedSimulatedObstacle")}
         </span>
       </figcaption>
     </figure>
@@ -280,9 +269,8 @@ function DecisionMap({ result, selected }: { result: Result; selected: number })
 }
 
 export default function TerrainRecoveryPanel({ base }: { base: Record<string, unknown> }) {
-  const { locale, t } = useTranslate();
+  const { t, tOr } = useTranslate();
   const {setPreview} = useAnalysisView();
-  const tr = locale.startsWith("tr");
   const version = useRef(0);
   const baseKey = JSON.stringify(base);
   useEffect(() => { version.current += 1; setResult(null); setError(""); setBusy(false); setPreview(p => p?.kind === "recovery" ? {...p,stale:true} : p); return () => { version.current += 1; }; }, [baseKey]);
@@ -332,8 +320,8 @@ export default function TerrainRecoveryPanel({ base }: { base: Record<string, un
 
   return (
     <div className="risk-panel heal-panel" aria-label="Self-healing landing">
-      <h3>{tr ? "Araziye bağlı iniş kurtarma" : "Terrain-aware landing recovery"}</h3>
-      <p className="field-help">{tr ? "Gerçek DEM üzerinde klasik yeniden hedefleme. Arızalar ve engeller senaryodur; bu çalışma hibrit görev planını değiştirmez. Hesaplama gecikmesi sırasında benzetim uçuşu devam eder." : "Classical retargeting on the real DEM. Faults and obstacles are simulated; this experiment does not replace the hybrid mission plan. Simulated flight advances during solver latency."}</p>
+      <h3>{t("terrainRecovery.terrainAwareLandingRecovery")}</h3>
+      <p className="field-help">{t("terrainRecovery.classicalRetargetingOnTheReal")}</p>
       <form
         className="risk-controls"
         onSubmit={(e) => {
@@ -343,29 +331,29 @@ export default function TerrainRecoveryPanel({ base }: { base: Record<string, un
       >
         <fieldset disabled={busy}>
           <label>
-            {tr ? "Arıza senaryosu" : "Fault scenario"}
+            {t("terrainRecovery.faultScenario")}
             <select aria-label="Self-healing scenario" value={preset} onChange={(e) => setPreset(e.target.value)}>
               {PRESETS.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {tr ? ({boulder:"560 s: hedefte kaya engeli", engine:"520 s: motor gücü −%25", sensor:"450 s: yön bulma sensörü kaybı", double:"550 s: motor −%50 ve 1,5 t yakıt kaybı"} as Record<string,string>)[p.id] : p.label}
+                  {tOr(`terrainRecovery.faultPresets.${p.id}`, p.label)}
                 </option>
               ))}
             </select>
           </label>
           <label>
-            {tr ? "Rastgelelik tohumu" : "Seed"}
+            {t("terrainRecovery.seed")}
             <input aria-label="Self-healing seed" type="number" min="0" step="1" value={seed} onChange={(e) => setSeed(e.target.value)} />
           </label>
           <label>
-            {tr ? "Çözücü gecikmesi · s" : "Solver latency · s"}
+            {t("terrainRecovery.solverLatencyS")}
             <input type="number" min="0" max="30" step="any" value={latency} onChange={(e) => setLatency(e.target.value)} />
           </label>
           <button type="submit" className="text-button">
-            {busy ? (tr ? "Uçuş ve yeniden planlama…" : "Flying and replanning…") : (tr ? "Kurtarmalı uçuşu karşılaştır ↗" : "Compare recovery flight ↗")}
+            {busy ? t("terrainRecovery.flyingAndReplanning") : t("terrainRecovery.compareRecoveryFlight")}
           </button>
         </fieldset>
         <p className="field-help">
-          {tr ? "Aynı arızalar özgün plan ve yeniden planlama ile ayrı ayrı uygulanır. Yeniden hedefleme seçenekleri benzetimin gerçek durumundan ayrıca doğrulanır. Bu, gerçek uçuş güvenliği onayı değildir." : "The same faults are replayed with the original plan and with replanning. Retargeting candidates are independently checked from simulation truth. This is not flight safety certification."}
+          {t("terrainRecovery.theSameFaultsAreReplayed")}
         </p>
       </form>
       {error && (
@@ -377,34 +365,34 @@ export default function TerrainRecoveryPanel({ base }: { base: Record<string, un
       {result && (
         <div className="risk-result">
           <div className="heal-compare">
-            <OutcomeCard title={tr ? "ÖZGÜN PLAN" : "ORIGINAL PLAN"} outcome={result.original} />
-            <OutcomeCard title={tr ? "YENİDEN PLANLAMA" : "WITH RECOVERY"} outcome={result.replanned} />
+            <OutcomeCard title={t("terrainRecovery.originalPlan2")} outcome={result.original} />
+            <OutcomeCard title={t("terrainRecovery.withRecovery2")} outcome={result.replanned} />
           </div>
           <TrajectoryChart result={result} />
           <div className="backup-grid">
             <DecisionMap result={result} selected={selectedDecision} />
             <div>
-              <h4>{tr ? "Karar günlüğü · harita için bir karar seçin" : "Decision log · select a decision for the map"}</h4>
+              <h4>{t("terrainRecovery.decisionLogSelectADecision")}</h4>
               <ol className="heal-log">
                 {result.decisions.map((d, i) => (
                   <li key={i} className={d.action}>
-                    <button type="button" aria-pressed={selectedDecision === i} onClick={() => { setSelectedDecision(i); setPreview({...previewFor("recovery",result),selected:d.chosen??undefined}); }}><b>{d.t_s.toFixed(1)} s</b> {tr ? ({continue:"Devam · plan doğrulandı", retarget:"Yedek hedefe geç", abort_required:"İptal gerekli · modellenmedi", budget_exhausted:"Hesaplama bütçesi tükendi", no_time_to_replan:"Yeniden planlama için geç", stale_result_rejected:"Eski sonuç reddedildi"} as Record<string,string>)[d.action] ?? d.action : ACTION_LABEL[d.action] ?? d.action}</button>
+                    <button type="button" aria-pressed={selectedDecision === i} onClick={() => { setSelectedDecision(i); setPreview({...previewFor("recovery",result),selected:d.chosen??undefined}); }}><b>{d.t_s.toFixed(1)} s</b> {tOr(`terrainRecovery.actions.${d.action}`, d.action)}</button>
                     {d.chosen ? ` → ${d.chosen}` : ""}
                     <small>
-                      {tr ? "Tetikleyen olay" : "Trigger"}: {d.trigger.map((event) => t(`twin.events.${event}`) === `twin.events.${event}` ? (tr ? "Plan koşulları değişti" : event.replaceAll("_", " ")) : t(`twin.events.${event}`)).join(" + ")} · {d.evaluations}/{d.budget} {tr ? "seçenek değerlendirildi" : "options evaluated"} · {d.solver_wall_ms.toFixed(0)} ms · {tr ? "güvenlik payı" : "safety margin"} {d.margin_m.toFixed(0)} m
-                      {d.applied_at_s !== null && d.applied_at_s > d.t_s ? ` · ${tr ? "uygulama zamanı" : "applied at"} ${d.applied_at_s.toFixed(1)} s` : ""}
+                      {t("terrainRecovery.trigger")}: {d.trigger.map((event) => t(`twin.events.${event}`) === `twin.events.${event}` ? tOr("terrainRecovery.unknownTrigger", event.replaceAll("_", " ")) : t(`twin.events.${event}`)).join(" + ")} · {d.evaluations}/{d.budget} {t("terrainRecovery.optionsEvaluated")} · {d.solver_wall_ms.toFixed(0)} ms · {t("terrainRecovery.safetyMargin")} {d.margin_m.toFixed(0)} m
+                      {d.applied_at_s !== null && d.applied_at_s > d.t_s ? ` · ${t("terrainRecovery.appliedAt")} ${d.applied_at_s.toFixed(1)} s` : ""}
                     </small>
                     <small><ServerExplanation text={d.explanation} /></small>
                     {d.validation.map((v) => (
                       <small key={v.id}>
-                        {tr ? "Benzetim durumundan doğrulama" : "Validation from true state"}: {v.id} {v.passed ? (tr ? "✓ geçti" : "✓ passed") : (tr ? "✕ başarısız" : "✕ failed")}
+                        {t("terrainRecovery.validationFromTrueState")}: {v.id} {v.passed ? t("terrainRecovery.passed") : t("terrainRecovery.failed")}
                       </small>
                     ))}
                     <details>
-                      <summary>{tr ? "Değerlendirilen tüm hedefler" : "All evaluated targets"} · {d.considered.length}</summary>
+                      <summary>{t("terrainRecovery.allEvaluatedTargets")} · {d.considered.length}</summary>
                       {d.considered.map(c => <div key={c.id} className="terrain-candidate-detail">
-                        <strong>{c.id} · {c.reachable ? (tr ? "Uygun" : "Feasible") : (tr ? "Elendi" : "Rejected")}</strong>
-                        <p>Δv {c.total_delta_v_mps.toFixed(2)} m/s · {tr ? "rezerv marjı" : "reserve margin"} {c.reserve_margin_kg.toFixed(2)} kg · {tr ? "arazi skoru" : "terrain score"} {c.safety_score?.toFixed(3) ?? "—"}</p>
+                        <strong>{c.id} · {c.reachable ? t("terrainRecovery.feasible") : t("terrainRecovery.rejected2")}</strong>
+                        <p>Δv {c.total_delta_v_mps.toFixed(2)} m/s · {t("terrainRecovery.reserveMargin")} {c.reserve_margin_kg.toFixed(2)} kg · {t("terrainRecovery.terrainScore")} {c.safety_score?.toFixed(3) ?? "—"}</p>
                         {c.reasons.map((r, index) => <p key={index}><ServerExplanation text={r.detail} reason={r.reason} /></p>)}
                       </div>)}
                     </details>
@@ -416,14 +404,14 @@ export default function TerrainRecoveryPanel({ base }: { base: Record<string, un
                       ))}
                   </li>
                 ))}
-                {result.decisions.length === 0 && <li>{tr ? "Hiçbir olay planı geçersiz kılmadı." : "No event invalidated the plan."}</li>}
+                {result.decisions.length === 0 && <li>{t("terrainRecovery.noEventInvalidatedThePlan")}</li>}
               </ol>
-              <h4>{tr ? "Uçuş boyunca erişilebilir yedekler" : "Reachable backups over time"}</h4>
+              <h4>{t("terrainRecovery.reachableBackupsOverTime")}</h4>
               <ul className="heal-backups">
                 {result.backups_over_time.map((b, i) => (
                   <li key={i}>
                     <span>
-                      {b.t_s.toFixed(0)} s · {tr ? (b.label === "initial" ? "Başlangıç" : "Yedek hedef kontrolü") : b.label.replaceAll("_", " ")}
+                      {b.t_s.toFixed(0)} s · {tOr(`terrainRecovery.backupLabels.${b.label}`, tOr("terrainRecovery.backupLabels.other", b.label.replaceAll("_", " ")))}
                     </span>
                     <span className="risk-meter" aria-label={`${b.reachable} of ${b.evaluated} reachable`}>
                       <i style={{ width: `${b.evaluated ? (100 * b.reachable) / b.evaluated : 0}%` }} />
@@ -438,13 +426,13 @@ export default function TerrainRecoveryPanel({ base }: { base: Record<string, un
           </div>
           <details className="communication-limits">
             <summary>
-              {tr ? "Model ve varsayımlar" : "Recovery model & assumptions"} <span>+</span>
+              {t("terrainRecovery.recoveryModelAssumptions")} <span>+</span>
             </summary>
             <ul>
               {result.assumptions.map((a) => (
                 <li key={a}><ServerExplanation text={a} /></li>
               ))}
-              <li>{tr ? "Yeniden planlama son zamanı (motorlu iniş başlangıcından):" : "Replanning deadline from powered descent start:"} {result.decision_deadline_s.toFixed(0)} s</li>
+              <li>{t("terrainRecovery.replanningDeadlineFromPoweredDescent")} {result.decision_deadline_s.toFixed(0)} s</li>
             </ul>
           </details>
         </div>

@@ -37,6 +37,9 @@ function interpolate(text: string, params?: Params) {
 
 export type Translate = (key: string, params?: Params) => string;
 
+/** Translates a key, returning the fallback when no dictionary defines it. */
+export type TranslateOr = (key: string, fallback: string, params?: Params) => string;
+
 /** Translates fixed English text sent by the backend; unknown text is returned unchanged. */
 export type TranslateText = (text: string) => string;
 
@@ -45,6 +48,7 @@ type LanguageContext = {
   locale: string;
   setLang: (lang: Language) => void;
   t: Translate;
+  tOr: TranslateOr;
   tText: TranslateText;
 };
 
@@ -59,6 +63,13 @@ function makeTranslate(lang: Language): Translate {
     const text =
       lookup(dictionaries[lang], key) ?? lookup(dictionaries.en, key) ?? key;
     return interpolate(text, params);
+  };
+}
+
+function makeTranslateOr(lang: Language): TranslateOr {
+  return (key, fallback, params) => {
+    const text = lookup(dictionaries[lang], key) ?? lookup(dictionaries.en, key);
+    return text === undefined ? fallback : interpolate(text, params);
   };
 }
 
@@ -90,6 +101,7 @@ const Context = createContext<LanguageContext>({
   locale: LOCALES.en,
   setLang: () => undefined,
   t: makeTranslate("en"),
+  tOr: makeTranslateOr("en"),
   tText: makeTranslateText("en"),
 });
 
@@ -109,6 +121,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       locale: LOCALES[lang],
       setLang,
       t: makeTranslate(lang),
+      tOr: makeTranslateOr(lang),
       tText: makeTranslateText(lang),
     }),
     [lang, setLang],

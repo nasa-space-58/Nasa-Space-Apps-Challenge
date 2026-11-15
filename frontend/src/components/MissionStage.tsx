@@ -207,7 +207,7 @@ export default function MissionStage({
   /** Content of the "Plan" tab, above the flight simulation controls. */
   children: ReactNode;
 }) {
-  const { t, locale } = useTranslate();
+  const { t, tOr, locale } = useTranslate();
   const [inspector, setInspector] = useState<"flight" | "surface" | "candidates" | null>(null);
   const [cleanView, setCleanView] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
@@ -239,7 +239,6 @@ export default function MissionStage({
   },[previewPlaying,visible,preview?.stale]);
   useEffect(() => {if(candidateId){setCameraMode("pole");setShowCandidates(true);}},[candidateId]);
   const inspected = candidates.find((c) => c.id === candidateId);
-  const tr = locale.startsWith("tr");
   const lockedNotice = t("missionStage.locked");
   const phaseLabel = (id: string) => t(`missionPhases.${id}.label`);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -567,22 +566,22 @@ export default function MissionStage({
             </select>
           </label>}
           {!preview && !cleanView && <div className="layer-picker">
-            <button aria-expanded={layersOpen} onClick={() => setLayersOpen(!layersOpen)}>{tr ? "Katmanlar" : "Layers"}</button>
+            <button aria-expanded={layersOpen} onClick={() => setLayersOpen(!layersOpen)}>{t("missionStage.layers")}</button>
             {layersOpen && <div className="layer-options" onKeyDown={e => { if (e.key === "Escape") setLayersOpen(false); }}>
-              <label><input type="checkbox" checked={showHazards} onChange={e => setShowHazards(e.target.checked)} />{tr ? "Tehlike bölgeleri" : "Hazards"}</label>
-              <label><input type="checkbox" checked={showSearch} onChange={e => setShowSearch(e.target.checked)} />{tr ? "Tarama alanı" : "Scan coverage"}</label>
-              <label><input type="checkbox" checked={showRoutes} onChange={e => setShowRoutes(e.target.checked)} />{tr ? "Rover rotaları" : "Rover routes"}</label>
-              <label><input type="checkbox" checked={showCandidates} onChange={e => setShowCandidates(e.target.checked)} />{tr ? "İniş adayları" : "Landing candidates"}</label>
-              <button onClick={() => setLayersOpen(false)}>{tr ? "Kapat" : "Close"}</button>
+              <label><input type="checkbox" checked={showHazards} onChange={e => setShowHazards(e.target.checked)} />{t("missionStage.hazards")}</label>
+              <label><input type="checkbox" checked={showSearch} onChange={e => setShowSearch(e.target.checked)} />{t("missionStage.scanCoverage")}</label>
+              <label><input type="checkbox" checked={showRoutes} onChange={e => setShowRoutes(e.target.checked)} />{t("missionStage.roverRoutes")}</label>
+              <label><input type="checkbox" checked={showCandidates} onChange={e => setShowCandidates(e.target.checked)} />{t("missionStage.landingCandidates")}</label>
+              <button onClick={() => setLayersOpen(false)}>{t("missionStage.close")}</button>
             </div>}
           </div>}
           {canSplit && <button onClick={() => setSingleScene(false)}>{t("splitSim.split")}</button>}
-          <button aria-pressed={cleanView} onClick={() => setCleanView(!cleanView)}>{tr ? (cleanView ? "Kontroller" : "Sade görünüm") : (cleanView ? "Controls" : "Clean view")}</button>
-          <button aria-label={tr ? "Tam ekranı değiştir" : "Toggle fullscreen"} aria-pressed={fullscreen} onClick={async () => {
+          <button aria-pressed={cleanView} onClick={() => setCleanView(!cleanView)}>{t(cleanView ? "missionStage.controls" : "missionStage.cleanView")}</button>
+          <button aria-label={t("missionStage.toggleFullscreen")} aria-pressed={fullscreen} onClick={async () => {
             try {
               if (document.fullscreenElement) await document.exitFullscreen();
               else await stageRef.current?.requestFullscreen();
-            } catch { setNotice(tr ? "Bu tarayıcıda tam ekran açılamadı." : "Fullscreen is unavailable in this browser."); }
+            } catch { setNotice(t("missionStage.fullscreenIsUnavailableInThis")); }
           }}>⛶</button>
         </div>
         {preview && !cleanView && <div className="stage-hud analysis-caption">
@@ -619,7 +618,7 @@ export default function MissionStage({
             aria-label={t("missionStage.progress")} aria-valuetext={`${phaseLabel(active.phase.id)}, ${Math.round(progress * 100)}%`}
             onChange={e => { setFlying(false); setProgress(Number(e.target.value) / 1000); }} />
           <span>{Math.round(progress * 100)}%</span>
-          {landed && <button onClick={() => inspect("surface")}>{tr ? "Keşif aracı" : "Rover"} ↗</button>}
+          {landed && <button onClick={() => inspect("surface")}>{t("missionStage.rover")} ↗</button>}
         </div>}
         </>)}
         {notice && (
@@ -749,11 +748,11 @@ export default function MissionStage({
             </div>
           )}
         </nav>
-        <details className="scene-inspector-tools"><summary>{tr ? "Sahne ayrıntıları" : "Scene details"}</summary><div className="scene-inspector-nav" role="group" aria-label={tr ? "Sahne ayrıntıları" : "Scene details"}>
-          <button aria-pressed={inspector === "flight"} onClick={() => inspect("flight")}>{tr ? "Uçuş bilgisi" : "Flight details"}</button>
-          {landed && <button aria-pressed={inspector === "surface"} onClick={() => inspect("surface")}>{tr ? "Yüzey operasyonları" : "Surface operations"}</button>}
-          <button aria-pressed={inspector === "candidates"} onClick={() => inspect("candidates")}>{tr ? "Adaylar" : "Candidates"} · {candidates.length}</button>
-          {inspector && <button onClick={() => setInspector(null)}>{tr ? "Göreve dön" : "Back to task"} ↩</button>}
+        <details className="scene-inspector-tools"><summary>{t("missionStage.sceneDetails")}</summary><div className="scene-inspector-nav" role="group" aria-label={t("missionStage.sceneDetails")}>
+          <button aria-pressed={inspector === "flight"} onClick={() => inspect("flight")}>{t("missionStage.flightDetails")}</button>
+          {landed && <button aria-pressed={inspector === "surface"} onClick={() => inspect("surface")}>{t("missionStage.surfaceOperations")}</button>}
+          <button aria-pressed={inspector === "candidates"} onClick={() => inspect("candidates")}>{t("missionStage.candidates")} · {candidates.length}</button>
+          {inspector && <button onClick={() => setInspector(null)}>{t("missionStage.backToTask")} ↩</button>}
         </div>
         </details>
         <div className="panel-body scene-inspector" hidden={inspector !== "flight"}>
@@ -832,15 +831,15 @@ export default function MissionStage({
         </div>
         <div className="panel-body scene-inspector" hidden={inspector !== "candidates"}>
         {candidates.length > 0 && <details className="mission-candidates" open>
-          <summary>{tr ? "Rota ve iniş adayları" : "Route & landing candidates"} · {candidates.length}</summary>
-          <label><input type="checkbox" checked={showCandidates} onChange={e => setShowCandidates(e.target.checked)} /> {tr ? "3D üzerinde göster" : "Show in 3D"}</label>
-          <p>{tr ? "Çizgiler temsili yaklaşım koridorlarıdır. Skor ve gerekçeler API sonuçlarıdır; hesaplanmamış skor — gösterilir." : "Lines are illustrative approach corridors. Scores and reasons come from the API; missing scores appear as —."}</p>
+          <summary>{t("missionStage.routeLandingCandidates")} · {candidates.length}</summary>
+          <label><input type="checkbox" checked={showCandidates} onChange={e => setShowCandidates(e.target.checked)} /> {t("missionStage.showIn3d")}</label>
+          <p>{t("missionStage.linesAreIllustrativeApproachCorridors")}</p>
           <div className="candidate-list">{candidates.map(c => <button key={c.id} aria-pressed={candidateId === c.id} onClick={() => { setCandidateId(c.id); setShowCandidates(true); setCameraMode("pole"); }} style={{ borderLeftColor: candidateColor(c) }}>
-            <span>{c.label}</span><b>{c.score?.toFixed(3) ?? "—"}</b><small>{tr ? ({accepted:"Uygun",rejected:"Elendi",failed:"Hata",unknown:"Veri yetersiz"})[c.status] : c.status}</small>
+            <span>{c.label}</span><b>{c.score?.toFixed(3) ?? "—"}</b><small>{tOr(`missionStage.candidateStatus.${c.status}`, c.status)}</small>
           </button>)}</div>
-          {inspected && <article><strong>{inspected.label}</strong><p>{inspected.source} · {inspected.lat.toFixed(4)}°, {inspected.lon.toFixed(4)}°</p><p>{inspected.explanation}</p><dl>{inspected.metrics.map((m, i) => <div key={i}><dt>{tr ? ({Orbit:"Yörünge",Propellant:"Yakıt", "Reserve margin":"Rezerv marjı",Assessment:"Değerlendirme"} as Record<string,string>)[m.label] ?? m.label : m.label}</dt><dd>{m.value}</dd></div>)}</dl></article>}
+          {inspected && <article><strong>{inspected.label}</strong><p>{inspected.source} · {inspected.lat.toFixed(4)}°, {inspected.lon.toFixed(4)}°</p><p>{inspected.explanation}</p><dl>{inspected.metrics.map((m, i) => <div key={i}><dt>{tOr(`missionStage.metricLabels.${m.label}`, m.label)}</dt><dd>{m.value}</dd></div>)}</dl></article>}
         </details>}
-          {!candidates.length && <p>{tr ? "Rota ve iniş adayları için Karşılaştır ve öner veya İniş ve yüzey adımında bir hesaplama çalıştırın." : "Run recommendations or descent planning to see route and landing candidates."}</p>}
+          {!candidates.length && <p>{t("missionStage.runRecommendationsOrDescentPlanning")}</p>}
         </div>
         <div className="panel-body scene-inspector" hidden={inspector !== "surface"}>
         {landed && (
@@ -854,7 +853,7 @@ export default function MissionStage({
             />
           </SceneBoundary>
         )}
-          {!landed && <p>{arrived && touchdown !== "landed" ? (tr ? "Araç inişte kaybedildi; yüzey operasyonları yapılamaz." : "The vehicle was lost at touchdown; no surface operations are possible.") : (tr ? "Yüzey operasyonları inişten sonra açılır." : "Surface operations become available after landing.")}</p>}
+          {!landed && <p>{arrived && touchdown !== "landed" ? t("missionStage.theVehicleWasLostAt") : t("missionStage.surfaceOperationsBecomeAvailableAfter")}</p>}
         </div>
         <div
           className="panel-body"
