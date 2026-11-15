@@ -1,0 +1,566 @@
+/* R3 recommend module: guided setup, ranked site cards and a what-if block.
+   Criterion hues come from the shared .contribution.* classes in style.css. */
+.recommendation-section {
+  display: grid;
+  gap: 14px;
+}
+.recommendation-section .section-heading {
+  margin-bottom: 0;
+}
+
+/* Status and live pipeline */
+.rec-status {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border-left: 3px solid var(--blue);
+}
+.rec-status.ready {
+  border-left-color: #199e70;
+}
+.rec-status.partial {
+  border-left-color: var(--gold);
+}
+.rec-status.failed {
+  border-left-color: #d95926;
+}
+.rec-status > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 6px 14px;
+  font-size: 13px;
+}
+.rec-status > div span {
+  font: 11px var(--mono);
+  color: var(--muted);
+}
+.rec-status progress {
+  width: 100%;
+  height: 8px;
+  accent-color: var(--gold);
+}
+.rec-status .text-button {
+  justify-self: start;
+  margin: 0;
+  font-size: 12px;
+}
+.rec-pipeline {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 12px;
+}
+.rec-pipeline li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  background: #0b131a;
+  color: var(--muted);
+}
+.rec-pipeline li b {
+  color: #dfe5e8;
+  font-weight: 500;
+}
+.rec-pipeline li[data-state="analyzing"] span,
+.rec-pipeline li[data-state="communicating"] span {
+  color: var(--gold);
+}
+.rec-pipeline li[data-state="evaluated"] span {
+  color: #4fc79c;
+}
+.rec-pipeline li[data-state="failed"] span {
+  color: #ef8a63;
+}
+
+/* Setup form */
+.rec-setup {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+}
+.rec-setup fieldset {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.rec-setup legend {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+.rec-setup legend small {
+  margin-left: auto;
+  font: 10px var(--mono);
+  font-weight: 400;
+  color: var(--muted);
+}
+.rec-step {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font: 11px var(--mono);
+}
+.rec-setup label,
+.rec-segment > span {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.rec-setup select,
+.rec-setup input:not([type="checkbox"]):not([type="range"]),
+.rec-slip input {
+  width: 100%;
+  height: 40px;
+  padding: 8px 10px;
+  background: #080e13;
+  border: 1px solid #35434d;
+  color: #e5e9e8;
+  font: inherit;
+}
+.rec-setup .checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.rec-setup .text-button {
+  justify-self: start;
+  margin: 0;
+  font-size: 12px;
+}
+.rec-setup .primary {
+  width: 100%;
+  font-size: 12px;
+}
+.rec-setup .field-help {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--muted);
+}
+
+/* Candidate chips: native checkboxes kept for keyboard and screen readers. */
+.rec-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.rec-setup .rec-chip {
+  position: relative;
+  display: block;
+  margin: 0;
+}
+.rec-chip input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+.rec-chip span {
+  display: inline-block;
+  padding: 7px 12px;
+  border: 1px solid #35434d;
+  border-radius: 999px;
+  color: #c4ced5;
+  font-size: 12px;
+  transition: border-color 0.15s, background 0.15s;
+}
+.rec-chip input:checked + span {
+  border-color: var(--gold);
+  background: #edbb661f;
+  color: #f3eee4;
+}
+.rec-chip input:checked + span::before {
+  content: "✓ ";
+  color: var(--gold);
+}
+.rec-chip input:focus-visible + span {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.rec-chip input:disabled + span {
+  opacity: 0.45;
+}
+.rec-custom {
+  display: grid;
+  grid-template-columns: 1fr 1fr 40px;
+  align-items: end;
+  gap: 8px;
+}
+.rec-remove {
+  height: 40px;
+  border: 1px solid #35434d;
+  background: transparent;
+  color: var(--muted);
+  font-size: 18px;
+  cursor: pointer;
+}
+.rec-remove:hover {
+  border-color: #ef8a63;
+  color: #ef8a63;
+}
+
+/* Window */
+.rec-window {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 10px;
+}
+.rec-segment {
+  display: grid;
+  gap: 6px;
+}
+.rec-segment > div {
+  display: flex;
+  height: 40px;
+  padding: 3px;
+  gap: 3px;
+  border: 1px solid #35434d;
+  border-radius: var(--radius-control, 12px);
+  background: #080e13;
+}
+.rec-segment button {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  cursor: pointer;
+  border-radius: 9px;
+}
+.rec-segment button[aria-checked="true"] {
+  background: #edbb6626;
+  color: #f3eee4;
+}
+
+/* Priorities */
+.rec-priorities {
+  display: grid;
+  gap: 8px;
+}
+.priority-split {
+  display: flex;
+  height: 10px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #202d37;
+}
+.priority-split span {
+  flex-basis: 0;
+  min-width: 0;
+  transition: flex-grow 0.2s;
+}
+.priority-split span + span {
+  border-left: 2px solid var(--panel);
+}
+.recommendation-section .weight-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2px 10px;
+  margin: 0;
+  font-size: 12px;
+}
+.weight-row output {
+  font: 11px var(--mono);
+  color: var(--muted);
+}
+.weight-row input[type="range"] {
+  grid-column: 1 / -1;
+  width: 100%;
+  accent-color: var(--gold);
+}
+.recommendation-section i.contribution {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  vertical-align: middle;
+}
+
+/* Hard constraints */
+.rec-constraints {
+  border-top: 1px solid var(--line);
+  padding-top: 12px;
+}
+.rec-constraints summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+.rec-constraints summary small {
+  font: 10px var(--mono);
+  font-weight: 400;
+  color: var(--muted);
+}
+.rec-constraints fieldset {
+  margin-top: 14px;
+}
+.rec-empty {
+  margin: 0;
+  padding: 0 4px;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* Results */
+.rec-results {
+  display: grid;
+  gap: 12px;
+}
+.rec-section-title {
+  margin: 6px 0 0;
+  font: 10px var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #bdc7cf;
+}
+.rec-results .contribution-legend {
+  margin: 0;
+}
+.rec-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rec-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-card, 16px);
+  background: var(--panel);
+}
+.rec-card.top {
+  border-color: #edbb6680;
+  background: linear-gradient(160deg, #edbb6614, var(--panel) 60%);
+}
+.rec-card-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px;
+}
+.rec-card-head h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+}
+.rec-card.top .rec-card-head h4 {
+  font-size: 18px;
+}
+.rec-kicker {
+  margin: 0 0 2px;
+  font: 9px var(--mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.rec-rank {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid #35434d;
+  font: 12px var(--mono);
+  color: #c4ced5;
+}
+.rec-card.top .rec-rank {
+  border-color: var(--gold);
+  background: var(--gold);
+  color: #10171e;
+  font-weight: 700;
+}
+.rec-score {
+  display: grid;
+  justify-items: end;
+  line-height: 1.1;
+}
+.rec-score b {
+  font: 18px var(--mono);
+}
+.rec-card.top .rec-score b {
+  font-size: 24px;
+  color: var(--gold);
+}
+.rec-score small {
+  font-size: 10px;
+  color: var(--muted);
+}
+.rec-card .contribution-bar {
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.rec-explanation,
+.rec-move {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #a9b6bf;
+}
+.rec-move {
+  color: var(--gold);
+}
+.rec-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rec-facts li {
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: #0b131a;
+  border: 1px solid var(--line);
+  font-size: 11px;
+  color: #c4ced5;
+}
+.rec-facts li.good {
+  border-color: #199e7080;
+}
+.rec-facts li.bad {
+  border-color: #d9592680;
+  color: #ef8a63;
+}
+.rec-more summary {
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+}
+.rec-more[open] summary {
+  margin-bottom: 10px;
+}
+.rec-criteria {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+.rec-criteria > div {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.8fr) 1fr;
+  gap: 10px;
+  font-size: 12px;
+}
+.rec-criteria dt {
+  color: #c4ced5;
+}
+.rec-criteria dd {
+  margin: 0;
+}
+.rec-criteria dd small {
+  display: block;
+  margin-top: 2px;
+  color: #8c9ba6;
+  line-height: 1.5;
+}
+.rec-list.compact .rec-card {
+  padding: 10px 12px;
+  gap: 8px;
+}
+.rec-list.compact .rec-card-head h4 {
+  font-size: 13px;
+}
+.rec-list.compact .rec-rank {
+  width: 28px;
+  height: 28px;
+}
+.rec-list.compact .rec-score b {
+  font-size: 14px;
+}
+
+/* Rejected or unranked */
+.rec-unranked {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rec-unranked li {
+  display: grid;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px dashed #d9592666;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #a9b6bf;
+}
+.rec-unranked li b {
+  color: #e6c9bd;
+  font-weight: 600;
+}
+
+/* What-if */
+.rec-whatif {
+  display: grid;
+  gap: 10px;
+  padding: 16px 18px;
+}
+.rec-whatif h3 {
+  margin: 0;
+  font-size: 16px;
+}
+.rec-whatif h4 {
+  margin: 6px 0 0;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.rec-whatif .muted {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.rec-whatif .primary {
+  width: 100%;
+  font-size: 12px;
+}
+.rec-slip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.rec-slip input {
+  width: 110px;
+}
+.rec-slip .text-button {
+  margin: 0;
+  font-size: 12px;
+}
+.recommendation-section .schedule-change {
+  margin: 0;
+}
+.recommendation-section .not-modeled {
+  margin: 0;
+}

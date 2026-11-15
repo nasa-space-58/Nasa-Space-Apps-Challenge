@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { MissionCandidate } from "../missionCandidates";
 import type { Preset } from "../types";
+import "./recommendations.css";
 import { errorText, siteLabel, useTranslate, type Translate } from "../i18n";
 
 // R3 (S8/S9): renders backend rankings; scores and rescoring come from the API.
@@ -116,72 +117,154 @@ function remember(id: string) {
   }
 }
 const utc = (v: string) => `${v.replace("T", " ").slice(0, 16)} UTC`;
+const DURATIONS = ["24", "72", "168"] as const;
 
-function RankingTable({
-  ranking,
-  names,
-  caption,
-}: {
-  ranking: Ranking;
-  names: Record<string, string>;
-  caption: string;
-}) {
+function ContributionBar({ row, ranking }: { row: Ranked; ranking: Ranking }) {
   const { t } = useTranslate();
-  const CRITERION_LABEL = (c: Criterion) => criterionLabel(t, c);
   const active = CRITERIA.filter((c) => c in ranking.weights);
   return (
-    <table className="ranking-table">
-      <caption>
-        {caption}
-        <span className="contribution-legend" aria-hidden="true">
-          {active.map((c) => (
-            <span key={c}>
-              <i className={`contribution ${c}`} /> {CRITERION_LABEL(c)}
-            </span>
-          ))}
+    <div
+      className="contribution-bar"
+      role="img"
+      aria-label={active
+        .map((c) => `${criterionLabel(t, c)} ${(row.contributions[c] ?? 0).toFixed(2)}`)
+        .join(", ")}
+    >
+      {active.map((c) => (
+        <span
+          key={c}
+          className={`contribution ${c}`}
+          style={{ width: `${(row.contributions[c] ?? 0) * 100}%` }}
+          title={t("recommendations.contributionTitle", {
+            criterion: criterionLabel(t, c),
+            score: row.criteria[c]?.score?.toFixed(2) ?? "—",
+            weight: (ranking.weights[c] ?? 0).toFixed(2),
+          })}
+        />
+      ))}
+    </div>
+  );
+}
+
+function Legend({ ranking }: { ranking: Ranking }) {
+  const { t } = useTranslate();
+  return (
+    <span className="contribution-legend" aria-hidden="true">
+      {CRITERIA.filter((c) => c in ranking.weights).map((c) => (
+        <span key={c}>
+          <i className={`contribution ${c}`} /> {criterionLabel(t, c)}
         </span>
-      </caption>
-      <thead>
-        <tr>
-          <th scope="col">{t("recommendations.col.rank")}</th>
-          <th scope="col">{t("recommendations.col.site")}</th>
-          <th scope="col">{t("recommendations.col.score")}</th>
-          <th scope="col">{t("recommendations.col.contribution")}</th>
-        </tr>
-      </thead>
-      <tbody>
-        {ranking.ranked.map((row) => (
-          <tr key={row.candidate_id}>
-            <td>#{row.rank}</td>
-            <th scope="row">{names[row.candidate_id] ?? row.candidate_id}</th>
-            <td>{row.total_score.toFixed(2)}</td>
-            <td>
-              <div
-                className="contribution-bar"
-                role="img"
-                aria-label={active
-                  .map((c) => `${CRITERION_LABEL(c)} ${(row.contributions[c] ?? 0).toFixed(2)}`)
-                  .join(", ")}
-              >
-                {active.map((c) => (
-                  <span
-                    key={c}
-                    className={`contribution ${c}`}
-                    style={{ width: `${(row.contributions[c] ?? 0) * 100}%` }}
-                    title={t("recommendations.contributionTitle", {
-                      criterion: CRITERION_LABEL(c),
-                      score: row.criteria[c]?.score?.toFixed(2) ?? "—",
-                      weight: (ranking.weights[c] ?? 0).toFixed(2),
-                    })}
-                  />
-                ))}
-              </div>
-              <small>{row.explanation}</small>
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+      ))}
+    </span>
+  );
+}
+
+/** Slope / descent facts the backend attached to a candidate, as short chips. */
+function CandidateFacts({ candidate }: { candidate?: CandidateState }) {
+  const { t } = useTranslate();
+  if (!candidate) return null;
+  const { safety, descent } = candidate;
+  if (!safety?.covered && !descent) return null;
+  return (
+    <ul className="rec-facts">
+      {safety?.covered && (
+        <li>
+          {t("recommendations.safety", {
+            slope: safety.site_slope_deg?.toFixed(1) ?? "—",
+            max: safety.max_landing_slope_deg?.toFixed(1) ?? "—",
+          })}{" "}
+          {safety.hazard_distance_m == null
+            ? t("recommendations.noHazard")
+            : t("recommendations.hazardAway", { m: safety.hazard_distance_m.toFixed(0) })}
+        </li>
+      )}
+      {descent && (
+        <li className={descent.feasible ? "good" : "bad"}>
+          {t("recommendations.descent")}{" "}
+          {descent.feasible
+            ? t("recommendations.reachable", {
+                kg: descent.propellant_margin_kg?.toFixed(0) ?? "—",
+              })
+            : t("recommendations.notReachable")}
+        </li>
+      )}
+    </ul>
+  );
+}
+
+function CriterionDetails({ row, ranking }: { row: Ranked; ranking: Ranking }) {
+  const { t, tText } = useTranslate();
+  const active = CRITERIA.filter((c) => c in ranking.weights);
+  return (
+    <dl className="rec-criteria">
+      {active.map((c) => {
+        const score = row.criteria[c];
+        return (
+          <div key={c}>
+            <dt>
+              <i className={`contribution ${c}`} aria-hidden="true" /> {criterionLabel(t, c)}
+            </dt>
+            <dd>
+              <b>{score?.score == null ? "—" : score.score.toFixed(2)}</b>
+              {score?.value != null && (
+                <span>
+                  {" "}
+                  · {Number(score.value.toFixed(2))} {score.unit}
+                </span>
+              )}
+              {score?.rule && <small>{tText(score.rule)}</small>}
+            </dd>
+          </div>
+        );
+      })}
+    </dl>
+  );
+}
+
+function RankedCard({
+  row,
+  ranking,
+  name,
+  candidate,
+  move,
+}: {
+  row: Ranked;
+  ranking: Ranking;
+  name: string;
+  candidate?: CandidateState;
+  move?: { from: number | null; reason: string };
+}) {
+  const { t, tText } = useTranslate();
+  const top = row.rank === 1;
+  return (
+    <li className={`rec-card${top ? " top" : ""}`}>
+      <div className="rec-card-head">
+        <span className="rec-rank" aria-label={t("recommendations.col.rank")}>
+          #{row.rank}
+        </span>
+        <div>
+          {top && <p className="rec-kicker">{t("recommendations.recommended")}</p>}
+          <h4>{name}</h4>
+        </div>
+        <span className="rec-score">
+          <b>{row.total_score.toFixed(2)}</b>
+          <small>{t("recommendations.col.score")}</small>
+        </span>
+      </div>
+      <ContributionBar row={row} ranking={ranking} />
+      <p className="rec-explanation">{tText(row.explanation)}</p>
+      {move && move.from !== row.rank && (
+        <p className="rec-move">
+          {move.from == null || move.from > row.rank ? "▲" : "▼"}{" "}
+          {t("recommendations.moved", { from: move.from ?? "—", to: row.rank, reason: move.reason })}
+        </p>
+      )}
+      <CandidateFacts candidate={candidate} />
+      <details className="rec-more">
+        <summary>{t("recommendations.details")}</summary>
+        <CriterionDetails row={row} ranking={ranking} />
+      </details>
+    </li>
   );
 }
 
@@ -201,6 +284,7 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
   const [weights, setWeights] = useState<Weights>(defaults);
   const [rec, setRec] = useState<Recommendation | null>(null);
   const [rescored, setRescored] = useState<Rescore | null>(null);
+  const [setupOpen, setSetupOpen] = useState(false);
   useEffect(() => {
     if (!rec) return;
     const ranking = rescored?.current ?? rec.ranking;
@@ -263,6 +347,7 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
         body: JSON.stringify(body),
       });
       remember(created.id);
+      setSetupOpen(false);
       setRec(created);
       poll(created.id);
     } catch (e) {
@@ -331,6 +416,63 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
   const running = rec ? ACTIVE.includes(rec.status) : false;
   const finished = rec && ["ready", "partial"].includes(rec.status) && rec.ranking;
   const count = picked.length + custom.length;
+  const ranking = rescored?.current ?? rec?.ranking ?? null;
+  const candidateOf = (id: string) => rec?.candidates.find((c) => c.candidate_id === id);
+  const evaluated = rec?.candidates.filter((c) => ["evaluated", "failed"].includes(c.state)).length ?? 0;
+  const unranked = ranking
+    ? [
+        ...ranking.rejected.map((r) => ({ id: r.candidate_id, text: r.explanation })),
+        ...ranking.insufficient_data.map((r) => ({ id: r.candidate_id, text: r.explanation })),
+        ...(ranking.failed ?? []).map((r) => ({ id: r.candidate_id, text: r.error })),
+      ]
+    : [];
+  const moves = new Map(
+    (rescored?.changes ?? []).map((c) => [
+      c.candidate_id,
+      {
+        from: c.previous_rank,
+        reason: c.reason ? CRITERION_LABEL(c.reason) : t("recommendations.newWeights"),
+      },
+    ]),
+  );
+  const shownCriteria = CRITERIA.filter((c) => c !== "fuel" || includeDescent);
+  const weightTotal = shownCriteria.reduce((sum, c) => sum + weights[c], 0);
+  const locked = busy || running;
+  const setupVisible = !rec || setupOpen;
+
+  const priorities = (
+    <div className="rec-priorities">
+      <div className="priority-split" role="img" aria-label={t("recommendations.prioritySplit")}>
+        {shownCriteria.map((c) => (
+          <span
+            key={c}
+            className={`contribution ${c}`}
+            style={{ flexGrow: weights[c] }}
+            title={`${CRITERION_LABEL(c)} ${weightTotal ? Math.round((weights[c] / weightTotal) * 100) : 0}%`}
+          />
+        ))}
+      </div>
+      {shownCriteria.map((c) => (
+        <label key={c} className="weight-row">
+          <span>
+            <i className={`contribution ${c}`} aria-hidden="true" /> {CRITERION_LABEL(c)}
+          </span>
+          <output>
+            {weightTotal ? Math.round((weights[c] / weightTotal) * 100) : 0}%
+          </output>
+          <input
+            aria-label={t("recommendations.weightLabel", { criterion: CRITERION_LABEL(c) })}
+            type="range"
+            min="0"
+            max="10"
+            step="0.5"
+            value={weights[c]}
+            onChange={(e) => setWeights({ ...weights, [c]: Number(e.target.value) })}
+          />
+        </label>
+      ))}
+    </div>
+  );
 
   return (
     <section
@@ -346,36 +488,87 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
           </h2>
           <p className="muted">{t("recommendations.intro")}</p>
         </div>
-        <span className="outline-tag">{t("recommendations.tag")}</span>
       </div>
-      <div className="search-layout">
+
+      {error && (
+        <div className="alert" role="alert">
+          {error}
+        </div>
+      )}
+
+      {rec && (
+        <div className={`panel rec-status ${rec.status}`} role="status">
+          <div>
+            <strong>
+              {STATUSES.includes(rec.status) ? t(`recommendations.status.${rec.status}`) : rec.status}
+            </strong>
+            <span>
+              {utc(rec.request.start_utc)} → {utc(rec.request.end_utc)}
+            </span>
+          </div>
+          {running && (
+            <>
+              <progress max={rec.candidates.length} value={evaluated} />
+              <ul className="rec-pipeline">
+                {rec.candidates.map((c) => (
+                  <li key={c.candidate_id} data-state={c.state}>
+                    <b>{names[c.candidate_id]}</b>
+                    <span>
+                      {STATES.includes(c.state) ? t(`recommendations.state.${c.state}`) : c.state}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
+          )}
+          {rec.error && <p className="alert">{rec.error}</p>}
+          {!running && (
+            <button
+              type="button"
+              className="text-button"
+              aria-expanded={setupVisible}
+              onClick={() => setSetupOpen(!setupOpen)}
+            >
+              {setupOpen ? t("recommendations.hideSetup") : t("recommendations.editSetup")}
+            </button>
+          )}
+        </div>
+      )}
+
+      {setupVisible && (
         <form
-          className="panel search-form"
+          className="panel rec-setup"
           onSubmit={(e) => {
             e.preventDefault();
             submit();
           }}
         >
-          <fieldset disabled={busy || running}>
-            <h3>{t("recommendations.candidates")}</h3>
-            {sites.map((s) => (
-              <label className="checkbox-label" key={s.site_id}>
-                <input
-                  type="checkbox"
-                  checked={picked.includes(s.site_id)}
-                  onChange={(e) =>
-                    setPicked(
-                      e.target.checked
-                        ? [...picked, s.site_id]
-                        : picked.filter((id) => id !== s.site_id),
-                    )
-                  }
-                />
-                {siteLabel(t, s)}
-              </label>
-            ))}
+          <fieldset disabled={locked}>
+            <legend>
+              <span className="rec-step">1</span> {t("recommendations.candidates")}
+              <small>{t("recommendations.selected", { n: count })}</small>
+            </legend>
+            <div className="rec-chips">
+              {sites.map((s) => (
+                <label className="rec-chip" key={s.site_id}>
+                  <input
+                    type="checkbox"
+                    checked={picked.includes(s.site_id)}
+                    disabled={!picked.includes(s.site_id) && count >= 6}
+                    onChange={(e) =>
+                      setPicked(
+                        e.target.checked
+                          ? [...picked, s.site_id]
+                          : picked.filter((id) => id !== s.site_id),
+                      )
+                    }
+                  />
+                  <span>{siteLabel(t, s)}</span>
+                </label>
+              ))}
+            </div>
             {custom.map((c, i) => (
-              <div className="field-pair" key={i}>
+              <div className="rec-custom" key={i}>
                 <label>
                   {t("recommendations.customLat", { n: i + 1 })} · °
                   <input
@@ -402,6 +595,14 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
                     }
                   />
                 </label>
+                <button
+                  type="button"
+                  className="rec-remove"
+                  aria-label={t("recommendations.removeCustomN", { n: i + 1 })}
+                  onClick={() => setCustom(custom.filter((_, j) => j !== i))}
+                >
+                  ×
+                </button>
               </div>
             ))}
             <button
@@ -412,270 +613,184 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
             >
               + {t("recommendations.addCustom")}
             </button>
-            {custom.length > 0 && (
-              <button
-                type="button"
-                className="text-button"
-                onClick={() => setCustom(custom.slice(0, -1))}
-              >
-                − {t("recommendations.removeCustom")}
-              </button>
-            )}
-            <h3>{t("recommendations.window")}</h3>
-            <label>
-              {t("recommendations.start")} · UTC
-              <input
-                aria-label={t("recommendations.startLabel")}
-                type="datetime-local"
-                value={start}
-                onChange={(e) => setStart(e.target.value)}
-              />
+          </fieldset>
+
+          <fieldset disabled={locked}>
+            <legend>
+              <span className="rec-step">2</span> {t("recommendations.window")}
+            </legend>
+            <div className="rec-window">
+              <label>
+                {t("recommendations.start")} · UTC
+                <input
+                  aria-label={t("recommendations.startLabel")}
+                  type="datetime-local"
+                  value={start}
+                  onChange={(e) => setStart(e.target.value)}
+                />
+              </label>
+              <div className="rec-segment" role="radiogroup" aria-label={t("recommendations.duration")}>
+                <span>{t("recommendations.duration")}</span>
+                <div>
+                  {DURATIONS.map((h) => (
+                    <button
+                      type="button"
+                      key={h}
+                      role="radio"
+                      aria-checked={hours === h}
+                      onClick={() => setHours(h)}
+                    >
+                      {h === "24" ? t("app.form.hours", { n: 24 }) : t("app.form.days", { n: Number(h) / 24 })}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <label className="checkbox-label">
+              <input type="checkbox" checked={refine} onChange={(e) => setRefine(e.target.checked)} />
+              {t("recommendations.refine")}
             </label>
-            <label>
-              {t("recommendations.duration")}
-              <select value={hours} onChange={(e) => setHours(e.target.value)}>
-                <option value="24">{t("app.form.hours", { n: 24 })}</option>
-                <option value="72">{t("app.form.days", { n: 3 })}</option>
-                <option value="168">{t("app.form.days", { n: 7 })}</option>
-              </select>
-            </label>
+          </fieldset>
+
+          <fieldset disabled={locked}>
+            <legend>
+              <span className="rec-step">3</span> {t("recommendations.priorities")}
+            </legend>
             <label className="checkbox-label">
               <input
                 type="checkbox"
-                checked={refine}
-                onChange={(e) => setRefine(e.target.checked)}
+                aria-label={t("recommendations.includeDescentLabel")}
+                checked={includeDescent}
+                onChange={(e) => {
+                  setIncludeDescent(e.target.checked);
+                  if (e.target.checked && weights.fuel === 0) setWeights({ ...weights, fuel: 1 });
+                }}
               />
-              {t("recommendations.refine")}
+              {t("recommendations.includeDescent")}
             </label>
-            <h3>{t("recommendations.hard")}</h3>
-            <label>
-              {t("recommendations.slope")} · °
-              <input
-                aria-label={t("recommendations.slopeLabel")}
-                type="number"
-                min="1"
-                max="45"
-                step="0.5"
-                value={slope}
-                onChange={(e) => setSlope(e.target.value)}
-              />
-            </label>
-            <label>
-              {t("recommendations.minSun")}
-              <input
-                type="number"
-                min="0"
-                max="100"
-                value={minSun}
-                onChange={(e) => setMinSun(e.target.value)}
-              />
-            </label>
-            <label>
-              {t("recommendations.minComm")}
-              <input
-                type="number"
-                min="0"
-                step="0.5"
-                value={minComm}
-                onChange={(e) => setMinComm(e.target.value)}
-              />
-            </label>
-            <label>
-              {t("recommendations.dsnLimit")}
-              <select
-                value={dsnLimit}
-                onChange={(e) => setDsnLimit(Number(e.target.value))}
-              >
-                <option value={6}>{t("recommendations.limit6")}</option>
-                <option value={10}>{t("recommendations.limit10")}</option>
-              </select>
-            </label>
+            {!finished && priorities}
+            {finished && <p className="field-help">{t("recommendations.prioritiesBelow")}</p>}
           </fieldset>
-          <h3>{t("recommendations.priorities")}</h3>
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
-              aria-label={t("recommendations.includeDescentLabel")}
-              checked={includeDescent}
-              disabled={busy || running}
-              onChange={(e) => {
-                setIncludeDescent(e.target.checked);
-                if (e.target.checked && weights.fuel === 0) setWeights({ ...weights, fuel: 1 });
-              }}
-            />
-            {t("recommendations.includeDescent")}
-          </label>
-          {CRITERIA.filter((c) => c !== "fuel" || includeDescent).map((c) => (
-            <label key={c}>
-              {CRITERION_LABEL(c)} · {weights[c]}
-              <input
-                aria-label={t("recommendations.weightLabel", { criterion: CRITERION_LABEL(c) })}
-                type="range"
-                min="0"
-                max="10"
-                step="0.5"
-                value={weights[c]}
-                onChange={(e) => setWeights({ ...weights, [c]: Number(e.target.value) })}
-              />
-            </label>
-          ))}
-          <button
-            type="submit"
-            className="primary"
-            disabled={busy || running || count < 2 || count > 6}
-          >
+
+          <details className="rec-constraints">
+            <summary>
+              {t("recommendations.hard")}
+              <small>{t("recommendations.constraintsSummary", { slope, dsn: dsnLimit })}</small>
+            </summary>
+            <fieldset disabled={locked}>
+              <label>
+                {t("recommendations.slope")} · °
+                <input
+                  aria-label={t("recommendations.slopeLabel")}
+                  type="number"
+                  min="1"
+                  max="45"
+                  step="0.5"
+                  value={slope}
+                  onChange={(e) => setSlope(e.target.value)}
+                />
+              </label>
+              <label>
+                {t("recommendations.minSun")}
+                <input
+                  type="number"
+                  min="0"
+                  max="100"
+                  value={minSun}
+                  onChange={(e) => setMinSun(e.target.value)}
+                />
+              </label>
+              <label>
+                {t("recommendations.minComm")}
+                <input
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={minComm}
+                  onChange={(e) => setMinComm(e.target.value)}
+                />
+              </label>
+              <label>
+                {t("recommendations.dsnLimit")}
+                <select value={dsnLimit} onChange={(e) => setDsnLimit(Number(e.target.value))}>
+                  <option value={6}>{t("recommendations.limit6")}</option>
+                  <option value={10}>{t("recommendations.limit10")}</option>
+                </select>
+              </label>
+              <p className="field-help">{t("recommendations.slopeNote")}</p>
+            </fieldset>
+          </details>
+
+          <button type="submit" className="primary" disabled={locked || count < 2 || count > 6}>
             {t("recommendations.rank")} ↗
           </button>
-          {finished && (
-            <button type="button" className="text-button" onClick={applyWeights}>
-              {t("recommendations.apply")}
-            </button>
-          )}
-          <p className="field-help">{t("recommendations.slopeNote")}</p>
+          {count < 2 && <p className="field-help">{t("recommendations.empty")}</p>}
         </form>
-        <div className="search-results">
-          {error && (
-            <div className="alert" role="alert">
-              {error}
-            </div>
-          )}
-          {!rec && (
-            <div className="panel search-empty">
-              {t("recommendations.empty")}
-            </div>
-          )}
-          {rec && (
-            <div className="panel search-progress" role="status">
-              <div>
-                <strong>
-                  {STATUSES.includes(rec.status)
-                    ? t(`recommendations.status.${rec.status}`)
-                    : rec.status}
-                </strong>
-                <span>
-                  {utc(rec.request.start_utc)} → {utc(rec.request.end_utc)}
-                </span>
-              </div>
-              {rec.error && <p className="alert">{rec.error}</p>}
-            </div>
-          )}
-          {rec && (
-            <ul className="candidate-status">
-              {rec.candidates.map((c) => (
-                <li key={c.candidate_id}>
-                  <b>{names[c.candidate_id]}</b> ·{" "}
-                  {STATES.includes(c.state) ? t(`recommendations.state.${c.state}`) : c.state}
-                  {c.safety?.covered && (
-                    <>
-                      {" "}
-                      ·{" "}
-                      {t("recommendations.safety", {
-                        slope: c.safety.site_slope_deg?.toFixed(1) ?? "—",
-                        max: c.safety.max_landing_slope_deg?.toFixed(1) ?? "—",
-                      })}{" "}
-                      {c.safety.hazard_distance_m == null
-                        ? t("recommendations.noHazard")
-                        : t("recommendations.hazardAway", {
-                            m: c.safety.hazard_distance_m.toFixed(0),
-                          })}
-                    </>
-                  )}
-                  {c.descent && (
-                    <>
-                      {" "}
-                      · {t("recommendations.descent")}{" "}
-                      {c.descent.feasible
-                        ? t("recommendations.reachable", {
-                            kg: c.descent.propellant_margin_kg?.toFixed(0) ?? "—",
-                          })
-                        : t("recommendations.notReachable")}
-                    </>
-                  )}
-                  {c.error && <span className="alert"> {c.error}</span>}
-                </li>
-              ))}
-            </ul>
-          )}
-          {finished && rec.ranking && (
+      )}
+
+      {!rec && <p className="rec-empty muted">{t("recommendations.emptyResult")}</p>}
+
+      {finished && ranking && (
+        <div className="rec-results">
+          <h3 className="rec-section-title">
+            {rescored ? t("recommendations.new") : t("recommendations.ranking")}
+          </h3>
+          {ranking.ranked.length ? (
             <>
-              {rec.ranking.ranked.length ? (
-                <RankingTable
-                  ranking={rec.ranking}
-                  names={names}
-                  caption={t("recommendations.ranking")}
-                />
-              ) : (
-                <div className="panel search-empty">{t("recommendations.nonePassed")}</div>
-              )}
-              {[...rec.ranking.rejected, ...rec.ranking.insufficient_data].length > 0 && (
-                <ul className="rejections" aria-label={t("recommendations.rejected")}>
-                  {[...rec.ranking.rejected, ...rec.ranking.insufficient_data].map((r) => (
-                    <li key={r.candidate_id}>
-                      <b>{names[r.candidate_id]}</b> — {r.explanation}
-                    </li>
-                  ))}
-                  {(rec.ranking.failed ?? []).map((r) => (
-                    <li key={r.candidate_id}>
-                      <b>{names[r.candidate_id]}</b> — {r.error}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <ul className="not-modeled">
-                {Object.entries(rec.ranking.not_modeled).map(([k, v]) => (
-                  <li key={k}>
-                    <b>{tText(k)}:</b> {tText(v)}
+              <Legend ranking={ranking} />
+              <ol className="rec-list">
+                {ranking.ranked.map((row) => (
+                  <RankedCard
+                    key={row.candidate_id}
+                    row={row}
+                    ranking={ranking}
+                    name={names[row.candidate_id] ?? row.candidate_id}
+                    candidate={candidateOf(row.candidate_id)}
+                    move={moves.get(row.candidate_id)}
+                  />
+                ))}
+              </ol>
+            </>
+          ) : (
+            <div className="panel search-empty">{t("recommendations.nonePassed")}</div>
+          )}
+          {rescored && rescored.changes.every((c) => c.previous_rank === c.new_rank) && (
+            <p className="rec-move">{t("recommendations.noChange")}</p>
+          )}
+
+          {unranked.length > 0 && (
+            <>
+              <h3 className="rec-section-title">{t("recommendations.rejected")}</h3>
+              <ul className="rec-unranked" aria-label={t("recommendations.rejected")}>
+                {unranked.map((r) => (
+                  <li key={r.id}>
+                    <b>{names[r.id] ?? r.id}</b>
+                    <span>{tText(r.text)}</span>
+                    <CandidateFacts candidate={candidateOf(r.id)} />
                   </li>
                 ))}
               </ul>
             </>
           )}
-          {rescored && (
-            <div className="rescore-compare">
-              <RankingTable
-                ranking={rescored.previous}
-                names={names}
-                caption={t("recommendations.previous")}
+
+          <div className="panel rec-whatif">
+            <h3>{t("recommendations.whatIf")}</h3>
+            <p className="muted">{t("recommendations.whatIfIntro")}</p>
+            <h4>{t("recommendations.priorities")}</h4>
+            {priorities}
+            <button type="button" className="primary" disabled={busy} onClick={applyWeights}>
+              {t("recommendations.apply")}
+            </button>
+            <h4>{t("recommendations.slip")}</h4>
+            <div className="rec-slip">
+              <input
+                aria-label={t("recommendations.slipLabel")}
+                type="number"
+                min="1"
+                max="720"
+                value={delay}
+                onChange={(e) => setDelay(e.target.value)}
               />
-              <RankingTable
-                ranking={rescored.current}
-                names={names}
-                caption={t("recommendations.new")}
-              />
-              <ul aria-label={t("recommendations.changes")}>
-                {rescored.changes
-                  .filter((c) => c.previous_rank !== c.new_rank)
-                  .map((c) => (
-                    <li key={c.candidate_id}>
-                      <b>{names[c.candidate_id]}</b>{" "}
-                      {t("recommendations.moved", {
-                        from: c.previous_rank ?? "—",
-                        to: c.new_rank ?? "—",
-                        reason: c.reason
-                          ? CRITERION_LABEL(c.reason)
-                          : t("recommendations.newWeights"),
-                      })}
-                    </li>
-                  ))}
-                {rescored.changes.every((c) => c.previous_rank === c.new_rank) && (
-                  <li>{t("recommendations.noChange")}</li>
-                )}
-              </ul>
-            </div>
-          )}
-          {finished && (
-            <div className="panel reschedule">
-              <label>
-                {t("recommendations.slip")}
-                <input
-                  aria-label={t("recommendations.slipLabel")}
-                  type="number"
-                  min="1"
-                  max="720"
-                  value={delay}
-                  onChange={(e) => setDelay(e.target.value)}
-                />
-              </label>
               <button
                 type="button"
                 className="text-button"
@@ -689,23 +804,55 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
                 {t("recommendations.rerank")} ↗
               </button>
             </div>
-          )}
-          {rec?.schedule_change && (
-            <div className="panel schedule-change" role="status">
-              <strong>{rec.schedule_change.suggestion}</strong>
-              <ul>
-                {rec.schedule_change.changes.map((c) => (
-                  <li key={c.candidate_id}>
-                    {names[c.candidate_id] ?? c.site_id}: {c.previous_status}
-                    {c.previous_rank ? ` #${c.previous_rank}` : ""} → {c.new_status}
-                    {c.new_rank ? ` #${c.new_rank}` : ""}
+          </div>
+
+          {rescored && rec.ranking && (
+            <details className="rec-more">
+              <summary>{t("recommendations.previous")}</summary>
+              <ol className="rec-list compact">
+                {rescored.previous.ranked.map((row) => (
+                  <li key={row.candidate_id} className="rec-card">
+                    <div className="rec-card-head">
+                      <span className="rec-rank">#{row.rank}</span>
+                      <h4>{names[row.candidate_id] ?? row.candidate_id}</h4>
+                      <span className="rec-score">
+                        <b>{row.total_score.toFixed(2)}</b>
+                      </span>
+                    </div>
+                    <ContributionBar row={row} ranking={rescored.previous} />
                   </li>
                 ))}
-              </ul>
-            </div>
+              </ol>
+            </details>
           )}
+
+          <details className="rec-more">
+            <summary>{t("recommendations.notModeled")}</summary>
+            <ul className="not-modeled">
+              {Object.entries(ranking.not_modeled).map(([k, v]) => (
+                <li key={k}>
+                  <b>{tText(k)}:</b> {tText(v)}
+                </li>
+              ))}
+            </ul>
+          </details>
         </div>
-      </div>
+      )}
+
+      {rec?.schedule_change && (
+        <div className="panel schedule-change" role="status">
+          <strong>{tText(rec.schedule_change.suggestion)}</strong>
+          <ul>
+            {rec.schedule_change.changes.map((c) => (
+              <li key={c.candidate_id}>
+                {names[c.candidate_id] ?? c.site_id}: {c.previous_status}
+                {c.previous_rank ? ` #${c.previous_rank}` : ""} → {c.new_status}
+                {c.new_rank ? ` #${c.new_rank}` : ""}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </section>
   );
 }
