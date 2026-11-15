@@ -271,3 +271,26 @@ Jupyter notebook: [`notebooks/H0_shared_contracts.ipynb`](notebooks/H0_shared_co
 [`notebooks/H3_resource_integration.ipynb`](notebooks/H3_resource_integration.ipynb), geometrik görüşü istasyon tahsisinden ayırır; faaliyet tüketimini başlangıç enerjisi, kapasite, rezerv ve üretimle birlikte değerlendirir. Dolu bataryada depolanamayan üretim ve sonradan gelen enerji yanlışlıkla kullanılabilir sayılmaz. Desteklenen örnekte klasik ve kuantum çözücü aynı girdiyi kullanır; kuantum kodlamasına sığmayan kısıtlar açıkça bildirilir.
 
 [Varsayımlar, yöntem ve doğrulama](docs/resource-integration.md). Notebook verileri sentetiktir; gerçek DSN tahsisi, radyo bağlantı garantisi veya fiziksel batarya doğrulaması değildir.
+
+## H8 — Klasik ve kuantum karşılaştırması
+
+Görev kontrolündeki **Çözücü arenası** sekmesi (`#/solver-arena`), aynı örnek senaryoda klasik tam arama ile yerel QAOA simülasyonunu karşılaştırır. Gerçek hesap adımlarını oynatabilir, ham ölçümleri ve doğrulanmış planları inceleyebilir, sonuçları JSON olarak indirebilirsin. H7'nin kayıtlı Rigetti deneyi ayrı gösterilir; yeni kuantum işi gönderilmez ve kredi harcanmaz.
+
+- Açıklama ve sınırlar: [H8 solver arena](docs/solver-arena.md)
+- Çalıştırılmış notebook: [H8_solver_arena.ipynb](notebooks/H8_solver_arena.ipynb)
+
+### H9 — Üç görev, ortak anten
+
+H9, bir insanlı ve iki robotik örnek görevin tek anten paylaşımını planlar. Bağımsız seçimlerin çakışmasını, ortak klasik/QAOA planını ve sabitlenen insanlı görev seçiminin etkisini aynı zaman çizelgesinde gösterir. Kaynaklı görünürlük verileriyle örnek kapasite/öncelik varsayımları ayrıdır; sonuç NASA görev planı veya iniş/enerji güvenliği onayı değildir.
+
+- Arayüz: görev kontrolünde **Ortak anten**, `#/shared-antenna`.
+- [Kapsam, kaynaklar ve doğrulama](docs/shared-antenna-campaign.md)
+- [H9 Jupyter notebooku](notebooks/H9_shared_antenna.ipynb): Run All yeni kuantum işi göndermez veya kredi harcamaz.
+
+
+### H10–H11: Ölçek ve röle yörüngesi seçimi
+
+H10, aynı örnek problemlerde tam tarama ve MILP sürelerini ölçer; tahminleri ölçümlerden ayırır. H11, JPL yörüngelerini klasik olarak hesaplar ve bir/iki röle seçimini yerel QAOA ile karşılaştırır. Modelin çerçeve, örnekleme ve haberleşme sınırları ekranda belirtilir. Bu aşamalar gerçek kuantum işi göndermez ve kredi harcamaz.
+
+- [H10 ölçüm ve doğrulama](docs/problem-scaling.md), [notebook](notebooks/H10_problem_scaling.ipynb), arayüz: `#/scaling`.
+- [H11 kaynaklar ve sonuçlar](docs/relay-orbit-selection.md), [notebook](notebooks/H11_relay_orbits.ipynb), arayüz: `#/relays`.

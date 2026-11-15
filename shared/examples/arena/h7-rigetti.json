@@ -1,0 +1,26 @@
+{
+  "execution_mode": "hardware",
+  "job_id": "4c0adc79-6bd3-4578-9147-bbf8ab7b2209",
+  "backend_code": "rigetti:cepheus-1-108q",
+  "input_fingerprint": "176fe28ceab9f98edef3ddc8d64175e0574d3459de96242a3705275cfbdf6bf3",
+  "circuit_sha256": "54275a0b2994acac9eb46f152aa9215d9ce12be4c922e24c4022dbb49c72298d",
+  "shots": 256,
+  "counts": {
+    "00": 18,
+    "01": 29,
+    "10": 9,
+    "11": 200
+  },
+  "logical_qubits": 2,
+  "depth": 2,
+  "training_seed": 17,
+  "training_evaluations": 160,
+  "credits_spent": 1,
+  "credit_type": "Spark",
+  "submitted_utc": "2026-11-14T20:10:08.326044Z",
+  "completion_observed_utc": "2026-11-14T20:12:07.120647Z",
+  "observed_elapsed_s": 118.794603,
+  "provenance": "docs/openquantum-hardware.md",
+  "attribution_url": "https://www.openquantum.com/citation",
+  "limitation": "One archived trial; different budgets from new runs. No hardware speedup or calibrated noise claim."
+}

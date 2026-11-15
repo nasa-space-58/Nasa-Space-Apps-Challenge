@@ -124,13 +124,16 @@ def validate_plan(plan: Plan, scenario: Scenario) -> ValidationReport:
     return _evaluate(plan, scenario, fingerprint(scenario))
 
 
-def solve_exact(scenario: Scenario, *, max_evaluations: int = 10_000) -> SolverResult:
+def solve_exact(
+    scenario: Scenario, *, max_evaluations: int = 10_000, on_assignment=None
+) -> SolverResult:
     """Enumerate bounded assignments; maximize H0 weighted normalized objectives.
 
     Return an incumbent and counts, with optimality only after full enumeration.
     Missing candidate metrics/used capacities stop search conservatively. Events are
     unsupported. Positive integer evaluation limit required; invalid input raises
     ValueError. Exact decimal-rational comparisons; ID order resolves equal scores.
+    Optional on_assignment receives detached observations; callback errors propagate.
     """
     started = perf_counter()
     if type(max_evaluations) is not int or max_evaluations <= 0:
@@ -156,12 +159,32 @@ def solve_exact(scenario: Scenario, *, max_evaluations: int = 10_000) -> SolverR
     best_plan = best_report = best_score = None
     feasible = evaluated = ties = 0
     failures = Counter()
+
+    def observe(plan, report):
+        if on_assignment is not None:
+            on_assignment(
+                {
+                    "evaluated": evaluated,
+                    "option_ids": plan.selected_option_ids,
+                    "feasible": report.status == "feasible",
+                    "feasible_count": feasible,
+                    "best_option_ids": best_plan.selected_option_ids
+                    if best_plan
+                    else (),
+                    "best_exact_score": best_report.exact_score
+                    if best_report
+                    else None,
+                    "elapsed_s": perf_counter() - started,
+                }
+            )
+
     for choice in islice(product(*groups), max_evaluations):
         plan = _make_plan(choice, scenario, digest, common["solver_name"])
         report = _evaluate(plan, scenario, digest)
         evaluated += 1
         if report.status != "feasible":
             failures.update({issue.code for issue in report.issues})
+            observe(plan, report)
             continue
         feasible += 1
         score = Fraction(report.exact_score)
@@ -171,6 +194,7 @@ def solve_exact(scenario: Scenario, *, max_evaluations: int = 10_000) -> SolverR
             ties += 1
             if plan.selected_option_ids < best_plan.selected_option_ids:
                 best_plan, best_report = plan, report
+        observe(plan, report)
     complete = evaluated == total
     status = ("optimal" if best_plan else "infeasible") if complete else "limit_reached"
     issues = (

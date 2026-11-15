@@ -167,9 +167,21 @@ The user explicitly authorized merging `codex/quantum-hybrid` into current `taha
 
 At the user's explicit request, tahakrcc (`28f8380`) was fast-forwarded directly onto `main` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
 
+### H8 delivery (user, 2026-11-14)
+
+Start from current main `cb17bdd` on `codex/h8-solver-arena`. Push only this new branch; do not merge into or push to main/tahakrcc. Skeleton `8bfd5be`, frozen tests `4071a81`. H8 records actual classical/QAOA computation history for progress-normalized replay; it is not a live hardware race. The two-qubit benchmark preserves the exact H7 input snapshot across platforms. Show H7 hardware only as archived evidence with its original budget and cost. No new provider submission is part of H8. See `docs/solver-arena.md`.
+
+### H9 delivery (user, 2026-11-15)
+
+H9 proceeds from completed H8 `74bcfba` on `codex/h9-shared-antenna`; push only the new branch for the user's manual merge. Current main `cb17bdd` is already an ancestor. Campaign skeleton `071e1fa`, frozen tests `945a718`; optional physical-layout skeleton `84dac54`, frozen tests `a366a5c` and user-approved reader-only correction `d66685f`. Preserve the user's local H6 notebook changes. The user authorized one free-credit hardware trial capped at 1 Spark; no paid credits or automatic retries. H9 uses actual archived R2/Sun evidence with explicit synthetic mission/calendar preferences, and distinguishes scheduling feasibility from landing/energy certification. See `docs/shared-antenna-campaign.md`.
 ### Space weather main push exception (user, 2026-11-15)
 
 At the user's explicit request, `feature/space-weather-noaa` (NOAA SWPC solar activity; frozen tests `be593c9`, see docs/space-weather.md) was fast-forwarded directly onto `main` and `temel` from `cb17bdd` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+
+### H10/H11 delivery (user, 2026-11-15)
+
+Start from H9 `fb59791` on `codex/h10-h11-scaling-relays`. Complete H10 then H11, run intermediate and combined tests, and push only this new branch for the user to merge. Never merge into or push main/tahakrcc. Ask before any real quantum credit expenditure, including free credits. H10 records exact/MILP benchmarks, not a quantum speedup; H11 supports k=1/2 relay selection on explicitly approximate, sampled CR3BP/terrain geometry. Preserve the local H6 notebook edit. Test baselines and two narrowly approved test corrections are documented in docs/problem-scaling.md and docs/relay-orbit-selection.md.
 
 ### R10 delivery (user, 2026-11-15)
 
@@ -195,3 +207,7 @@ R12's last item (visual event panel) was built from `main` `90d6561` on `feature
 
 R13 (additional quantum application benchmarks) starts from `main` `456f4ef` on `feature/r13-quantum-application-benchmarks`. Pre-registration/skeleton `0bcb830`, frozen tests `351c1e1`; see `docs/quantum-applications.md`. All five applications (communication slots, science activities, relay selection, R8 rover routes, R6 robust plans) are NO-GO on held-out instances, so `solve_application` keeps the HiGHS MILP and runs QAOA only for a held-out GO. At the user's explicit request the branch was merged into `main` and pushed, overriding the PR/approval rule for this one merge only. Do not present the raw-feasibility gain of noiseless QAOA as an end-to-end contribution, and do not tune on held-out cases after the fact.
 
+
+### H11 and current main integration (user, 2026-11-15)
+
+The user explicitly authorized integrating the latest main with the completed H10/H11 branch and publishing the combined version to main after resolving conflicts and passing checks. This one-time authorization supersedes the earlier H10/H11 manual-merge boundary. Preserve both teams' features and the unrelated local H6 notebook edit. No new quantum submission or credit spending is authorized by this integration.

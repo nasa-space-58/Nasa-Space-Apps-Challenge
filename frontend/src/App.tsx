@@ -12,6 +12,9 @@ import MissionStage from "./components/MissionStage";
 import Comparison from "./components/Comparison";
 import WindowSearch from "./components/WindowSearch";
 import DateScrubber from "./components/DateScrubber";
+import SolverArena from "./components/SolverArena";
+import SharedAntenna from "./components/SharedAntenna";
+import ResearchLab from "./components/ResearchLab";
 import ExportPanel from "./components/ExportPanel";
 import ScenarioTransfer from "./components/ScenarioTransfer";
 import Classroom from "./components/Classroom";
@@ -48,6 +51,10 @@ const routes: Record<View, string> = {
 };
 /** Former standalone pages are mission-control panel tabs; their hashes still open them. */
 const MODULE_HASHES: Record<string, string> = {
+  "#/solver-arena": "arena",
+  "#/shared-antenna": "shared-antenna",
+  "#/scaling": "scaling",
+  "#/relays": "relays",
   "#/time-search": "window-search",
   "#/recommendations": "recommendations",
   "#/descent": "descent",
@@ -846,6 +853,10 @@ export default function App() {
     </section>
   );
   const stageModules = [
+    { id: "scaling", label: t("research.scaling"), content: <ResearchLab kind="scaling" active={view === "mission" && panel === "scaling" && pageVisible} /> },
+    { id: "relays", label: t("research.relays"), content: <ResearchLab kind="relays" active={view === "mission" && panel === "relays" && pageVisible} /> },
+    { id: "shared-antenna", label: t("sharedAntenna.tab"), content: <SharedAntenna active={view === "mission" && panel === "shared-antenna" && pageVisible} /> },
+    { id: "arena", label: t("arena.tab"), content: <SolverArena active={view === "mission" && panel === "arena" && pageVisible} /> },
     { id: "results", label: t("app.modules.results"), content: resultsModule },
     ...(comparisonBase
       ? [{ id: "comparison", label: t("app.modules.compare"), content: comparisonBase ? (

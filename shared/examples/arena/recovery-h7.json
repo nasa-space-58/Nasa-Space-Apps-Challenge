@@ -1,0 +1,231 @@
+{
+  "schema_version": 1,
+  "scenario_id": "h6-campaign",
+  "revision": 0,
+  "description": "Synthetic two-mission campaign",
+  "seed": 17,
+  "window": {
+    "start_utc": "2030-01-01T00:00:00Z",
+    "end_utc": "2030-01-01T00:02:00Z"
+  },
+  "selection_rule": "exactly_one_per_mission",
+  "missions": [
+    {
+      "mission_id": "follow",
+      "vehicle_id": "rover",
+      "deadline_utc": "2030-01-01T00:02:00Z",
+      "source_ids": [
+        "h6-demo"
+      ]
+    },
+    {
+      "mission_id": "landing",
+      "vehicle_id": "demo-lander",
+      "deadline_utc": "2030-01-01T00:02:00Z",
+      "source_ids": [
+        "h6-demo"
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "option_id": "follow-early",
+      "mission_id": "follow",
+      "site": {
+        "site_id": "follow-early",
+        "latitude_deg": -86.0,
+        "longitude_deg_east": 3.0,
+        "reference_frame": "MOON_ME"
+      },
+      "window": {
+        "start_utc": "2030-01-01T00:00:33Z",
+        "end_utc": "2030-01-01T00:00:34Z"
+      },
+      "demands": [
+        {
+          "resource_id": "antenna",
+          "amount": 1.0,
+          "unit": "channel",
+          "window": {
+            "start_utc": "2030-01-01T00:00:33Z",
+            "end_utc": "2030-01-01T00:00:34Z"
+          }
+        }
+      ],
+      "metrics": {
+        "utility": 40.0,
+        "recovery_propellant_kg": 0.0
+      },
+      "source_ids": [
+        "h6-demo"
+      ]
+    },
+    {
+      "option_id": "follow-late",
+      "mission_id": "follow",
+      "site": {
+        "site_id": "follow-late",
+        "latitude_deg": -86.0,
+        "longitude_deg_east": 3.0,
+        "reference_frame": "MOON_ME"
+      },
+      "window": {
+        "start_utc": "2030-01-01T00:00:40Z",
+        "end_utc": "2030-01-01T00:00:41Z"
+      },
+      "demands": [
+        {
+          "resource_id": "antenna",
+          "amount": 1.0,
+          "unit": "channel",
+          "window": {
+            "start_utc": "2030-01-01T00:00:40Z",
+            "end_utc": "2030-01-01T00:00:41Z"
+          }
+        }
+      ],
+      "metrics": {
+        "utility": 10.0,
+        "recovery_propellant_kg": 0.0
+      },
+      "source_ids": [
+        "h6-demo"
+      ]
+    },
+    {
+      "option_id": "land-backup",
+      "mission_id": "landing",
+      "site": {
+        "site_id": "land-backup",
+        "latitude_deg": -86.0,
+        "longitude_deg_east": 1.0,
+        "reference_frame": "MOON_ME"
+      },
+      "window": {
+        "start_utc": "2030-01-01T00:00:29.999945Z",
+        "end_utc": "2030-01-01T00:00:31.999945Z"
+      },
+      "demands": [
+        {
+          "resource_id": "antenna",
+          "amount": 1.0,
+          "unit": "channel",
+          "window": {
+            "start_utc": "2030-01-01T00:00:29.999945Z",
+            "end_utc": "2030-01-01T00:00:31.999945Z"
+          }
+        }
+      ],
+      "metrics": {
+        "utility": 10.0,
+        "recovery_propellant_kg": 14.883838625545309
+      },
+      "source_ids": [
+        "h6-2f66df6f719a9f365e23b761",
+        "h6-demo"
+      ]
+    },
+    {
+      "option_id": "land-remote",
+      "mission_id": "landing",
+      "site": {
+        "site_id": "land-remote",
+        "latitude_deg": -86.0,
+        "longitude_deg_east": 2.0,
+        "reference_frame": "MOON_ME"
+      },
+      "window": {
+        "start_utc": "2030-01-01T00:00:34.999980Z",
+        "end_utc": "2030-01-01T00:00:36.999980Z"
+      },
+      "demands": [
+        {
+          "resource_id": "antenna",
+          "amount": 1.0,
+          "unit": "channel",
+          "window": {
+            "start_utc": "2030-01-01T00:00:34.999980Z",
+            "end_utc": "2030-01-01T00:00:36.999980Z"
+          }
+        }
+      ],
+      "metrics": {
+        "utility": 100.0,
+        "recovery_propellant_kg": 17.736404276589383
+      },
+      "source_ids": [
+        "h6-2f66df6f719a9f365e23b761",
+        "h6-demo"
+      ]
+    }
+  ],
+  "resources": [
+    {
+      "resource_id": "antenna",
+      "mode": "concurrent",
+      "unit": "channel",
+      "capacity": 1.0,
+      "availability": [
+        {
+          "start_utc": "2030-01-01T00:00:00Z",
+          "end_utc": "2030-01-01T00:02:00Z"
+        }
+      ],
+      "source_ids": [
+        "h6-demo"
+      ]
+    }
+  ],
+  "objectives": [
+    {
+      "metric": "recovery_propellant_kg",
+      "unit": "kg",
+      "direction": "minimize",
+      "weight": 1.0,
+      "scale": 1000.0
+    },
+    {
+      "metric": "utility",
+      "unit": "score",
+      "direction": "maximize",
+      "weight": 1.0,
+      "scale": 1.0
+    }
+  ],
+  "incompatibilities": [
+    {
+      "constraint_id": "h6-dependency-ee2fed15b1c41607e31c5a3ba30cbb87be11a9e4eca626cf1f2b2ec2f329250e",
+      "kind": "at_most_one",
+      "option_ids": [
+        "follow-early",
+        "land-remote"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "source_id": "h6-2f66df6f719a9f365e23b761",
+      "kind": "derived",
+      "description": "H5 planar screening and explicit target/site bindings; no coordinate conversion.",
+      "locator": null,
+      "version": "h6-recovery-v1",
+      "sha256": "2f66df6f719a9f365e23b76192501db661cd6cd9995f6a81539a3641a3b7ce12",
+      "analysis_id": null,
+      "parent_source_ids": [
+        "h6-demo"
+      ]
+    },
+    {
+      "source_id": "h6-demo",
+      "kind": "synthetic",
+      "description": "Synthetic demonstration sites and service slots; no planar-to-MOON_ME conversion.",
+      "locator": null,
+      "version": null,
+      "sha256": null,
+      "analysis_id": null,
+      "parent_source_ids": []
+    }
+  ],
+  "states": [],
+  "events": []
+}

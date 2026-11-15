@@ -1,0 +1,13 @@
+.research-lab { max-width: 1200px; margin: auto; }
+.research-charts { display: grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap: 1rem; margin: 1.5rem 0; }
+.research-charts figure { margin: 0; padding: 1rem; border: 1px solid #334155; background: #0b1626; border-radius: 1rem; }
+.research-charts figcaption { color: #e2e8f0; font-weight: 700; }
+.research-charts svg { width: 100%; max-height: 320px; overflow: visible; }
+.research-charts p, .research-legend { font-size: .8rem; line-height: 1.5; }
+.research-legend { padding-left: 1rem; }
+.research-note { padding: 1rem; border-left: 3px solid #fcd34d; background: #1c2030; line-height: 1.7; }
+.research-validation { padding: 1rem; border: 1px solid #334155; border-radius: .75rem; margin: 1rem 0; }
+.research-lab pre, .research-lab code { overflow: auto; white-space: pre-wrap; overflow-wrap: anywhere; }
+.research-lab details { margin: 1rem 0; }
+.research-lab table { width: 100%; text-align: left; border-collapse: collapse; }
+.research-lab th, .research-lab td { padding: .65rem; border-bottom: 1px solid #334155; }
