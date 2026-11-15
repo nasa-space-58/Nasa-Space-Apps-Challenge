@@ -1,3 +1,4 @@
+import UnifiedMissionWorkspace from "./components/UnifiedMissionWorkspace";
 import {
   Component,
   lazy,
@@ -5,9 +6,11 @@ import {
   useEffect,
   useRef,
   useState,
+  useMemo,
   type ReactNode,
 } from "react";
 import HorizonPlot from "./components/HorizonPlot";
+import type { MissionCandidate } from "./missionCandidates";
 import MissionStage, { type StageModule } from "./components/MissionStage";
 import Comparison from "./components/Comparison";
 import WindowSearch from "./components/WindowSearch";
@@ -181,6 +184,9 @@ function Timeline({
   );
 }
 export default function App() {
+  const [siteCandidates, setSiteCandidates] = useState<MissionCandidate[]>([]);
+  const [descentCandidates, setDescentCandidates] = useState<MissionCandidate[]>([]);
+  const missionCandidates = useMemo(() => [...siteCandidates, ...descentCandidates], [siteCandidates, descentCandidates]);
   const { t, locale } = useTranslate();
   const h = (seconds: number | undefined) => hours(t, seconds);
   const utc = (value: string) => utcLabel(value, locale);
@@ -872,7 +878,7 @@ export default function App() {
       id: "recommendations",
       group: "compare",
       label: t("app.modules.recommend"),
-      content: <Recommendations sites={sites} />,
+      content: <Recommendations sites={sites} onCandidates={setSiteCandidates} />,
     },
     {
       id: "window-search",
@@ -903,19 +909,19 @@ export default function App() {
           },
         ]
       : []),
-    { id: "descent", group: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} /> },
+    { id: "descent", group: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} onCandidates={setDescentCandidates} /> },
     {
       id: "classroom",
       group: "learn",
       label: t("app.modules.classroom"),
       content: <Classroom onOpen={openSearchResult} />,
     },
-    { id: "campaign", group: "advanced", label: t("app.modules.campaign"), content: <MissionPlanner /> },
-    { id: "recovery", group: "advanced", label: t("app.modules.recovery"), content: <SelfHealing /> },
+    { id: "campaign", group: "advanced", label: t("app.modules.campaign"), content: <UnifiedMissionWorkspace view="plan"><MissionPlanner /></UnifiedMissionWorkspace> },
+    { id: "recovery", group: "advanced", label: t("app.modules.recovery"), content: <UnifiedMissionWorkspace view="recovery"><SelfHealing /></UnifiedMissionWorkspace> },
     { id: "scaling", group: "advanced", label: t("research.scaling"), content: <ResearchLab kind="scaling" active={view === "mission" && panel === "scaling" && pageVisible} /> },
     { id: "relays", group: "advanced", label: t("research.relays"), content: <ResearchLab kind="relays" active={view === "mission" && panel === "relays" && pageVisible} /> },
     { id: "shared-antenna", group: "advanced", label: t("sharedAntenna.tab"), content: <SharedAntenna active={view === "mission" && panel === "shared-antenna" && pageVisible} /> },
-    { id: "arena", group: "advanced", label: t("arena.tab"), content: <SolverArena active={view === "mission" && panel === "arena" && pageVisible} /> },
+    { id: "arena", group: "advanced", label: t("arena.tab"), content: <UnifiedMissionWorkspace view="comparison"><SolverArena active={view === "mission" && panel === "arena" && pageVisible} /></UnifiedMissionWorkspace> },
   ];
 
   return (
@@ -1184,6 +1190,7 @@ export default function App() {
         hidden={view !== "mission"}
       >
         <MissionStage
+          candidates={missionCandidates}
           lat={Number(lat)}
           lon={Number(lon)}
           sites={sites}

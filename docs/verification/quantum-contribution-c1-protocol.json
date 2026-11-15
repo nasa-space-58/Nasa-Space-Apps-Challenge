@@ -1,0 +1,104 @@
+{
+  "version": "contribution-c1",
+  "instance_seeds": {
+    "dev": [
+      701,
+      702
+    ],
+    "held_out": [
+      711,
+      712,
+      713,
+      714
+    ],
+    "scaling": [
+      721,
+      722
+    ]
+  },
+  "solver_seeds": [
+    17,
+    23,
+    42
+  ],
+  "methods": [
+    "milp",
+    "multistart",
+    "annealing",
+    "random",
+    "qaoa",
+    "warm_qaoa",
+    "conflict_qaoa"
+  ],
+  "applications": [
+    "comm_slots",
+    "science_activities",
+    "robust_plans"
+  ],
+  "budget": {
+    "validator_calls": 64,
+    "energy_evaluations": 2048,
+    "wall_s": 3.0,
+    "max_qubits": 12,
+    "depth": 1,
+    "tuning_evaluations": 24,
+    "shots": 256
+  },
+  "family_sizes": {
+    "dev": {
+      "comm_slots": {
+        "missions": 2,
+        "requests_per_mission": 1,
+        "stations": 2,
+        "slots": 4
+      },
+      "science_activities": {
+        "activities": 3,
+        "slots": 5,
+        "precedence_pairs": 1
+      },
+      "robust_plans": {
+        "runs": 24
+      }
+    },
+    "held_out": {
+      "comm_slots": {
+        "missions": 3,
+        "requests_per_mission": 1,
+        "stations": 2,
+        "slots": 5
+      },
+      "science_activities": {
+        "activities": 4,
+        "slots": 6,
+        "precedence_pairs": 1
+      },
+      "robust_plans": {
+        "runs": 24
+      }
+    },
+    "scaling": {
+      "comm_slots": {
+        "missions": 8,
+        "requests_per_mission": 3,
+        "stations": 3,
+        "slots": 12
+      },
+      "science_activities": {
+        "activities": 8,
+        "slots": 12,
+        "precedence_pairs": 2
+      },
+      "robust_plans": {
+        "runs": 24
+      }
+    }
+  },
+  "criteria": {
+    "max_mean_check_ratio": 0.8,
+    "max_mean_runtime_ratio": 1.0,
+    "require_all_paired_quality": true
+  },
+  "physics_oracle": "precomputed_R6_records_not_online_flight_simulation",
+  "hardware_jobs": 0
+}

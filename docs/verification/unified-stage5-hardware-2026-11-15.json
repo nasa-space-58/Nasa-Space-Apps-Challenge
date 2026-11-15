@@ -1,0 +1,21 @@
+{
+  "job_id": "dd340d59-3d25-43e0-8268-df5607b84e3a",
+  "status": "Queued",
+  "backend_code": "rigetti:cepheus-1-108q",
+  "problem_fingerprint": "9ea6a5890b3050cbffff358cdd080fb06f3132a6cd0a0a5c4bd64471d696f77d",
+  "circuit_sha256": "e65e8e13dbc4c2ea3d90e4cf90ebac48ec4b6f282606b463a39c805a2fd8e7e0",
+  "shots": 256,
+  "quoted_credits": 1.0,
+  "submitted_utc": "2026-11-15T01:33:44.079602+00:00",
+  "observed_utc": "2026-11-15T01:47:09.562408+00:00",
+  "schema_version": 1,
+  "result_available": false,
+  "spark_before": 22,
+  "spark_after_submission": 21,
+  "full_before_and_after": 0,
+  "logical_qubits": 1,
+  "auto_refill_verified_off": true,
+  "observed_wait_s": 805.482806,
+  "auto_applied_to_session": false,
+  "note": "One authorized job only. No resubmission. Queue time is not device execution time. Pending work is not a successful optimization measurement."
+}

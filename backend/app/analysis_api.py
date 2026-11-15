@@ -408,18 +408,33 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
             else:
                 await asyncio.sleep(0.5)
 
+    from app.unified_coordinator import UnifiedCoordinator, register_unified_routes
+
+    unified = UnifiedCoordinator(state_dir / "unified.sqlite")
+
+    async def unified_worker():
+        while True:
+            await asyncio.to_thread(unified.tick)
+            await asyncio.sleep(0.5)
+
     @asynccontextmanager
     async def lifespan(app):
+        unified.recover_interrupted()
         store.recover()
         communications.recover()
         space_weather.recover()
         flights.recover()
         tasks = (
-            [asyncio.create_task(worker()), asyncio.create_task(flight_worker())]
+            [
+                asyncio.create_task(worker()),
+                asyncio.create_task(flight_worker()),
+                asyncio.create_task(unified_worker()),
+            ]
             if start_worker
             else []
         )
         yield
+        unified.recover_interrupted()
         for task in tasks:
             task.cancel()
             try:
@@ -428,6 +443,8 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
                 pass
 
     app = FastAPI(title="Lunar Landing Navigator", lifespan=lifespan)
+    app.state.unified = unified
+    register_unified_routes(app, unified)
     app.state.store = store
     app.state.searches = searches
     app.state.communications = communications

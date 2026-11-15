@@ -15,9 +15,10 @@ import {
 import * as THREE from "three";
 import { Dust, Model, Terrain, smooth } from "./LunarSurface";
 import LaunchSite from "./LaunchSite";
-import Rover, { preloadRoverModel, type RoutePoint } from "./Rover";
+import Rover, { preloadRoverModel, type RoutePoint, type RoverState } from "./Rover";
 import { DemTerrain, ScanOverlay } from "./RoverScan";
 import { SEARCH_END, sceneMapping, type SurfaceScene } from "./surfaceScene";
+import { candidateColor, type MissionCandidate } from "../missionCandidates";
 import type { Preset } from "../types";
 import { useTranslate } from "../i18n";
 import {
@@ -765,6 +766,29 @@ function ProgressEaser({
   return null;
 }
 
+function CandidateCorridor({ candidate, selected, onSelect }: { candidate: MissionCandidate; selected: boolean; onSelect: () => void }) {
+  const points = useMemo(() => {
+    const end = onSurface(candidate.lat, candidate.lon, 1.006);
+    const normal = end.clone().normalize();
+    const tangent = new THREE.Vector3(0, 1, 0).cross(normal).normalize();
+    // Fan illustrative corridors sharing the same landing point.
+    const hash = [...candidate.id].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 0);
+    const spread = Math.sin(hash * 12.9898) * 43758.5453;
+    tangent.applyAxisAngle(normal, (spread - Math.floor(spread) - 0.5) * 2.6);
+    const height = Math.max(0.07, Math.min(0.35, (candidate.altitudeKm ?? 150) / 1737.4));
+    const start = end.clone().addScaledVector(normal, height).addScaledVector(tangent, 0.3);
+    return new THREE.QuadraticBezierCurve3(start, end.clone().addScaledVector(normal, height * 0.6), end).getPoints(48);
+  }, [candidate]);
+  const color = candidateColor(candidate);
+  return <group>
+    <Line points={points} color={color} opacity={selected ? 1 : 0.4} dashed={candidate.status !== "accepted"} dashSize={0.008} />
+    <mesh position={points[points.length - 1]} onClick={e => { e.stopPropagation(); onSelect(); }}>
+      <sphereGeometry args={[selected ? 0.013 : 0.007, 16, 12]} /><meshBasicMaterial color={color} />
+    </mesh>
+    {selected && <mesh position={points[0]}><sphereGeometry args={[0.008, 12, 8]} /><meshBasicMaterial color={color} /></mesh>}
+  </group>;
+}
+
 function System({
   lat,
   lon,
@@ -777,6 +801,7 @@ function System({
   onPick,
   onPreset,
   view,
+  candidates = [], selectedCandidate, onCandidate,
 }: SceneProps & {
   view: FlightView | null;
   progress: MutableRefObject<number>;
@@ -975,6 +1000,7 @@ function System({
       {Number.isFinite(lat) && Number.isFinite(lon) && (
         <SiteMarker lat={lat} lon={lon} condition={condition} reduced={reduced} />
       )}
+      {candidates.map(c => <CandidateCorridor key={c.id} candidate={c} selected={selectedCandidate === c.id} onSelect={() => onCandidate?.(c.id)} />)}
       <ScienceOrbiter reduced={reduced} />
       </group>
       {view && (
@@ -997,8 +1023,8 @@ function System({
               ? "spacecraft"
               : cameraMode
         }
-        lat={lat}
-        lon={lon}
+        lat={candidates.find(c => c.id === selectedCandidate)?.lat ?? lat}
+        lon={candidates.find(c => c.id === selectedCandidate)?.lon ?? lon}
         spacecraft={spacecraft}
         progress={progress}
         reduced={reduced}
@@ -1023,6 +1049,8 @@ function LandingSite({
   roverScan,
   roverScene,
   roverTarget,
+  roverAlternatives,
+  showHazards, showSearch, showRoutes,
 }: {
   progress: MutableRefObject<number>;
   reduced: boolean;
@@ -1032,6 +1060,10 @@ function LandingSite({
   roverScan: MutableRefObject<number>;
   roverScene: SurfaceScene | null;
   roverTarget: string;
+  roverAlternatives?: RoverState["alternatives"];
+  showHazards?: boolean;
+  showSearch?: boolean;
+  showRoutes?: boolean;
 }) {
   const lander = useRef<THREE.Group>(null!);
   // Fetch the rover model during the descent so it is ready at touchdown.
@@ -1172,6 +1204,8 @@ function LandingSite({
           <ScanOverlay
             scene={roverScene}
             mapping={mapping}
+            showHazards={showHazards}
+            showSearch={showSearch}
             target={roverTarget}
             scan={roverScan}
           />
@@ -1184,7 +1218,9 @@ function LandingSite({
       </group>
       {roverPath && (
         <Rover
+          showRoutes={showRoutes}
           path={roverPath}
+          alternatives={roverAlternatives}
           drive={roverDrive}
           focus={roverFocus}
           scan={roverScan}
@@ -1239,6 +1275,9 @@ function LaunchCloseup({
 }
 
 type SceneProps = {
+  candidates?: MissionCandidate[];
+  selectedCandidate?: string | null;
+  onCandidate?: (id: string) => void;
   lat: number;
   lon: number;
   sites: Preset[];
@@ -1292,6 +1331,10 @@ export default function MissionScene(
     /** Backend DEM window and A* order for the route, if loaded. */
     roverScene?: SurfaceScene | null;
     roverTarget?: string;
+    roverAlternatives?: RoverState["alternatives"];
+    showHazards?: boolean;
+    showSearch?: boolean;
+    showRoutes?: boolean;
   },
 ) {
   const {
@@ -1305,6 +1348,8 @@ export default function MissionScene(
     roverScan = 1,
     roverScene = null,
     roverTarget = "",
+    roverAlternatives,
+    showHazards = true, showSearch = true, showRoutes = true,
     flight = null,
     path,
     ...scene
@@ -1343,6 +1388,8 @@ export default function MissionScene(
           scene.lon,
           scene.cameraMode,
           scene.condition,
+          scene.candidates,
+          scene.selectedCandidate,
           visible,
           roverPath,
           roverDrive,
@@ -1372,6 +1419,8 @@ export default function MissionScene(
             roverScan={scan}
             roverScene={roverScene}
             roverTarget={roverTarget}
+            roverAlternatives={roverAlternatives}
+            showHazards={showHazards} showSearch={showSearch} showRoutes={showRoutes}
           />
         ) : (
           <System {...scene} view={view} progress={progress} />

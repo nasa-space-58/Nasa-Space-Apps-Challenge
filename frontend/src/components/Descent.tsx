@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import type { MissionCandidate } from "../missionCandidates";
 import type { Preset } from "../types";
 import RouteOptimizer, { type RouteResult } from "./RouteOptimizer";
 import RiskPanel from "./RiskPanel";
@@ -238,7 +239,7 @@ function ProfileChart({ samples, zoom }: { samples: Sample[]; zoom: boolean }) {
   );
 }
 
-export default function Descent({ sites }: { sites: Preset[] }) {
+export default function Descent({ sites, onCandidates }: { sites: Preset[]; onCandidates?: (items: MissionCandidate[]) => void }) {
   const { t, tText } = useTranslate();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [siteId, setSiteId] = useState("malapert-massif-r23");
@@ -284,8 +285,8 @@ export default function Descent({ sites }: { sites: Preset[] }) {
     setOptimizing(true);
     setError("");
     try {
-      setRoutes(
-        await call("/descents/optimize", {
+      const coordinates = { lat: Number(lat), lon: Number(lon) };
+      const result: RouteResult = await call("/descents/optimize", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -297,8 +298,22 @@ export default function Descent({ sites }: { sites: Preset[] }) {
             reserve_delta_v_mps: Number(reserveFps) * 0.3048,
             ...vehicle(),
           }),
-        }),
-      );
+        });
+      setRoutes(result);
+      onCandidates?.(result.routes.map((r) => ({
+        id: `descent:${r.id}`, label: r.id, ...coordinates,
+        status: r.feasible ? "accepted" : "rejected", score: null,
+        source: "Classical descent grid / API", altitudeKm: r.orbit_altitude_km,
+        explanation: r.rejection_reasons.map((v) => `${v.reason}: ${v.detail}`).join("; ") || (result.pareto_ids.includes(r.id) ? "Pareto frontier" : "Feasible alternative"),
+        metrics: [
+          { label: "Orbit", value: `${r.orbit_altitude_km} km` },
+          { label: "Propellant", value: `${r.propellant_used_kg?.toFixed(1) ?? "—"} kg` },
+          { label: "Reserve margin", value: `${r.reserve_margin_kg?.toFixed(1) ?? "—"} kg` },
+          { label: "Assessment", value: `${r.assessment_time_s} s` },
+          { label: "Δv", value: `${r.delta_v_mps?.toFixed(1) ?? "—"} m/s` },
+        ],
+      })));
+
     } catch (e) {
       setError(errorText(e, t, "communication.requestFailed"));
     } finally {

@@ -1,0 +1,799 @@
+{
+  "schema_version": 1,
+  "context": {
+    "integration_id": "unified-stage3-pilot",
+    "revision": 0,
+    "created_utc": "2030-01-01T00:00:00Z",
+    "decision_deadline_utc": "2030-01-01T00:00:10Z",
+    "state_kind": "estimate",
+    "correspondence": "declared_synthetic",
+    "sources": [
+      {
+        "source_id": "synthetic-registration",
+        "kind": "synthetic",
+        "description": "Declared association of illustrative H6 targets to MOON_ME site labels, not a physical coordinate transformation. R11 descent evidence is independent of H6 screening."
+      }
+    ]
+  },
+  "campaign": {
+    "schema_version": 1,
+    "revision": 0,
+    "window": {
+      "start_utc": "2030-01-01T00:00:00Z",
+      "end_utc": "2030-01-01T00:10:00Z"
+    },
+    "slot_s": 60,
+    "landing_step_s": 60,
+    "preferences": {
+      "priority_weights": [
+        5,
+        3,
+        2,
+        1.5,
+        1
+      ],
+      "science_weight": 1,
+      "science_scale_score": 1,
+      "fuel_weight": 0.5,
+      "fuel_scale_kg": 1000,
+      "wait_weight": 1.0,
+      "wait_scale_s": 60.0,
+      "reserve_weight": 0.1,
+      "reserve_scale_kg": 1000
+    },
+    "sources": [
+      {
+        "source_id": "synthetic-evidence",
+        "kind": "synthetic",
+        "description": "Synthetic R2/Task 3/R3/R4-shaped evidence for a teaching example; not computed from LOLA or Horizons."
+      },
+      {
+        "source_id": "planning-assumptions",
+        "kind": "assumption",
+        "description": "Assumed vehicle, data-rate, station-calendar and policy values; not NASA or DSN figures."
+      }
+    ],
+    "campaign_id": "unified-stage3-campaign",
+    "description": "Synthetic stage 2 identity adapter fixture; no coordinate conversion or unified flight.",
+    "missions": [
+      {
+        "mission_id": "landing",
+        "vehicle_id": "demo-lander",
+        "mission_type": "crewed_lander",
+        "priority": 1,
+        "landing_window": {
+          "start_utc": "2030-01-01T00:00:20Z",
+          "end_utc": "2030-01-01T00:00:40Z"
+        },
+        "deadline_utc": "2030-01-01T00:10:00Z",
+        "site_ids": [
+          "land-primary",
+          "land-backup",
+          "land-remote"
+        ],
+        "science_score_by_site": {
+          "land-primary": 200.0,
+          "land-backup": 10.0,
+          "land-remote": 100.0
+        },
+        "requirements": {
+          "surface_duration_s": 240.0,
+          "energy_j": 0.0,
+          "downlink_bits": 60.0
+        },
+        "policy": {
+          "cancel_allowed": false,
+          "cancel_penalty_score": 0,
+          "defer_allowed": false,
+          "max_defer_s": 0,
+          "defer_penalty_score": 0,
+          "defer_penalty_score_per_h": 0
+        },
+        "dependencies": [],
+        "requires_exclusive_link": true,
+        "relay_terminal": false,
+        "relay_service": null,
+        "source_ids": [
+          "planning-assumptions"
+        ]
+      },
+      {
+        "mission_id": "rover",
+        "vehicle_id": "rover-vehicle",
+        "mission_type": "rover",
+        "priority": 3,
+        "landing_window": {
+          "start_utc": "2030-01-01T00:00:45Z",
+          "end_utc": "2030-01-01T00:03:46Z"
+        },
+        "deadline_utc": "2030-01-01T00:10:00Z",
+        "site_ids": [
+          "land-primary"
+        ],
+        "science_score_by_site": {
+          "land-primary": 1.0
+        },
+        "requirements": {
+          "surface_duration_s": 180.0,
+          "energy_j": 0.0,
+          "downlink_bits": 60.0
+        },
+        "policy": {
+          "cancel_allowed": false,
+          "cancel_penalty_score": 0,
+          "defer_allowed": false,
+          "max_defer_s": 0,
+          "defer_penalty_score": 0,
+          "defer_penalty_score_per_h": 0
+        },
+        "dependencies": [
+          {
+            "predecessor_mission_id": "landing",
+            "min_lag_s": 15.0
+          }
+        ],
+        "requires_exclusive_link": true,
+        "relay_terminal": false,
+        "relay_service": null,
+        "source_ids": [
+          "planning-assumptions"
+        ]
+      },
+      {
+        "mission_id": "other",
+        "vehicle_id": "other-vehicle",
+        "mission_type": "robotic_lander",
+        "priority": 3,
+        "landing_window": {
+          "start_utc": "2030-01-01T00:01:00Z",
+          "end_utc": "2030-01-01T00:03:01Z"
+        },
+        "deadline_utc": "2030-01-01T00:10:00Z",
+        "site_ids": [
+          "land-primary"
+        ],
+        "science_score_by_site": {
+          "land-primary": 1.0
+        },
+        "requirements": {
+          "surface_duration_s": 180.0,
+          "energy_j": 0.0,
+          "downlink_bits": 60.0
+        },
+        "policy": {
+          "cancel_allowed": false,
+          "cancel_penalty_score": 0,
+          "defer_allowed": false,
+          "max_defer_s": 0,
+          "defer_penalty_score": 0,
+          "defer_penalty_score_per_h": 0
+        },
+        "dependencies": [],
+        "requires_exclusive_link": true,
+        "relay_terminal": false,
+        "relay_service": null,
+        "source_ids": [
+          "planning-assumptions"
+        ]
+      }
+    ],
+    "vehicles": [
+      {
+        "vehicle_id": "demo-lander",
+        "usable_propellant_kg": 100.0,
+        "propellant_reserve_kg": 5.0,
+        "max_landing_slope_deg": 8,
+        "max_unknown_landing_fraction": 0.1,
+        "solar_power_w": 5000,
+        "initial_energy_j": 100000000.0,
+        "energy_reserve_j": 20000000.0,
+        "source_ids": [
+          "planning-assumptions"
+        ]
+      },
+      {
+        "vehicle_id": "rover-vehicle",
+        "usable_propellant_kg": 100.0,
+        "propellant_reserve_kg": 5.0,
+        "max_landing_slope_deg": 8,
+        "max_unknown_landing_fraction": 0.1,
+        "solar_power_w": 5000,
+        "initial_energy_j": 100000000.0,
+        "energy_reserve_j": 20000000.0,
+        "source_ids": [
+          "planning-assumptions"
+        ]
+      },
+      {
+        "vehicle_id": "other-vehicle",
+        "usable_propellant_kg": 100.0,
+        "propellant_reserve_kg": 5.0,
+        "max_landing_slope_deg": 8,
+        "max_unknown_landing_fraction": 0.1,
+        "solar_power_w": 5000,
+        "initial_energy_j": 100000000.0,
+        "energy_reserve_j": 20000000.0,
+        "source_ids": [
+          "planning-assumptions"
+        ]
+      }
+    ],
+    "sites": [
+      {
+        "site": {
+          "site_id": "land-primary",
+          "latitude_deg": -86.0,
+          "longitude_deg_east": 0.0
+        },
+        "evidence_window": {
+          "start_utc": "2030-01-01T00:00:00Z",
+          "end_utc": "2030-01-01T00:10:00Z"
+        },
+        "terrain": {
+          "max_landing_slope_deg": 3.5,
+          "unknown_landing_fraction": 0.0,
+          "hazard_distance_m": null,
+          "source_ids": [
+            "synthetic-evidence"
+          ]
+        },
+        "sunlight": [
+          {
+            "window": {
+              "start_utc": "2030-01-01T00:00:00Z",
+              "end_utc": "2030-01-01T00:10:00Z"
+            },
+            "state": "full"
+          }
+        ],
+        "station_geometry": [
+          {
+            "station_id": "dss-alpha",
+            "intervals": [
+              {
+                "window": {
+                  "start_utc": "2030-01-01T00:00:00Z",
+                  "end_utc": "2030-01-01T00:10:00Z"
+                },
+                "state": "available"
+              }
+            ]
+          }
+        ],
+        "descents": [
+          {
+            "vehicle_id": "demo-lander",
+            "feasible": true,
+            "propellant_used_kg": 20.0,
+            "source_ids": [
+              "synthetic-evidence"
+            ]
+          },
+          {
+            "vehicle_id": "rover-vehicle",
+            "feasible": true,
+            "propellant_used_kg": 20.0,
+            "source_ids": [
+              "synthetic-evidence"
+            ]
+          },
+          {
+            "vehicle_id": "other-vehicle",
+            "feasible": true,
+            "propellant_used_kg": 20.0,
+            "source_ids": [
+              "synthetic-evidence"
+            ]
+          }
+        ],
+        "source_ids": [
+          "synthetic-evidence"
+        ]
+      },
+      {
+        "site": {
+          "site_id": "land-backup",
+          "latitude_deg": -86.0,
+          "longitude_deg_east": 1.0
+        },
+        "evidence_window": {
+          "start_utc": "2030-01-01T00:00:00Z",
+          "end_utc": "2030-01-01T00:10:00Z"
+        },
+        "terrain": {
+          "max_landing_slope_deg": 3.5,
+          "unknown_landing_fraction": 0.0,
+          "hazard_distance_m": null,
+          "source_ids": [
+            "synthetic-evidence"
+          ]
+        },
+        "sunlight": [
+          {
+            "window": {
+              "start_utc": "2030-01-01T00:00:00Z",
+              "end_utc": "2030-01-01T00:10:00Z"
+            },
+            "state": "full"
+          }
+        ],
+        "station_geometry": [
+          {
+            "station_id": "dss-alpha",
+            "intervals": [
+              {
+                "window": {
+                  "start_utc": "2030-01-01T00:00:00Z",
+                  "end_utc": "2030-01-01T00:10:00Z"
+                },
+                "state": "available"
+              }
+            ]
+          }
+        ],
+        "descents": [
+          {
+            "vehicle_id": "demo-lander",
+            "feasible": true,
+            "propellant_used_kg": 20.0,
+            "source_ids": [
+              "synthetic-evidence"
+            ]
+          },
+          {
+            "vehicle_id": "rover-vehicle",
+            "feasible": true,
+            "propellant_used_kg": 20.0,
+            "source_ids": [
+              "synthetic-evidence"
+            ]
+          },
+          {
+            "vehicle_id": "other-vehicle",
+            "feasible": true,
+            "propellant_used_kg": 20.0,
+            "source_ids": [
+              "synthetic-evidence"
+            ]
+          }
+        ],
+        "source_ids": [
+          "synthetic-evidence"
+        ]
+      },
+      {
+        "site": {
+          "site_id": "land-remote",
+          "latitude_deg": -86.0,
+          "longitude_deg_east": 2.0
+        },
+        "evidence_window": {
+          "start_utc": "2030-01-01T00:00:00Z",
+          "end_utc": "2030-01-01T00:10:00Z"
+        },
+        "terrain": {
+          "max_landing_slope_deg": 3.5,
+          "unknown_landing_fraction": 0.0,
+          "hazard_distance_m": null,
+          "source_ids": [
+            "synthetic-evidence"
+          ]
+        },
+        "sunlight": [
+          {
+            "window": {
+              "start_utc": "2030-01-01T00:00:00Z",
+              "end_utc": "2030-01-01T00:10:00Z"
+            },
+            "state": "full"
+          }
+        ],
+        "station_geometry": [
+          {
+            "station_id": "dss-alpha",
+            "intervals": [
+              {
+                "window": {
+                  "start_utc": "2030-01-01T00:00:00Z",
+                  "end_utc": "2030-01-01T00:10:00Z"
+                },
+                "state": "available"
+              }
+            ]
+          }
+        ],
+        "descents": [
+          {
+            "vehicle_id": "demo-lander",
+            "feasible": true,
+            "propellant_used_kg": 20.0,
+            "source_ids": [
+              "synthetic-evidence"
+            ]
+          },
+          {
+            "vehicle_id": "rover-vehicle",
+            "feasible": true,
+            "propellant_used_kg": 20.0,
+            "source_ids": [
+              "synthetic-evidence"
+            ]
+          },
+          {
+            "vehicle_id": "other-vehicle",
+            "feasible": true,
+            "propellant_used_kg": 20.0,
+            "source_ids": [
+              "synthetic-evidence"
+            ]
+          }
+        ],
+        "source_ids": [
+          "synthetic-evidence"
+        ]
+      }
+    ],
+    "stations": [
+      {
+        "station_id": "dss-alpha",
+        "capacity_links": 1,
+        "availability": [
+          {
+            "start_utc": "2030-01-01T00:00:00Z",
+            "end_utc": "2030-01-01T00:10:00Z"
+          }
+        ],
+        "source_ids": [
+          "planning-assumptions"
+        ]
+      }
+    ],
+    "link_rates": [
+      {
+        "mission_id": "landing",
+        "station_id": "dss-alpha",
+        "rate_bps": 1.0,
+        "source_ids": [
+          "planning-assumptions"
+        ]
+      },
+      {
+        "mission_id": "rover",
+        "station_id": "dss-alpha",
+        "rate_bps": 1.0,
+        "source_ids": [
+          "planning-assumptions"
+        ]
+      },
+      {
+        "mission_id": "other",
+        "station_id": "dss-alpha",
+        "rate_bps": 1.0,
+        "source_ids": [
+          "planning-assumptions"
+        ]
+      }
+    ],
+    "relay_geometry": []
+  },
+  "recovery": {
+    "recovery": {
+      "scenario_id": "h5-combined-recovery",
+      "seed": 17,
+      "initial_request": {
+        "initial_state": {
+          "epoch_utc": "2030-01-01T00:00:00Z",
+          "vehicle_id": "demo-lander",
+          "revision": 0,
+          "reference_frame": "PLANAR_MOON_CENTERED_NONROTATING",
+          "position_m": [
+            0.0,
+            1737500.0
+          ],
+          "velocity_mps": [
+            0.0,
+            -3.0
+          ],
+          "propellant_kg": 100.0
+        },
+        "vehicle": {
+          "vehicle_id": "demo-lander",
+          "dry_mass_kg": 900.0,
+          "propellant_capacity_kg": 100.0,
+          "max_thrust_n": 10000.0,
+          "design_thrust_n": 10000.0,
+          "min_throttle_fraction": 0.0,
+          "max_throttle_fraction": 1.0,
+          "isp_s": 300.0,
+          "source": {
+            "source_id": "h4-declared-demo",
+            "kind": "synthetic",
+            "description": "Illustrative flat corridor and 1000 kg vehicle. Not a real landing site or calibrated spacecraft."
+          }
+        },
+        "terrain": {
+          "reference_radius_m": 1737400.0,
+          "points": [
+            {
+              "downrange_m": -20000.0,
+              "height_m": 0.0
+            },
+            {
+              "downrange_m": 20000.0,
+              "height_m": 0.0
+            }
+          ],
+          "source": {
+            "source_id": "h4-declared-demo",
+            "kind": "synthetic",
+            "description": "Illustrative flat corridor and 1000 kg vehicle. Not a real landing site or calibrated spacecraft."
+          }
+        },
+        "target_downrange_m": 0.0,
+        "duration_s": 30.0,
+        "dt_s": 0.1,
+        "reserve_kg": 10.0,
+        "target_vertical_speed_mps": -0.5,
+        "position_tolerance_m": 5.0,
+        "vertical_speed_limit_mps": 2.0,
+        "horizontal_speed_limit_mps": 1.0,
+        "slope_limit_deg": 15.0
+      },
+      "nominal_target_id": "primary",
+      "targets": [
+        {
+          "target_id": "primary",
+          "downrange_m": 0.0,
+          "touchdown_deadline_utc": "2030-01-01T00:00:30Z"
+        },
+        {
+          "target_id": "backup",
+          "downrange_m": 40.0,
+          "touchdown_deadline_utc": "2030-01-01T00:00:30Z"
+        },
+        {
+          "target_id": "remote",
+          "downrange_m": 80.0,
+          "touchdown_deadline_utc": "2030-01-01T00:00:35Z"
+        }
+      ],
+      "uncertainty": {
+        "samples": 8,
+        "position_std_m": [
+          0.0,
+          0.0
+        ],
+        "velocity_std_mps": [
+          0.0,
+          0.0
+        ],
+        "thrust_loss_fraction_bound": 0.0,
+        "fuel_shortfall_bound_kg": 0.0,
+        "source": {
+          "source_id": "h5-demo-assumptions",
+          "kind": "synthetic",
+          "description": "Illustrative faults, persistent navigation bias and landing exclusion interval; no sourced flight telemetry."
+        }
+      },
+      "require_link_for_retarget": true,
+      "events": []
+    },
+    "campaign": {
+      "scenario_id": "h6-campaign",
+      "revision": 0,
+      "description": "Synthetic two-mission campaign",
+      "seed": 17,
+      "window": {
+        "start_utc": "2030-01-01T00:00:00Z",
+        "end_utc": "2030-01-01T00:02:00Z"
+      },
+      "sources": [
+        {
+          "source_id": "h6-demo",
+          "kind": "synthetic",
+          "description": "Synthetic demonstration sites and service slots; no planar-to-MOON_ME conversion."
+        }
+      ],
+      "missions": [
+        {
+          "mission_id": "landing",
+          "vehicle_id": "demo-lander",
+          "deadline_utc": "2030-01-01T00:02:00Z",
+          "source_ids": [
+            "h6-demo"
+          ]
+        }
+      ],
+      "resources": [
+        {
+          "resource_id": "antenna",
+          "mode": "concurrent",
+          "unit": "channel",
+          "capacity": 1.0,
+          "availability": [
+            {
+              "start_utc": "2030-01-01T00:00:00Z",
+              "end_utc": "2030-01-01T00:02:00Z"
+            }
+          ],
+          "source_ids": [
+            "h6-demo"
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "metric": "utility",
+          "unit": "score",
+          "direction": "maximize",
+          "weight": 1.0,
+          "scale": 1.0
+        }
+      ],
+      "candidates": [
+        {
+          "option_id": "land-primary",
+          "mission_id": "landing",
+          "site": {
+            "site_id": "land-primary",
+            "latitude_deg": -86.0,
+            "longitude_deg_east": 0.0
+          },
+          "window": {
+            "start_utc": "2030-01-01T00:00:20Z",
+            "end_utc": "2030-01-01T00:00:40Z"
+          },
+          "metrics": {
+            "utility": 200.0
+          },
+          "demands": [
+            {
+              "resource_id": "antenna",
+              "amount": 1.0,
+              "unit": "channel",
+              "window": {
+                "start_utc": "2030-01-01T00:00:20Z",
+                "end_utc": "2030-01-01T00:00:22Z"
+              }
+            }
+          ],
+          "source_ids": [
+            "h6-demo"
+          ]
+        },
+        {
+          "option_id": "land-backup",
+          "mission_id": "landing",
+          "site": {
+            "site_id": "land-backup",
+            "latitude_deg": -86.0,
+            "longitude_deg_east": 1.0
+          },
+          "window": {
+            "start_utc": "2030-01-01T00:00:20Z",
+            "end_utc": "2030-01-01T00:00:40Z"
+          },
+          "metrics": {
+            "utility": 10.0
+          },
+          "demands": [
+            {
+              "resource_id": "antenna",
+              "amount": 1.0,
+              "unit": "channel",
+              "window": {
+                "start_utc": "2030-01-01T00:00:20Z",
+                "end_utc": "2030-01-01T00:00:22Z"
+              }
+            }
+          ],
+          "source_ids": [
+            "h6-demo"
+          ]
+        },
+        {
+          "option_id": "land-remote",
+          "mission_id": "landing",
+          "site": {
+            "site_id": "land-remote",
+            "latitude_deg": -86.0,
+            "longitude_deg_east": 2.0
+          },
+          "window": {
+            "start_utc": "2030-01-01T00:00:20Z",
+            "end_utc": "2030-01-01T00:00:40Z"
+          },
+          "metrics": {
+            "utility": 100.0
+          },
+          "demands": [
+            {
+              "resource_id": "antenna",
+              "amount": 1.0,
+              "unit": "channel",
+              "window": {
+                "start_utc": "2030-01-01T00:00:20Z",
+                "end_utc": "2030-01-01T00:00:22Z"
+              }
+            }
+          ],
+          "source_ids": [
+            "h6-demo"
+          ]
+        }
+      ]
+    },
+    "landing_mission_id": "landing",
+    "bindings": [
+      {
+        "target_id": "primary",
+        "option_id": "land-primary"
+      },
+      {
+        "target_id": "backup",
+        "option_id": "land-backup"
+      },
+      {
+        "target_id": "remote",
+        "option_id": "land-remote"
+      }
+    ],
+    "dependencies": [],
+    "checkpoint": {
+      "estimated_state": {
+        "epoch_utc": "2030-01-01T00:00:00Z",
+        "vehicle_id": "demo-lander",
+        "revision": 0,
+        "reference_frame": "PLANAR_MOON_CENTERED_NONROTATING",
+        "position_m": [
+          0.0,
+          1737500.0
+        ],
+        "velocity_mps": [
+          0.0,
+          -3.0
+        ],
+        "propellant_kg": 100.0
+      },
+      "available_thrust_n": 10000.0,
+      "landing_hazards": [],
+      "outage_end_utc": "2030-01-01T00:00:00Z",
+      "uncertainty": {
+        "samples": 8,
+        "position_std_m": [
+          0.0,
+          0.0
+        ],
+        "velocity_std_mps": [
+          0.0,
+          0.0
+        ],
+        "thrust_loss_fraction_bound": 0.0,
+        "fuel_shortfall_bound_kg": 0.0,
+        "source": {
+          "source_id": "h5-demo-assumptions",
+          "kind": "synthetic",
+          "description": "Illustrative faults, persistent navigation bias and landing exclusion interval; no sourced flight telemetry."
+        }
+      },
+      "previous_target_id": "primary"
+    }
+  },
+  "option_links": [
+    {
+      "h6_option_id": "land-primary",
+      "r11_option_id": "landing.land-primary.20300101T000020Z",
+      "source_id": "synthetic-registration"
+    },
+    {
+      "h6_option_id": "land-backup",
+      "r11_option_id": "landing.land-backup.20300101T000020Z",
+      "source_id": "synthetic-registration"
+    },
+    {
+      "h6_option_id": "land-remote",
+      "r11_option_id": "landing.land-remote.20300101T000020Z",
+      "source_id": "synthetic-registration"
+    }
+  ]
+}

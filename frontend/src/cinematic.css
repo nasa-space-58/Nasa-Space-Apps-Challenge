@@ -1815,7 +1815,7 @@ body.panel-resizing canvas {
   z-index: 2;
   background: #05080b;
   pointer-events: none;
-  animation: stage-fade 0.9s ease-out forwards;
+  animation: stage-fade 1.2s cubic-bezier(.22,.61,.36,1) forwards;
 }
 @keyframes stage-fade {
   from {
@@ -1825,3 +1825,5 @@ body.panel-resizing canvas {
     opacity: 0;
   }
 }
+
+@media (prefers-reduced-motion: reduce) { .stage-fade { animation: none; opacity: 0; } }

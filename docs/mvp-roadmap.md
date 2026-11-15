@@ -425,3 +425,14 @@ Completed demonstrations are checked below; unchecked items remain planned conce
   - Hybrid decision: encode "select k relay orbits from n candidates" with coverage, gap and per-mission communication-demand constraints as a QUBO, solved by the H8 classical/QAOA pair.
   - Independent validation: check every selected set against the original coverage constraints, independent of the QUBO objective value.
   - Scope: quantum computation selects among classically computed orbits; it does not propagate trajectories. Relay link budgets, station keeping and launch constraints remain outside this concept unless separately modeled.
+
+## Unified mission planner integration
+
+This sequence builds on the merged H0–H11 and R10–R13 implementations. Existing modules are retained; completing their individual milestones does not imply a lossless common planner. See [stage 1 inventory, baseline and acceptance gates](unified-mission-planner.md).
+
+- [x] Stage 1 — Audit current contracts and connections; record fresh R11 classical and H6/R12 local-replay baselines, explicit adapter rejection and existing R13 NO-GO policy. This is an inventory/evidence delivery, not a new solver.
+- [x] Stage 2 — Versioned native R11/H6 envelope, sealed snapshots and bounded synthetic option-identity adapters; full constraints retained and proposals require classical completion/physical revalidation. All H0–H11 roles are catalogued; unsupported real frame/relay-only mappings reject explicitly. See [contracts and limits](unified-planner-contracts.md).
+- [x] Stage 3 — Full classical lander/dependent-rover/shared-resource pilot, exact arrival/fuel evidence, event replanning, independent physical/campaign admission, stale/expired rejection and no-continuation cases. Completed choices are frozen; incompatible historic allocations reject explicitly. See [pilot and limits](unified-classical-pilot.md).
+- [x] Stage 4 — Explicit local H2/H6 target proposals, frozen outside choices, full R11 completion and physical admission, matched random/greedy caps and independent score checks. Unsupported compact domains retain the classical baseline; production NO-GO gates stay unchanged. See [scope and measurements](unified-quantum-proposals.md).
+- [x] Stage 5 — Durable synthetic event coordination, revision/idempotency/deadline fences and one accepted plan across Campaign, Self-healing and Solver Arena; separate timing and fallback evidence. See [scope, API and limits](unified-event-coordination.md).
+- [ ] Stage 6 — New pre-registered dev/held-out comparisons and separately authorized hardware tests; later rover/activity and orbital-relay extensions only after their own validation.

@@ -12,6 +12,7 @@ import { useFrame, useLoader } from "@react-three/fiber";
 import * as THREE from "three";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { clone as cloneSkeleton } from "three/addons/utils/SkeletonUtils.js";
 import { terrainHeight } from "./LunarSurface";
 import {
   DEPLOY_END,
@@ -33,6 +34,8 @@ export type RoverState = {
   scan: number;
   scene: SurfaceScene | null;
   targetId: string;
+  source?: "demo" | "lola";
+  alternatives?: { id: string; path: RoutePoint[] }[];
 };
 
 /** Where the rover rolls off, beside the lander (scene units). */
@@ -55,6 +58,11 @@ const ROVER_MODEL_SIZE = 1.3;
 /** Antenna height above the ground for the scan pulses (scene units). */
 const DISH_HEIGHT_SCENE = 0.62;
 const PULSE_RINGS = 3;
+// Presentation telemetry cycle, paced by playback so pause/scrub also stop the dish.
+const antennaAngle = (scan: number, drive: number) => scan < SEARCH_END
+  ? Math.PI * 4 * THREE.MathUtils.smoothstep(scan, DEPLOY_END, SEARCH_END)
+  : Math.PI * 4 + 0.45 * Math.sin(drive * Math.PI * 12);
+
 
 /**
  * Lays the backend route into the scene. With the backend DEM scene the route
@@ -137,14 +145,15 @@ function Wheel({
 function RoverModel({
   spin,
   scan,
+  drive,
 }: {
   spin: MutableRefObject<number>;
   scan: MutableRefObject<number>;
+  drive: MutableRefObject<number>;
 }) {
   const dish = useRef<THREE.Group>(null!);
-  useFrame(({ clock }) => {
-    // The high-gain dish sweeps while the scan runs.
-    if (scan.current < SEARCH_END) dish.current.rotation.y = clock.elapsedTime * 1.8;
+  useFrame((_, delta) => {
+    dish.current.rotation.y = THREE.MathUtils.damp(dish.current.rotation.y, antennaAngle(scan.current, drive.current), 5, Math.min(delta, 0.05));
   });
   const wheels: [number, number, number][] = [];
   for (const z of [-0.33, 0, 0.33])
@@ -221,13 +230,15 @@ function pivotFor(parts: THREE.Object3D[], centre: THREE.Vector3, axis: THREE.Ve
 function RoverGlb({
   spin,
   scan,
+  drive,
 }: {
   spin: MutableRefObject<number>;
   scan: MutableRefObject<number>;
+  drive: MutableRefObject<number>;
 }) {
   const gltf = useLoader(GLTFLoader, ROVER_MODEL_URL, withDraco);
   const rig = useMemo(() => {
-    const model = gltf.scene.clone(true);
+    const model = cloneSkeleton(gltf.scene);
     model.updateMatrixWorld(true);
     const materials = new Map<string, THREE.MeshStandardMaterial>();
     const look = (object: THREE.Object3D) => {
@@ -296,11 +307,12 @@ function RoverGlb({
     };
   }, [gltf]);
   useEffect(() => () => rig.materials.forEach((m) => m.dispose()), [rig]);
-  useFrame(({ clock }) => {
+  const dishAngle = useRef(0);
+  useFrame((_, delta) => {
     // The model's nose points to −z, so forward rolling is a negative turn.
     for (const wheel of rig.wheels) wheel.pivot.quaternion.setFromAxisAngle(wheel.axis, -spin.current);
-    if (rig.dish && scan.current < SEARCH_END)
-      rig.dish.pivot.quaternion.setFromAxisAngle(rig.dish.axis, clock.elapsedTime * 1.2);
+    dishAngle.current = THREE.MathUtils.damp(dishAngle.current, antennaAngle(scan.current, drive.current), 5, Math.min(delta, 0.05));
+    if (rig.dish) rig.dish.pivot.quaternion.setFromAxisAngle(rig.dish.axis, dishAngle.current);
   });
   return (
     <group rotation={[0, ROVER_MODEL_YAW, 0]} scale={rig.scale}>
@@ -361,11 +373,13 @@ class ModelBoundary extends Component<
 /** Antenna pulse rings expanding from the rover over the scanned terrain. */
 function Pulses({
   scan,
+  drive,
   reach,
   origin,
 }: {
   scan: MutableRefObject<number>;
   reach: number;
+  drive: MutableRefObject<number>;
   origin: THREE.Vector3;
 }) {
   const rings = useRef<THREE.Mesh[]>([]);
@@ -374,17 +388,20 @@ function Pulses({
     [],
   );
   useEffect(() => () => geometry.dispose(), [geometry]);
-  useFrame(({ clock }) => {
+  useFrame(() => {
     const s = scan.current;
-    const active = s > DEPLOY_END && s < SEARCH_END;
+    const searching = s > DEPLOY_END && s < SEARCH_END;
+    const transmitting = s >= 1 && drive.current > 0 && (drive.current * 8) % 1 < 0.24;
+    const active = searching || transmitting;
     const front =
       reach * THREE.MathUtils.clamp((s - DEPLOY_END) / (PULSE_END - DEPLOY_END), 0, 1);
     rings.current.forEach((ring, k) => {
       ring.visible = active;
       if (!active) return;
-      const phase = (clock.elapsedTime * 0.45 + k / PULSE_RINGS) % 1;
-      ring.position.set(origin.x, origin.y + DISH_HEIGHT_SCENE, origin.z);
-      ring.scale.setScalar(Math.max(0.05, phase * front));
+      const phase = ((searching ? s * 6 : drive.current * 32) + k / PULSE_RINGS) % 1;
+      ring.position.set(origin.x, origin.y + DISH_HEIGHT_SCENE + (transmitting ? phase * 3 : 0), origin.z);
+      ring.rotation.z = transmitting ? -0.35 : 0;
+      ring.scale.setScalar(Math.max(0.05, phase * (transmitting ? 2.6 : front)));
       (ring.material as THREE.MeshBasicMaterial).opacity = (1 - phase) * 0.55;
     });
   });
@@ -426,8 +443,12 @@ export default function Rover({
   scan,
   mapping = null,
   reach = 0,
+  alternatives = [],
+  showRoutes = true,
 }: {
   path: RoutePoint[];
+  showRoutes?: boolean;
+  alternatives?: { id: string; path: RoutePoint[] }[];
   drive: MutableRefObject<number>;
   focus: THREE.Vector3;
   scan: MutableRefObject<number>;
@@ -440,8 +461,15 @@ export default function Rover({
   const spin = useRef(0);
   const lastDistance = useRef(0);
   const heading = useRef<number | null>(null);
-  const route = useMemo(() => layout(path, mapping), [path, mapping]);
+  const route = useMemo(() => layout(path.length ? path : [{north_m:0,east_m:0}], mapping), [path, mapping]);
+  useEffect(() => { lastDistance.current = 0; spin.current = 0; heading.current = null; }, [route]);
   const hasModel = useModelAvailable();
+  const comparisonLines = useMemo(() => alternatives.filter(a => a.path.length > 1 && a.path !== path).map(a => {
+    const alternate = layout(a.path, mapping);
+    const line = new THREE.Line(new THREE.BufferGeometry().setFromPoints(drape(alternate.points, alternate.ground)), new THREE.LineDashedMaterial({color: "#78bdbb",transparent:true,opacity:0.42,dashSize:0.12,gapSize:0.18,depthWrite:false}));
+    line.computeLineDistances(); return line;
+  }), [alternatives, path, mapping]);
+  useEffect(() => () => comparisonLines.forEach(line => {line.geometry.dispose();line.material.dispose();}), [comparisonLines]);
   const lines = useMemo(() => {
     const lifted = drape(route.points, route.ground);
     const planned = new THREE.Line(
@@ -521,6 +549,11 @@ export default function Rover({
     lastDistance.current = travelled;
     body.current.position.set(position.x, position.y + RIDE_HEIGHT_SCENE, position.z);
     body.current.rotation.y = heading.current ?? 0;
+    // Ground-contact roll across the wheel track, independently of the heading pitch.
+    const yaw = heading.current ?? 0;
+    const dx = Math.cos(yaw) * 0.34, dz = -Math.sin(yaw) * 0.34;
+    const crossSlope = Math.atan2(route.ground(position.x + dx, position.z + dz) - route.ground(position.x - dx, position.z - dz), 0.68);
+    body.current.rotation.z = THREE.MathUtils.damp(body.current.rotation.z, crossSlope, 6, Math.min(delta, 0.05));
     focus.copy(position);
     // The planned route draws itself once the search playback has finished.
     const shown = THREE.MathUtils.clamp(
@@ -528,6 +561,7 @@ export default function Rover({
       0,
       1,
     );
+    comparisonLines.forEach(line => { line.visible = shown > 0; });
     lines.planned.visible = shown > 0;
     lines.planned.geometry.setDrawRange(0, Math.max(1, Math.round(lines.count * shown)));
     lines.driven.geometry.setDrawRange(
@@ -536,23 +570,26 @@ export default function Rover({
     );
   });
 
-  const procedural = <RoverModel spin={spin} scan={scan} />;
+  const procedural = <RoverModel spin={spin} scan={scan} drive={drive} />;
   return (
     <>
+      <group visible={showRoutes}>
+      {comparisonLines.map((line, i) => <primitive key={i} object={line} />)}
       <primitive object={lines.planned} />
       <primitive object={lines.driven} />
+      </group>
       <group ref={body} rotation-order="YXZ">
         {hasModel ? (
           <ModelBoundary fallback={procedural}>
             <Suspense fallback={procedural}>
-              <RoverGlb spin={spin} scan={scan} />
+              <RoverGlb spin={spin} scan={scan} drive={drive} />
             </Suspense>
           </ModelBoundary>
         ) : (
           procedural
         )}
       </group>
-      {reach > 0 && <Pulses scan={scan} reach={reach} origin={position} />}
+      {reach > 0 && <Pulses scan={scan} drive={drive} reach={reach} origin={position} />}
     </>
   );
 }
