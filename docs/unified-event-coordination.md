@@ -109,3 +109,35 @@ Spark credit, with no automatic retries. Its fixed protocol is recorded in
 [hardware protocol](verification/unified-stage5-hardware-protocol.json).
 Hardware evidence is kept separate from the shared application's local-only
 execution modes and cannot overwrite an expired or revised session.
+
+## Authorized hardware trial: pending provider execution
+
+The single job `dd340d59-3d25-43e0-8268-df5607b84e3a` was submitted to Rigetti
+`rigetti:cepheus-1-108q` through Open Quantum at 2026-11-15 01:33:44 UTC.
+It uses one logical qubit, physical layout [0], one QAOA layer and 256 shots;
+32 parameter evaluations were performed locally. The live quote was one Spark,
+and the observed balance changed from 22 to 21 Spark; Full remained zero and
+Auto Refill was independently observed off in the authenticated billing portal.
+
+At the recorded observation, the job was still `Queued` after more than 13
+minutes. No measured counts, full-plan hardware admission rate or hardware
+improvement claim are available. See the [pending receipt](verification/unified-stage5-hardware-2026-11-15.json)
+and [provider job](https://www.openquantum.com/jobs/dd340d59-3d25-43e0-8268-df5607b84e3a).
+This pending experiment is separate from the 2,169 passing local tests. No retry
+or second job was submitted. Keep the existing durable local ticket and receipt;
+collect this same job later rather than creating another trial.
+
+The local gateway ledger is `~/.local/share/lunar-stage5-hardware/` and contains
+`ticket.json`, `job.json`, `scenario.json`, `envelope.json`, `local.json` and
+`report.json`, plus the original QASM and submission claim. These files contain
+no stored credentials and are not included in Git. With the existing H7 Python
+environment, `OpenQuantumGateway.collect(ticket, job_id, scenario)` reads the
+provider result without submitting or spending credits. Decode against the
+saved scenario, complete at most the two observed target choices with the saved
+outside selections, and independently revalidate the full plans. Treat cloud
+latency as offline evidence, never as an on-time operational result.
+
+Infrastructure attribution: Kuhn, R., Armbruster, O., and Wold, B. (2026),
+*Open Quantum: An open infrastructure layer for quantum computing*, Zenodo,
+[doi:10.5281/zenodo.22103261](https://doi.org/10.5281/zenodo.22103261).
+This attribution does not imply provider endorsement or quantum advantage.
