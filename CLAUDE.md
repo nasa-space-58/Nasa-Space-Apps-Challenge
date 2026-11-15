@@ -258,3 +258,7 @@ At the user's explicit request, `feature/split-comparison-simulator` (split 3D v
 ### Sources page main push exception (user, 2026-11-15)
 
 At the user's explicit request, `ui/sources-page-complete` (complete grouped Sources dialog: every model, terrain, ephemeris, mission, communication and quantum source, including the CC BY 4.0 rover attribution; catalog in `frontend/src/sourceCatalog.ts`) was fast-forwarded directly onto `main` from `d57db9a` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### Mission run route set (user, 2026-11-15)
+
+On `feature/mission-run-route-candidates` from main `91ba1ae`; commit locally only, no push or merge. Starting a mission run also shows every computed landing route in the 3D scene: primary green, reachable R7 backups yellow, rejected red (dashed when flown, point only when it failed the R3 terrain check), with metrics and reasons on selection. Skeleton `0b272e0`, frozen tests `58af088`; see docs/mission-routes.md. The route set is the nominal pre-flight plan set, not a replay of the run's faults.

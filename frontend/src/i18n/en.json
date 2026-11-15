@@ -1964,14 +1964,17 @@
       "backups": "Backup landing sites",
       "twin": "Fault replay comparison",
       "recovery": "Original and replanned flight",
-      "surface": "Calculated surface routes"
+      "surface": "Calculated surface routes",
+      "routes": "Computed mission routes"
     },
     "line": {
       "planned": "Descent route",
       "truth": "Simulation truth",
       "estimate": "Sensor estimate",
       "original": "Original plan",
-      "replanned": "Replanned route"
+      "replanned": "Replanned route",
+      "PRIMARY": "Primary plan",
+      "flown": "Flown run"
     }
   },
   "missionRun": {
@@ -2118,6 +2121,66 @@
     "scene": {
       "crash": "Crash",
       "tip_over": "Tipped over"
+    },
+    "routes": {
+      "heading": "Computed landing routes",
+      "intro": "All routes from the {gate} divert point: {primary} primary, {backup} backup, {rejected} rejected. Select a route here or its end point in the 3D view.",
+      "divert": {
+        "high_gate": "high gate",
+        "low_gate": "low gate"
+      },
+      "show3d": "Show routes in 3D",
+      "pick": "Select a route to see its metrics and why it was chosen or rejected.",
+      "terrainOnly": "terrain check only",
+      "notFlown": "This cell failed the terrain check, so no descent was flown to it.",
+      "error": "The route set could not be computed.",
+      "unavailable": "Routes are unavailable for this analysis: {detail}",
+      "disclaimer": "Pre-flight route set for the unfaulted vehicle on the 80 m DEM; the run's faults are not applied to it. Not landing-safety certification.",
+      "metricsHeading": "Metrics",
+      "legend": {
+        "primary": "Primary plan",
+        "backup": "Backup plan",
+        "rejected": "Rejected (dashed)",
+        "flown": "Flown run"
+      },
+      "role": {
+        "primary": "Primary plan",
+        "backup": "Backup #{rank}",
+        "rejected": "Rejected {id}"
+      },
+      "why": {
+        "primary": "Why this is the primary plan",
+        "backup": "Why it is a backup, not the primary",
+        "rejected": "Why it was rejected"
+      },
+      "metric": {
+        "distance_m": "Distance from target",
+        "safety_score": "R3 safety score",
+        "max_landing_slope_deg": "Landing-area slope",
+        "hazard_distance_m": "Nearest steep terrain",
+        "divert_delta_v_mps": "Extra divert delta-v",
+        "propellant_remaining_kg": "Propellant at touchdown",
+        "reserve_margin_kg": "Margin above reserve",
+        "hover_margin_s": "Hover margin",
+        "time_to_touchdown_s": "Time to touchdown",
+        "touchdown_position_error_m": "Touchdown position error",
+        "touchdown_vertical_speed_mps": "Touchdown vertical speed",
+        "touchdown_horizontal_speed_mps": "Touchdown horizontal speed"
+      },
+      "reason": {
+        "planned_target": "Planned landing target of the analysis; reachable from the divert point with {value} kg above the propellant reserve.",
+        "planned_target_unreachable": "Planned landing target of the analysis, but not reachable from the divert point with this vehicle.",
+        "reachable": "Reachable from the divert point with {value} kg above the propellant reserve and within the touchdown tolerances.",
+        "backup_rank": "Backup {value} of {limit}, ranked by R3 safety score ({score}) and then distance.",
+        "not_planned_target": "Not the planned target: it is {value} m away and the divert needs {dv} m/s extra delta-v.",
+        "propellant": "The divert needs {value} kg more propellant than is available.",
+        "reserve": "Leaves {value} kg of propellant at touchdown; the reserve needs {limit} kg.",
+        "thrust": "In-plane plus lateral acceleration needs {pct} % of maximum thrust.",
+        "thrust_window": "The engine stays at full throttle for the whole divert, so no thrust is left for the {value} m lateral move.",
+        "touchdown_tolerance": "Touchdown outside tolerance (position error {value} m, limit {limit} m).",
+        "slope": "Landing-area slope {value}° exceeds the {limit}° limit (tip-over risk).",
+        "unknown_terrain": "{pct} % of the landing area has unknown slope; unknown terrain is never treated as flat."
+      }
     }
   },
   "liveResults": {

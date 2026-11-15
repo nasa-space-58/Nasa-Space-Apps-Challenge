@@ -6,6 +6,8 @@ import {
   type MissionGate,
   type MissionRunResult,
 } from "../missionRunStore";
+import { previewFor, useAnalysisView } from "../analysisView";
+import MissionRoutes, { type MissionRouteSet } from "./MissionRoutes";
 import "./mission-run.css";
 
 type Fault = { kind: string } & Record<string, number | string>;
@@ -153,6 +155,17 @@ export default function MissionRun({
   const [comm, setComm] = useState<Record<string, number>>({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const [routes, setRoutes] = useState<MissionRouteSet | null>(null);
+  const [routesError, setRoutesError] = useState("");
+  const { preview, setPreview } = useAnalysisView();
+  const routeSet = routes && routes.analysis_id === analysisId ? routes : null;
+  const routesShown = preview?.kind === "routes";
+  const selectedRoute = routesShown ? (preview?.selected ?? null) : null;
+  const showRoutes = (set: MissionRouteSet, result: MissionRunResult | null, selected?: string) =>
+    setPreview({
+      ...previewFor("routes", { ...set, flown: result?.descent?.samples ?? [] }),
+      selected,
+    });
 
   useEffect(() => {
     fetch("/api/mission-faults")
@@ -199,10 +212,30 @@ export default function MissionRun({
   const editFault = (index: number, field: string, value: number) =>
     setCustom((list) => list.map((f, i) => (i === index ? { ...f, [field]: value } : f)));
 
+  // The route set ignores faults, so one request per analysis is enough.
+  const loadRoutes = (id: string): Promise<MissionRouteSet> =>
+    routeSet
+      ? Promise.resolve(routeSet)
+      : fetch(`/api/analyses/${encodeURIComponent(id)}/mission-routes`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        }).then(async (r) => {
+          const body = await r.json().catch(() => ({}));
+          if (!r.ok)
+            throw new Error(
+              typeof body.detail === "string" ? body.detail : t("missionRun.routes.error"),
+            );
+          return body as MissionRouteSet;
+        });
+
   const start = (scenario: string | null, faults: Fault[]) => {
     if (!analysisId) return;
     setBusy(true);
     setError("");
+    setRoutesError("");
+    const routeCall = loadRoutes(analysisId);
+    routeCall.catch(() => undefined); // handled after the run; avoids an unhandled rejection
     fetch(`/api/analyses/${encodeURIComponent(analysisId)}/mission-run`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -221,9 +254,17 @@ export default function MissionRun({
           );
         return body as MissionRunResult;
       })
-      .then((result) => {
+      .then(async (result) => {
         setMissionRun(result);
-        onWatch();
+        try {
+          const set = await routeCall;
+          setRoutes(set);
+          showRoutes(set, result);
+        } catch (e) {
+          // Without routes the run is still valid; fall back to the flight.
+          setRoutesError((e as Error).message);
+          onWatch();
+        }
       })
       .catch((e: Error) => setError(e.message))
       .finally(() => setBusy(false));
@@ -378,7 +419,14 @@ export default function MissionRun({
               {run.scenario_id ? scenarioName(run.scenario_id) : t("missionRun.customScenario")}
               {run.failure && ` · ${fmt(run.failure.at_utc)}`}
             </span>
-            <button onClick={onWatch}>{t("missionRun.watch")}</button>
+            <button
+              onClick={() => {
+                setPreview(null);
+                onWatch();
+              }}
+            >
+              {t("missionRun.watch")}
+            </button>
           </div>
           <ol className="run-gates">
             {run.gates.map((g) => (
@@ -394,6 +442,24 @@ export default function MissionRun({
               </li>
             ))}
           </ol>
+          {routeSet && (
+            <MissionRoutes
+              set={routeSet}
+              selected={selectedRoute}
+              shown={routesShown}
+              onShow={() => showRoutes(routeSet, run)}
+              onSelect={(id) =>
+                routesShown
+                  ? setPreview((p) => (p ? { ...p, selected: p.selected === id ? undefined : id } : p))
+                  : showRoutes(routeSet, run, id)
+              }
+            />
+          )}
+          {routesError && (
+            <p className="muted small" role="status">
+              {t("missionRun.routes.unavailable", { detail: routesError })}
+            </p>
+          )}
           {run.descent && (
             <Chart
               label={t("missionRun.altitudeChart")}

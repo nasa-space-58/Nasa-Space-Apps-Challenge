@@ -4,8 +4,13 @@ import * as THREE from "three";
 import { Model } from "./LunarSurface";
 import type { AnalysisPreview, PlotPoint } from "../analysisView";
 
-function Path({points,color,opacity}: {points:THREE.Vector3[];color:string;opacity:number}) {
-  const line = useMemo(()=>new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), new THREE.LineBasicMaterial({color,transparent:true,opacity})),[points,color,opacity]);
+function Path({points,color,opacity,dashed}: {points:THREE.Vector3[];color:string;opacity:number;dashed?:boolean}) {
+  const line = useMemo(()=>{
+    const material = dashed ? new THREE.LineDashedMaterial({color,transparent:true,opacity,dashSize:0.25,gapSize:0.18}) : new THREE.LineBasicMaterial({color,transparent:true,opacity});
+    const object = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), material);
+    if (dashed) object.computeLineDistances();
+    return object;
+  },[points,color,opacity,dashed]);
   useEffect(()=>()=>{line.geometry.dispose();line.material.dispose();},[line]);
   return <primitive object={line} />;
 }
@@ -53,9 +58,9 @@ export default function AnalysisScene({preview,progress,onSelect}: {preview:Anal
     <color attach="background" args={["#080f18"]} /><ambientLight intensity={1.8}/><directionalLight position={[5,12,8]} intensity={3}/>
     <gridHelper args={[22,22,"#365061","#172b39"]} position={[0,origin.y-0.03,0]}/>
     <mesh position={origin} rotation={[-Math.PI/2,0,0]}><ringGeometry args={[0.12,0.2,32]}/><meshBasicMaterial color="#ffffff" side={THREE.DoubleSide}/></mesh>
-    {paths.map(l=><Path key={l.id} points={l.vertices} color={l.color} opacity={preview.selected&&preview.selected!==l.id?0.25:1}/>)}
+    {paths.map(l=><Path key={l.id} points={l.vertices} color={l.color} dashed={l.dashed} opacity={preview.selected&&preview.selected!==l.id?0.25:1}/>)}
     {preview.points.map((p,i)=><mesh key={i} position={point(p)} onClick={e=>{e.stopPropagation();if(e.delta<6&&p.id)onSelect(p.id);}} scale={preview.selected===p.id?1.5:1}>
-      <sphereGeometry args={[0.075,10,8]}/><meshBasicMaterial color={p.ok===false?"#ff8a78":p.ok===true?"#65ddbd":"#e8c58b"}/>
+      <sphereGeometry args={[0.075,10,8]}/><meshBasicMaterial color={p.color??(p.ok===false?"#ff8a78":p.ok===true?"#65ddbd":"#e8c58b")}/>
     </mesh>)}
     {preview.obstacles.map((p,i)=><mesh key={i} position={point(p)} rotation={[-Math.PI/2,0,0]}><circleGeometry args={[Math.max(0.06,(p.radius??0)*bounds.scale),40]}/><meshBasicMaterial color="#ff6655" transparent opacity={0.4} side={THREE.DoubleSide}/></mesh>)}
     {preview.lines.some(l=>l.points.length>1)&&preview.kind!=="surface"&&<group ref={body}><Model path="/nasa/apollo.glb" size={0.65} grounded/></group>}

@@ -1,9 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useTranslate } from "./i18n";
 
-export type AnalysisKind = "descent" | "risk" | "backups" | "twin" | "recovery" | "surface";
-export type PlotPoint = { x: number; y: number; z: number; time?: number; id?: string; ok?: boolean; radius?: number };
-export type PlotLine = { id: string; color: string; points: PlotPoint[] };
+export type AnalysisKind = "descent" | "risk" | "backups" | "twin" | "recovery" | "surface" | "routes";
+export type PlotPoint = { x: number; y: number; z: number; time?: number; id?: string; ok?: boolean; radius?: number; color?: string };
+export type PlotLine = { id: string; color: string; points: PlotPoint[]; dashed?: boolean };
+/** Mission-run route colours: primary green, reachable backup yellow, rejected red, flown run white. */
+export const ROUTE_COLORS = { primary: "#4fd18b", backup: "#f2c94c", rejected: "#ff6b5e", flown: "#f4f7fb" } as const;
 export type AnalysisPreview = { kind: AnalysisKind; lines: PlotLine[]; points: PlotPoint[]; obstacles: PlotPoint[]; events: number[]; selected?: string; stale?: boolean };
 const Context = createContext<{
   candidateId: string | null;
@@ -48,6 +50,19 @@ export function previewFor(kind: AnalysisKind, value: unknown): AnalysisPreview 
   }
   if (kind === "risk") result.points = rows(obj(d.landing).points).flatMap(p=>finite(p.down_m)&&finite(p.cross_m)?[{x:p.down_m,y:0,z:p.cross_m,ok:p.success===true}]:[]);
   if (kind === "backups") result.points = [obj(d.primary),...rows(d.candidates)].flatMap(p=>finite(p.down_m)&&finite(p.cross_m)?[{x:p.down_m,y:0,z:p.cross_m,id:String(p.id),ok:p.reachable===true}]:[]);
+  if (kind === "routes") {
+    // Backend paths in the primary target frame; terrain-only rejections have no path.
+    const routes = rows(d.routes);
+    const colorOf = (r: Row) => r.role === "primary" && r.reachable !== false ? ROUTE_COLORS.primary : r.role === "backup" ? ROUTE_COLORS.backup : ROUTE_COLORS.rejected;
+    result.lines = routes.filter(r => rows(r.trajectory).length > 1).map(r => ({
+      id: String(r.id), color: colorOf(r), dashed: r.role === "rejected",
+      points: rows(r.trajectory).flatMap(p => finite(p.down_m) && finite(p.altitude_m) && finite(p.cross_m) ? [{x:p.down_m,y:p.altitude_m,z:p.cross_m,time:finite(p.t_s)?p.t_s:undefined}] : []),
+    }));
+    const start = finite(obj(d.divert_state).t_s) ? obj(d.divert_state).t_s as number : -Infinity;
+    const flown = rows(d.flown).flatMap(p => finite(p.t_s) && p.t_s >= start && finite(p.downrange_m) && finite(p.altitude_m) ? [{x:p.downrange_m,y:p.altitude_m,z:0,time:p.t_s}] : []);
+    if (flown.length > 1) result.lines.push({id:"flown",color:ROUTE_COLORS.flown,points:flown});
+    result.points = routes.flatMap(r => finite(r.down_m) && finite(r.cross_m) ? [{x:r.down_m,y:0,z:r.cross_m,id:String(r.id),color:colorOf(r)}] : []);
+  }
   if (kind === "surface") result.lines = rows(d.routes).map((r,i)=>({id:String(r.target_id),color:r.reachable===false?red:[gold,blue,green][i%3],points:rows(r.path).flatMap(p=>finite(p.north_m)&&finite(p.east_m)?[{x:p.east_m,y:0,z:-p.north_m}]:[])}));
   return result;
 }

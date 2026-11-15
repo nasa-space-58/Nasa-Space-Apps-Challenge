@@ -2026,14 +2026,17 @@
       "backups": "Yedek iniş noktaları",
       "twin": "Arızalı uçuş karşılaştırması",
       "recovery": "Özgün ve yeniden planlanan uçuş",
-      "surface": "Hesaplanan yüzey rotaları"
+      "surface": "Hesaplanan yüzey rotaları",
+      "routes": "Hesaplanan görev rotaları"
     },
     "line": {
       "planned": "İniş rotası",
       "truth": "Benzetimdeki gerçek durum",
       "estimate": "Sensör tahmini",
       "original": "Özgün plan",
-      "replanned": "Yeniden planlanan rota"
+      "replanned": "Yeniden planlanan rota",
+      "PRIMARY": "Ana plan",
+      "flown": "Uçulan koşu"
     }
   },
   "missionRun": {
@@ -2180,6 +2183,66 @@
     "scene": {
       "crash": "Çarpma",
       "tip_over": "Devrildi"
+    },
+    "routes": {
+      "heading": "Hesaplanan iniş rotaları",
+      "intro": "{gate} sapma noktasından hesaplanan tüm rotalar: {primary} ana, {backup} yedek, {rejected} reddedilen. Rotayı buradan ya da 3B görünümde uç noktasından seçin.",
+      "divert": {
+        "high_gate": "Yüksek kapı",
+        "low_gate": "Alçak kapı"
+      },
+      "show3d": "Rotaları 3B göster",
+      "pick": "Metriklerini ve neden seçildiğini ya da reddedildiğini görmek için bir rota seçin.",
+      "terrainOnly": "yalnızca arazi kontrolü",
+      "notFlown": "Bu hücre arazi kontrolünden geçemedi; bu yüzden ona iniş uçuşu hesaplanmadı.",
+      "error": "Rota kümesi hesaplanamadı.",
+      "unavailable": "Bu analiz için rotalar kullanılamıyor: {detail}",
+      "disclaimer": "Arızasız araç için 80 m DEM üzerinde uçuş öncesi rota kümesi; koşudaki arızalar buna uygulanmaz. İniş güvenliği sertifikası değildir.",
+      "metricsHeading": "Metrikler",
+      "legend": {
+        "primary": "Ana plan",
+        "backup": "Yedek plan",
+        "rejected": "Reddedilen (kesikli)",
+        "flown": "Uçulan koşu"
+      },
+      "role": {
+        "primary": "Ana plan",
+        "backup": "Yedek #{rank}",
+        "rejected": "Reddedilen {id}"
+      },
+      "why": {
+        "primary": "Neden ana plan",
+        "backup": "Neden yedek, neden ana değil",
+        "rejected": "Neden reddedildi"
+      },
+      "metric": {
+        "distance_m": "Hedefe uzaklık",
+        "safety_score": "R3 güvenlik puanı",
+        "max_landing_slope_deg": "İniş alanı eğimi",
+        "hazard_distance_m": "En yakın dik arazi",
+        "divert_delta_v_mps": "Ek sapma delta-v",
+        "propellant_remaining_kg": "Temasta kalan yakıt",
+        "reserve_margin_kg": "Rezerv üstü pay",
+        "hover_margin_s": "Askıda kalma payı",
+        "time_to_touchdown_s": "Temasa kalan süre",
+        "touchdown_position_error_m": "Temas konum hatası",
+        "touchdown_vertical_speed_mps": "Temas dikey hızı",
+        "touchdown_horizontal_speed_mps": "Temas yatay hızı"
+      },
+      "reason": {
+        "planned_target": "Analizin planlanan iniş hedefi; sapma noktasından yakıt rezervinin {value} kg üzerinde ulaşılabiliyor.",
+        "planned_target_unreachable": "Analizin planlanan iniş hedefi, ancak bu araçla sapma noktasından ulaşılamıyor.",
+        "reachable": "Sapma noktasından yakıt rezervinin {value} kg üzerinde ve temas toleransları içinde ulaşılabiliyor.",
+        "backup_rank": "{limit} yedek içinde {value}. sırada; önce R3 güvenlik puanına ({score}), sonra mesafeye göre sıralandı.",
+        "not_planned_target": "Planlanan hedef değil: {value} m uzakta ve sapma {dv} m/s ek delta-v gerektiriyor.",
+        "propellant": "Sapma, mevcut yakıttan {value} kg daha fazlasını gerektiriyor.",
+        "reserve": "Temasta {value} kg yakıt kalıyor; rezerv {limit} kg gerektiriyor.",
+        "thrust": "Düzlem içi ve yanal ivme birlikte azami itkinin %{pct}'ini gerektiriyor.",
+        "thrust_window": "Motor sapma boyunca tam gazda kalıyor; {value} m yanal hareket için itki kalmıyor.",
+        "touchdown_tolerance": "Temas tolerans dışında (konum hatası {value} m, sınır {limit} m).",
+        "slope": "İniş alanı eğimi {value}°, {limit}° sınırını aşıyor (devrilme riski).",
+        "unknown_terrain": "İniş alanının %{pct}'inde eğim bilinmiyor; bilinmeyen arazi düz sayılmaz."
+      }
     }
   },
   "liveResults": {

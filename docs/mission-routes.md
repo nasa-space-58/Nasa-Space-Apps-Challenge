@@ -20,7 +20,15 @@ reasons it was chosen, kept as a backup or rejected.
   `plan_alternatives(trajectories=True)` in `backend/app/alternatives.py`
   (default behaviour and `result_id` unchanged).
 - Interface: `frontend/src/components/MissionRun.tsx` and the analysis scene.
-- Tests: `backend/tests/test_mission_routes.py`.
+- Tests: `backend/tests/test_mission_routes.py`. Skeleton `0b272e0`, frozen
+  tests `58af088`.
+
+The interface sends the route request in parallel with the run and reuses
+the result for later runs of the same analysis, because the route set does
+not depend on faults. When the run returns, the scene switches to the local
+route view; "Watch flight" returns to the illustrative flight. The flown
+(faulted) descent of the run is drawn in white from the divert time onward,
+along-track only, so it can be compared with the plans.
 
 ## Frame
 
@@ -28,6 +36,15 @@ All paths share one local planar frame at the primary target: `down_m` along
 the approach azimuth, `cross_m` to its right, `altitude_m` above the primary
 site sphere and `t_s` since powered descent initiation. A backup's altitude is
 shifted by its terrain height difference to the primary.
+
+## Observed behaviour (cached LOLA data, 2026-11-15)
+
+With the defaults (Apollo 11 LM, high-gate divert, 3 km search radius, up to
+8 backups and 6 terrain rejections), Haworth, Malapert and the Shackleton rim
+each give 1 primary, 8 reachable backups and 6 cells rejected for slope, in
+about 3.6 s. Flown rejections (propellant, reserve, thrust, tolerance) appear
+with a tighter vehicle or a low-gate divert; the tests cover them with a
+660 kg shorter propellant load.
 
 ## Limits
 
