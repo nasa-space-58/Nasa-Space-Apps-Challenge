@@ -219,3 +219,7 @@ The user explicitly authorized integrating the latest main with the completed H1
 ### UI simplification and rover scan main push exception (user, 2026-11-15)
 
 At the user's explicit request, `feature/rover-scan-route` (which contains `ui/simplify-interface`) was fast-forwarded directly onto `main` from `e92174e` without a PR, overriding the no-direct-push rule for this one push only. It adds the simplified mission-control menu, the R8 route scene payload (skeleton `6b3d52c`, frozen tests `93583cf`), the real-DEM rover scan and the CC BY 4.0 Sketchfab rover model (attribution in `frontend/public/models/manifest.json`). The default rules for `main` still apply afterwards.
+
+### Q&A assistant main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/assistant-qa` (merged with main `5d032c0`) was pushed directly onto `main` without a PR, overriding the no-direct-push rule for this one push only. It adds the opt-in Claude Q&A assistant (skeleton `383ea15`, frozen tests `6db6f82`, see docs/assistant.md) and the mission-control "Ask the Navigator" drawer. `temel` was intentionally left unchanged. The default rules for `main` still apply afterwards.

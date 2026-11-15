@@ -1,9 +1,16 @@
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { errorText, useTranslate } from "../i18n";
 import "./assistant.css";
 
-// Mission-control Q&A drawer. It only relays questions to the backend
-// assistant and renders its answers and sources; no analysis logic lives here.
+// Q&A drawer. It only relays questions to the backend assistant and renders
+// its answers and sources; no analysis logic lives here.
 type Status = {
   enabled: boolean;
   model: string;
@@ -40,7 +47,7 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
 function sourceLabel(source: Source) {
   if (source.kind === "api") return source.ref;
   const [path, heading] = source.ref.split("#");
-  return `${path.replace(/^docs\//, "")}${heading ? ` · ${heading}` : ""}`;
+  return `${path.replace(/^docs\//, "").replace(/\.md$/, "")}${heading ? ` · ${heading}` : ""}`;
 }
 
 /** Completed user/assistant pairs only, so the backend's alternation rule holds. */
@@ -56,6 +63,108 @@ function historyFrom(messages: Message[]) {
     }
   }
   return turns.slice(-MAX_HISTORY_TURNS);
+}
+
+/** Inline **bold** and `code` as React nodes; never injects HTML. */
+function inline(text: string) {
+  return text.split(/(\*\*[^*]+\*\*|`[^`]+`)/g).map((part, index) => {
+    if (part.startsWith("**") && part.endsWith("**") && part.length > 4)
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    if (part.startsWith("`") && part.endsWith("`") && part.length > 2)
+      return <code key={index}>{part.slice(1, -1)}</code>;
+    return part;
+  });
+}
+
+/** Minimal Markdown subset: paragraphs, headings, bullet and numbered lists. */
+function RichText({ text }: { text: string }) {
+  const blocks: ReactNode[] = [];
+  let list: { ordered: boolean; items: string[] } | null = null;
+  let paragraph: string[] = [];
+  const flushParagraph = () => {
+    if (paragraph.length)
+      blocks.push(<p key={blocks.length}>{inline(paragraph.join(" "))}</p>);
+    paragraph = [];
+  };
+  const flushList = () => {
+    if (!list) return;
+    const items = list.items.map((item, index) => <li key={index}>{inline(item)}</li>);
+    blocks.push(
+      list.ordered ? <ol key={blocks.length}>{items}</ol> : <ul key={blocks.length}>{items}</ul>,
+    );
+    list = null;
+  };
+  for (const raw of text.split("\n")) {
+    const line = raw.trim();
+    const bullet = line.match(/^[-*•]\s+(.*)$/);
+    const numbered = line.match(/^\d+[.)]\s+(.*)$/);
+    const heading = line.match(/^#{1,4}\s+(.*)$/);
+    if (bullet || numbered) {
+      flushParagraph();
+      const ordered = !!numbered;
+      if (list && list.ordered !== ordered) flushList();
+      list ??= { ordered, items: [] };
+      list.items.push((bullet ?? numbered)![1]);
+    } else if (!line) {
+      flushParagraph();
+      flushList();
+    } else if (heading) {
+      flushParagraph();
+      flushList();
+      blocks.push(<h4 key={blocks.length}>{inline(heading[1])}</h4>);
+    } else if (list && raw.startsWith(" ")) {
+      list.items[list.items.length - 1] += ` ${line}`;
+    } else {
+      flushList();
+      paragraph.push(line);
+    }
+  }
+  flushParagraph();
+  flushList();
+  return <div className="assistant-rich">{blocks}</div>;
+}
+
+function Spark() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M12 2c.4 4.9 2.6 8.1 7.5 9.5L22 12l-2.5.5C14.6 13.9 12.4 17.1 12 22c-.4-4.9-2.6-8.1-7.5-9.5L2 12l2.5-.5C9.4 10.1 11.6 6.9 12 2Z"
+      />
+    </svg>
+  );
+}
+
+function Sources({ sources, tokens }: { sources: Source[]; tokens: number }) {
+  const { t } = useTranslate();
+  const [open, setOpen] = useState(false);
+  if (!sources.length) return null;
+  return (
+    <div className="assistant-sources">
+      <button
+        type="button"
+        className="assistant-sources-toggle"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+      >
+        {t("assistant.sourcesToggle", { count: sources.length })}
+        <span className={`assistant-chevron${open ? " up" : ""}`} aria-hidden="true" />
+      </button>
+      {open && (
+        <ul>
+          {sources.map((source) => (
+            <li key={`${source.kind}:${source.ref}`}>
+              <span className={`assistant-kind ${source.kind}`}>
+                {source.kind === "doc" ? t("assistant.kindDoc") : t("assistant.kindApi")}
+              </span>
+              {sourceLabel(source)}
+            </li>
+          ))}
+          <li className="assistant-cost">{t("assistant.tokens", { count: tokens })}</li>
+        </ul>
+      )}
+    </div>
+  );
 }
 
 export default function AssistantPanel({ analysisIds }: { analysisIds: string[] }) {
@@ -168,7 +277,8 @@ export default function AssistantPanel({ analysisIds }: { analysisIds: string[] 
         t("assistant.suggest.data"),
       ];
   const ready = !!status?.enabled;
-  const offline = status && !status.enabled;
+  const offline = !!status && !status.enabled;
+  const linked = analysisIds.length + (recommendationId ? 1 : 0);
 
   return (
     <>
@@ -180,15 +290,9 @@ export default function AssistantPanel({ analysisIds }: { analysisIds: string[] 
         aria-controls="assistant-panel"
         onClick={() => (open ? close() : setOpen(true))}
       >
-        <span className="assistant-launcher-pulse" aria-hidden="true" />
-        <span className="assistant-launcher-label">
-          <small>{t("assistant.launcherEyebrow")}</small>
-          {t("assistant.launcher")}
-        </span>
+        <Spark />
+        {t("assistant.launcher")}
       </button>
-      {open && (
-        <div className="assistant-scrim" onClick={close} aria-hidden="true" />
-      )}
       <aside
         id="assistant-panel"
         className={`assistant-panel${open ? " is-open" : ""}`}
@@ -198,11 +302,23 @@ export default function AssistantPanel({ analysisIds }: { analysisIds: string[] 
         hidden={!open}
       >
         <header className="assistant-head">
-          <div>
-            <p className="assistant-eyebrow">
-              <i aria-hidden="true" /> {t("assistant.eyebrow")}
-            </p>
+          <span className="assistant-logo">
+            <Spark />
+          </span>
+          <div className="assistant-heading">
             <h2 id="assistant-title">{t("assistant.title")}</h2>
+            <p aria-live="polite">
+              <span className={`assistant-dot${ready ? " on" : offline ? " off" : ""}`} />
+              {statusError
+                ? statusError
+                : !status
+                  ? t("assistant.connecting")
+                  : ready
+                    ? linked
+                      ? t("assistant.onlineLinked", { count: linked })
+                      : t("assistant.onlineDocs")
+                    : t("assistant.offline")}
+            </p>
           </div>
           <button
             type="button"
@@ -210,43 +326,25 @@ export default function AssistantPanel({ analysisIds }: { analysisIds: string[] 
             onClick={close}
             aria-label={t("assistant.close")}
           >
-            ×
+            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7l1.4-1.4 6.3 6.3 6.3-6.3z"
+              />
+            </svg>
           </button>
         </header>
-        <div className="assistant-telemetry" aria-live="polite">
-          <span className={`assistant-dot ${ready ? "on" : offline ? "off" : ""}`} />
-          {statusError
-            ? statusError
-            : !status
-              ? t("assistant.connecting")
-              : ready
-                ? t("assistant.online", { model: status.model, sections: status.doc_sections })
-                : t("assistant.offline")}
-        </div>
-        <div className="assistant-context">
-          <span>{t("assistant.contextLabel")}</span>
-          {analysisIds.length ? (
-            analysisIds.slice(0, 2).map((id, index) => (
-              <code key={id}>
-                {index === 0 ? "A" : "B"} · {id.slice(0, 8)}
-              </code>
-            ))
-          ) : (
-            <em>{t("assistant.noContext")}</em>
-          )}
-          {recommendationId && <code>REC · {recommendationId.slice(0, 8)}</code>}
-        </div>
 
         <div className="assistant-log" ref={logRef}>
           {offline && (
-            <div className="assistant-offline">
+            <div className="assistant-notice">
               <strong>{t("assistant.offlineTitle")}</strong>
               <p>{t("assistant.offlineBody")}</p>
-              {status?.reason && <code>{status.reason}</code>}
             </div>
           )}
           {ready && messages.length === 0 && (
-            <div className="assistant-intro">
+            <div className="assistant-welcome">
+              <h3>{t("assistant.greeting")}</h3>
               <p>{t("assistant.intro")}</p>
               <div className="assistant-suggestions">
                 {suggestions.map((text) => (
@@ -257,67 +355,71 @@ export default function AssistantPanel({ analysisIds }: { analysisIds: string[] 
               </div>
             </div>
           )}
-          {messages.map((message, index) => (
-            <article key={index} className={`assistant-msg ${message.role}`}>
-              <span className="assistant-who">
-                {message.role === "user"
-                  ? t("assistant.you")
-                  : message.role === "assistant"
-                    ? t("assistant.navigator")
-                    : t("assistant.signalLost")}
-              </span>
-              <p>{message.text}</p>
-              {message.role === "assistant" && message.sources.length > 0 && (
-                <ul className="assistant-sources" aria-label={t("assistant.sources")}>
-                  {message.sources.map((source) => (
-                    <li key={`${source.kind}:${source.ref}`} className={source.kind}>
-                      <b>{source.kind === "doc" ? "DOC" : "API"}</b> {sourceLabel(source)}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {message.role === "assistant" && (
-                <small className="assistant-cost">
-                  {t("assistant.tokens", { count: message.tokens })}
-                </small>
-              )}
-            </article>
-          ))}
+          {messages.map((message, index) =>
+            message.role === "user" ? (
+              <div key={index} className="assistant-msg user">
+                <p>{message.text}</p>
+              </div>
+            ) : (
+              <div key={index} className={`assistant-msg ${message.role}`}>
+                <span className="assistant-avatar">
+                  <Spark />
+                </span>
+                <div className="assistant-body">
+                  {message.role === "assistant" ? (
+                    <RichText text={message.text} />
+                  ) : (
+                    <p>{message.text}</p>
+                  )}
+                  {message.role === "assistant" && (
+                    <Sources sources={message.sources} tokens={message.tokens} />
+                  )}
+                </div>
+              </div>
+            ),
+          )}
           {sending && (
-            <article className="assistant-msg assistant pending" aria-live="polite">
-              <span className="assistant-who">{t("assistant.navigator")}</span>
-              <p className="assistant-typing">
-                <span />
-                <span />
-                <span />
-                {t("assistant.thinking")}
-              </p>
-            </article>
+            <div className="assistant-msg assistant" aria-live="polite">
+              <span className="assistant-avatar thinking">
+                <Spark />
+              </span>
+              <div className="assistant-body">
+                <p className="assistant-pending">{t("assistant.thinking")}</p>
+              </div>
+            </div>
           )}
         </div>
 
         <form className="assistant-form" onSubmit={submit}>
-          <textarea
-            ref={inputRef}
-            value={draft}
-            maxLength={2000}
-            rows={2}
-            disabled={!ready || sending}
-            placeholder={ready ? t("assistant.placeholder") : t("assistant.placeholderOff")}
-            aria-label={t("assistant.placeholder")}
-            onChange={(event) => setDraft(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter" && !event.shiftKey) {
-                event.preventDefault();
-                void send(draft);
-              }
-            }}
-          />
-          <button type="submit" disabled={!ready || sending || !draft.trim()}>
-            {t("assistant.send")}
-          </button>
+          <div className="assistant-input">
+            <textarea
+              ref={inputRef}
+              value={draft}
+              maxLength={2000}
+              rows={1}
+              disabled={!ready || sending}
+              placeholder={ready ? t("assistant.placeholder") : t("assistant.placeholderOff")}
+              aria-label={t("assistant.placeholder")}
+              onChange={(event) => setDraft(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault();
+                  void send(draft);
+                }
+              }}
+            />
+            <button
+              type="submit"
+              disabled={!ready || sending || !draft.trim()}
+              aria-label={t("assistant.send")}
+            >
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
+                <path fill="currentColor" d="M3 20.5v-6.3L11 12 3 9.8V3.5L22 12z" />
+              </svg>
+            </button>
+          </div>
+          <p className="assistant-disclaimer">{t("assistant.disclaimer")}</p>
         </form>
-        <p className="assistant-disclaimer">{t("assistant.disclaimer")}</p>
       </aside>
     </>
   );

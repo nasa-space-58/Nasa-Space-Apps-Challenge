@@ -1709,31 +1709,22 @@
     "mapLabel": "Routes from the landing site to {count} targets, north up; details are in the table."
   },
   "assistant": {
-    "launcherEyebrow": "MISSION CONTROL",
     "launcher": "Ask the Navigator",
-    "eyebrow": "MISSION CONTROL · Q&A",
-    "title": "Ask the Navigator",
+    "title": "Navigator assistant",
     "close": "Close the assistant",
     "connecting": "Establishing link…",
-    "online": "LINK ACTIVE · {model} · {sections} doc sections",
-    "offline": "LINK OFFLINE",
+    "offline": "Offline",
     "statusFailed": "Could not reach the assistant service.",
-    "contextLabel": "Linked",
-    "noContext": "No saved analysis yet: questions use the documentation only.",
-    "offlineTitle": "ASSISTANT OFFLINE",
+    "offlineTitle": "Assistant is off",
     "offlineBody": "The Q&A assistant is optional and currently switched off on this server. Every analysis still works without it.",
-    "intro": "Ask about your landing site, a date comparison or how the navigator works. Answers use only computed results and project documentation, with sources.",
-    "you": "YOU",
-    "navigator": "NAVIGATOR",
-    "signalLost": "SIGNAL LOST",
-    "sources": "Sources",
+    "intro": "Ask about your landing site, a date comparison or how the navigator works. Answers use computed results and project documentation.",
     "tokens": "{count} tokens",
-    "thinking": "Querying mission data…",
-    "placeholder": "Ask about sunlight, Earth visibility, sites…",
+    "thinking": "Looking through the mission data…",
+    "placeholder": "Ask the navigator",
     "placeholderOff": "Assistant unavailable",
-    "send": "SEND",
+    "send": "Send",
     "askFailed": "The assistant could not answer. Please try again.",
-    "disclaimer": "AI answers can be wrong. Numbers come from the backend's computed results. This is decision support, not flight certification.",
+    "disclaimer": "The assistant can make mistakes. Numbers come from computed results; this is not flight certification.",
     "suggest": {
       "explainSite": "Explain this site's sunlight and Earth visibility in plain language.",
       "compare": "How do my two scenarios differ, and which is better for power?",
@@ -1742,6 +1733,12 @@
       "horizon": "How is the terrain horizon computed?",
       "sites": "Which landing sites can I analyze?",
       "data": "Which NASA data sources does the navigator use?"
-    }
+    },
+    "greeting": "Hello, what would you like to know?",
+    "onlineDocs": "Online · documentation",
+    "onlineLinked": "Online · {count} linked results",
+    "sourcesToggle": "Sources ({count})",
+    "kindDoc": "Doc",
+    "kindApi": "Result"
   }
 }
