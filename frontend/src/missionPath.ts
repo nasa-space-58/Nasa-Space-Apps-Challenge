@@ -435,6 +435,8 @@ export type FlightView = {
   positionAt: (progress: number) => Vec3;
   headingAt: (progress: number) => Vec3;
   pointsUntil: (progress: number) => Vec3[];
+  /** The whole planned path as drawn at a progress (moves with the Moon). */
+  plannedAt: (progress: number) => Vec3[];
   allPoints: Vec3[];
   parkingRing: Vec3[];
   /** UTC milliseconds at a progress, or null without dated ephemeris. */
@@ -514,6 +516,7 @@ export function staticFlightView(path: TransferPath, sun_direction: Vec3): Fligh
     positionAt: (p) => positionAt(path, p),
     headingAt: (p) => headingAt(path, p),
     pointsUntil: (p) => pathPointsUntil(path, p),
+    plannedAt: () => allPathPoints(path),
     allPoints: allPathPoints(path),
     parkingRing: ringAround(earth, path.layout.parking_orbit_radius_scene, (v) => v),
     utcAt: () => null,
@@ -624,6 +627,28 @@ export function liveFlightView(path: TransferPath, flight: FlightEphemeris): Fli
       return applyPose(moonAt(landing), path.site_scene);
     return world[phase.id](phase_progress);
   };
+  // Lunar segments are drawn in the Moon's frame at the shown time (never
+  // before insertion), so the orbit stays wrapped around the moving Moon
+  // instead of smearing along its geocentric track. After insertion the
+  // coast's far end bends smoothly to stay attached to the drawn orbit.
+  const loiMs = timeOf("lunar_orbit", 0);
+  const coastSamples = segments.translunar_coast;
+  const segmentsAt = (progress: number): Record<FlightSegment, Vec3[]> => {
+    const pose = moonAt(Math.max(utcAt(progress), loiMs));
+    const shift = sub(applyPose(pose, evaluate.lunar_orbit(0)), capture);
+    const last = coastSamples.length - 1;
+    return {
+      launch: segments.launch,
+      parking_orbit: segments.parking_orbit,
+      translunar_coast: coastSamples.map((v, i) =>
+        add(v, scale(shift, smoothstep(i / last))),
+      ),
+      lunar_orbit: path.segments.lunar_orbit.map((v) => applyPose(pose, v)),
+      descent: path.segments.descent.map((v) => applyPose(pose, v)),
+    };
+  };
+  const joined = (parts: Record<FlightSegment, Vec3[]>) =>
+    flightOrder.flatMap((id, i) => (i === 0 ? parts[id] : parts[id].slice(1)));
   return {
     live: true,
     earthCenter: () => earthCenter,
@@ -646,10 +671,9 @@ export function liveFlightView(path: TransferPath, flight: FlightEphemeris): Fli
       const delta = sub(ahead, behind);
       return norm(delta) > 0 ? unit(delta) : [0, 0, 0];
     },
-    pointsUntil: (p) => pointsUntilFrom(segments, position, p),
-    allPoints: flightOrder.flatMap((id, i) =>
-      i === 0 ? segments[id] : segments[id].slice(1),
-    ),
+    pointsUntil: (p) => pointsUntilFrom(segmentsAt(p), position, p),
+    plannedAt: (p) => joined(segmentsAt(p)),
+    allPoints: joined(segments),
     parkingRing: ringAround(earthCenter, parkingRadius, (v) => rotateByPose(tliPose, v)),
     utcAt,
   };

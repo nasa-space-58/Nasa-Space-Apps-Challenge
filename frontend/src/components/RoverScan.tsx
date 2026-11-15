@@ -1,4 +1,4 @@
-import { useEffect, useMemo, type MutableRefObject } from "react";
+import { useEffect, useMemo, useRef, type MutableRefObject } from "react";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { noise } from "./LunarSurface";
@@ -87,13 +87,14 @@ export function DemTerrain({
 
 type Rgba = [number, number, number, number];
 const UNSCANNED: Rgba = [0, 0, 0, 0];
-const OPEN: Rgba = [70, 190, 160, 46];
-const STEEP: Rgba = [217, 89, 38, 165];
-const UNKNOWN: Rgba = [30, 30, 34, 150];
-const SEARCHED: Rgba = [57, 135, 229, 105];
-const FRONTIER: Rgba = [170, 215, 255, 210];
-const ROUTE: Rgba = [240, 200, 110, 235];
+const OPEN: Rgba = [70, 190, 160, 22];
+const STEEP: Rgba = [217, 89, 38, 120];
+const UNKNOWN: Rgba = [30, 30, 34, 110];
+const SEARCHED: Rgba = [57, 135, 229, 90];
+const FRONTIER: Rgba = [170, 215, 255, 190];
 const FRONTIER_CELLS = 60;
+/** Overlay strength once the scan is over: a faint hint under the route. */
+const SETTLED_OPACITY = 0.3;
 
 /**
  * Scan reveal draped on the DEM: the antenna pulse front marks traversable
@@ -120,8 +121,9 @@ export function ScanOverlay({
   const pixels = useMemo(() => new Uint8Array(rows * cols * 4), [rows, cols]);
   const texture = useMemo(() => {
     const value = new THREE.DataTexture(pixels, cols, rows);
-    value.magFilter = THREE.NearestFilter;
-    value.minFilter = THREE.NearestFilter;
+    // Smooth between cell centres so the 80 m grid does not read as blocks.
+    value.magFilter = THREE.LinearFilter;
+    value.minFilter = THREE.LinearFilter;
     value.needsUpdate = true;
     return value;
   }, [pixels, rows, cols]);
@@ -145,11 +147,14 @@ export function ScanOverlay({
     return { values, max };
   }, [scene, rows, cols]);
   const explored = scene.explored[target] ?? [];
-  const path = scene.path_cells[target] ?? [];
+  const material = useRef<THREE.MeshBasicMaterial>(null!);
   const drawn = useMemo(() => ({ key: "" }), [scene, target]);
 
-  useFrame(() => {
+  useFrame((_, delta) => {
     const s = THREE.MathUtils.clamp(scan.current, 0, 1);
+    const goal = s >= 1 ? SETTLED_OPACITY : 1;
+    material.current.opacity +=
+      (goal - material.current.opacity) * Math.min(1, Math.min(delta, 0.05) * 3);
     const radius = distance.max * Math.min(1, s / PULSE_END);
     const searched = Math.floor(
       explored.length *
@@ -171,13 +176,13 @@ export function ScanOverlay({
       const [r, c] = explored[k];
       put(r, c, k >= searched - FRONTIER_CELLS && !routed ? FRONTIER : SEARCHED);
     }
-    if (routed) for (const [r, c] of path) put(r, c, ROUTE);
     texture.needsUpdate = true;
   });
 
   return (
     <mesh geometry={geometry} renderOrder={1}>
       <meshBasicMaterial
+        ref={material}
         map={texture}
         transparent
         depthWrite={false}

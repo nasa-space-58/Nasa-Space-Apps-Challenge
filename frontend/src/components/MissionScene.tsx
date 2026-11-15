@@ -320,6 +320,59 @@ function Trail({
   return <primitive object={line} />;
 }
 
+/** Dashed planned path, redrawn each frame so it follows the moving Moon. */
+function PlannedPath({
+  view,
+  progress,
+}: {
+  view: FlightView;
+  progress: MutableRefObject<number>;
+}) {
+  const count = view.allPoints.length;
+  const line = useMemo(() => {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(new Float32Array(count * 3), 3),
+    );
+    return new THREE.Line(
+      geometry,
+      new THREE.LineDashedMaterial({
+        color: "#c6d3dc",
+        transparent: true,
+        opacity: 0.28,
+        dashSize: 0.3,
+        gapSize: 0.3 * 0.78,
+      }),
+    );
+  }, [count]);
+  useEffect(
+    () => () => {
+      line.geometry.dispose();
+      (line.material as THREE.Material).dispose();
+    },
+    [line],
+  );
+  const shown = useRef<{ view: FlightView | null; progress: number }>({
+    view: null,
+    progress: -1,
+  });
+  useFrame(() => {
+    const last = shown.current;
+    if (last.view === view && (!view.live || last.progress === progress.current)) return;
+    shown.current = { view, progress: progress.current };
+    const points = view.plannedAt(progress.current);
+    const attribute = line.geometry.getAttribute("position") as THREE.BufferAttribute;
+    const n = Math.min(points.length, count);
+    for (let i = 0; i < n; i++) attribute.setXYZ(i, ...points[i]);
+    attribute.needsUpdate = true;
+    line.geometry.setDrawRange(0, n);
+    line.computeLineDistances();
+    line.geometry.computeBoundingSphere();
+  });
+  return <primitive object={line} />;
+}
+
 function Spacecraft({
   view,
   progress,
@@ -746,7 +799,6 @@ function System({
       ),
     [],
   );
-  const fullPath = useMemo(() => (view ? view.allPoints.map(v3) : []), [view]);
   const parkingRing = useMemo(
     () =>
       view
@@ -897,13 +949,7 @@ function System({
       </group>
       {view && (
         <>
-          <Line
-            points={fullPath}
-            color="#c6d3dc"
-            opacity={0.28}
-            dashed
-            dashSize={0.3}
-          />
+          <PlannedPath view={view} progress={progress} />
           <Trail view={view} progress={progress} />
           <Spacecraft
             view={view}
