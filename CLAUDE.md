@@ -238,3 +238,7 @@ Continue on `codex/unified-quantum-stage1`; connect bounded local quantum propos
 ### Branch consolidation and scene refresh (user, 2026-11-15)
 
 The user authorized consolidating the latest GitHub branches into main, cleaning up branch clutter, and implementing the agreed rounded-control / scene-first interface. This authorization supersedes earlier branch-specific no-merge and delivery restrictions for this integration. Preserve active worktrees and unrelated local files. H8–H11 and healthinfo were already squash-integrated via PRs #19 and #18. The divergent early R12 implementation is archived rather than replacing the current H5/H6 and R12 event stack. See docs/verification/branch-consolidation-2026-11-15.md for exact tips, preserved branches and verification. No paid assistant or quantum provider calls are authorized.
+
+### Terrain R12 restoration (user, 2026-11-15)
+
+The user explicitly authorized restoring the archived R12 features without breaking either system, testing and publishing to main. This supersedes the earlier archive-only disposition for this implementation and authorizes this delivery to main. Terrain recovery is isolated in `app.terrain_recovery` / `app.terrain_twin` at `/descents/self-healing`; existing H5/H6 and public R9 remain unchanged. Frozen new test baseline: `1fa44d5`. See docs/terrain-recovery.md. Do not conflate this real-DEM classical experiment with the shared hybrid plan or certified flight control.

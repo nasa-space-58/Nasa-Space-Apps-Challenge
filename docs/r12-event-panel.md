@@ -6,6 +6,8 @@ Branch: `feature/r12-event-panel`, started from `main` `90d6561`, with `main` `8
 
 The older `feature/r12-self-healing` branch was not merged. Its backend is a separate twin-based implementation that conflicts with H5 in `backend/app/self_healing.py`, its tests and `docs/self-healing.md`.
 
+**Subsequent restoration (2026-11-15):** The terrain-based R12 features are now restored under separate `terrain_recovery` / `terrain_twin` modules and `/descents/self-healing`, without replacing this H5/H6 panel or its API. See [terrain recovery](terrain-recovery.md) for the integration boundary and verification.
+
 ## Backend: replay view
 
 `backend/app/recovery_api.py` exposes:
