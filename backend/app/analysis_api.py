@@ -411,6 +411,15 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     from app.unified_coordinator import UnifiedCoordinator, register_unified_routes
 
     unified = UnifiedCoordinator(state_dir / "unified.sqlite")
+    from app.mission_resilience_api import MissionReplayStore, register_resilience_routes
+
+    resilience = MissionReplayStore(state_dir / "resilience.sqlite")
+
+    async def resilience_worker():
+        while True:
+            await asyncio.to_thread(resilience.tick)
+            await asyncio.sleep(0.2)
+
 
     async def unified_worker():
         while True:
@@ -420,6 +429,7 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     @asynccontextmanager
     async def lifespan(app):
         unified.recover_interrupted()
+        resilience.recover_interrupted()
         store.recover()
         communications.recover()
         space_weather.recover()
@@ -429,6 +439,7 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
                 asyncio.create_task(worker()),
                 asyncio.create_task(flight_worker()),
                 asyncio.create_task(unified_worker()),
+                asyncio.create_task(resilience_worker()),
             ]
             if start_worker
             else []
@@ -438,6 +449,7 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
         finally:
             await asyncio.to_thread(risk_runtime.close)
             unified.recover_interrupted()
+            resilience.recover_interrupted()
             for task in tasks:
                 task.cancel()
                 try:
@@ -448,6 +460,8 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     app = FastAPI(title="Lunar Landing Navigator", lifespan=lifespan)
     app.state.unified = unified
     register_unified_routes(app, unified)
+    app.state.resilience = resilience
+    register_resilience_routes(app, resilience)
     app.state.store = store
     app.state.searches = searches
     app.state.communications = communications

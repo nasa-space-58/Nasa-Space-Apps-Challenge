@@ -277,14 +277,54 @@ def plan_mission(config: MissionConfig, view: PlannerView) -> dict:
                 based_on_revision=v.revision, phase=v.phase,
                 conditions=dict(fuel_reserve_kg=c.terminal.reserve_kg, energy_reserve_wh=c.reserve_energy_wh,
                                 temperature_limits_c=c.temperature_limits_c,
-                                valid_until_met_s=min(c.horizon_s, v.met_s + c.plan_ttl_s),
+                                valid_until_met_s=min(c.horizon_s, v.met_s + (max(0.0, c.terminal.duration_s-v.phase_elapsed_s) if v.phase == "descent" else c.plan_ttl_s)),
                                 revalidate_on="observation, phase, resource or deadline change"),
                 solver="classical_finite_enumeration")
 
 
 def validate_active_action(config: MissionConfig, view: PlannerView, action: dict) -> list[str]:
     """Check immediate action limits before continuing controls for one tick."""
-    raise NotImplementedError
+    c, v, a = config, view, action
+    reasons = []
+    if _energy_reason(c, v, a["power_w"], 1.0):
+        reasons.append("energy_reserve")
+    temperature = v.temperature_c + v.thermal_drift_cps + a.get("thermal_rate_cps", 0.0)
+    if not c.temperature_limits_c[0] <= temperature <= c.temperature_limits_c[1]:
+        reasons.append("temperature_limit")
+    if a["kind"] == "task":
+        task = next(t for t in c.tasks if t.task_id == a["id"])
+        if task.hardware not in v.hardware:
+            reasons.append("hardware_unavailable")
+        if task.requires_link and not v.link:
+            reasons.append("link_required")
+        if v.met_s + 1 > min(task.deadline_met_s, c.horizon_s):
+            reasons.append("task_deadline")
+    elif a["kind"] == "landing":
+        if a["id"] in v.blocked_targets:
+            reasons.append("landing_hazard")
+        if v.sensor_conflict:
+            reasons.append("navigation_sensor_conflict")
+        if v.fuel_kg <= c.terminal.reserve_kg or v.available_thrust_n <= 0:
+            reasons.append("insufficient_propulsion")
+    elif a["kind"] == "route":
+        route = next(r for r in c.routes if r.route_id == a["id"])
+        if route.requires_link and not v.link:
+            reasons.append("link_required")
+        if v.available_thrust_n < route.min_thrust_n:
+            reasons.append("insufficient_thrust")
+        if v.fuel_kg - route.fuel_kg / route.duration_s < c.terminal.reserve_kg:
+            reasons.append("fuel_reserve")
+        if v.met_s + route.duration_s * (1-v.cruise_progress) > c.arrival_deadline_met_s:
+            reasons.append("arrival_deadline")
+    elif a["kind"] == "launch":
+        if not v.weather_ok:
+            reasons.append("weather_not_clear")
+        if v.fuel_kg - c.launch_fuel_kg/c.launch_duration_s < c.terminal.reserve_kg:
+            reasons.append("fuel_reserve")
+    elif a["kind"] == "thermal":
+        if (a["id"] == "heat" and "heater" not in v.hardware) or (a["id"] == "cool" and "cooler" not in v.hardware):
+            reasons.append("hardware_unavailable")
+    return reasons
 
 
 def _initial(c):
@@ -322,6 +362,7 @@ def replay_mission(scenario: MissionScenario, *, cancelled=None) -> dict:
     truth, known = _initial(c), _initial(c)
     phase, entered, met, revision = c.initial_phase, 0.0, 0.0, 0
     fired, notices, observations, truth_events = set(), [], [], []
+    last_observed = {}
     frames, decisions, transitions = [], [], []
     active, pending, trajectory = None, None, None
     target_name = next(k for k, x in c.targets.items() if x == c.terminal.target_downrange_m)
@@ -382,22 +423,33 @@ def replay_mission(scenario: MissionScenario, *, cancelled=None) -> dict:
                 fired.add(e.event_id)
                 _effect(truth, e)
                 truth_events.append(dict(event_id=e.event_id, met_s=met, kind=e.kind, subject=e.subject, value=e.value))
-                notices.append((met+e.notice_delay_s, e))
+                notices.append((met+e.notice_delay_s, e, met))
                 if e.kind in ("fuel_loss", "thrust"):
                     trajectory = None
-        for at, e in list(notices):
+        for at, e, occurred in list(notices):
             if at <= met:
-                # Resource losses are already accounted by meters; never apply twice.
-                if e.kind not in ("fuel_loss", "energy_loss", "sensor_bias"):
-                    _effect(known, e)
-                observations.append(dict(event_id=e.event_id, met_s=met, kind=e.kind, subject=e.subject, value=e.value))
-                notices.remove((at, e))
-                revision += 1
-                needs_plan = True
+                key = (e.kind, e.subject)
+                observation_status = "applied"
+                if occurred < last_observed.get(key, -1):
+                    observation_status = "ignored_older_observation"
+                else:
+                    last_observed[key] = occurred
+                    # Resource losses are already accounted by meters; never apply twice.
+                    if e.kind not in ("fuel_loss", "energy_loss", "sensor_bias"):
+                        _effect(known, e)
+                    revision += 1
+                    needs_plan = True
+                observations.append(dict(event_id=e.event_id, met_s=met, occurred_met_s=occurred,
+                    kind=e.kind, subject=e.subject, value=e.value, status=observation_status))
+                notices.remove((at, e, occurred))
         current = observe()
+        control_reasons = validate_active_action(c, current, active) if active else ["no_current_control"]
+        if active and control_reasons:
+            needs_plan = True
         frames.append(dict(met_s=met, phase=phase, estimate=current.model_dump(mode="json"), truth=deepcopy(truth),
                            executing=active["id"] if active else None,
                            planning_pending=pending is not None,
+                           control_validated=not control_reasons, control_reasons=control_reasons,
                            navigation_channels_m=[truth["landing_state"]["position_m"][0], truth["landing_state"]["position_m"][0]+truth["sensor_bias_m"]] if truth["landing_state"] else []))
         low, high = c.temperature_limits_c
         if truth["energy_wh"] <= 0 or truth["fuel_kg"] <= 0 and phase != "surface":
@@ -452,8 +504,9 @@ def replay_mission(scenario: MissionScenario, *, cancelled=None) -> dict:
                 record(proposal, "no_feasible_continuation", current)
                 status, reasons = "no_feasible_continuation", sorted({r for row in proposal["candidates"] for r in row["reasons"]})
                 break
-            # Initial stage decision is an explicitly offline preflight check.
-            if met == entered or c.planning_delay_s == 0:
+            # Only the initial decision is an offline preflight check; phase
+            # transitions consume the same declared planning latency.
+            if met == 0 or c.planning_delay_s == 0:
                 record(proposal, "accepted", current)
                 active = deepcopy(proposal["selected"])
                 active["accepted_s"] = met
@@ -463,12 +516,17 @@ def replay_mission(scenario: MissionScenario, *, cancelled=None) -> dict:
             else:
                 pending = dict(ready_s=met+c.planning_delay_s, proposal=proposal)
                 needs_plan = False
-        # During latency retain current controls, but inhibit known unsafe task work.
+        # Inertial descent continues the existing controller during latency; it
+        # is explicitly marked unvalidated, never called a safe hover. Other
+        # stages inhibit known invalid work and consume finite baseline power.
         action = active or _candidate("pending", "standby")
-        if phase == "surface" and action["kind"] == "task":
-            task = next(t for t in c.tasks if t.task_id == action["id"])
-            if task.hardware not in current.hardware or task.requires_link and not current.link:
-                action = _candidate("pending", "standby")
+        immediate_reasons = validate_active_action(c, current, action)
+        if immediate_reasons and phase != "descent":
+            action = _candidate("pending", "standby")
+            wait_reasons = validate_active_action(c, current, action)
+            if wait_reasons:
+                status, reasons = "no_feasible_continuation", wait_reasons
+                break
         dt, next_phase = 1.0, None
         actual_power = action["power_w"]
         if phase == "launch" and action["kind"] == "launch":
@@ -531,7 +589,7 @@ def replay_mission(scenario: MissionScenario, *, cancelled=None) -> dict:
         if energy < c.reserve_energy_wh-1e-10 or fuel < c.terminal.reserve_kg-1e-8:
             status, reasons = "no_feasible_continuation", ["resource_reserve_breached"]
         if status == "no_feasible_continuation":
-            frames.append(dict(met_s=met, phase=phase, truth=deepcopy(truth), estimate=observe().model_dump(mode="json"), executing=action["id"], planning_pending=False, navigation_channels_m=[]))
+            frames.append(dict(met_s=met, phase=phase, truth=deepcopy(truth), estimate=observe().model_dump(mode="json"), executing=action["id"], planning_pending=False, control_validated=False, control_reasons=reasons, navigation_channels_m=[]))
             break
         if next_phase:
             enter(next_phase)
