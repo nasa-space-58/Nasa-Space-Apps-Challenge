@@ -62,4 +62,25 @@ class ModuleRole(Contract):
 
 def module_catalog() -> tuple[ModuleRole, ...]:
     """Describe all H modules without enabling execution or provider access."""
-    raise NotImplementedError
+    roles = (
+        ("H0", "Native mission contracts and provenance", "native_input"),
+        ("H1", "Classical reference and independent validation", "reference_only"),
+        ("H2", "Bounded QUBO/QAOA proposals", "reference_only"),
+        ("H3", "Resource, calendar and storage constraints", "reference_only"),
+        ("H4", "Native terminal descent inputs", "native_input"),
+        ("H5", "Native fault scenario and estimated checkpoint", "native_input"),
+        ("H6", "Native recovery request and selection identity bridge", "native_input"),
+        ("H7", "Optional quoted hardware execution", "approval_required"),
+        ("H8", "Comparison and solver provenance presentation", "reference_only"),
+        ("H9", "Shared-antenna scheduling evidence", "reference_only"),
+        ("H10", "Scaling and matched performance benchmarks", "reference_only"),
+        (
+            "H11",
+            "Orbital-relay selection evidence; separate frame/model",
+            "reference_only",
+        ),
+    )
+    return tuple(
+        ModuleRole(module_id=module, role=role, stage2_status=status)
+        for module, role, status in roles
+    )

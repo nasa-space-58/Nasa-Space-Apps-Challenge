@@ -431,7 +431,7 @@ Completed demonstrations are checked below; unchecked items remain planned conce
 This sequence builds on the merged H0–H11 and R10–R13 implementations. Existing modules are retained; completing their individual milestones does not imply a lossless common planner. See [stage 1 inventory, baseline and acceptance gates](unified-mission-planner.md).
 
 - [x] Stage 1 — Audit current contracts and connections; record fresh R11 classical and H6/R12 local-replay baselines, explicit adapter rejection and existing R13 NO-GO policy. This is an inventory/evidence delivery, not a new solver.
-- [ ] Stage 2 — Versioned integration envelope and bounded, semantics-preserving adapters for R11 campaigns, H6 estimated state, evidence and decision deadlines.
+- [x] Stage 2 — Versioned native R11/H6 envelope, sealed snapshots and bounded synthetic option-identity adapters; full constraints retained and proposals require classical completion/physical revalidation. All H0–H11 roles are catalogued; unsupported real frame/relay-only mappings reject explicitly. See [contracts and limits](unified-planner-contracts.md).
 - [ ] Stage 3 — End-to-end classical lander/dependent-rover/shared-resource pilot, including feasible replanning, stale results and no-continuation cases.
 - [ ] Stage 4 — Bounded quantum proposal path with full classical completion, original-constraint validation, matched baselines and unchanged production execution gates.
 - [ ] Stage 5 — Event-driven coordination and unified plan identity across existing views; timing, fallback and execution-mode evidence.

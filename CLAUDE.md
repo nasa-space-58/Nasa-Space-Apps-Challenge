@@ -215,3 +215,7 @@ The user explicitly authorized integrating the latest main with the completed H1
 ### Unified planner stage 1 (user, 2026-11-15)
 
 Start from current main `e92174e` on `codex/unified-quantum-stage1`. Complete only the first agreed stage: integration inventory, baseline observations and tests. Push only this new branch; do not merge into or push main/tahakrcc. Ask before any real quantum credit spending, including Spark. The new common solver, adapters and live coordinator remain subsequent stages. Preserve the unrelated H6 notebook edit and existing frozen tests. See docs/unified-mission-planner.md and its stage 1 evidence.
+
+### Unified planner stage 2 (user, 2026-11-15)
+
+Continue on `codex/unified-quantum-stage1`, implement the R11/H6 common contracts/adapters, test and push only this branch. Do not merge into main/tahakrcc. All H0–H11 roles must remain in the common architecture; stage 2 does not claim all adapters or a universal solver are implemented. Ask before any real quantum credits, including Spark. Preserve the local H6 notebook. Skeleton `408dbf7`, frozen tests/fixture `73cdc6e`; see docs/unified-planner-contracts.md.

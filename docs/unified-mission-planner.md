@@ -95,3 +95,7 @@ The contract rejection probe replaces `hybrid.campaign` in the recovery request 
 The unchanged merged baseline passed 1,716 backend tests, 218 ingestion tests and 91 optional-quantum tests: **2,025 tests total**. Backend/ingestion Ruff checks and the frontend TypeScript/Vite production build passed. The existing Starlette/AnyIO deprecation and large Vite chunk warnings remain. No frontend tests, screenshots, provider requests or hardware jobs were run.
 
 This branch changes documentation and the recorded baseline evidence only. The pre-existing local H6 notebook edit is excluded from the commit. Stage 2 remains pending: define the integration envelope and supported adapters before implementing the common planner.
+
+## Stage 2 delivery
+
+The native envelope and bounded synthetic identity adapters are now implemented; see [stage 2 contracts, tests and remaining limits](unified-planner-contracts.md). Earlier pending statements above describe the stage 1 delivery. The common coordinator and general quantum proposal path remain later stages.
