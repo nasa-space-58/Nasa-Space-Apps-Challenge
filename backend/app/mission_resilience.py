@@ -595,7 +595,7 @@ def replay_mission(scenario: MissionScenario, *, cancelled=None) -> dict:
             enter(next_phase)
     stop_check()
     completed = sorted(t.task_id for t in c.tasks if truth["task_progress_s"][t.task_id] >= t.duration_s)
-    return dict(input_sha256=fingerprint(s), scenario_id=c.scenario_id, status=status, reasons=reasons,
+    return dict(input_sha256=fingerprint(s), inputs=s.model_dump(mode="json"), scenario_id=c.scenario_id, status=status, reasons=reasons,
         source=c.source.model_dump(mode="json"), decisions=decisions, frames=frames, transitions=transitions,
         observations=observations, truth_events=truth_events, completed_tasks=completed,
         unfinished_tasks=[dict(task_id=t.task_id, progress_s=truth["task_progress_s"][t.task_id],
