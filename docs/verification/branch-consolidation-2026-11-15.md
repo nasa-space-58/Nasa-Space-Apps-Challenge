@@ -60,3 +60,7 @@ Frontend TypeScript/Vite build passed in the preview container. No new frontend 
 - Changed integration modules: Ruff check passed.
 - Final frontend TypeScript/Vite production build passed; existing large-bundle advisory remains.
 - Local rebuilt backend `/health` returned OK; `/assistant/status` confirms disabled-by-default operation. Existing data/state volumes were preserved.
+
+## Published outcome
+
+Main was fast-forwarded to the verified integration at `9567419`. All 25 archive tags were verified against their exact remote peeled commit before any branch deletion. Nine listed tracking refs were already absent on GitHub; 16 remaining completed/superseded remote branches were deleted. A pruning fetch removed the nine stale local remote-tracking refs. GitHub now has five branches: main, tahakrcc, temel, sinan, and codex/unified-quantum-stage1. PR #17 is closed; its superseded implementation remains recoverable from the archive tag. No contributor branch or other worktree was rewritten.
