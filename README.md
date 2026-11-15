@@ -294,3 +294,15 @@ H10, aynı örnek problemlerde tam tarama ve MILP sürelerini ölçer; tahminler
 
 - [H10 ölçüm ve doğrulama](docs/problem-scaling.md), [notebook](notebooks/H10_problem_scaling.ipynb), arayüz: `#/scaling`.
 - [H11 kaynaklar ve sonuçlar](docs/relay-orbit-selection.md), [notebook](notebooks/H11_relay_orbits.ipynb), arayüz: `#/relays`.
+
+### Görev dayanıklılığı simülasyonu
+
+Görev kontrolündeki **Görev dayanıklılığı** sekmesi (`#/resilience`) kalkış,
+yolculuk, iniş ve yüzey boyunca ardışık arızaları tekrar oynatır. Örnek seçip
+**Görev simülasyonunu çalıştır** düğmesine basın; zaman çizgisinden kaynakları,
+gözlenen olayları ve yeniden planlama kararlarını inceleyin. İptal ve sonuç
+indirme desteklenir. Kararlar klasiktir; kuantum işi veya kredi kullanımı yoktur.
+
+Bunlar sentetik, çevrimdışı örneklerdir. Kalkış/yolculuk kaynak muhasebesi, iniş
+düzlemsel fizik, yüzey ise basit enerji/sıcaklık modeli kullanır. Gerçek uçuş
+güvenliği garantisi verilmez. [Kapsam, API ve sınırlar](docs/mission-resilience.md).
