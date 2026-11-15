@@ -15,7 +15,7 @@ import {
 import * as THREE from "three";
 import { Dust, Model, Terrain, smooth } from "./LunarSurface";
 import LaunchSite from "./LaunchSite";
-import Rover, { type RoutePoint } from "./Rover";
+import Rover, { preloadRoverModel, type RoutePoint } from "./Rover";
 import { DemTerrain, ScanOverlay } from "./RoverScan";
 import { SEARCH_END, sceneMapping, type SurfaceScene } from "./surfaceScene";
 import type { Preset } from "../types";
@@ -1034,6 +1034,10 @@ function LandingSite({
   roverTarget: string;
 }) {
   const lander = useRef<THREE.Group>(null!);
+  // Fetch the rover model during the descent so it is ready at touchdown.
+  useEffect(() => {
+    preloadRoverModel();
+  }, []);
   // Real LOLA DEM window from the backend route scene, when loaded.
   const mapping = useMemo(
     () => (roverScene ? sceneMapping(roverScene) : null),

@@ -225,9 +225,7 @@ function RoverGlb({
   spin: MutableRefObject<number>;
   scan: MutableRefObject<number>;
 }) {
-  const gltf = useLoader(GLTFLoader, ROVER_MODEL_URL, (loader) => {
-    loader.setDRACOLoader(new DRACOLoader().setDecoderPath("/draco/"));
-  });
+  const gltf = useLoader(GLTFLoader, ROVER_MODEL_URL, withDraco);
   const rig = useMemo(() => {
     const model = gltf.scene.clone(true);
     model.updateMatrixWorld(true);
@@ -311,23 +309,38 @@ function RoverGlb({
   );
 }
 
-/** Checks that the optional model file is really there (not the SPA page). */
-function useModelAvailable(url: string) {
+const withDraco = (loader: GLTFLoader) => {
+  loader.setDRACOLoader(new DRACOLoader().setDecoderPath("/draco/"));
+};
+let modelCheck: Promise<boolean> | null = null;
+
+/**
+ * Checks once that the optional model file is really there (not the SPA
+ * page) and starts downloading it, so it is ready by touchdown.
+ */
+export function preloadRoverModel(): Promise<boolean> {
+  modelCheck ??= fetch(ROVER_MODEL_URL, { method: "HEAD" })
+    .then((response) => {
+      const type = response.headers.get("content-type") ?? "";
+      const available = response.ok && !type.includes("text/html");
+      if (available) useLoader.preload(GLTFLoader, ROVER_MODEL_URL, withDraco);
+      return available;
+    })
+    .catch(() => false);
+  return modelCheck;
+}
+
+function useModelAvailable() {
   const [available, setAvailable] = useState(false);
   useEffect(() => {
     let live = true;
-    fetch(url, { method: "HEAD" })
-      .then((response) => {
-        const type = response.headers.get("content-type") ?? "";
-        if (live) setAvailable(response.ok && !type.includes("text/html"));
-      })
-      .catch(() => {
-        if (live) setAvailable(false);
-      });
+    preloadRoverModel().then((value) => {
+      if (live) setAvailable(value);
+    });
     return () => {
       live = false;
     };
-  }, [url]);
+  }, []);
   return available;
 }
 
@@ -428,7 +441,7 @@ export default function Rover({
   const lastDistance = useRef(0);
   const heading = useRef<number | null>(null);
   const route = useMemo(() => layout(path, mapping), [path, mapping]);
-  const hasModel = useModelAvailable(ROVER_MODEL_URL);
+  const hasModel = useModelAvailable();
   const lines = useMemo(() => {
     const lifted = drape(route.points, route.ground);
     const planned = new THREE.Line(
