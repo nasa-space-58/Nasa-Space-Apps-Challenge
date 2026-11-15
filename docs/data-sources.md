@@ -5,7 +5,7 @@
 > This document ranks the challenge's official resources and additional APIs / datasets we researched **by how much value they add to the project**.
 > Last checked: 14 November 2026. ✅ = page opened and verified · 🔎 = from search results, still needs to be opened and checked · 🧪 = tested by the team against the live API.
 >
-> Horizons query details, the data schema and the visibility-window algorithm are summarized here from [2gbram_horizons_veri_notlari.md](2gbram_horizons_veri_notlari.md); see that file for the full details.
+> Horizons query details, the data schema and the visibility-window algorithm are summarized here from [horizons-data-notes.md](horizons-data-notes.md); see that file for the full details.
 
 ## Implementation decision
 

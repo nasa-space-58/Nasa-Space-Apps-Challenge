@@ -1,28 +1,28 @@
-# Ay İniş Alanı Navigatörü
+# Lunar Landing Site Navigator
 
-2gbram takımının NASA Space Apps Challenge projesi. İlk MVP, Ay'daki konum ve tarih seçeneklerini Güneş/Dünya görünürlüğüne göre karşılaştırır.
+Team 2gbram's NASA Space Apps Challenge project. The first MVP compares lunar site and date options by Sun/Earth visibility.
 
-## Mevcut durum
+## Current status
 
-Task 0 tamamlandı: servis kurulumu, bağımlılık kilitleri, temiz kurulum ve başlangıç arazi/nokta kaynakları doğrulandı. Backend sağlık endpoint'i, ortak veri modelleri ve başlangıç arayüzü mevcut. Task 1 bu dalda uygulandı: RabbitMQ istekleri Güneş/Dünya verisi ve kalıcı LOLA arazi kesiti üretir. Task 2 arazi ufkunu, Task 3 görünürlük aralıklarını ve süre metriklerini hesaplar. Task 4 de bu dalda tamamlandı: kalıcı analiz API’si, NASA modelleriyle kaydırmalı 3D giriş, konum/tarih seçimi ve gerçek sonuçların zaman kontrollü arayüzü mevcut.
+Task 0 is complete: service setup, dependency locks, a clean install and the initial terrain/site sources were verified. A backend health endpoint, shared data models and an initial interface are available. Task 1 was implemented on this branch: RabbitMQ requests produce Sun/Earth data and a persistent LOLA terrain tile. Task 2 computes the terrain horizon, and Task 3 computes visibility intervals and duration metrics. Task 4 was also completed on this branch: a persistent analysis API, a scroll-driven 3D introduction with NASA models, site/date selection and a time-controlled interface for real results.
 
-## Kurulum
+## Setup
 
-Docker Desktop ve Docker Compose gerekir. Proje kökünde `.env.example` dosyasını `.env` olarak kopyalayın ve yerel RabbitMQ kullanıcı adı/parolasını belirleyin. URL içinde kullanılabilecek karakterler seçin.
+Docker Desktop and Docker Compose are required. In the project root, copy `.env.example` to `.env` and set a local RabbitMQ username/password. Choose characters that are safe inside a URL.
 
 ```bash
 cp .env.example .env
 docker compose up --build
 ```
 
-- Arayüz — http://localhost:5173
-- API belgeleri — http://localhost:8000/docs
-- Sağlık kontrolü — http://localhost:8000/health
-- RabbitMQ yönetimi — http://localhost:15672
+- Interface — http://localhost:5173
+- API documentation — http://localhost:8000/docs
+- Health check — http://localhost:8000/health
+- RabbitMQ management — http://localhost:15672
 
-Worker kalıcı RabbitMQ kuyruğunu tüketir; dosyaları doğrulayıp sonuç mesajını yayımladıktan sonra isteği onaylar. Backend kaynak değişikliklerini yeniden yükler. Worker değişikliklerinde `docker compose restart data-ingestion` kullanın.
+The worker consumes the durable RabbitMQ queue; it acknowledges a request after validating the files and publishing the result message. The backend reloads on source changes. After worker changes, use `docker compose restart data-ingestion`.
 
-## Kontroller
+## Checks
 
 ```bash
 docker compose --env-file .env.example config --quiet
@@ -34,28 +34,28 @@ docker compose run --rm backend ruff check app tests /workspace/shared
 docker compose run --rm data-ingestion ruff check app tests
 ```
 
-Doğrudan bağımlılıklar sabitlendi. Frontend Vite 7.3.8 ve Vitest 4.1.12 kullanır; kilit dosyası güncellendi ve `npm ci` ile doğrulandı. 14 Kasım 2026 kontrolünde `npm audit` sıfır açık bildirdi; Task 4 sonunda 192 test (112 backend, 75 veri alımı, 5 arayüz), Python lint kontrolleri ve frontend derlemesi geçti. Python geçişli bağımlılıkları `requirements.lock` dosyalarında sürüm ve SHA-256 hash ile kilitlendi; Docker kurulumu `--require-hashes` ve `pip check` kullanır. [Kilitleri güncelleme](docs/python-dependencies.md).
+Direct dependencies are pinned. The frontend uses Vite 7.3.8 and Vitest 4.1.12; the lock file was updated and verified with `npm ci`. In the 14 November 2026 check, `npm audit` reported zero vulnerabilities; at the end of Task 4, 192 tests (112 backend, 75 data ingestion, 5 interface), the Python lint checks and the frontend build passed. Python transitive dependencies are locked with versions and SHA-256 hashes in the `requirements.lock` files; the Docker install uses `--require-hashes` and `pip check`. [Updating the locks](docs/python-dependencies.md).
 
 ```bash
 docker compose run --rm --no-deps frontend npm ci
 ```
 
-14 Kasım 2026 tarihinde ayrı ve temiz bir Git klonunda önbelleksiz Docker derlemesi, yeni veri diskleriyle başlangıç ve 70 test doğrulandı. [Temiz kurulum raporu](docs/clean-install-verification.md).
+On 14 November 2026, an uncached Docker build, startup with new data volumes and 70 tests were verified in a separate, clean Git clone. [Clean install report](docs/clean-install-verification.md).
 
-## Horizons verilerini indirme
+## Downloading Horizons data
 
 ```bash
 docker compose --env-file .env.example run --rm --no-deps data-ingestion \
   python -m app.download_horizons examples/horizons-reference.json
 ```
 
-Referans noktasında 14–15 Kasım 2026 için saatlik 25 örnek indirildi; tekrar çalıştırma önbelleği kullandı. Ham yanıtlar, kaynak bilgileri ve eşleştirilmiş Güneş/Dünya verileri ortak `/data/horizons/` dizininde saklanır. Tek başına Horizons komutu kullanılabilir; aşağıdaki uçtan uca kuyruk komutu araziyi de hazırlar. [Ayrıntılar ve doğrulama](docs/horizons-ingestion.md).
+At the reference site, 25 hourly samples were downloaded for 14–15 November 2026; a repeated run used the cache. Raw responses, provenance and the matched Sun/Earth data are stored in the shared `/data/horizons/` directory. The standalone Horizons command can be used on its own; the end-to-end queue command below also prepares the terrain. [Details and verification](docs/horizons-ingestion.md).
 
-Başlangıç karşılaştırma noktaları Mons Mouton merkezi ve Malapert Massif R23 olarak kaynaklandırıldı. İki noktanın çevresindeki DEM pencerelerinde veri kapsamı doğrulandı. Bunlar güvenli iniş noktası sertifikası değildir; uygulama içi nokta seçimi, arazi ufku hesabı ve görünürlük analizi sonraki task’larda eklendi. [Arazi ve koordinat kaynakları](docs/terrain-and-sites.md).
+The initial comparison sites are sourced as the Mons Mouton center and Malapert Massif R23. Data coverage was verified in the DEM windows around both sites. They are not safe-landing-site certifications; in-app site selection, the terrain horizon computation and the visibility analysis were added in later tasks. [Terrain and coordinate sources](docs/terrain-and-sites.md).
 
-## Task 1 — Kuyruk üzerinden veri hazırlama
+## Task 1 — Data preparation through the queue
 
-Başka bir dalın çalışan ortamına dokunmadan ayrı Docker projesi açmak için:
+To start a separate Docker project without touching another branch's running environment:
 
 ```bash
 docker compose -p nasa-task1 --env-file .env.example \
@@ -66,26 +66,26 @@ docker compose -p nasa-task1 --env-file .env.example \
   python -m app.submit_ingestion /workspace/shared/examples/ingestion-malapert.json
 ```
 
-İlk istek yaklaşık 189 MB'lık NASA arazi kaynağını indirir. Aynı istek kimliği ve parametreler tekrar kullanıldığında doğrulanmış sonuç döner; yeni senaryo için yeni UUID gerekir. Veriler projenin kalıcı `lunar-data` diskinde tutulur. `down --volumes` bu verileri siler; korumak için yalnızca `down` kullanın. İzole yapılandırma host portu açmaz.
+The first request downloads the roughly 189 MB NASA terrain source. Reusing the same request ID and parameters returns the verified result; a new scenario needs a new UUID. Data is kept in the project's persistent `lunar-data` volume. `down --volumes` deletes this data; use plain `down` to keep it. The isolated configuration exposes no host ports.
 
-Malapert için 25 zaman örneği ve 501 × 501 arazi kesiti gerçek kuyruk akışıyla doğrulandı. RabbitMQ yeniden başlatıldığında bekleyen istek korundu. [Akış, hata davranışları ve kanıtlar](docs/ingestion-pipeline.md).
+For Malapert, 25 time samples and a 501 × 501 terrain tile were verified through the real queue flow. A pending request survived a RabbitMQ restart. [Flow, failure behavior and evidence](docs/ingestion-pipeline.md).
 
-Bu çalışma yalnızca `feature/task1-ingestion-cache` dalına gönderilir; `tahakrcc` ve `main` ile birleştirilmez.
+This work is pushed only to the `feature/task1-ingestion-cache` branch; it is not merged into `tahakrcc` or `main`.
 
-## Plan ve veri sözleşmeleri
+## Plan and data contracts
 
-- [MVP ve aşamalı yapılacaklar listesi](docs/mvp-roadmap.md)
-- [Başlangıç varsayımları](docs/assumptions.md)
-- [Teknolojiler](docs/technologies.md)
-- [Kodlama kuralları](docs/coding-conventions.md)
+- [MVP and phased task list](docs/mvp-roadmap.md)
+- [Initial assumptions](docs/assumptions.md)
+- [Technologies](docs/technologies.md)
+- [Coding conventions](docs/coding-conventions.md)
 
-Graphify çıktıları `graphify-out/` altında yerel tutulur ve Git tarafından yok sayılır.
+Graphify output is kept locally under `graphify-out/` and is ignored by Git.
 
-## Task 2: Arazi ufku
+## Task 2: Terrain horizon
 
-Task 2, önbellekteki tam NASA arazi dosyasından Ay eğriliğini ve gözlemci
-yüksekliğini içeren 360° ufuk profili hesaplar. Backend veriyi salt okunur kullanır.
-Eksik yönler `null` olarak raporlanır; arama mesafesinin dışı değerlendirilmez.
+Task 2 computes a 360° horizon profile, including lunar curvature and observer
+height, from the full cached NASA terrain file. The backend uses the data read-only.
+Missing azimuths are reported as `null`; terrain beyond the search distance is not evaluated.
 
 ```bash
 docker compose --env-file .env.example build backend
@@ -95,19 +95,19 @@ docker compose --env-file .env.example run --rm --no-deps backend \
   > horizon.json
 ```
 
-Örnekteki referans Task 1'in Malapert isteğine aittir; farklıysa kendi `ready`
-yanıtındaki `terrain_path` değerini kullan. Varsayılanlar 1° yön aralığı, 100 km
-arama mesafesi ve uzakta 40 m örneklemedir; ilk 1 km her metrede örneklenir.
-80 m arazi çözünürlüğü değişmez. Bu profil henüz Güneş/Dünya görünürlük süresi
-veya güvenli iniş kararı üretmez. Görünürlük Task 3, arayüz Task 4 kapsamındadır.
+The reference in the example belongs to Task 1's Malapert request; if yours differs, use
+the `terrain_path` value from your own `ready` response. The defaults are a 1° azimuth step, a 100 km
+search distance and 40 m sampling far away; the first 1 km is sampled every meter.
+The 80 m terrain resolution does not change. This profile does not yet produce Sun/Earth visibility durations
+or a safe-landing decision. Visibility is in Task 3's scope and the interface in Task 4's.
 
-[Hesaplama ayrıntıları, sınırlamalar ve doğrulama](docs/terrain-horizon.md).
-Task 2 yalnızca `feature/task2-terrain-horizon` branch'ine gönderilir;
-`tahakrcc` ve `main` ile birleştirmeyi kullanıcı yapar.
+[Computation details, limitations and verification](docs/terrain-horizon.md).
+Task 2 is pushed only to the `feature/task2-terrain-horizon` branch;
+the user performs the merge into `tahakrcc` and `main`.
 
-## Task 3: Görünürlük ve süre metrikleri
+## Task 3: Visibility and duration metrics
 
-Task 1'in `ready` yanıtındaki iki referansla çalıştır:
+Run it with the two references from Task 1's `ready` response:
 
 ```bash
 docker compose --env-file .env.example run --rm --no-deps backend \
@@ -115,182 +115,182 @@ docker compose --env-file .env.example run --rm --no-deps backend \
   > visibility.json
 ```
 
-Güneş için tam/kısmi görünürlük ve karanlık, Dünya için merkez görünürlüğü;
-toplam süre/yüzde, en uzun kesinti ve kesintisiz görünürlük, sonraki batış
-hesaplanır. Eksik veri ayrıca raporlanır. `--refine`, bulunan geçişler için
-RabbitMQ üzerinden 5 dakikalık ve ardından 1 dakikalık veri ister; servisler
-çalışıyor olmalıdır. Bu seçenek olmadan yalnızca yerel veriler okunur.
+For the Sun, full/partial visibility and darkness are computed; for Earth, center visibility;
+plus total duration/percentage, the longest outage, continuous visibility and the next setting.
+Missing data is reported separately. `--refine` requests 5-minute and then 1-minute data
+through RabbitMQ for the transitions found; the services must be
+running. Without this option, only local data is read.
 
-Süreler örnekler arasındaki modele göre tahmindir. Geçişlerin zaman aralığı ve
-arazi belirsizliği sonuçta korunur. Dünya'nın görünmesi gerçek bir haberleşme
-bağlantısı garantisi değildir. [Model, komutlar ve doğrulama](docs/visibility-metrics.md).
-Task 3 yalnızca `feature/task3-visibility-metrics` branch'ine gönderilir;
-birleştirmeyi kullanıcı yapar.
+Durations are estimates based on the model between samples. The time bracket of each transition and
+the terrain uncertainty are preserved in the result. Earth being visible is not a guarantee of a real
+communication link. [Model, commands and verification](docs/visibility-metrics.md).
+Task 3 is pushed only to the `feature/task3-visibility-metrics` branch;
+the user performs the merge.
 
 
-## Task 4: Analiz API’si ve 3D arayüz
+## Task 4: Analysis API and 3D interface
 
-Takımın 5173 portundaki ortamına dokunmadan yeni önizleme:
+A new preview that does not touch the team's environment on port 5173:
 
 ```bash
 docker compose -p nasa-task4 --env-file .env.example \
   -f docker-compose.yml -f docker-compose.preview.yml up -d --build --wait
 ```
 
-- Arayüz: http://localhost:5174
+- Interface: http://localhost:5174
 - API: http://localhost:8001/docs
-- `Plan your observation` doğrudan analiz paneline geçer. `Run the Malapert example` gerçek veriyle örnek analiz başlatır.
-- NASA LRO ve Apollo modelleriyle kaydırmalı giriş temsili bir animasyondur; fiziksel iniş yörüngesi hesabı değildir.
-- Nokta/koordinat, arazi üstü gözlemci yüksekliği, UTC başlangıç ve süre seçilir. Sonuçta ufuk, Güneş/Dünya konumları, görünürlük aralıkları ve sonraki batış gösterilir.
-- Zaman çubuğu ve oynatma örnekler arasında ilerler. Detaylandırılmış örneklerin zaman aralıkları eşit değildir.
-- İşler ayrı `analysis-state` diskinde kalır; tarayıcı son iş kimliğini saklar. Backend yeniden başladığında tamamlanmış sonuç korunur, yarım işler kuyruğa geri alınır.
-- İlk boş veri diskiyle çalışma NASA’dan arazi indirir; bağlantı gerekir. Backend veri diskine yazmaz, indirmeler RabbitMQ üzerinden ingestion servisine gider.
+- `Plan your observation` goes straight to the analysis panel. `Run the Malapert example` starts an example analysis with real data.
+- The scroll-driven introduction with NASA LRO and Apollo models is an illustrative animation; it is not a physical descent-trajectory computation.
+- You choose a site/coordinates, the observer height above the terrain, a UTC start and a duration. The result shows the horizon, Sun/Earth positions, visibility intervals and the next setting.
+- The time slider and playback step between samples. Refined samples are not evenly spaced in time.
+- Jobs are kept in a separate `analysis-state` volume; the browser stores the last job ID. When the backend restarts, completed results are preserved and unfinished jobs are re-queued.
+- A run with an initially empty data volume downloads terrain from NASA; a connection is required. The backend does not write to the data volume; downloads go to the ingestion service through RabbitMQ.
 
-[API sözleşmeleri, kaynaklar ve kullanım](docs/analysis-api-and-interface.md) · [Task 4 doğrulama raporu](docs/verification/task4-interface-2026-11-14.json).
+[API contracts, sources and usage](docs/analysis-api-and-interface.md) · [Task 4 verification report](docs/verification/task4-interface-2026-11-14.json).
 
-Task 4 yalnızca `feature/task4-mission-interface` dalına gönderilir; tahakrcc/main ile birleştirme kullanıcıya aittir. İki senaryoyu karşılaştırma Task 5 kapsamındadır.
+Task 4 is pushed only to the `feature/task4-mission-interface` branch; merging into tahakrcc/main is up to the user. Comparing two scenarios is in Task 5's scope.
 
 
-## Task 5: A/B konum ve tarih karşılaştırması
+## Task 5: A/B site and date comparison
 
-Tek nokta analizinin altındaki **Add comparison** düğmesiyle mevcut sonucu A olarak koruyun. B için aynı yerde farklı tarih veya aynı tarihte farklı konum seçin. **Use +48-hour delay** hazır gecikme örneğini kurar; **Run scenario B** gerçek analiz başlatır.
+Keep the current result as A with the **Add comparison** button below the single-site analysis. For B, choose a different date at the same place or a different site on the same date. **Use +48-hour delay** sets up the ready-made delay example; **Run scenario B** starts a real analysis.
 
-Ortak süre/yükseklik/hesaplama ayarları korunur. Güneşlenme, en uzun karanlık ve Dünya görünürlüğü farkları B−A olarak gösterilir. Ortak zaman kontrolünde iki UTC tarihi ve gerçekten hesaplanmış örneklerin zamanı açıkça yazılır. Masaüstünde yan yana, mobilde A/B sekmeleriyle kullanılır. B taslağı ve iş kimliği tarayıcıda saklanır; A değişmez.
+Shared duration/height/computation settings are kept. Differences in sunlight, longest darkness and Earth visibility are shown as B−A. The shared time control states both UTC dates and the times of the actually computed samples explicitly. It is used side by side on desktop and with A/B tabs on mobile. The B draft and job ID are stored in the browser; A does not change.
 
-`POST /comparisons` iki tamamlanmış iş kimliği alır. Uyumsuz koşulları reddeder; eksik kapsamı sıfır görünürlük gibi yorumlamaz. Task 5 doğrulamasında **212 test** (128 backend, 75 ingestion, 9 arayüz), lint, derleme ve npm audit geçti.
+`POST /comparisons` takes two completed job IDs. It rejects incompatible conditions and does not interpret missing coverage as zero visibility. In the Task 5 verification, **212 tests** (128 backend, 75 ingestion, 9 interface), lint, the build and npm audit passed.
 
-[Kullanım, API ve model sınırları](docs/scenario-comparison.md) · [Gerçek veri doğrulaması](docs/verification/task5-comparison-2026-11-14.json).
+[Usage, API and model limits](docs/scenario-comparison.md) · [Real-data verification](docs/verification/task5-comparison-2026-11-14.json).
 
-Bu çalışma yalnızca `feature/task5-scenario-comparison` dalına gönderilir; tahakrcc ve main ile birleştirilmez.
+This work is pushed only to the `feature/task5-scenario-comparison` branch; it is not merged into tahakrcc or main.
 
 
-## Task 6: Doğrulama ve demo hazırlığı
+## Task 6: Verification and demo preparation
 
-Teknik kontroller tamamlandı: **222 test** (136 backend, 75 ingestion, 11 arayüz), önbelleksiz Docker kurulumu, gerçek ilk indirme/önbellek karşılaştırması, hata/toparlanma ve üretim arayüzü kontrol edildi.
+The technical checks are complete: **222 tests** (136 backend, 75 ingestion, 11 interface), an uncached Docker install, a real first-download/cache comparison, failure/recovery and the production interface were checked.
 
-Düzeltilenler: boş tarih alanında hazır örneğin başlatılması, sayfa yenilendiğinde kayıtlı analiz girdilerinin forma geri gelmesi ve RabbitMQ hazır olmadan başlayan backend bağlantısının sınırlı tekrar denemesi.
+Fixed: the ready-made example starting with an empty date field, saved analysis inputs returning to the form after a page reload, and a bounded retry for a backend connection that starts before RabbitMQ is ready.
 
-Bu oturumda ilk 24 saatlik analiz yaklaşık **268 sn**, önbellekten aynı analiz **4 sn**, 30 günlük detaylandırılmış analiz **58 sn** sürdü. Bunlar yerel ölçümlerdir; sunumdan önce örnekleri hazırlayın.
+In this session, the first 24-hour analysis took about **268 s**, the same analysis from cache **4 s**, and a refined 30-day analysis **58 s**. These are local measurements; prepare the examples before presenting.
 
-[Doğrulama raporu](docs/mvp-verification.md) · [Demo akışı ve takım arkadaşı kontrol listesi](docs/demo-runbook.md).
+[Verification report](docs/mvp-verification.md) · [Demo flow and teammate checklist](docs/demo-runbook.md).
 
-**Takım arkadaşının kullanım değerlendirmesi hâlâ bekliyor; tüm MVP yayın kapısı kapanmış sayılmıyor.** Task 6 yalnızca `feature/task6-demo-verification` dalına gönderilir; tahakrcc/main ile birleştirilmez.
+**The teammate's usability review is still pending; the overall MVP release gate is not considered closed.** Task 6 is pushed only to the `feature/task6-demo-verification` branch; it is not merged into tahakrcc/main.
 
-## Task 7: Uygun başlangıç zamanı arama
+## Task 7: Searching for suitable start times
 
-Üst menüde **Time search** seçin. Konum, UTC başlangıç aralığı, görev süresi ve
-adaylar arasındaki saat farkını; ardından minimum güneşlenme yüzdesi, maksimum
-kesintisiz karanlık ve minimum Dünya görünürlüğünü girin. En fazla 16 aday hesaplanır.
+Choose **Time search** in the top menu. Enter the site, the UTC start range, the mission duration and
+the hour spacing between candidates; then the minimum sunlight percentage, the maximum
+continuous darkness and the minimum Earth visibility. At most 16 candidates are computed.
 
-Her adayın sağladığı/sağlamadığı koşullar gösterilir; eksik veri uygun sonuç sayılmaz.
-**Open analysis** sonucu açar, **Use as comparison A** karşılaştırmanın A senaryosu
-yapar. Arama ilerlemesi yeniden başlatmalarda korunur.
+The conditions each candidate meets/fails are shown; missing data never counts as a suitable result.
+**Open analysis** opens the result, **Use as comparison A** makes it the comparison's A
+scenario. Search progress is preserved across restarts.
 
-Hazır güneş örneği Dünya şartını açıkça 0 saate indirir; 4–6 Kasım 2026 Malapert
-başlangıçlarında yalnızca 6 Kasım güneş koşullarını sağlar. Dünya şartı 4 saatse
-bu üç adayın hiçbiri uygun çıkmaz. Aradaki bütün anlar taranmaz; kısa fırsatlar kaçabilir.
+The ready-made sunlight example explicitly lowers the Earth requirement to 0 hours; among the 4–6 November 2026 Malapert
+starts, only 6 November meets the sunlight conditions. With a 4-hour Earth requirement,
+none of these three candidates is suitable. Not every moment in between is scanned; short opportunities may be missed.
 
-**243 test**, Ruff, derleme ve npm audit geçti. [Kullanım ve API](docs/window-search.md).
-Task 7 yalnızca `feature/task7-window-search` dalına gönderilir; tahakrcc/main ile birleştirilmez.
+**243 tests**, Ruff, the build and npm audit passed. [Usage and API](docs/window-search.md).
+Task 7 is pushed only to the `feature/task7-window-search` branch; it is not merged into tahakrcc/main.
 
-## R1: Dışa aktarma, paylaşım ve sınıf modu
+## R1: Exports, sharing and classroom mode
 
-- Sonuçların yanındaki **Export / Share** panelinden CSV, grafik PNG, yazdırılabilir HTML raporu ve senaryo JSON dosyası indirilir. HTML raporunu açıp tarayıcıdan **Yazdır / PDF olarak kaydet** seçilebilir.
-- Bağlantı, aynı sunucudaki kayıtlı analizi ve seçili zamanı açar; A/B karşılaştırması da paylaşılabilir. `localhost` bağlantısı başka bilgisayardan senin sunucuna erişim sağlamaz.
-- **Mission control → Import a shared scenario file** girdileri ve beklenen veri/model kimliklerini yükler. **Calculate imported scenario** yeniden hesaplar; sonuç eski parmak iziyle eşleşmiyorsa açıkça uyarılır. JSON dosyası NASA veri önbelleğini içermez.
-- Zaman aramasında hiç uygun sonuç yoksa en yakın üç değerlendirilebilir aday ve her koşuldaki eksik/fazla miktar gösterilir. Eksik verili adaylar sıralanmaz.
-- **Classroom → Start lesson** iki tıkla Malapert örneği açar. 4 ve 6 Kasım örnekleri; hız seçimi, oynatma/durdurma, zaman çubuğu ve açıklama kartları bulunur. Bu mod bir gözlemcinin ufuk/görünürlüğünü öğretir; yüzey geneli hareketli gölge simülasyonu veya kalıcı gölge doğrulaması yapmaz.
+- From the **Export / Share** panel next to the results you can download CSV, a chart PNG, a printable HTML report and a scenario JSON file. Open the HTML report and choose **Print / Save as PDF** in the browser.
+- A link opens the saved analysis and selected time on the same server; A/B comparisons can be shared too. A `localhost` link does not give another computer access to your server.
+- **Mission control → Import a shared scenario file** loads the inputs and the expected data/model identifiers. **Calculate imported scenario** recomputes; if the result does not match the old fingerprint, a clear warning is shown. The JSON file does not contain the NASA data cache.
+- When a time search has no suitable result, the three closest evaluable candidates and the shortfall/excess for each condition are shown. Candidates with missing data are not ranked.
+- **Classroom → Start lesson** opens the Malapert example in two clicks. It has the 4 and 6 November examples, a speed selector, play/pause, a time slider and explanation cards. This mode teaches one observer's horizon/visibility; it does not perform a surface-wide moving-shadow simulation or permanent-shadow verification.
 
-**263 test** ve derleme kontrolleri geçti. [R1 kullanım, API ve kapsam](docs/release-r1.md).
-Yalnızca `feature/r1-exports-sharing-classroom` dalına gönderilir; tahakrcc/main ile birleştirme kullanıcıya aittir. Takım arkadaşı MVP kabulü hâlâ bekliyor.
+**263 tests** and the build checks passed. [R1 usage, API and scope](docs/release-r1.md).
+Pushed only to the `feature/r1-exports-sharing-classroom` branch; merging into tahakrcc/main is up to the user. Teammate MVP acceptance is still pending.
 
-## R2: DSN yer istasyonlarıyla Dünya'ya doğrudan iletişim
+## R2: Direct-to-Earth communication with DSN ground stations
 
-Görev kontrolündeki **Direct-to-Earth communication** paneli, kaydedilmiş bir analiz için Dünya ile doğrudan iletişimin geometrik olarak mümkün olduğu zamanları gösterir. Bir pencere için iki koşulun aynı anda sağlanması gerekir:
+The **Direct-to-Earth communication** panel in mission control shows, for a saved analysis, when direct communication with Earth is geometrically possible. A window requires two conditions at the same time:
 
-- Dünya'nın merkezi iniş noktasındaki arazi ufkunun üstünde olmalı.
-- Ay, NASA DSN istasyonlarından en az birinde (Goldstone DSS-14, Canberra DSS-43, Madrid DSS-63) yükseklik sınırının üstünde olmalı.
+- The center of Earth must be above the terrain horizon at the landing site.
+- The Moon must be above the elevation limit at at least one NASA DSN station (Goldstone DSS-14, Canberra DSS-43, Madrid DSS-63).
 
-Varsayılan sınır 6° (alma), alternatifi 10° (düşük güçlü gönderme). İstasyon koordinatları NASA DSN 810-005 modül 301 Rev. P'den, Ay konumları JPL Horizons'tan gelir. İstasyon ufuk maskeleri, takvim ve link-budget modellenmez; sonuç bir bağlantı garantisi değildir. [Kaynaklar, yöntem ve API](docs/ground-station-communication.md).
+The default limit is 6° (receive); the alternative is 10° (low-power transmit). Station coordinates come from NASA DSN 810-005 module 301 Rev. P, and Moon positions from JPL Horizons. Station horizon masks, scheduling and the link budget are not modeled; the result is not a link guarantee. [Sources, method and API](docs/ground-station-communication.md).
 
-## R3: Açıklamalı iniş noktası önerisi
+## R3: Explained landing-site recommendations
 
-Gezinmedeki **Recommend** bölümü 2–6 aday noktayı aynı UTC zaman aralığında sıralar. Kullanılan kriterler güneş ışığı, en uzun karanlık, DSN iletişimi (R2) ve arazi güvenliğidir. Her sıranın kriter katkıları ve kısa bir açıklaması gösterilir. Elenen her noktanın hangi kesin koşulu hangi değerle geçemediği yazılır. Verisi eksik noktalar sıralanmaz, ayrıca gösterilir.
+The **Recommend** section in the navigation ranks 2–6 candidate sites over the same UTC time range. The criteria are sunlight, longest darkness, DSN communication (R2) and terrain safety. Each rank's criterion contributions and a short explanation are shown. For every eliminated site, it states which hard condition failed and by what value. Sites with missing data are not ranked and are shown separately.
 
-Ağırlık kaydırıcıları değişince sıralama, analizler tekrar çalışmadan yeniden hesaplanır; eski ve yeni sıralama yan yana gösterilir. Takvim kaydığında (örneğin 48 saat) aynı adaylar yeni tarih için yeniden sıralanır ve en iyi alternatif önerilir.
+When the weight sliders change, the ranking is recomputed without rerunning the analyses; the old and new rankings are shown side by side. When the schedule shifts (for example by 48 hours), the same candidates are re-ranked for the new date and the best alternative is recommended.
 
-Eğim, önbellekteki 80 m LOLA verisinden Horn yöntemiyle hesaplanır. Varsayılan 10° iniş alanı sınırı bir planlama varsayımıdır; NASA sayısal bir değer yayımlamamıştır. 80 m çözünürlük küçük krater ve kayaları göremez; yakıt ve bilim değeri henüz modellenmez. [Yöntem, kaynaklar ve API](docs/recommendations.md).
+Slope is computed from the cached 80 m LOLA data with Horn's method. The default 10° landing-area limit is a planning assumption; NASA has not published a numeric value. The 80 m resolution cannot see small craters and boulders; fuel and science value are not modeled yet. [Method, sources and API](docs/recommendations.md).
 
-## R4: İniş yörüngesi
+## R4: Descent trajectory
 
-Gezinmedeki **Descent** bölümü, seçilen iniş noktası için Ay yörüngesinden temasa kadar iniş yörüngesini hesaplar. Aşamalar: yörüngeden iniş manevrası (DOI), süzülme, frenleme, yaklaşma ve son iniş. Her aşamanın süresi, Δv'si ve yakıtı gösterilir; irtifa–menzil grafiği üzerinde fareyle anlık değerler okunabilir.
+The **Descent** section in the navigation computes the descent trajectory from lunar orbit to touchdown for the selected landing site. The phases are the descent orbit insertion (DOI), coast, braking, approach and terminal descent. Each phase's duration, Δv and propellant are shown; instantaneous values can be read by hovering over the altitude–range chart.
 
-Varsayılan araç, Apollo 11 Ay modülüdür. Değerler NASA TN D-6846 ve Apollo 11 görev raporundan alınmıştır. Model, Apollo 11 iniş planındaki toplam Δv'yi (6775 fps) %2 farkla tutturur. Yörünge iniş noktasının üzerinden geçmiyorsa gereken düzlem değişimi bildirilir; yakıt yetmezse ya da temas toleransları aşılırsa nokta "ulaşılamaz" sayılır ve nedeni yazılır.
+The default vehicle is the Apollo 11 Lunar Module. The values come from NASA TN D-6846 and the Apollo 11 mission report. The model matches the total Δv of the Apollo 11 descent plan (6775 fps) within 2%. If the orbit does not pass over the landing site, the required plane change is reported; if propellant runs out or touchdown tolerances are exceeded, the site is marked "unreachable" and the reason is given.
 
-Arazi engelleri, Ay'ın kütle konsantrasyonları (mascon) ve dönüşü modellenmez. Görselleştirme 2B'dir. [Kaynaklar, model ve doğrulama](docs/descent-trajectories.md).
+Terrain obstacles, the Moon's mass concentrations (mascons) and its rotation are not modeled. The visualization is 2D. [Sources, model and verification](docs/descent-trajectories.md).
 
-## R5: Rotalar arası yakıt optimizasyonu
+## R5: Fuel optimization across routes
 
-**Descent → Optimize routes**, aynı iniş noktası için 27 rota üretir. Rotalar üç değişkenle çeşitlenir: başlangıç yörüngesi (40/60/80 deniz mili), yaklaşma süresi (60/100/140 s) ve son iniş süresi (60/108/150 s). Her rotanın yörüngeden iniş manevrasından (DOI) temasa kadar harcadığı yakıt hesaplanır.
+**Descent → Optimize routes** generates 27 routes for the same landing site. The routes vary along three variables: the starting orbit (40/60/80 nautical miles), the approach duration (60/100/140 s) and the terminal descent duration (60/108/150 s). The propellant each route uses from the descent orbit insertion (DOI) to touchdown is computed.
 
-Varsayılan temas rezervi 145 fps'dir. Bu değer NASA TN D-6846 Tablo II'deki iniş noktası değiştirme (60 fps) ve elle hover (85 fps) paylarının toplamıdır. Rezervi, yakıtı ya da R4 sınırlarını aşan rotalar nedeniyle birlikte elenir. Grafik, harcanan yakıtı inceleme süresine (yaklaşma + son iniş) karşı gösterir; Pareto cephesi ve en az yakıt harcayan rota işaretlidir.
+The default touchdown reserve is 145 fps. This is the sum of the landing-site redesignation (60 fps) and manual hover (85 fps) allowances in NASA TN D-6846 Table II. Routes that exceed the reserve, the propellant or the R4 limits are eliminated together with the reason. The chart shows propellant used against inspection time (approach + terminal descent); the Pareto front and the lowest-propellant route are marked.
 
-**Recommend** bölümünde "include descent" seçeneği açılırsa, her aday için R4 inişi hesaplanır. Ulaşılamayan nokta elenir; yakıt payı 5. kriter olarak sıralamaya eklenir. Seçenek kapalıyken R3 sonuçları değişmez. [Yöntem, kaynaklar ve doğrulama](docs/fuel-optimization.md).
+If the "include descent" option is enabled in the **Recommend** section, the R4 descent is computed for each candidate. Unreachable sites are eliminated; the propellant margin is added to the ranking as a fifth criterion. With the option off, the R3 results do not change. [Method, sources and verification](docs/fuel-optimization.md).
 
-## R11: Çok görevli kampanya planlaması
+## R11: Multi-mission campaign planning
 
-Mission control'deki **Campaign** sekmesi birden fazla görevi birlikte planlar. Görevler aynı iniş alanlarını, zamanı ve yer istasyonu kapasitesini paylaşır. Her görevin tipi, önceliği, son tarihi, bağımlılıkları, enerji ve veri ihtiyacı, iptal/erteleme kuralları tanımlıdır.
+The **Campaign** tab in mission control plans several missions together. The missions share landing sites, time and ground-station capacity. Each mission's type, priority, deadline, dependencies, energy and data needs, and cancel/defer rules are defined.
 
-İniş seçenekleri arazi eğimi, güneş ışığı, iniş yakıtı ve araç kanıtlarından üretilir; elenen her zaman için nedeni yazılır. Planlayıcı (HiGHS MILP) her görev için bir seçenek, erteleme ya da iptal seçer ve her veri indirme dilimini zamanlar. İstasyon görüşü, takvimi, kapasitesi, veri hızı ve özel bağlantı ihtiyacı ayrı girdilerdir. Röle desteği yalnızca röle donanımı, görüş hattı kanıtı ve menzil sağlanırsa sayılır.
+Landing options are generated from terrain slope, sunlight, descent propellant and vehicle evidence; the reason is given for every eliminated time. The planner (HiGHS MILP) chooses an option, a deferral or a cancellation for each mission and schedules every downlink slot. Station visibility, calendar, capacity, data rate and exclusive-link needs are separate inputs. Relay support counts only when relay equipment, line-of-sight evidence and range are provided.
 
-Her plan, çözücüden bağımsız bir doğrulayıcıyla yeniden denetlenir. Ortak zaman çizelgesi, görevlerin tek başına seçtikleri en iyi seçeneklerin birlikte neden çakıştığını ve her kararın gerekçesini gösterir. Uygun plan yoksa birlikte tamamlanamayan en küçük görev kümesi açıklanır.
+Every plan is rechecked by a validator independent of the solver. The shared timeline shows why the best options the missions would choose on their own conflict when combined, and the rationale for every decision. If no feasible plan exists, the smallest set of missions that cannot be completed together is explained.
 
-Örnek kampanyalar sentetiktir; NASA görev planı veya DSN rezervasyonu değildir. [Yöntem, sonuçlar ve sınırlar](docs/multi-mission-planning.md).
+The example campaigns are synthetic; they are not NASA mission plans or DSN bookings. [Method, results and limits](docs/multi-mission-planning.md).
 
-## H0: Hibrit planlama için ortak veri temeli
+## H0: Shared data foundation for hybrid planning
 
-Jupyter notebook: [`notebooks/H0_shared_contracts.ipynb`](notebooks/H0_shared_contracts.ipynb). Ortak modeller, beş örnek senaryo, veri doğrulama ve girdi parmak izi kontrollerini hücre hücre çalıştırır. Kurulum ve alan açıklamaları: [H0 sözleşmeleri](docs/hybrid-contracts.md). Bu aşamada kuantum çözücü çalıştırılmaz; klasik referans H1, QUBO/QAOA deneyi H2 kapsamında geliştirilir.
+Jupyter notebook: [`notebooks/H0_shared_contracts.ipynb`](notebooks/H0_shared_contracts.ipynb). It runs the shared models, five example scenarios, data validation and input fingerprint checks cell by cell. Setup and field descriptions: [H0 contracts](docs/hybrid-contracts.md). No quantum solver runs at this stage; the classical reference is developed in H1 and the QUBO/QAOA experiment in H2.
 
 
-## H1: Klasik çoklu görev planlaması
+## H1: Classical multi-mission planning
 
-[`notebooks/H1_classical_planning.ipynb`](notebooks/H1_classical_planning.ipynb), aynı Jupyter çekirdeğiyle bağımsız seçimleri ortak planlamayla karşılaştırır. Üç görev ve dört seçenek için 64 birleşimi değerlendirir; kapasite, zaman ve enerji ihlallerini açıklar. Tek kanallı örnekte 24 geçerli plan arasından 26 ham bilim puanlı planı seçer. Eksik bilgi, çözümsüzlük ve yarıda kalan arama ayrı gösterilir.
+[`notebooks/H1_classical_planning.ipynb`](notebooks/H1_classical_planning.ipynb) compares independent choices with joint planning using the same Jupyter kernel. It evaluates 64 combinations for three missions and four options and explains capacity, time and energy violations. In the single-channel example, it selects the plan with a raw science score of 26 among 24 valid plans. Missing information, infeasibility and an interrupted search are shown separately.
 
-[Yöntem, sınırlar ve testler](docs/classical-planning.md). Bu aşama statik klasik referanstır; kuantum devresi veya gerçek iniş güvenliği değerlendirmesi çalıştırmaz. Hibrit geliştirme `codex/quantum-hybrid` branch'inde sürdürülür.
+[Method, limits and tests](docs/classical-planning.md). This stage is a static classical reference; it does not run a quantum circuit or a real landing-safety assessment. Hybrid development continues on the `codex/quantum-hybrid` branch.
 
 
-## H2: Küçük kuantum simülatörü deneyi
+## H2: Small quantum simulator experiment
 
-[`notebooks/H2_quantum_mapping.ipynb`](notebooks/H2_quantum_mapping.ipynb), 12 seçim değişkenli QUBO modelini klasik referansla doğrular ve aynı üç görevli problemi 6 kubitlik QAOA simülatöründe dener. Tek katman düşük kapı sayılı varsayılandır; iki katmanla sonuç ve kapı ihtiyacını karşılaştırır. Ham geçersiz örnekler gizlenmez, klasik onarım yapılmaz.
+[`notebooks/H2_quantum_mapping.ipynb`](notebooks/H2_quantum_mapping.ipynb) validates the 12-decision-variable QUBO model against the classical reference and tries the same three-mission problem on a 6-qubit QAOA simulator. A single layer with a low gate count is the default; it compares the result and the gate cost with two layers. Raw invalid samples are not hidden and no classical repair is applied.
 
-[Yöntem, ölçümler ve sınırlar](docs/quantum-mapping.md). Gerçek kuantum servisine iş göndermez; bu küçük örnek klasik yöntemle zaten kolayca çözülür. Simülatörde örnek başına olasılığın artması, klasik çözücüye göre hız veya maliyet üstünlüğü anlamına gelmez.
+[Method, measurements and limits](docs/quantum-mapping.md). It does not submit jobs to a real quantum service; this small example is already easily solved classically. A higher per-sample probability in the simulator does not mean a speed or cost advantage over the classical solver.
 
 
-## H3: İletişim takvimi ve enerji entegrasyonu
+## H3: Communication scheduling and energy integration
 
-[`notebooks/H3_resource_integration.ipynb`](notebooks/H3_resource_integration.ipynb), geometrik görüşü istasyon tahsisinden ayırır; faaliyet tüketimini başlangıç enerjisi, kapasite, rezerv ve üretimle birlikte değerlendirir. Dolu bataryada depolanamayan üretim ve sonradan gelen enerji yanlışlıkla kullanılabilir sayılmaz. Desteklenen örnekte klasik ve kuantum çözücü aynı girdiyi kullanır; kuantum kodlamasına sığmayan kısıtlar açıkça bildirilir.
+[`notebooks/H3_resource_integration.ipynb`](notebooks/H3_resource_integration.ipynb) separates geometric visibility from station allocation and evaluates activity consumption together with initial energy, capacity, reserve and generation. Generation that cannot be stored in a full battery, and energy that arrives later, are never wrongly counted as available. In the supported example, the classical and quantum solvers use the same input; constraints that do not fit the quantum encoding are reported explicitly.
 
-[Varsayımlar, yöntem ve doğrulama](docs/resource-integration.md). Notebook verileri sentetiktir; gerçek DSN tahsisi, radyo bağlantı garantisi veya fiziksel batarya doğrulaması değildir.
+[Assumptions, method and verification](docs/resource-integration.md). The notebook data is synthetic; it is not a real DSN allocation, a radio-link guarantee or a physical battery verification.
 
-## H8 — Klasik ve kuantum karşılaştırması
+## H8 — Classical and quantum comparison
 
-Görev kontrolündeki **Çözücü arenası** sekmesi (`#/solver-arena`), aynı örnek senaryoda klasik tam arama ile yerel QAOA simülasyonunu karşılaştırır. Gerçek hesap adımlarını oynatabilir, ham ölçümleri ve doğrulanmış planları inceleyebilir, sonuçları JSON olarak indirebilirsin. H7'nin kayıtlı Rigetti deneyi ayrı gösterilir; yeni kuantum işi gönderilmez ve kredi harcanmaz.
+The **Solver arena** tab in mission control (`#/solver-arena`) compares classical exhaustive search with a local QAOA simulation on the same example scenario. You can replay the real computation steps, inspect raw measurements and validated plans, and download the results as JSON. H7's archived Rigetti experiment is shown separately; no new quantum job is submitted and no credit is spent.
 
-- Açıklama ve sınırlar: [H8 solver arena](docs/solver-arena.md)
-- Çalıştırılmış notebook: [H8_solver_arena.ipynb](notebooks/H8_solver_arena.ipynb)
+- Description and limits: [H8 solver arena](docs/solver-arena.md)
+- Executed notebook: [H8_solver_arena.ipynb](notebooks/H8_solver_arena.ipynb)
 
-### H9 — Üç görev, ortak anten
+### H9 — Three missions, one shared antenna
 
-H9, bir insanlı ve iki robotik örnek görevin tek anten paylaşımını planlar. Bağımsız seçimlerin çakışmasını, ortak klasik/QAOA planını ve sabitlenen insanlı görev seçiminin etkisini aynı zaman çizelgesinde gösterir. Kaynaklı görünürlük verileriyle örnek kapasite/öncelik varsayımları ayrıdır; sonuç NASA görev planı veya iniş/enerji güvenliği onayı değildir.
+H9 plans how one crewed and two robotic example missions share a single antenna. It shows, on the same timeline, the conflict between independent choices, the joint classical/QAOA plan and the effect of pinning the crewed mission's choice. Sourced visibility data is kept separate from the example capacity/priority assumptions; the result is not a NASA mission plan or a landing/energy safety approval.
 
-- Arayüz: görev kontrolünde **Ortak anten**, `#/shared-antenna`.
-- [Kapsam, kaynaklar ve doğrulama](docs/shared-antenna-campaign.md)
-- [H9 Jupyter notebooku](notebooks/H9_shared_antenna.ipynb): Run All yeni kuantum işi göndermez veya kredi harcamaz.
+- Interface: **Shared antenna** in mission control, `#/shared-antenna`.
+- [Scope, sources and verification](docs/shared-antenna-campaign.md)
+- [H9 Jupyter notebook](notebooks/H9_shared_antenna.ipynb): Run All does not submit a new quantum job or spend credit.
 
 
-### H10–H11: Ölçek ve röle yörüngesi seçimi
+### H10–H11: Scaling and relay orbit selection
 
-H10, aynı örnek problemlerde tam tarama ve MILP sürelerini ölçer; tahminleri ölçümlerden ayırır. H11, JPL yörüngelerini klasik olarak hesaplar ve bir/iki röle seçimini yerel QAOA ile karşılaştırır. Modelin çerçeve, örnekleme ve haberleşme sınırları ekranda belirtilir. Bu aşamalar gerçek kuantum işi göndermez ve kredi harcamaz.
+H10 measures exhaustive-search and MILP times on the same example problems and separates estimates from measurements. H11 computes JPL orbits classically and compares one/two-relay selection with a local QAOA. The model's frame, sampling and communication limits are stated on screen. These stages do not submit real quantum jobs or spend credit.
 
-- [H10 ölçüm ve doğrulama](docs/problem-scaling.md), [notebook](notebooks/H10_problem_scaling.ipynb), arayüz: `#/scaling`.
-- [H11 kaynaklar ve sonuçlar](docs/relay-orbit-selection.md), [notebook](notebooks/H11_relay_orbits.ipynb), arayüz: `#/relays`.
+- [H10 measurements and verification](docs/problem-scaling.md), [notebook](notebooks/H10_problem_scaling.ipynb), interface: `#/scaling`.
+- [H11 sources and results](docs/relay-orbit-selection.md), [notebook](notebooks/H11_relay_orbits.ipynb), interface: `#/relays`.
