@@ -975,6 +975,12 @@ export default function App() {
           </button>
         </nav>
         <div className="header-tools">
+          <AssistantPanel
+            analysisIds={[
+              ...(comparisonBase ? [comparisonBase.id] : []),
+              ...(job && result && job.id !== comparisonBase?.id ? [job.id] : []),
+            ]}
+          />
           <LanguageToggle />
           <span className="team-label">
             2GBRAM <i /> NASA SPACE APPS
@@ -1526,12 +1532,6 @@ export default function App() {
           </section>
         </div>
       )}
-      <AssistantPanel
-        analysisIds={[
-          ...(comparisonBase ? [comparisonBase.id] : []),
-          ...(job && result && job.id !== comparisonBase?.id ? [job.id] : []),
-        ]}
-      />
     </main>
   );
 }

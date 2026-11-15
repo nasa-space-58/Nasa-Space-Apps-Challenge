@@ -6,6 +6,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import { errorText, useTranslate } from "../i18n";
 import "./assistant.css";
 
@@ -293,6 +294,10 @@ export default function AssistantPanel({ analysisIds }: { analysisIds: string[] 
         <Spark />
         {t("assistant.launcher")}
       </button>
+      {/* The launcher lives in the blurred header, which would become the
+          containing block for fixed children, so the drawer is portaled. */}
+      {createPortal(
+        <>
       <aside
         id="assistant-panel"
         className={`assistant-panel${open ? " is-open" : ""}`}
@@ -421,6 +426,9 @@ export default function AssistantPanel({ analysisIds }: { analysisIds: string[] 
           <p className="assistant-disclaimer">{t("assistant.disclaimer")}</p>
         </form>
       </aside>
+        </>,
+        document.body,
+      )}
     </>
   );
 }
