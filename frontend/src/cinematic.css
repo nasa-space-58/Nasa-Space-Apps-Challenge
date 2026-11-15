@@ -345,12 +345,17 @@
   border-radius: 3px;
 }
 .panel-heading {
-  padding: 18px 22px;
-  font-size: 10px;
-  color: #c6cdcf;
+  gap: 10px;
+  padding: 16px 20px;
+  font: 600 15px/1.3 "DM Sans", sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #eef1f2;
 }
 .panel-heading small {
-  font-size: 10px;
+  font: 400 12px "DM Sans", sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
   color: #a1aeb7;
 }
 .parameters {
@@ -1573,3 +1578,252 @@ body.panel-resizing canvas {
   align-items: center;
   gap: 18px;
 }
+
+/* Mission control menu: title row, four numbered steps, then Learn and Advanced. */
+.menu-bar {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #0a0f13;
+}
+.menu-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.menu-title {
+  color: #9aa9b3;
+  font: 600 12px "DM Sans", sans-serif;
+  letter-spacing: 0.04em;
+}
+.menu-top .panel-bar-end {
+  padding-top: 0;
+}
+.step-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.step-tabs > button {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 6px;
+  min-height: 64px;
+  padding: 9px 4px 8px;
+  border: 1px solid #ffffff14;
+  border-radius: 8px;
+  background: #0f171d;
+  color: #a7b6c0;
+  font: 500 12.5px/1.25 "DM Sans", sans-serif;
+  text-align: center;
+  text-transform: none;
+  letter-spacing: 0;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.step-tabs > button b {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid #ffffff38;
+  font: 700 11px "DM Sans", sans-serif;
+}
+.step-tabs > button span {
+  overflow-wrap: anywhere;
+}
+.step-tabs > button:hover {
+  border-color: #ffffff30;
+  color: #f3eee4;
+}
+.step-tabs > button[aria-selected="true"] {
+  border-color: var(--gold);
+  background: #1d1a12;
+  color: #f3eee4;
+}
+.step-tabs > button[aria-selected="true"] b {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #10171e;
+}
+.step-tabs > button:focus-visible,
+.menu-extra button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+.menu-extra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.menu-extra > button,
+.advanced-menu > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid #ffffff1c;
+  border-radius: 999px;
+  background: transparent;
+  color: #b9c6ce;
+  font: 500 13px "DM Sans", sans-serif;
+  cursor: pointer;
+}
+.menu-extra > button:hover,
+.advanced-menu > button:hover {
+  border-color: #ffffff40;
+  color: #f3eee4;
+}
+.menu-extra > button[aria-pressed="true"],
+.advanced-menu > button[data-active] {
+  border-color: var(--gold);
+  color: #f3eee4;
+}
+.advanced-menu {
+  position: relative;
+}
+.advanced-list {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  width: min(300px, 80vw);
+  padding: 8px;
+  border: 1px solid #ffffff24;
+  border-radius: 8px;
+  background: #0a0f13;
+  box-shadow: 0 14px 36px #000a;
+}
+.advanced-list p {
+  margin: 4px 8px 8px;
+  color: #7f8e98;
+  font-size: 12px;
+  line-height: 1.5;
+}
+.advanced-list button {
+  display: block;
+  width: 100%;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #d5dde2;
+  font: 14px "DM Sans", sans-serif;
+  text-align: left;
+  cursor: pointer;
+}
+.advanced-list button:hover,
+.advanced-list button[aria-current] {
+  background: #17232c;
+  color: #f3eee4;
+}
+.sub-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 12px 16px 0;
+}
+.sub-tabs button {
+  padding: 6px 12px;
+  border: 1px solid #ffffff20;
+  border-radius: 999px;
+  background: transparent;
+  color: #a7b6c0;
+  font: 13px "DM Sans", sans-serif;
+  cursor: pointer;
+}
+.sub-tabs button[aria-selected="true"] {
+  background: #f3eee4;
+  border-color: #f3eee4;
+  color: #10171e;
+}
+
+/* Descent: deeper analyses as collapsible cards. */
+.tool-cards {
+  margin-top: 28px;
+}
+.tool-cards > h3 {
+  margin: 0 0 4px;
+  font: 600 16px "DM Sans", sans-serif;
+}
+.tool-card {
+  margin-top: 10px;
+  border: 1px solid #ffffff1c;
+  background: #0d141a;
+}
+.tool-card > summary {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+.tool-card > summary::-webkit-details-marker {
+  display: none;
+}
+.tool-card > summary b {
+  font: 600 15px "DM Sans", sans-serif;
+  color: #f3eee4;
+}
+.tool-card > summary b::after {
+  content: " +";
+  color: var(--gold);
+}
+.tool-card[open] > summary b::after {
+  content: " −";
+}
+.tool-card > summary span {
+  color: #9aa9b3;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.tool-card[open] {
+  padding-bottom: 12px;
+}
+.tool-card > div {
+  padding: 0 16px;
+}
+/* The card summary already names the panel. */
+.tool-card > div > h3:first-child {
+  display: none;
+}
+
+/* Shared: collapsed "advanced settings" inside panel forms. */
+.advanced-settings {
+  grid-column: 1 / -1;
+  border-top: 1px solid #ffffff14;
+  padding-top: 8px;
+}
+.advanced-settings > summary {
+  cursor: pointer;
+  color: #9aa9b3;
+  font-size: 13px;
+  padding: 4px 0 8px;
+}
+.advanced-settings[open] {
+  display: grid;
+  gap: 10px;
+}
+
+/* Soft cut between the launch, space and landing scenes. */
+.stage-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #05080b;
+  pointer-events: none;
+  animation: stage-fade 1.2s cubic-bezier(.22,.61,.36,1) forwards;
+}
+@keyframes stage-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) { .stage-fade { animation: none; opacity: 0; } }

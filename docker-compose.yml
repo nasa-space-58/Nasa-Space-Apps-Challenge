@@ -25,11 +25,17 @@ services:
       RISK_PHYSICS_CACHE_ENABLED: ${RISK_PHYSICS_CACHE_ENABLED:-1}
       RISK_PHYSICS_CACHE_BYTES: ${RISK_PHYSICS_CACHE_BYTES:-33554432}
       RISK_PHYSICS_CACHE_ENTRIES: ${RISK_PHYSICS_CACHE_ENTRIES:-128}
+      DOCS_DIR: /workspace/docs
+      # Optional Q&A assistant; off unless enabled and a key is provided.
+      ASSISTANT_ENABLED: ${ASSISTANT_ENABLED:-false}
+      ASSISTANT_MODEL: ${ASSISTANT_MODEL:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     ports:
       - "127.0.0.1:8000:8000"
     volumes:
       - ./backend:/workspace/backend
       - ./shared:/workspace/shared:ro
+      - ./docs:/workspace/docs:ro
       - lunar-data:/data:ro
       - analysis-state:/state
     depends_on:

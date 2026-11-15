@@ -37,6 +37,9 @@ function interpolate(text: string, params?: Params) {
 
 export type Translate = (key: string, params?: Params) => string;
 
+/** Translates a key, returning the fallback when no dictionary defines it. */
+export type TranslateOr = (key: string, fallback: string, params?: Params) => string;
+
 /** Translates fixed English text sent by the backend; unknown text is returned unchanged. */
 export type TranslateText = (text: string) => string;
 
@@ -45,6 +48,7 @@ type LanguageContext = {
   locale: string;
   setLang: (lang: Language) => void;
   t: Translate;
+  tOr: TranslateOr;
   tText: TranslateText;
 };
 
@@ -62,11 +66,33 @@ function makeTranslate(lang: Language): Translate {
   };
 }
 
+function makeTranslateOr(lang: Language): TranslateOr {
+  return (key, fallback, params) => {
+    const text = lookup(dictionaries[lang], key) ?? lookup(dictionaries.en, key);
+    return text === undefined ? fallback : interpolate(text, params);
+  };
+}
+
 function makeTranslateText(lang: Language): TranslateText {
   const table = dictionaries[lang].serverText;
   return (text) => {
     const value = typeof table === "object" ? table[text] : undefined;
-    return typeof value === "string" ? value : text;
+    if (typeof value === "string") return value;
+    if (lang === "tr") {
+      const patterns: [RegExp, (...values: string[]) => string][] = [
+        [/^Landed ([\d.]+) m from the target\.$/, (_,m)=>`Hedeften ${m} m uzakta iniş yapıldı.`],
+        [/^Vertical speed ([\d.]+) m\/s at touchdown\.$/, (_,v)=>`Temas anındaki düşey hız: ${v} m/s.`],
+        [/^Horizontal speed ([\d.]+) m\/s at touchdown\.$/, (_,v)=>`Temas anındaki yatay hız: ${v} m/s.`],
+        [/^([\d.-]+) kg left; the reserve needs ([\d.-]+) kg\.$/, (_,left,need)=>`Kalan yakıt ${left} kg; gereken rezerv ${need} kg.`],
+        [/^Needs ([\d.]+) % of maximum thrust for a ([\d.]+) m sideways move\.$/, (_,percent,m)=>`${m} m yanal manevra için azami itkinin %${percent} kadarı gerekiyor.`],
+        [/^Leaves ([\d.-]+) kg; the reserve \(with a ([\d.]+) m correction allowance\) needs ([\d.]+) kg\.$/, (_,left,m,need)=>`Kalan yakıt ${left} kg. ${m} m düzeltme payıyla gereken rezerv ${need} kg.`],
+      ];
+      for (const [pattern,translate] of patterns) {
+        const match = text.match(pattern);
+        if (match) return translate(...match);
+      }
+    }
+    return text;
   };
 }
 
@@ -75,6 +101,7 @@ const Context = createContext<LanguageContext>({
   locale: LOCALES.en,
   setLang: () => undefined,
   t: makeTranslate("en"),
+  tOr: makeTranslateOr("en"),
   tText: makeTranslateText("en"),
 });
 
@@ -94,6 +121,7 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
       locale: LOCALES[lang],
       setLang,
       t: makeTranslate(lang),
+      tOr: makeTranslateOr(lang),
       tText: makeTranslateText(lang),
     }),
     [lang, setLang],
@@ -128,4 +156,16 @@ export function LanguageToggle() {
 /** Server-provided error text when present, otherwise the translated fallback. */
 export function errorText(error: unknown, t: Translate, fallbackKey: string) {
   return error instanceof Error && error.message ? error.message : t(fallbackKey);
+}
+
+/** Localized preset label; falls back to the backend display name for unknown sites. */
+export function siteLabel(
+  t: Translate,
+  site: { site_id: string; display_name: string },
+  part: "name" | "short" = "name",
+) {
+  const key = `siteNames.${site.site_id}.${part}`;
+  const text = t(key);
+  if (text !== key) return text;
+  return part === "short" ? site.site_id.toUpperCase() : site.display_name;
 }

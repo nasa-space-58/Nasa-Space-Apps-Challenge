@@ -51,6 +51,8 @@ DEFAULT_OBSERVER_HEIGHT_M = 2.0
 MAX_TARGET_DISTANCE_M = 8000.0
 MAX_TARGETS = 5
 MAX_PATH_POINTS = 200
+DEFAULT_SCENE_MARGIN_M = 400.0
+DEFAULT_MAX_EXPLORED_CELLS = 4000
 MAX_ANALYSIS_OFFSET_M = 10000.0
 SOLAR_RADIUS_DEG = 959.63 / 3600
 NEIGHBOURS = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
@@ -92,6 +94,13 @@ class RouteRequest(BaseModel):
     analysis_job_id: str | None = Field(default=None, max_length=64)
     departure_utc: str | None = None
     waypoints_per_route: int = Field(default=5, ge=2, le=8, strict=True)
+    # Optional 3-D scene payload: the terrain window around the routes and the
+    # A* search order, for visualizing the planner on the real DEM.
+    include_scene: bool = False
+    scene_margin_m: float = Field(default=DEFAULT_SCENE_MARGIN_M, ge=0, le=2000)
+    max_explored_cells: int = Field(
+        default=DEFAULT_MAX_EXPLORED_CELLS, ge=100, le=20000, strict=True
+    )
 
     @model_validator(mode="after")
     def unique_targets(self):
@@ -114,11 +123,13 @@ def astar(
     start: tuple[int, int],
     goal: tuple[int, int],
     pixel_m: float,
+    explored: list[tuple[int, int]] | None = None,
 ) -> list[tuple[int, int]] | None:
     """Shortest 3-D path over 8-connected passable cells; None when unreachable.
 
     Includes start and goal. Deterministic for equal costs. Start or goal
-    outside the grid or impassable returns None.
+    outside the grid or impassable returns None. When `explored` is a list,
+    every expanded (closed) cell is appended to it in expansion order.
     """
     heights = np.asarray(heights_m, dtype=float)
     rows, cols = heights.shape
@@ -149,6 +160,8 @@ def astar(
                 path.append(parent[path[-1]])
             return path[::-1]
         closed.add(cell)
+        if explored is not None:
+            explored.append(cell)
         for d_row, d_col in NEIGHBOURS:
             nxt = (cell[0] + d_row, cell[1] + d_col)
             if not inside(nxt) or not passable[nxt] or nxt in closed:
@@ -299,6 +312,99 @@ def _sky_state(frames, arrival, target, profile) -> dict:
     }
 
 
+def scene_window(
+    rows: int,
+    cols: int,
+    cells: list[tuple[int, int]],
+    margin_cells: int,
+) -> tuple[int, int, int, int]:
+    """Clipped (row0, col0, row1, col1) box, end-exclusive, around `cells`."""
+    if not cells:
+        raise ValueError("A scene window needs at least one cell")
+    if margin_cells < 0:
+        raise ValueError("Scene margin must be non-negative")
+    row_values = [c[0] for c in cells]
+    col_values = [c[1] for c in cells]
+    return (
+        max(0, min(row_values) - margin_cells),
+        max(0, min(col_values) - margin_cells),
+        min(rows, max(row_values) + margin_cells + 1),
+        min(cols, max(col_values) + margin_cells + 1),
+    )
+
+
+def _scene(
+    request: "RouteRequest",
+    terrain: LocalTerrain,
+    heights: np.ndarray,
+    passable: np.ndarray,
+    site: tuple[int, int],
+    searches: dict[str, dict],
+) -> dict:
+    """Terrain window, traversability, affine and per-target A* order.
+
+    `searches[target_id]` holds the target cell (or None), the full path (or
+    None) and the expanded cells of that target's search, in terrain indices.
+    """
+    rows, cols = heights.shape
+    cells = [site]
+    for search in searches.values():
+        if search["path"]:
+            cells.extend(search["path"])
+        elif search["target"] is not None:
+            cells.append(search["target"])
+    margin = math.ceil(request.scene_margin_m / terrain.pixel_m)
+    r0, c0, r1, c1 = scene_window(rows, cols, cells, margin)
+
+    def inside(cell):
+        return r0 <= cell[0] < r1 and c0 <= cell[1] < c1
+
+    def relative(cell):
+        return [int(cell[0] - r0), int(cell[1] - c0)]
+
+    base = float(heights[site])
+    window = heights[r0:r1, c0:c1]
+    t = terrain.transform
+    a_matrix = np.array([[t.a, t.b], [t.d, t.e]])
+    offset = a_matrix @ np.array([c0, r0]) + np.array([t.c, t.f])
+    offset = offset - np.asarray(terrain.site_xy_m, dtype=float)
+
+    def row_of(unit):
+        unit = np.asarray(unit, dtype=float)
+        return [
+            float(unit @ a_matrix[:, 0]),
+            float(unit @ a_matrix[:, 1]),
+            float(unit @ offset),
+        ]
+
+    explored, truncated, path_cells = {}, {}, {}
+    for target_id, search in searches.items():
+        kept = [relative(c) for c in search["explored"] if inside(c)]
+        truncated[target_id] = len(kept) > request.max_explored_cells
+        explored[target_id] = kept[: request.max_explored_cells]
+        path_cells[target_id] = [relative(c) for c in search["path"] or []]
+    return {
+        "pixel_m": float(terrain.pixel_m),
+        "slope_limit_deg": request.slope_limit_deg,
+        "rows": int(r1 - r0),
+        "cols": int(c1 - c0),
+        "window": {"row0": int(r0), "col0": int(c0), "row1": int(r1), "col1": int(c1)},
+        "site_cell": relative(site),
+        "heights_m": [
+            [float(v - base) if np.isfinite(v) else None for v in line]
+            for line in window
+        ],
+        "passable": [[bool(v) for v in line] for line in passable[r0:r1, c0:c1]],
+        "local_from_cell": {
+            "east": row_of(terrain.east_unit_xy),
+            "north": row_of(terrain.north_unit_xy),
+        },
+        "explored": explored,
+        "explored_truncated": truncated,
+        "path_cells": path_cells,
+    }
+
+
 def plan_routes(
     request: RouteRequest,
     terrain: LocalTerrain,
@@ -341,6 +447,7 @@ def plan_routes(
     start_time = _parse_utc(departure) if departure else None
     site_centre = centre(site)
     routes = []
+    searches: dict[str, dict] = {}
     for item in request.targets:
         bearing = math.radians(item.bearing_deg)
         xy = site_xy + item.distance_m * (
@@ -372,10 +479,13 @@ def plan_routes(
             "unknown_sky_waypoints": None,
         }
         routes.append(route)
+        search = {"target": None, "path": None, "explored": []}
+        searches[item.target_id] = search
         if not (0 <= cell[0] < rows and 0 <= cell[1] < cols):
             route["reason"] = "outside_terrain"
             route["detail"] = "The target lies outside the loaded terrain window."
             continue
+        search["target"] = cell
         route["straight_distance_m"] = float(np.linalg.norm(centre(cell) - site_centre))
         if not passable[cell]:
             slope = slopes[cell]
@@ -386,7 +496,15 @@ def plan_routes(
                 else f"The target cell slope is {slope:.1f} deg, above the {request.slope_limit_deg:g} deg limit."
             )
             continue
-        path = astar(heights, passable, site, cell, terrain.pixel_m)
+        path = astar(
+            heights,
+            passable,
+            site,
+            cell,
+            terrain.pixel_m,
+            explored=search["explored"] if request.include_scene else None,
+        )
+        search["path"] = path
         if path is None:
             route["reason"] = "no_path"
             route["detail"] = (
@@ -507,6 +625,11 @@ def plan_routes(
             "weights": weights,
         },
         "assumptions": list(ASSUMPTIONS),
+        "scene": (
+            _scene(request, terrain, heights, passable, site, searches)
+            if request.include_scene
+            else None
+        ),
     }
     identity = json.dumps(output, sort_keys=True, allow_nan=False).encode()
     output["result_id"] = hashlib.sha256(identity).hexdigest()

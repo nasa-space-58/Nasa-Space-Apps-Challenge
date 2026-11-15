@@ -7,10 +7,12 @@ import {
   useEffect,
   useRef,
   useState,
+  useMemo,
   type ReactNode,
 } from "react";
 import HorizonPlot from "./components/HorizonPlot";
-import MissionStage from "./components/MissionStage";
+import type { MissionCandidate } from "./missionCandidates";
+import MissionStage, { type StageModule } from "./components/MissionStage";
 import Comparison from "./components/Comparison";
 import WindowSearch from "./components/WindowSearch";
 import DateScrubber from "./components/DateScrubber";
@@ -24,10 +26,15 @@ import Communication from "./components/Communication";
 import SpaceWeather from "./components/SpaceWeather";
 import Recommendations from "./components/Recommendations";
 import Descent from "./components/Descent";
+import MissionRun from "./components/MissionRun";
 import MissionPlanner from "./components/MissionPlanner";
 import SelfHealing from "./components/SelfHealing";
+import AssistantPanel from "./components/AssistantPanel";
+import LiveResults, { type PlaybackSpeed } from "./components/LiveResults";
+import SavedLibrary from "./components/SavedLibrary";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
-import { LanguageToggle, useTranslate, type Translate } from "./i18n";
+import { LanguageToggle, siteLabel, useTranslate, type Translate } from "./i18n";
+import { SOURCE_GROUPS } from "./sourceCatalog";
 
 const MoonScene = lazy(() => import("./components/MoonScene"));
 const activeStates = ["pending", "preparing", "analyzing", "refining"];
@@ -54,8 +61,6 @@ const routes: Record<View, string> = {
 /** Former standalone pages are mission-control panel tabs; their hashes still open them. */
 const MODULE_HASHES: Record<string, string> = {
   "#/solver-arena": "arena",
-  "#/campaign": "campaign",
-  "#/recovery": "recovery",
   "#/resilience": "resilience",
   "#/shared-antenna": "shared-antenna",
   "#/scaling": "scaling",
@@ -185,6 +190,9 @@ function Timeline({
   );
 }
 export default function App() {
+  const [siteCandidates, setSiteCandidates] = useState<MissionCandidate[]>([]);
+  const [descentCandidates, setDescentCandidates] = useState<MissionCandidate[]>([]);
+  const missionCandidates = useMemo(() => [...siteCandidates, ...descentCandidates], [siteCandidates, descentCandidates]);
   const { t, locale } = useTranslate();
   const h = (seconds: number | undefined) => hours(t, seconds);
   const utc = (value: string) => utcLabel(value, locale);
@@ -222,6 +230,7 @@ export default function App() {
   } | null>(null);
   const [frameIndex, setFrameIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const [speed, setSpeed] = useState<PlaybackSpeed>(1);
   const [error, setError] = useState("");
   const [apiError, setApiError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -390,10 +399,10 @@ export default function App() {
           }
           return index + 1;
         }),
-      600,
+      600 / speed,
     );
     return () => clearInterval(timer);
-  }, [playing, result]);
+  }, [playing, result, speed]);
   useEffect(() => {
     if (reduced) setPlaying(false);
   }, [reduced]);
@@ -525,6 +534,7 @@ export default function App() {
     id: string,
     compare: boolean,
     otherId?: string,
+    showFinal = false,
   ) => {
     const [selected, view] = await Promise.all([
       api(`/analyses/${id}`),
@@ -549,7 +559,7 @@ export default function App() {
     setPlaying(false);
     setJob(selected);
     setResult(view);
-    setFrameIndex(0);
+    setFrameIndex(showFinal ? Math.max(0, view.frames.length - 1) : 0);
     setError("");
     localStorage.setItem("lunar-analysis-id", id);
     setComparisonBase(compare ? { id, result: view } : null);
@@ -572,6 +582,26 @@ export default function App() {
     }
   };
 
+  const togglePlay = () => {
+    if (!result) return;
+    if (!playing && frameIndex >= result.frames.length - 1) setFrameIndex(0);
+    setPlaying(!playing);
+  };
+  const compareSaved = async (aId: string, bId: string) => {
+    if (job && result && aId === job.id) {
+      setPlaying(false);
+      setSharedB(bId);
+      setComparisonBase({ id: aId, result });
+      setPanel("comparison");
+    } else await openSearchResult(aId, true, bId);
+  };
+  // After touchdown the observation window plays so the results follow the landed site.
+  const startSurfacePlayback = () => {
+    if (!result) return;
+    setFrameIndex(reduced ? result.frames.length - 1 : 0);
+    setPlaying(!reduced);
+    if (panel === "plan") setPanel("results");
+  };
   const resultsModule = (
     <section className="analysis-results" aria-labelledby="analysis-title">
       <div className="analysis-intro">
@@ -590,47 +620,21 @@ export default function App() {
         </div>
         <span className="outline-tag">MOON_ME / UTC</span>
       </div>
-      <div className="metric-grid">
-        <div className="metric-card">
-          <span className="metric-label">
-            <i className="sun-dot" /> {t("app.results.sunlight")}
-          </span>
-          <strong>
-            {result
-              ? `${result.analysis.sun.metrics.visible_percent_of_interval.toFixed(1)}%`
-              : "—"}
-          </strong>
-          <small>
-            {result
-              ? t("app.results.sunlightDetail", {
-                  hours: h(result.analysis.sun.metrics.visible_duration_s),
-                })
-              : t("app.results.ofWindow")}
-          </small>
-        </div>
-        <div className="metric-card">
-          <span className="metric-label">
-            <i className="earth-dot" /> {t("app.results.earth")}
-          </span>
-          <strong>
-            {result
-              ? `${result.analysis.earth.metrics.visible_percent_of_interval.toFixed(1)}%`
-              : "—"}
-          </strong>
-          <small>
-            {result
-              ? t("app.results.earthDetail", {
-                  hours: h(result.analysis.earth.metrics.visible_duration_s),
-                })
-              : t("app.results.earthEmpty")}
-          </small>
-        </div>
-        <div className="metric-card">
-          <span className="metric-label">{t("app.results.longestDark")}</span>
-          <strong>{h(result?.analysis.sun.metrics.longest_blocked_s)}</strong>
-          <small>{t("app.results.longestDarkDetail")}</small>
-        </div>
-      </div>
+      {result && (
+        <LiveResults
+          result={result}
+          frame={frame}
+          frameIndex={frameIndex}
+          playing={playing}
+          speed={speed}
+          onSpeed={setSpeed}
+          onTogglePlay={togglePlay}
+          onJumpEnd={() => {
+            setPlaying(false);
+            setFrameIndex(result.frames.length - 1);
+          }}
+        />
+      )}
       <div className="panel horizon-panel">
         <div className="panel-heading">
           <span>{t("app.results.localHorizon")}</span>
@@ -700,11 +704,7 @@ export default function App() {
           <button
             className="play-button"
             disabled={!result?.frames.length}
-            onClick={() => {
-              if (result && frameIndex === result.frames.length - 1)
-                setFrameIndex(0);
-              setPlaying(!playing);
-            }}
+            onClick={togglePlay}
             aria-label={playing ? t("app.playback.pause") : t("app.playback.play")}
           >
             {playing ? "Ⅱ" : "▷"}
@@ -779,67 +779,6 @@ export default function App() {
       {result && job && (
         <Communication key={job.id} jobId={job.id} current={frame?.utc} />
       )}
-      {result && job && <SpaceWeather key={`sw-${job.id}`} jobId={job.id} />}
-      {result && (
-        <div className="panel trace-panel">
-          <details>
-            <summary>
-              {t("app.trace.summary")} <span>+</span>
-            </summary>
-            <div className="trace-content">
-              <p>
-                <b>{t("common.sun")}:</b>{" "}
-                {t("app.trace.sun", {
-                  longest: h(result.analysis.sun.metrics.longest_visible_s),
-                  unknown: h(result.analysis.sun.metrics.unknown_duration_s),
-                })}
-              </p>
-              <p>
-                <b>{t("common.earth")}:</b>{" "}
-                {t("app.trace.earth", {
-                  longest: h(result.analysis.earth.metrics.longest_visible_s),
-                  blocked: h(result.analysis.earth.metrics.longest_blocked_s),
-                  unknown: h(result.analysis.earth.metrics.unknown_duration_s),
-                })}
-              </p>
-              <p>
-                {t("app.trace.grid", {
-                  radius: (
-                    result.horizon.settings.search_distance_m / 1000
-                  ).toFixed(0),
-                  spacing: result.horizon.settings.azimuth_step_deg,
-                  height:
-                    result.horizon.observer_height_above_terrain_m.toFixed(1),
-                })}
-              </p>
-              <p>
-                {t("app.trace.limits", {
-                  offset: result.analysis.spatial_sensitivity.offset_deg,
-                })}
-              </p>
-              <p>
-                {t("app.trace.refinement", {
-                  status: result.analysis.refinement.status.replaceAll("_", " "),
-                  count: result.analysis.provenance.ephemerides.length,
-                })}
-              </p>
-              <code>
-                {t("app.trace.analysis")} {result.analysis.analysis_id}
-              </code>
-              <button className="text-button" onClick={openSources}>
-                {t("app.trace.viewSources")} ↗
-              </button>
-            </div>
-          </details>
-        </div>
-      )}
-      {result && job && (
-        <ExportPanel
-          jobId={job.id}
-          result={result}
-          frameIndex={frameIndex}
-        />
-      )}
       {result && job && (
         <button
           className="primary add-comparison"
@@ -853,51 +792,155 @@ export default function App() {
           {t("app.results.addComparison")} ↗
         </button>
       )}
+      <SavedLibrary
+        current={result && job ? { id: job.id, result } : null}
+        onOpen={(id) => openSearchResult(id, false, undefined, true)}
+        onCompare={compareSaved}
+      />
+      {/* Secondary results stay closed until opened. */}
+      <div className="tool-cards">
+        {result && job && (
+          <details className="tool-card">
+            <summary>
+              <b>{t("app.results.cards.weather.title")}</b>
+              <span>{t("app.results.cards.weather.desc")}</span>
+            </summary>
+            <SpaceWeather key={`sw-${job.id}`} jobId={job.id} />
+          </details>
+        )}
+        <details className="tool-card">
+          <summary>
+            <b>{t("app.results.cards.share.title")}</b>
+            <span>{t("app.results.cards.share.desc")}</span>
+          </summary>
+          {result && job && (
+            <ExportPanel jobId={job.id} result={result} frameIndex={frameIndex} />
+          )}
+          <ScenarioTransfer onOpen={openSearchResult} />
+        </details>
+        {result && (
+          <details className="tool-card">
+            <summary>
+              <b>{t("app.results.cards.trace.title")}</b>
+              <span>{t("app.results.cards.trace.desc")}</span>
+            </summary>
+          <div className="trace-content">
+            <p>
+              <b>{t("common.sun")}:</b>{" "}
+              {t("app.trace.sun", {
+                longest: h(result.analysis.sun.metrics.longest_visible_s),
+                unknown: h(result.analysis.sun.metrics.unknown_duration_s),
+              })}
+            </p>
+            <p>
+              <b>{t("common.earth")}:</b>{" "}
+              {t("app.trace.earth", {
+                longest: h(result.analysis.earth.metrics.longest_visible_s),
+                blocked: h(result.analysis.earth.metrics.longest_blocked_s),
+                unknown: h(result.analysis.earth.metrics.unknown_duration_s),
+              })}
+            </p>
+            <p>
+              {t("app.trace.grid", {
+                radius: (
+                  result.horizon.settings.search_distance_m / 1000
+                ).toFixed(0),
+                spacing: result.horizon.settings.azimuth_step_deg,
+                height:
+                  result.horizon.observer_height_above_terrain_m.toFixed(1),
+              })}
+            </p>
+            <p>
+              {t("app.trace.limits", {
+                offset: result.analysis.spatial_sensitivity.offset_deg,
+              })}
+            </p>
+            <p>
+              {t("app.trace.refinement", {
+                status: result.analysis.refinement.status.replaceAll("_", " "),
+                count: result.analysis.provenance.ephemerides.length,
+              })}
+            </p>
+            <code>
+              {t("app.trace.analysis")} {result.analysis.analysis_id}
+            </code>
+            <button className="text-button" onClick={openSources}>
+              {t("app.trace.viewSources")} ↗
+            </button>
+          </div>
+          </details>
+        )}
+      </div>
       <p className="results-footnote">{t("app.results.footnote")}</p>
-      <ScenarioTransfer onOpen={openSearchResult} />
     </section>
   );
-  const stageModules = [
-    { id: "resilience", label: t("resilience.title"), content: <MissionResilience active={view === "mission" && panel === "resilience" && pageVisible} /> },
-    { id: "scaling", label: t("research.scaling"), content: <ResearchLab kind="scaling" active={view === "mission" && panel === "scaling" && pageVisible} /> },
-    { id: "relays", label: t("research.relays"), content: <ResearchLab kind="relays" active={view === "mission" && panel === "relays" && pageVisible} /> },
-    { id: "shared-antenna", label: t("sharedAntenna.tab"), content: <SharedAntenna active={view === "mission" && panel === "shared-antenna" && pageVisible} /> },
-    { id: "arena", label: t("arena.tab"), content: <UnifiedMissionWorkspace view="comparison"><SolverArena active={view === "mission" && panel === "arena" && pageVisible} /></UnifiedMissionWorkspace> },
-    { id: "results", label: t("app.modules.results"), content: resultsModule },
-    ...(comparisonBase
-      ? [{ id: "comparison", label: t("app.modules.compare"), content: comparisonBase ? (
-      <Comparison
-        key={comparisonBase.id}
-        aId={comparisonBase.id}
-        initialBId={sharedB}
-        initialCursor={Number(shared.current.get("cursor") || 0)}
-        a={comparisonBase.result}
-        sites={sites}
-        onClose={() => {
-          setComparisonBase(null);
-          setPanel("results");
-        }}
-      />
-    ) : null }]
-      : []),
+  // Grouped into four numbered steps; research tools live in the Advanced menu.
+  const stageModules: StageModule[] = [
+    { id: "results", group: "results", label: t("app.modules.results"), content: resultsModule },
+    {
+      id: "recommendations",
+      group: "compare",
+      label: t("app.modules.recommend"),
+      content: <Recommendations sites={sites} onCandidates={setSiteCandidates} />,
+    },
     {
       id: "window-search",
+      group: "compare",
       label: t("app.modules.timeSearch"),
       content: <WindowSearch sites={sites} onChoose={openSearchResult} />,
     },
+    ...(comparisonBase
+      ? [
+          {
+            id: "comparison",
+            group: "compare" as const,
+            label: t("app.modules.compare"),
+            content: (
+              <Comparison
+                key={`${comparisonBase.id}:${sharedB ?? ""}`}
+                aId={comparisonBase.id}
+                initialBId={sharedB}
+                initialCursor={Number(shared.current.get("cursor") || 0)}
+                a={comparisonBase.result}
+                sites={sites}
+                onClose={() => {
+                  setComparisonBase(null);
+                  setPanel("results");
+                }}
+              />
+            ),
+          },
+        ]
+      : []),
     {
-      id: "recommendations",
-      label: t("app.modules.recommend"),
-      content: <Recommendations sites={sites} />,
+      id: "mission-run",
+      group: "descent",
+      label: t("app.modules.missionRun"),
+      content: (
+        <MissionRun
+          analysisId={
+            job && (job.status === "ready" || job.status === "insufficient_data")
+              ? job.id
+              : undefined
+          }
+          onWatch={() => setLaunchKey((key) => key + 1)}
+        />
+      ),
     },
-    { id: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} /> },
-    { id: "campaign", label: t("app.modules.campaign"), content: <UnifiedMissionWorkspace view="plan"><MissionPlanner /></UnifiedMissionWorkspace> },
-    { id: "recovery", label: t("app.modules.recovery"), content: <UnifiedMissionWorkspace view="recovery"><SelfHealing /></UnifiedMissionWorkspace> },
+    { id: "descent", group: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} onCandidates={setDescentCandidates} onLocation={(latitude,longitude)=>{setLat(String(latitude));setLon(String(longitude));setSiteId("custom");setResolved("");}} /> },
     {
       id: "classroom",
+      group: "learn",
       label: t("app.modules.classroom"),
       content: <Classroom onOpen={openSearchResult} />,
     },
+    { id: "campaign", group: "advanced", label: t("app.modules.campaign"), content: <UnifiedMissionWorkspace view="plan"><MissionPlanner /></UnifiedMissionWorkspace> },
+    { id: "recovery", group: "advanced", label: t("app.modules.recovery"), content: <UnifiedMissionWorkspace view="recovery"><SelfHealing /></UnifiedMissionWorkspace> },
+    { id: "scaling", group: "advanced", label: t("research.scaling"), content: <ResearchLab kind="scaling" active={view === "mission" && panel === "scaling" && pageVisible} /> },
+    { id: "relays", group: "advanced", label: t("research.relays"), content: <ResearchLab kind="relays" active={view === "mission" && panel === "relays" && pageVisible} /> },
+    { id: "shared-antenna", group: "advanced", label: t("sharedAntenna.tab"), content: <SharedAntenna active={view === "mission" && panel === "shared-antenna" && pageVisible} /> },
+    { id: "resilience", group: "advanced", label: t("resilience.title"), content: <MissionResilience active={view === "mission" && panel === "resilience" && pageVisible} /> },
+    { id: "arena", group: "advanced", label: t("arena.tab"), content: <UnifiedMissionWorkspace view="comparison"><SolverArena active={view === "mission" && panel === "arena" && pageVisible} /></UnifiedMissionWorkspace> },
   ];
 
   return (
@@ -951,6 +994,12 @@ export default function App() {
           </button>
         </nav>
         <div className="header-tools">
+          <AssistantPanel
+            analysisIds={[
+              ...(comparisonBase ? [comparisonBase.id] : []),
+              ...(job && result && job.id !== comparisonBase?.id ? [job.id] : []),
+            ]}
+          />
           <LanguageToggle />
           <span className="team-label">
             2GBRAM <i /> NASA SPACE APPS
@@ -1166,6 +1215,7 @@ export default function App() {
         hidden={view !== "mission"}
       >
         <MissionStage
+          candidates={missionCandidates}
           lat={Number(lat)}
           lon={Number(lon)}
           sites={sites}
@@ -1211,6 +1261,7 @@ export default function App() {
             setResolved("");
           }}
           onSceneFailure={() => setWebgl(false)}
+          onArrived={startSurfacePlayback}
           modules={stageModules}
           activeModule={panel}
           onModuleChange={setPanel}
@@ -1262,7 +1313,7 @@ export default function App() {
                   {sites.length ? (
                     sites.map((site) => (
                       <option key={site.site_id} value={site.site_id}>
-                        {site.display_name}
+                        {siteLabel(t, site)}
                       </option>
                     ))
                   ) : (
@@ -1424,79 +1475,48 @@ export default function App() {
             <p className="eyebrow">{t("app.sources.eyebrow")}</p>
             <h2 id="sources-title">{t("app.sources.title")}</h2>
             <p>{t("app.sources.body")}</p>
-            <ul>
-              <li>
-                <a
-                  href="https://science.nasa.gov/3d-resources/lunar-reconnaissance-orbiter-a/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t("app.sources.lro")}
-                </a>{" "}
-                · NASA / Christopher R. Meaney
-              </li>
-              <li>
-                <a
-                  href="https://science.nasa.gov/3d-resources/apollo-lunar-module/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Apollo Lunar Module
-                </a>{" "}
-                · NASA / Michael D. Carbajal
-              </li>
-              <li>
-                <a
-                  href="https://svs.gsfc.nasa.gov/4720/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  CGI Moon Kit
-                </a>{" "}
-                · NASA / Goddard / Scientific Visualization Studio
-              </li>
-              <li>
-                <a
-                  href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Blue Marble Next Generation
-                </a>{" "}
-                · NASA Earth Observatory / Reto Stöckli
-              </li>
-              <li>
-                <a
-                  href="https://pgda.gsfc.nasa.gov/products/90"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t("app.sources.lola")}
-                </a>{" "}
-                · Barker et al. (2023)
-              </li>
-              <li>
-                <a
-                  href="https://ssd.jpl.nasa.gov/horizons/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  JPL Horizons
-                </a>{" "}
-                · {t("app.sources.horizons")}
-              </li>
-              {sites.map((site) => (
-                <li key={site.site_id}>
-                  <a
-                    href={site.coordinate_source_url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {t("app.sources.coordinate", { name: site.display_name })}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            {SOURCE_GROUPS.map((group) => (
+              <section key={group.id} className="source-group">
+                <h3>{t(`app.sources.groups.${group.id}`)}</h3>
+                <ul>
+                  {group.entries.map((entry) => (
+                    <li key={entry.id}>
+                      {entry.href ? (
+                        <a href={entry.href} target="_blank" rel="noreferrer">
+                          {entry.title}
+                        </a>
+                      ) : (
+                        <strong>{entry.title}</strong>
+                      )}{" "}
+                      · {entry.credit}
+                      {entry.extra?.map((link) => (
+                        <span key={link.href}>
+                          {" "}
+                          ·{" "}
+                          <a href={link.href} target="_blank" rel="noreferrer">
+                            {link.labelKey ? t(link.labelKey) : link.label}
+                          </a>
+                        </span>
+                      ))}
+                      <span className="source-use">{t(`app.sources.use.${entry.id}`)}</span>
+                    </li>
+                  ))}
+                  {group.id === "terrain" &&
+                    sites.map((site) => (
+                      <li key={site.site_id}>
+                        <a
+                          href={site.coordinate_source_url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {t("app.sources.coordinate", { name: siteLabel(t, site) })}
+                        </a>
+                        <span className="source-use">{t("app.sources.use.siteCoordinate")}</span>
+                      </li>
+                    ))}
+                </ul>
+              </section>
+            ))}
             <small>{t("app.sources.disclaimer")}</small>
           </section>
         </div>

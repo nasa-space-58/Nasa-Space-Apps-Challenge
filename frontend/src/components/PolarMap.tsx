@@ -1,5 +1,5 @@
 import type { Preset } from "../types";
-import { useTranslate } from "../i18n";
+import { siteLabel, useTranslate } from "../i18n";
 export default function PolarMap({
   lat,
   lon,
@@ -99,7 +99,7 @@ export default function PolarMap({
             <circle cx={x} cy={y} r="11" fill="transparent" />
             <circle cx={x} cy={y} r="3" fill="#c1cbd1" />
             <text x={x + 7} y={y - 7}>
-              {site.site_id.startsWith("malapert") ? "R23" : "MOUTON"}
+              {siteLabel(t, site, "short")}
             </text>
           </g>
         );

@@ -1,0 +1,83 @@
+{
+  "site": {
+    "latitude_deg": -85.9948,
+    "longitude_deg_east": 359.76422
+  },
+  "seed": 2026,
+  "solver_latency_s": 2,
+  "event": {
+    "kind": "obstacle_detected",
+    "t_s": 560,
+    "down_m": 0,
+    "cross_m": 0,
+    "radius_m": 150
+  },
+  "terrain_api": "/descents/self-healing",
+  "candidate_count": 8,
+  "original": {
+    "success": false,
+    "reasons": [
+      {
+        "reason": "obstacle",
+        "detail": "The target lies inside a detected (synthetic) obstacle.",
+        "value": null,
+        "limit": null,
+        "unit": null
+      }
+    ],
+    "final": {
+      "position_error_m": 0.08986243357778573,
+      "vertical_speed_mps": -0.8395966674848229,
+      "horizontal_speed_mps": 0.014942180871906538,
+      "mass_kg": 7780.633030249256
+    },
+    "target_offset_m": {
+      "down_m": 0.0,
+      "cross_m": 0.0
+    },
+    "target_safety_score": 0.2921026365403582,
+    "reserve_margin_kg": 678.7793160690521,
+    "propellant_remaining_kg": 791.1828416822555,
+    "abort_required": false,
+    "plan_valid": false
+  },
+  "replanned": {
+    "success": true,
+    "reasons": [],
+    "final": {
+      "position_error_m": 0.08991439130267911,
+      "vertical_speed_mps": -0.8395999621890934,
+      "horizontal_speed_mps": 0.014983028568602315,
+      "mass_kg": 7745.257180364815
+    },
+    "target_offset_m": {
+      "down_m": -460.5434212222202,
+      "cross_m": 18.119501564204256
+    },
+    "target_safety_score": 0.5038009277731508,
+    "reserve_margin_kg": 643.914526175889,
+    "propellant_remaining_kg": 755.8069917978146,
+    "abort_required": false,
+    "plan_valid": true
+  },
+  "decisions": [
+    {
+      "t_s": 559.9999999999903,
+      "applied_at_s": 561.9999999999908,
+      "action": "retarget",
+      "chosen": "B1",
+      "evaluations": 9,
+      "budget": 12,
+      "validation": [
+        {
+          "id": "B1",
+          "passed": true,
+          "reasons": []
+        }
+      ]
+    }
+  ],
+  "existing_recovery_api": "/recovery/replays",
+  "existing_recovery_http_status": 200,
+  "limitations": "Cached real DEM; synthetic obstacle and vehicle simulation. Not flight safety certification."
+}

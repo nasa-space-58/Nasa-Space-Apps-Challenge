@@ -1,0 +1,419 @@
+/* Mission run: physics-gated simulation panel (kept separate from style.css). */
+.mission-run h3 {
+  margin: 0 0 6px;
+}
+.mission-run h4 {
+  margin: 16px 0 8px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.mission-run .muted {
+  color: var(--muted);
+}
+.mission-run .small {
+  font-size: 11px;
+}
+.run-scenarios {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.run-scenario {
+  display: grid;
+  gap: 3px;
+  text-align: left;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.run-scenario small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.run-scenario[aria-checked="true"] {
+  border-color: var(--gold);
+  box-shadow: inset 0 0 0 1px var(--gold);
+}
+.run-builder {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+.run-builder summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.run-fault {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 8px 10px 10px;
+  margin: 10px 0 0;
+}
+.run-fault legend {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  font-size: 12px;
+  color: var(--gold);
+}
+.run-fault label,
+.run-fields label {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.run-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px 12px;
+  margin-top: 10px;
+}
+.run-add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.run-add select,
+.run-add input {
+  flex: 1 1 160px;
+}
+.run-saved {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 6px;
+}
+.run-saved li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.run-saved li > span {
+  flex: 1;
+  display: grid;
+}
+.run-saved small {
+  color: var(--muted);
+  font-size: 11px;
+}
+.run-result {
+  margin-top: 16px;
+  border: 1px solid var(--line);
+  border-left-width: 4px;
+  border-radius: 10px;
+  padding: 12px;
+}
+.run-success {
+  border-left-color: #65ddbd;
+}
+.run-success_with_warnings {
+  border-left-color: var(--gold);
+}
+.run-failure {
+  border-left-color: #ff8a78;
+}
+.run-inconclusive {
+  border-left-color: var(--blue);
+}
+.run-outcome {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  align-items: baseline;
+}
+.run-outcome strong {
+  font-size: 17px;
+}
+.run-outcome span {
+  flex: 1;
+  color: var(--muted);
+  font-size: 12px;
+}
+.run-gates {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+  display: grid;
+  gap: 8px;
+}
+.run-gates li {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 8px;
+}
+.run-gates strong {
+  margin-right: 8px;
+}
+.run-gates small {
+  color: var(--muted);
+}
+.run-gates p {
+  margin: 3px 0 0;
+  font-size: 13px;
+}
+.gate-icon {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  font-size: 12px;
+  font-weight: 700;
+}
+.gate-pass .gate-icon {
+  color: #65ddbd;
+  border-color: #65ddbd;
+}
+.gate-warn .gate-icon {
+  color: var(--gold);
+  border-color: var(--gold);
+}
+.gate-fail .gate-icon {
+  color: #ff8a78;
+  border-color: #ff8a78;
+}
+.gate-unknown .gate-icon {
+  color: var(--blue);
+  border-color: var(--blue);
+}
+.gate-not_reached {
+  opacity: 0.5;
+}
+.run-chart {
+  margin: 10px 0 0;
+}
+.run-chart svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+.run-chart polyline {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 1.6;
+  vector-effect: non-scaling-stroke;
+}
+.run-chart-cap {
+  stroke: var(--muted);
+  stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
+}
+.run-chart-marker {
+  stroke: #ff8a78;
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+.run-chart figcaption {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+.run-events {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+}
+.run-events li {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 8px;
+}
+.run-events time {
+  font-family: var(--mono);
+  color: var(--muted);
+  font-size: 11px;
+}
+.stage-hud.mission-outcome {
+  position: absolute;
+  left: 50%;
+  top: 18%;
+  transform: translateX(-50%);
+  max-width: min(90%, 460px);
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: rgba(8, 12, 16, 0.82);
+  color: inherit;
+  text-align: center;
+  cursor: pointer;
+  display: grid;
+  gap: 4px;
+}
+.mission-outcome.run-failure {
+  border-color: #ff8a78;
+}
+.mission-outcome.run-success {
+  border-color: #65ddbd;
+}
+.mission-outcome strong {
+  font-size: 18px;
+}
+.mission-outcome span {
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* Computed landing routes (primary / backup / rejected) of a mission run. */
+.run-routes {
+  margin-top: 14px;
+  border-top: 1px solid var(--line);
+  padding-top: 4px;
+}
+.route-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  font-size: 11px;
+  color: var(--muted);
+}
+.route-legend li,
+.route-list button {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.route-legend i,
+.route-list i {
+  flex: none;
+  width: 18px;
+  height: 0;
+  border-top: 3px solid var(--route);
+}
+.route-legend i.dashed,
+.route-list i.dashed {
+  border-top-style: dashed;
+}
+.route-list {
+  display: grid;
+  gap: 4px;
+  list-style: none;
+  margin: 10px 0;
+  padding: 0;
+}
+.route-list button {
+  width: 100%;
+  padding: 6px 9px;
+  border: 1px solid var(--line);
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.route-list button small {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 11px;
+}
+.route-list button[aria-pressed="true"] {
+  border-color: var(--route);
+  box-shadow: inset 0 0 0 1px var(--route);
+}
+.route-detail {
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--route);
+  border-radius: 10px;
+  padding: 8px 11px;
+}
+.route-detail h5 {
+  margin: 0 0 6px;
+  font-size: 14px;
+}
+.route-detail h5 small {
+  color: var(--muted);
+  font-weight: 400;
+}
+.route-detail h6 {
+  margin: 10px 0 4px;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.route-reasons {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 12px;
+}
+.route-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 12px;
+}
+.route-metrics dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+.route-metrics dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Why runs look alike, and how this run differs from the fault-free one. */
+.run-limits {
+  margin: 0 0 10px;
+  padding: 8px 12px;
+  border: 1px solid #f2c46d;
+  border-radius: 10px;
+  background: rgba(242, 196, 109, 0.1);
+  font-size: 12px;
+}
+.run-limits ul {
+  margin: 0 0 4px;
+  padding-left: 18px;
+}
+.run-limits small {
+  color: var(--muted);
+}
+.run-delta dl {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 12px;
+}
+.run-delta dt {
+  color: var(--muted);
+  font-size: 11px;
+}
+.run-delta dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+.run-delta .changed dd {
+  color: #f2c46d;
+  font-weight: 600;
+}
+.run-chart-verdict {
+  stroke: #ff8a78;
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+.mission-outcome small {
+  display: block;
+  font-size: 12px;
+  color: #f2c46d;
+}

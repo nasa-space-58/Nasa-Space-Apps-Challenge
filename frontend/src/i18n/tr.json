@@ -52,7 +52,21 @@
       "awaitsDetail": "Araziyi, ışığı ve görünürlüğü ortaya çıkarmak için bir bölge ve zaman seçin.",
       "runExample": "Malapert örneğini çalıştır",
       "addComparison": "Karşılaştırma ekle",
-      "footnote": "Ufuk bir bakış açısıdır, bir vaat değil. Sonuçlar örneklenen araziyi ve gözlem penceresini tanımlar."
+      "footnote": "Ufuk bir bakış açısıdır, bir vaat değil. Sonuçlar örneklenen araziyi ve gözlem penceresini tanımlar.",
+      "cards": {
+        "weather": {
+          "title": "Uzay havası",
+          "desc": "Güneş fırtınası ve radyasyon riskinin gözlem penceresine etkisi."
+        },
+        "share": {
+          "title": "Paylaş ve dışa aktar",
+          "desc": "Sonucu CSV, grafik ya da rapor olarak indir; bağlantı veya senaryo dosyası paylaş."
+        },
+        "trace": {
+          "title": "Hesap ayrıntıları ve sınırlar",
+          "desc": "Hangi veri ve varsayımlarla hesaplandığı, kaynaklar ve modelin sınırları."
+        }
+      }
     },
     "playback": {
       "eyebrow": "GÖZLEM ZAMANI",
@@ -95,7 +109,8 @@
       "descent": "İniş",
       "classroom": "Sınıf",
       "campaign": "Kampanya",
-      "recovery": "Kendini onarma"
+      "recovery": "Kendini onarma",
+      "missionRun": "Simülasyon"
     },
     "nav": {
       "skip": "Görev kontrolüne geç",
@@ -194,12 +209,46 @@
       "close": "Kaynakları kapat",
       "eyebrow": "KAYNAKÇA",
       "title": "Gerçek veriler üzerine kurulu bir görünüm.",
-      "body": "NASA modelleri yolculuğu canlandırır. Giriş bölümündeki krater arazisi seçilen konum değil, özgün dekoratif bir geometridir. Görev kontrolündeki Dünya'dan Ay'a uçuş temsilidir: Dünya, Ay ve aralarındaki mesafe ölçeklidir; uzay araçları büyütülmüş, Güneş ise gerçek görünür boyutunda ama daha yakın gösterilmiştir; hesaplanmış bir yörünge değildir. Bilimsel sonuçlar önbellekteki Horizons efemerislerini ve doğrulanmış LOLA arazi ürününü kullanır.",
-      "lro": "LRO modeli",
-      "lola": "LOLA güney kutbu arazisi",
-      "horizons": "Güneş ve Dünya gözlemci efemerisleri",
+      "body": "NASA modelleri yolculuğu canlandırır. Giriş bölümündeki krater arazisi seçilen konum değil, özgün dekoratif bir geometridir. Görev kontrolünde Dünya, Ay ve aralarındaki mesafe ölçeklidir; uzay araçları büyütülmüştür, gezici araziyle aynı ölçekte değildir, Güneş ise gerçek görünür boyutunda ama daha yakın gösterilir. Seçilen iniş zamanına ait tarihli efemeris yüklendiğinde Ay'ın konumu, Dünya'nın dönüşü ve Güneş'in yönü JPL Horizons'u izler; uzay aracının izlediği yol ise temsilidir, hesaplanmış bir yörünge değildir. Bilimsel sonuçlar önbellekteki Horizons efemerislerini, doğrulanmış LOLA arazi ürününü ve aşağıda listelenen kaynakları kullanır.",
       "coordinate": "{name} koordinat kaynağı",
-      "disclaimer": "Giriş bölümü temsili bir animasyondur. Apollo, tarihi bir güney kutbu görevi olarak gösterilmemektedir. NASA bu uygulamayı onaylamamaktadır."
+      "groups": {
+        "models": "3B modeller ve dokular",
+        "terrain": "Arazi ve konum koordinatları",
+        "ephemeris": "Efemerisler, yörüngeler ve referans sabitleri",
+        "mission": "Görev zaman çizelgesi ve iniş aracı",
+        "communication": "Yer istasyonları ve uzay havası",
+        "quantum": "Kuantum optimizasyonu"
+      },
+      "link": {
+        "license": "Lisans",
+        "manual": "Kılavuz",
+        "model": "Dinamik model",
+        "scales": "NOAA uzay havası ölçekleri"
+      },
+      "use": {
+        "lro": "Giriş ve görev kontrolü sahnelerindeki yörünge aracı modeli.",
+        "apollo": "Giriş, görev kontrolü ve analiz sahnelerindeki iniş aracı modeli.",
+        "mobileLauncher": "Fırlatma yakın planındaki dekoratif fırlatma platformu.",
+        "rocket": "Fırlatma yakın planındaki üç kademeli roket. Ücretsiz 1DesignTool kütüphane lisansıyla kullanılır.",
+        "rover": "İniş yakın planındaki gezici. Özgün modelden farkları: ağ seyreltildi ve nicemlendi, doku koordinatları kaldırıldı, renkler parça başına değiştirildi, tekerlekler ve anten canlandırıldı.",
+        "moonKit": "Dekoratif Ay küresi için renk haritası ve kabartma önizlemesi; yükseklik analizinde hiç kullanılmaz.",
+        "blueMarble": "Görev kontrolü sahnesindeki Dünya dokusu (Ocak 2004).",
+        "lola": "Arazi ufku, eğim, gezici rotaları ve arazi kurtarma için yükseklik verisi.",
+        "lsdb": "Ay referans yarıçapı ve konum koordinatları.",
+        "siteCoordinate": "Bu hazır konumun gözlemci noktası.",
+        "horizons": "Analiz için Güneş ve Dünya gözlemci efemerisleri; uçuş sahnesi için Ay ve Güneş'in yer merkezli vektörleri.",
+        "astroPar": "İniş dinamiği için Ay'ın kütleçekim parametresi (GM).",
+        "iers": "Uçuş sahnesi için Dünya Dönme Açısı.",
+        "periodicOrbits": "Röle seçimi için Dünya–Ay L2 hale yörüngesi kataloğu.",
+        "apollo11Report": "Uçuş zaman çizelgesindeki görev evreleri ve motorlu iniş başındaki ay modülü kütlesi.",
+        "tnD6846": "Motorlu iniş geçitleri, motor sınırları ve delta-v yedekleri.",
+        "dpsEvaluation": "İniş motoru özgül itkisi (309,7 s, Apollo 9 zaman ortalaması).",
+        "dsn": "Derin Uzay Ağı istasyon koordinatları ve yükseklik açısı sınırları.",
+        "swpc": "Güneş patlaması ve proton olayı olasılıkları, GOES X ışını ve proton akısı, aktif bölgeler.",
+        "qaoa": "Yerel kuantum optimizasyon deneylerinde kullanılan algoritma.",
+        "openQuantum": "Arşivlenmiş tek bir iki kübitlik donanım işi (2026-11-14); yalnızca kayıtlı kanıt olarak gösterilir."
+      },
+      "disclaimer": "Giriş bölümü temsili bir animasyondur. Apollo, tarihi bir güney kutbu görevi olarak gösterilmemektedir. Örnek kampanyalar ve arıza senaryoları ekibin hazırladığı öğretici örneklerdir; NASA planı, DSN rezervasyonu veya arıza istatistiği değildir. Sonuçlar iniş güvenliği, güç, ısıl veya bağlantı sertifikası değildir. NASA ve listelenen diğer kaynak sahipleri bu uygulamayı onaylamamaktadır."
     }
   },
   "language": {
@@ -213,7 +262,8 @@
   "common": {
     "sun": "Güneş",
     "earth": "Dünya",
-    "terrain": "Arazi"
+    "terrain": "Arazi",
+    "advancedSettings": "Gelişmiş ayarlar"
   },
   "jobState": {
     "pending": "Kuyrukta bekliyor",
@@ -481,6 +531,50 @@
       "craftMoon": "Araç–Ay (temsili rota)",
       "loading": "Gerçek Ay/Güneş konumları JPL Horizons'tan alınıyor…",
       "failed": "Gerçek konumlar alınamadı; sabit temsili düzen gösteriliyor."
+    },
+    "steps": {
+      "plan": "Yer ve zaman",
+      "results": "Sonuçlar",
+      "compare": "Karşılaştır ve öner",
+      "descent": "İniş ve yüzey"
+    },
+    "learn": "Öğren",
+    "advanced": "Gelişmiş",
+    "advancedHint": "Uzmanlar için planlama ve araştırma araçları",
+    "menuTitle": "Görev adımları",
+    "layers": "Katmanlar",
+    "hazards": "Tehlike bölgeleri",
+    "scanCoverage": "Tarama alanı",
+    "roverRoutes": "Rover rotaları",
+    "landingCandidates": "İniş adayları",
+    "close": "Kapat",
+    "toggleFullscreen": "Tam ekranı değiştir",
+    "fullscreenIsUnavailableInThis": "Bu tarayıcıda tam ekran açılamadı.",
+    "rover": "Keşif aracı",
+    "sceneDetails": "Sahne ayrıntıları",
+    "flightDetails": "Uçuş bilgisi",
+    "surfaceOperations": "Yüzey operasyonları",
+    "candidates": "Adaylar",
+    "backToTask": "Göreve dön",
+    "routeLandingCandidates": "Rota ve iniş adayları",
+    "showIn3d": "3D üzerinde göster",
+    "linesAreIllustrativeApproachCorridors": "Çizgiler temsili yaklaşım koridorlarıdır. Skor ve gerekçeler API sonuçlarıdır; hesaplanmamış skor — gösterilir.",
+    "runRecommendationsOrDescentPlanning": "Rota ve iniş adayları için Karşılaştır ve öner veya İniş ve yüzey adımında bir hesaplama çalıştırın.",
+    "theVehicleWasLostAt": "Araç inişte kaybedildi; yüzey operasyonları yapılamaz.",
+    "surfaceOperationsBecomeAvailableAfter": "Yüzey operasyonları inişten sonra açılır.",
+    "controls": "Kontroller",
+    "cleanView": "Sade görünüm",
+    "candidateStatus": {
+      "accepted": "Uygun",
+      "rejected": "Elendi",
+      "failed": "Hata",
+      "unknown": "Veri yetersiz"
+    },
+    "metricLabels": {
+      "Orbit": "Yörünge",
+      "Propellant": "Yakıt",
+      "Reserve margin": "Rezerv marjı",
+      "Assessment": "Değerlendirme"
     }
   },
   "missionPhases": {
@@ -790,7 +884,31 @@
     },
     "pdiStart": "Motorlu iniş {km} km geriden {speed} m/s hızla başlar; {n} motorlu aşama.",
     "touchdown": "Temas: bölgeden {error} m uzakta, dikey {vertical} m/s, yatay {horizontal} m/s. Bölge 1737,4 km kürenin {height} m üzerinde.",
-    "assumptions": "Fiziksel varsayımlar ve kaynaklar"
+    "assumptions": "Fiziksel varsayımlar ve kaynaklar",
+    "more": {
+      "title": "Daha fazla analiz",
+      "hint": "Yukarıdaki iniş planını kullanır. Açmak için bir başlığa dokunun.",
+      "risk": {
+        "title": "Risk ve belirsizlik",
+        "desc": "Belirsizlikler altında inişin ne sıklıkla başarılı olduğunu yüzlerce simülasyonla gösterir."
+      },
+      "backups": {
+        "title": "Yedek iniş noktaları",
+        "desc": "Plan bozulursa inişin ortasında ulaşılabilecek güvenli alternatif noktaları bulur."
+      },
+      "twin": {
+        "title": "Dijital ikiz",
+        "desc": "Aracın sensörlerle bildiği ile gerçekte olanı arıza senaryolarında karşılaştırır."
+      },
+      "surface": {
+        "title": "İnişten sonra: yüzey rotaları",
+        "desc": "Gezginin bilim hedeflerine dik yamaçlardan kaçınarak gideceği rotaları planlar."
+      },
+      "terrainRecovery": {
+        "title": "Araziye bağlı iniş kurtarma",
+        "desc": "Gerçek araziden yedek hedefler, arıza ve gecikmeli yeniden planlama."
+      }
+    }
   },
   "recommendations": {
     "criterion": {
@@ -909,7 +1027,57 @@
     "Analysis time outside the SWPC forecast days has no forecast; nothing is extrapolated.": "SWPC tahmin günleri dışındaki analiz zamanı için tahmin yoktur; hiçbir değer ileriye taşınmaz.",
     "Current conditions describe the Sun when the snapshot was fetched, not at the landing time.": "Güncel koşullar inişin değil, verinin çekildiği andaki Güneş'i anlatır.",
     "GOES measures near Earth; proton flux is a proxy for the lunar surface, not a dose estimate.": "GOES Dünya yakınında ölçer; proton akısı Ay yüzeyi için yaklaşık bir göstergedir, doz tahmini değildir.",
-    "The radio blackout scale describes HF radio on Earth's sunlit side, not DSN links.": "Radyo kesintisi ölçeği Dünya'nın gündüz yüzündeki HF radyoyu anlatır, DSN bağlantılarını değil."
+    "The radio blackout scale describes HF radio on Earth's sunlit side, not DSN links.": "Radyo kesintisi ölçeği Dünya'nın gündüz yüzündeki HF radyoyu anlatır, DSN bağlantılarını değil.",
+    "Every run flies the R4 model (planar point-mass Moon, ZEM/ZEV guidance through the Apollo 11 gates) at a 0.5 s step.": "Her deneme R4 iniş modelini 0,5 saniyelik adımlarla çalıştırır: düzlemsel noktasal Ay modeli ve Apollo 11 geçiş noktalarından geçen ZEM/ZEV güdümü.",
+    "Uncertainty sources are independent Gaussians; their standard deviations are planning assumptions, not certified vehicle values.": "Belirsizlikler birbirinden bağımsız normal dağılımlardır. Standart sapmalar planlama varsayımıdır; onaylı araç değerleri değildir.",
+    "Thrust error scales maximum and design thrust together; Isp error scales specific impulse.": "İtki hatası azami ve tasarım itkisini birlikte; özgül itki hatası ise özgül itkiyi ölçekler.",
+    "PDI dispersions change the actual starting downrange position and speed; guidance knows the actual state.": "Motorlu iniş başlangıcındaki sapmalar gerçek başlangıç konumunu ve hızını değiştirir. Güdüm gerçek durumu bilir.",
+    "Navigation (knowledge) error shifts the landing point one-to-one, because guidance flies to the believed site.": "Yön bulma hatası iniş noktasına bire bir yansır; güdüm doğru sandığı hedefe uçar.",
+    "Crossrange dispersion comes only from navigation error: the planar descent model has no crossrange dynamics.": "Yanal sapma yalnızca yön bulma hatasından gelir; düzlemsel modelde yanal dinamik yoktur.",
+    "Lower true ground: engine cut-off at the believed touchdown, then free fall. Higher true ground: contact at the first sample at or below it.": "Gerçek zemin daha alçaksa motor beklenen temas anında kapanır ve araç serbest düşer. Daha yüksekse zemine ulaşan ilk örnek temas sayılır.",
+    "Propellant remaining is taken at the believed touchdown (conservative when contact is earlier).": "Kalan yakıt beklenen temas anında hesaplanır; erken temas halinde ihtiyatlı bir tahmindir.",
+    "Slope is the R3 Horn slope of the containing 80 m DEM cell; landings off the map or on unknown cells are failures, never assumed safe.": "Eğim, 80 m DEM hücresinin Horn eğimidir. Harita dışındaki ve bilinmeyen hücrelere iniş başarısız sayılır.",
+    "Sensitivity is a Spearman rank correlation, not a variance decomposition; values below 2/sqrt(runs) are not distinguishable from noise.": "Duyarlılık Spearman sıralama korelasyonudur. 2/√deneme sayısı altındaki değerler gürültüden ayırt edilemez; varyans ayrıştırması değildir.",
+    "The twin flies the R4 model: planar point-mass Moon, ZEM/ZEV guidance through the Apollo 11 gates, RK4 at the chosen step.": "İkiz, R4 modelini kullanır: düzlemsel noktasal Ay, Apollo 11 geçiş noktaları boyunca ZEM/ZEV güdümü ve seçilen adımla RK4 integrasyonu.",
+    "Guidance uses the estimated state; the true state is integrated separately (ground truth vs observation vs estimate).": "Güdüm tahmini durumu kullanır. Gerçek benzetim durumu ayrı hesaplanır; gözlem ve tahmin birbirinden ayrıdır.",
+    "Navigation observations add independent Gaussian noise to downrange/altitude position and horizontal/vertical speed; sizes are planning assumptions.": "Yön bulma gözlemlerinin konum ve hız bileşenlerine bağımsız normal gürültü eklenir. Büyüklükler planlama varsayımıdır.",
+    "Sensor noise is range-scaled (radar/lidar-like): the configured sigma is a cap, reduced to range_fraction x altitude near the surface, never below a floor.": "Sensör gürültüsü radar/lidar gibi mesafeyle ölçeklenir. Ayarlanan sigma üst sınırdır; yüzeye yaklaşınca azalır, taban sınırının altına düşmez.",
+    "The estimator is a constant-gain predictor-corrector: prediction with the commanded acceleration, correction toward each observation.": "Tahminci sabit kazançlı öngörü–düzeltme kullanır: komut verilen ivmeyle öngörür, her gözleme doğru düzeltir.",
+    "Actual thrust carries a constant engine performance bias drawn once per run and unknown to the estimator; without observations the estimate drifts.": "Motor performans sapması her çalıştırmada bir kez seçilir ve tahminci tarafından bilinmez. Gözlem kesilirse tahmin kayar.",
+    "Mass is known to the estimator (propellant gauging). Battery energy uses a constant load; no thermal or power model.": "Tahminci kütleyi bilir. Pil enerjisi sabit yükle azalır; ısıl ve ayrıntılı güç modeli yoktur.",
+    "Events change the model: thrust_loss scales available thrust, sensor_degradation changes noise/health (degraded without values = 5x noise), propellant_leak removes mass instantly, comm_outage removes ground uplink, obstacle_detected adds a synthetic hazard disk.": "Olaylar modeli değiştirir: motor kaybı kullanılabilir itkiyi azaltır; sensör bozulması gürültüyü artırır; sızıntı kütleyi azaltır; bağlantı kesintisi yer komutlarını durdurur; engel olayı temsili tehlike bölgesi ekler.",
+    "The twin does not replan: an invalidated plan keeps flying so its consequences are visible (R12 replans).": "Bu ikiz yeniden planlama yapmaz. Geçersiz planın sonuçları görülsün diye uçuş sürer; R12 kurtarma modülü yeniden planlar.",
+    "All telemetry is simulated; obstacles are synthetic; the vehicle profile and terrain height keep their sources.": "Tüm telemetri benzetimdir; engeller senaryodur. Araç profili ve arazi yüksekliği kendi veri kaynaklarını korur.",
+    "Passable cells have a known R3 Horn slope at or below the mobility limit on the 80 m DEM; rocks and craters below 80 m are not resolved.": "Geçilebilir hücrelerin 80 m DEM üzerindeki Horn eğimi bilinir ve hareket sınırını aşmaz. 80 m altındaki kaya ve kraterler çözülemez.",
+    "A* finds the shortest 3-D path over 8-connected passable cells; the route follows cell centres.": "A*, komşu sekiz geçilebilir hücre üzerinden en kısa üç boyutlu yolu bulur. Rota hücre merkezlerinden geçer.",
+    "Duration uses a constant traverse speed including stops; rover power, thermal and wheel limits are not modelled.": "Süre, duruşları da içeren sabit keşif hızıyla hesaplanır. Güç, ısıl sınırlar ve tekerlek sınırları modellenmez.",
+    "Sunlight and Earth are checked only at sampled route cells, using a local horizon computed for each cell and the site analysis' Sun/Earth directions at arrival.": "Güneş ve Dünya yalnızca rotadan örneklenen hücrelerde değerlendirilir. Her hücrenin yerel ufku ve varış anındaki Güneş/Dünya yönleri kullanılır.",
+    "The landing site's ephemeris is reused along the route; directions shift by at most distance / R (about 0.033 deg per km).": "İniş bölgesinin gök cismi konumları rota boyunca yeniden kullanılır. Yön farkı en fazla mesafe/Ay yarıçapıdır; kilometre başına yaklaşık 0,033°.",
+    "The Sun is a disk of the mean solar angular radius (959.63 arcsec at 1 au); Earth visibility is for its centre, not a usable radio link.": "Güneş ortalama açısal yarıçapıyla disk olarak modellenir. Dünya görünürlüğü yalnızca merkez içindir; kullanılabilir radyo bağlantısı anlamına gelmez.",
+    "Mission efficiency = reachable share, straight-line/route length and the sunlit share of sampled points; weights are documented and adjustable only in code.": "Görev verimliliği; erişilebilir hedef oranı, düz mesafe/rota uzunluğu ve örneklerin aydınlık oranından hesaplanır. Ağırlıklar kodda tanımlıdır.",
+    "The primary plan is the R4 descent; the divert starts from its state at high gate (approach) or low gate (terminal descent).": "Ana plan R4 inişidir. Hedef değiştirme yaklaşma veya son iniş geçiş noktasındaki durumdan başlar.",
+    "Downrange retargeting is flown with the R4 ZEM/ZEV guidance to the backup's own terrain height (state rotated about the Moon's centre).": "Uçuş doğrultusundaki yeni hedefe R4 ZEM/ZEV güdümüyle, hedefin kendi arazi yüksekliği kullanılarak gidilir. Durum Ay merkezi çevresinde döndürülür.",
+    "Crossrange offsets use the analytic minimum-energy lateral divert (3|c|/T delta-v, 6|c|/T^2 peak), decoupled from the planar descent.": "Yanal sapma düzlemsel inişten ayrı, asgari enerjili analitik manevrayla hesaplanır: 3|c|/T hız değişimi ve 6|c|/T² tepe ivme.",
+    "The lateral divert starts once the engine leaves the fixed-throttle (maximum thrust) position; T is the time left after that.": "Yanal manevra motor sabit azami itki bölümünü tamamlayınca başlar. T, bundan sonra kalan süredir.",
+    "Lateral propellant is added after the in-plane flight with the rocket equation, which overstates the combined cost (conservative).": "Yanal yakıt maliyeti düzlemsel uçuştan sonra roket denklemiyle eklenir. Birleşik maliyeti yüksek tahmin eden ihtiyatlı bir yaklaşımdır.",
+    "Reachable means: no propellant exhaustion, the R5 reserve kept, the R4 touchdown tolerances met, and in-plane plus lateral acceleration within maximum thrust at every sample.": "Erişilebilirlik için yakıt tükenmemeli, rezerv korunmalı, iniş toleransları sağlanmalı ve toplam ivme her örnekte motor sınırını aşmamalıdır.",
+    "Candidates must pass the R3 hard constraints on the 80 m DEM (landing-area slope within the limit, no unknown cells); lander-scale hazards are not resolved.": "Adaylar 80 m DEM üzerinde eğim ve bilinen hücre koşullarını sağlamalıdır. İniş aracı ölçeğindeki küçük tehlikeler çözülemez.",
+    "Sunlight and communication at the backups are not evaluated here; use the site analysis for each backup.": "Yedeklerin aydınlatması ve iletişimi burada değerlendirilmez. Her yedek için bölge analizini kullanın.",
+    "The vehicle is the R9 twin flying the R4 descent; replanning sees only the estimated state, never the truth.": "Araç R4 inişini yapan R9 ikizidir. Yeniden planlayıcı yalnızca tahmini durumu görür; benzetimin gerçek durumunu görmez.",
+    "A decision is triggered when an event invalidates the active plan; continuing to the current target is evaluated first, then backups.": "Bir olay aktif planı geçersiz kılınca karar tetiklenir. Önce mevcut hedefe devam, ardından yedekler değerlendirilir.",
+    "Backups are R7-style DEM cells passing the R3 hard constraints within the search radius, ranked by safety score.": "Yedekler, arama yarıçapında R3 kısıtlarını sağlayan DEM hücreleridir; güvenlik skoruyla sıralanır.",
+    "Options are flown from the estimate with R4 guidance (downrange by state rotation) plus the analytic lateral divert (3|c|/T) after the fixed-throttle block.": "Seçenekler tahmini durumdan R4 güdümüyle uçurulur. Sabit itki bölümünden sonra analitik yanal manevra eklenir.",
+    "An option must keep the R5 reserve after the divert and a k-sigma correction allowance, meet R4 tolerances, stay within maximum thrust and keep k-sigma clearance from obstacles and R3 hazards.": "Seçenek; manevra ve belirsizlik düzeltmesinden sonra yakıt rezervini korumalı, iniş toleranslarını sağlamalı, itki sınırını aşmamalı ve engellerden güvenli uzaklıkta kalmalıdır.",
+    "Sigma is the navigation uncertainty the planner must assume: the estimator's error with a working sensor, or, with the sensor lost, a bound on drift to touchdown from a one-sigma engine bias. The bias itself is unknown to the planner and to validation.": "Sigma, planlayıcının hesaba katması gereken yön bulma belirsizliğidir. Sensör kaybolduğunda motor sapmasının temasa kadar oluşturabileceği sürüklenme sınırı kullanılır. Gerçek motor sapması planlayıcı ve doğrulayıcı tarafından bilinmez.",
+    "The chosen option is validated independently from the true state at 0.05 s before it is applied; a failed validation moves to the next option.": "Seçilen seçenek uygulanmadan önce gerçek benzetim durumundan 0,05 saniyelik adımla bağımsız doğrulanır. Başarısızsa sonraki seçenek denenir.",
+    "The evaluation budget is a count (deterministic); wall-clock solver time is reported but excluded from the result ID.": "Hesaplama bütçesi deterministik değerlendirme sayısıdır. Gerçek çözüm süresi raporlanır ama sonuç kimliğine katılmaz.",
+    "abort_required means no evaluated option is feasible: abort-to-orbit is not simulated and the vehicle keeps flying its old plan; hover/defer is not modelled.": "İptal gerekli sonucu, değerlendirilen hiçbir seçeneğin uygun olmadığını gösterir. Yörüngeye geri dönüş, askıda kalma ve erteleme modellenmez; araç eski planıyla devam eder.",
+    "Hybrid or quantum selection, asynchronous quantum paths and propagation into a multi-mission schedule are not part of this classical prototype.": "Bu klasik prototip kuantum/hibrit seçim, eşzamansız kuantum yolları veya çoklu görev takvimine aktarım içermez.",
+    "Propellant ran out before touchdown.": "Yakıt yüzeye temastan önce tükendi.",
+    "The target lies inside a detected (synthetic) obstacle.": "Hedef, senaryoda algılanan engelin içinde.",
+    "The target lies inside a detected obstacle.": "Hedef algılanan engelin içinde.",
+    "Not enough propellant to reach this target.": "Bu hedefe ulaşmak için yakıt yetersiz.",
+    "The engine stays at full thrust; nothing is left for a lateral move.": "Motor tam itkide çalışıyor; yanal manevra için güç kalmıyor."
   },
   "arena": {
     "tab": "Çözücü arenası",
@@ -1393,7 +1561,8 @@
       "sample": "Son ölçüm noktası: {km} km · {utc}",
       "noSample": "Henüz ölçüm noktasına varılmadı",
       "noAnalysis": "Güneş/Dünya durumu için önce Analizi çalıştırın.",
-      "note": "Rota NASA LOLA 80 m arazisinde backend tarafından hesaplanır; 3B arazi temsilidir, rota gerçektir. Güneş/Dünya durumu yalnızca örneklenen noktalarda değerlendirilir."
+      "note": "Rota NASA LOLA 80 m arazisinde backend tarafından hesaplanır. 3B zemin bu gerçek arazi penceresidir ve yükseklikler gerçek oranındadır; gezgin modeli ölçekli değildir, tarama animasyonunun hızı yalnızca gösterim içindir. Güneş/Dünya durumu yalnızca örneklenen noktalarda değerlendirilir.",
+      "modelCredit": "3B gezgin modeli: “Lunar Rover”, Versal (Sketchfab), CC BY 4.0; renkler ve hareketler bu uygulamada eklendi."
     },
     "sun": {
       "full": "Tam güneşte",
@@ -1423,7 +1592,256 @@
       "forecast": "Tahmin (günlük en yüksek)",
       "acquired": "Veri çekilme zamanı: {utc}",
       "note": "Ayrıntılar ve sınırlar Sonuçlar sekmesindeki Güneş aktivitesi panelinde. Ay'ın manyetik alanı olmadığından S seviyesi yüzeydeki ekip için önemlidir."
+    },
+    "scan": {
+      "pulse": "Anten çevreyi tarıyor: her hücrenin eğimi ölçülüyor…",
+      "search": "A* en kısa güvenli yolu arıyor: {cells} hücre incelendi",
+      "route": "Rota bulundu: kraterlerin dik kenarlarından kaçınıyor",
+      "done": "Tarama tamam: gezgin hesaplanan rotada ilerliyor",
+      "replay": "↻ Taramayı tekrarla",
+      "legendOpen": "Geçilebilir (≤{deg}°)",
+      "legendSteep": "Çok dik (>{deg}°)",
+      "legendSearched": "A* tarafından incelendi",
+      "legendRoute": "Seçilen rota",
+      "truncated": "İncelenen hücrelerin yalnızca ilk kısmı gösteriliyor.",
+      "deploy": "Gezgin iniş aracından iniyor…"
+    },
+    "scanning": "Tarama",
+    "exploring": "Keşif",
+    "standby": "Beklemede",
+    "newCraterExplorationDemo": "Yeni krater keşfi · Demo",
+    "returnToApiRoutes": "API rotalarına dön",
+    "theApiDoesNotProvide": "API arazi tarama haritası sağlamıyor. 3D keşif, görünen kraterleri tarayan demo planlayıcıyla çalışıyor; kırmızı bölgelerden kaçınılıyor.",
+    "demoAAndSampledCosts": "DEMO · Sahnedeki kraterler üzerinde A* ve rastgele maliyet örnekleme. Kuantum hesaplama değildir. Mesafe ve süre temsili ölçek kullanır.",
+    "goldSelectedRouteTealOther": "Altın: seçilen rota · Turkuaz: diğer hesaplanan rotalar",
+    "antennaSweep": "Anten taraması",
+    "targetReached": "Hedefe ulaşıldı",
+    "telemetryUplinkAnimation": "Telemetri aktarımı · animasyon",
+    "surfaceTraverse": "Yüzey keşfi"
+  },
+  "risk": {
+    "label": "İniş riski",
+    "title": "Risk ve belirsizlik · Monte Carlo",
+    "runs": "Simülasyon sayısı",
+    "seed": "Rastgelelik tohumu (seed)",
+    "navigation": "Navigasyon hatası 1σ · m",
+    "terrain": "Arazi yüksekliği hatası 1σ · m",
+    "thrust": "İtki hatası 1σ · %",
+    "isp": "Özgül itki (Isp) hatası 1σ · %",
+    "pdiDown": "İniş başlangıcı (PDI) konum hatası 1σ · m",
+    "pdiSpeed": "İniş başlangıcı (PDI) hız hatası 1σ · m/s",
+    "azimuth": "Yaklaşma yönü · °",
+    "run": "Simülasyonları çalıştır ↗",
+    "running": "{runs} iniş simüle ediliyor…",
+    "help": "Yukarıdaki nokta, araç, yörünge ve rezervi kullanır. Aynı tohum ve girdiler aynı sonucu verir. Hata büyüklükleri planlama varsayımıdır, onaylı araç değerleri değildir.",
+    "requestFailed": "İstek başarısız oldu",
+    "verdict": "Başarılı iniş oranı: {rate} ({runs} simülasyon)",
+    "confidence": "%95 güven aralığı {low}–{high} · tohum {seed} · sonuç {id}",
+    "mainDriver": "başarısızlıkların ana nedeni:",
+    "metrics": {
+      "ellipse": "3σ İNİŞ ELİPSİ",
+      "inside": "elips içinde kalan iniş: {share}",
+      "steep": "ELİPS İÇİNDE DİK ARAZİ",
+      "notEvaluated": "değerlendirilmedi",
+      "cells": "{count} hücre > {limit}° · bilinmeyen {unknown}",
+      "noTerrain": "arazi verisi yok",
+      "fuel": "REZERV ÜSTÜ YAKIT (P5)",
+      "median": "medyan {kg} kg"
+    },
+    "whyFail": "İnişler neden başarısız oluyor",
+    "noFailures": "Bu örnekte başarısız iniş yok.",
+    "whichMatters": "Hangi belirsizlik önemli",
+    "association": "ilişki {value}",
+    "nothingToExplain": "açıklanacak başarısızlık yok",
+    "off": "kapalı",
+    "significant": "anlamlı",
+    "barHelp": "Çubuk: başarısızlıkla sıra korelasyonu. Çizgi, 2/√simülasyon gürültü seviyesini gösterir; daha kısa çubuklar şanstan ayırt edilemez.",
+    "propellantLeft": "Temasta kalan yakıt",
+    "assumptions": "Monte Carlo modeli ve varsayımlar",
+    "travel": "hareket yönü",
+    "legend": {
+      "success": "başarılı iniş",
+      "failure": "başarısız iniş",
+      "ellipses": "hedef · kesikli 1σ · düz 3σ elips"
+    },
+    "plotLabel": "Hedef çevresinde {points} simüle iniş noktası, 1σ ve 3σ elipslerle; başarılı: {ok} / {runs}.",
+    "histogramLabel": "Temasta kalan yakıt, {min} ile {max} kg arası.",
+    "sources": {
+      "thrust": "Motor itkisi",
+      "isp": "Özgül itki",
+      "pdi_downrange": "PDI konumu",
+      "pdi_speed": "PDI hızı",
+      "terrain_height": "Arazi yüksekliği (DEM)",
+      "navigation_down": "Navigasyon · menzil yönü",
+      "navigation_cross": "Navigasyon · yan yön"
+    },
+    "causes": {
+      "propellant_exhausted": "Yakıt bitti",
+      "propellant_reserve": "Rezerv korunamadı",
+      "touchdown_position": "Güdüm hedefi kaçırıldı",
+      "vertical_speed": "Sert iniş (dikey hız)",
+      "horizontal_speed": "Kayarak iniş (yatay hız)",
+      "hazard_slope": "Dik araziye iniş",
+      "hazard_unknown": "Bilinmeyen araziye iniş"
     }
+  },
+  "backups": {
+    "label": "Yedek iniş planları",
+    "title": "Yedek iniş noktaları",
+    "divertFrom": "Yön değiştirme noktası",
+    "highGate": "Yüksek kapı (yaklaşık 2 km yukarıda)",
+    "lowGate": "Alçak kapı (yaklaşık 150 m yukarıda)",
+    "radius": "Arama yarıçapı · m",
+    "count": "Yedek sayısı",
+    "spacing": "Aday aralığı · m",
+    "separation": "Noktalar arası en az mesafe · m",
+    "slope": "En büyük eğim · °",
+    "run": "Yedek noktaları bul ↗",
+    "running": "Yedekler aranıyor…",
+    "help": "Yedekler arazi koşullarını geçer; yön değiştirme noktasından yakıt, rezerv, temas toleransı ve motor itkisi açısından kontrol edilir.",
+    "verdict": "{gate} noktasından ulaşılabilen yedek: {reachable} / {count}",
+    "gates": {
+      "high_gate": "Yüksek kapı (yaklaşmanın başı)",
+      "low_gate": "Alçak kapı (son inişin başı)"
+    },
+    "divertState": "Yön değiştirme: {altitude} m irtifa, {speed} m/s, temasa {seconds} s. Yedek olarak işaretlenen: {marked}.",
+    "none": "yok",
+    "primary": "Ana nokta",
+    "plannedSite": "planlanan nokta",
+    "slopeShort": "eğim",
+    "unknown": "bilinmiyor",
+    "toTouchdown": "temasa {seconds} s",
+    "hover": "hover {seconds} s",
+    "reachable": "Ulaşılabilir",
+    "unreachable": "Ulaşılamaz",
+    "mark": "yedek olarak işaretle",
+    "assumptions": "Yedek modeli ve varsayımlar",
+    "mapLabel": "Ortada ana nokta ve {count} yedek nokta; {reachable} tanesi ulaşılabilir. Ayrıntılar tabloda.",
+    "table": {
+      "caption": "Ana nokta ve yedekler, aynı ölçütlerle",
+      "site": "Nokta",
+      "safety": "Güvenlik",
+      "divert": "Yön değiştirme",
+      "fuel": "Rezerv üstü yakıt",
+      "status": "Durum"
+    }
+  },
+  "twin": {
+    "label": "İniş dijital ikizi",
+    "title": "Dijital ikiz · araç ne biliyor, gerçekte ne oluyor",
+    "scenario": "Arıza senaryosu",
+    "presets": {
+      "nominal": "Arıza yok",
+      "lost": "450. saniyede navigasyon sensörü kayboluyor",
+      "thrust": "520. saniyede motor itkisi %25 düşüyor",
+      "leak": "600. saniyede 700 kg yakıt sızıntısı",
+      "obstacle": "640. saniyede hedefte kaya alanı"
+    },
+    "positionSigma": "Konum ölçüm hatası 1σ · m",
+    "speedSigma": "Hız ölçüm hatası 1σ · m/s",
+    "thrustNoise": "İtki gürültüsü 1σ · %",
+    "energy": "Batarya enerjisi · MJ",
+    "load": "Elektrik yükü · W",
+    "run": "İkizi uçur ↗",
+    "running": "İkiz uçuruluyor…",
+    "help": "Güdüm gerçeğe değil, kendi gürültülü tahminine göre yön verir. İkiz yeniden plan yapmaz; bir arızanın özgün plana etkisini görürsünüz. Tüm telemetri simülasyondur.",
+    "success": "Tolerans içinde iniyor",
+    "failure": "İniş başarısız",
+    "fromTarget": "hedefe {m} m",
+    "planValid": "Özgün plan geçerli kaldı.",
+    "planInvalid": "Özgün plan geçersiz oldu: {reasons}.",
+    "replay": "Tekrar oynatma kimliği {id}.",
+    "metrics": {
+      "versus": "ARIZASIZ UÇUŞA GÖRE",
+      "errorChange": "iniş noktası hatasındaki değişim",
+      "propellant": "YAKIT",
+      "left": "{kg} kg kaldı · rezerv payı {margin} kg",
+      "navError": "TEMASTA NAVİGASYON HATASI",
+      "speeds": "dikey {vertical} m/s · yatay {horizontal} m/s"
+    },
+    "log": {
+      "applied": "{event} uygulandı",
+      "invalidated": "Plan geçersiz — {reason}",
+      "noEffect": "Plana etkisi yok — {reason}",
+      "notReached": "{event} temastan önce gerçekleşmedi"
+    },
+    "events": {
+      "thrust_loss": "Motor itkisi kaybı",
+      "sensor_degradation": "Navigasyon sensörü değişimi",
+      "propellant_leak": "Yakıt sızıntısı",
+      "comm_outage": "Yer bağlantısı kesintisi",
+      "obstacle_detected": "Engel algılandı (sentetik)"
+    },
+    "chartLabel": "İniş boyunca navigasyon tahmin hatası ve beklenen büyüklüğü; arıza anları işaretli.",
+    "axis": "güçlü iniş başlangıcından beri geçen süre · 0–{seconds} s",
+    "legend": {
+      "error": "gerçek tahmin hatası (yalnızca simülasyonda bilinir)",
+      "std": "aracın beklediği hata"
+    },
+    "assumptions": "İkiz modeli ve varsayımlar"
+  },
+  "surfaceRoutes": {
+    "label": "İniş sonrası keşif",
+    "title": "İnişten sonra · bilim hedeflerine yüzey rotaları",
+    "north": "K",
+    "target": "Hedef",
+    "bearing": "Yön · °",
+    "distance": "Uzaklık · m",
+    "remove": "Kaldır",
+    "nameLabel": "Hedef {n} adı",
+    "bearingLabel": "Hedef {n} yönü",
+    "distanceLabel": "Hedef {n} uzaklığı",
+    "removeLabel": "Hedef {n}'i kaldır",
+    "add": "Hedef ekle",
+    "defaults": {
+      "north": "Kuzey sırt",
+      "east": "Doğu yamaç",
+      "south": "Güney"
+    },
+    "slope": "Gezginin çıkabileceği en büyük eğim · °",
+    "speed": "Gezinme hızı · m/s",
+    "useSky": "Güneş ve Dünya görünürlüğünü son nokta analiziyle kontrol et",
+    "needAnalysis": "Güneş ve Dünya kontrolü için önce Görev kontrolünde bir nokta analizi çalıştırın",
+    "observerHeight": "Gözlem yüksekliği · m",
+    "waypoints": "Rota başına kontrol noktası",
+    "run": "Rotaları planla ↗",
+    "running": "Rota hesaplanıyor…",
+    "help": "Yönler kuzeyden saat yönünde ölçülür. Eğim sınırı ve hız planlama varsayımıdır, belirli bir gezgine ait değildir. Güneş kontrolünde her nokta için ayrı arazi ufku hesaplanır (nokta başına yaklaşık 2 s).",
+    "metrics": {
+      "efficiency": "GÖREV VERİMİ",
+      "efficiencyHelp": "0–1 · ulaşılabilirlik, dolambaçsızlık",
+      "efficiencyWithSun": "0–1 · ulaşılabilirlik, dolambaçsızlık, güneş",
+      "reachable": "ULAŞILABİLEN HEDEF",
+      "directness": "dolambaçsızlık %{pct}",
+      "sunlit": "GÜNEŞ ALAN ROTA NOKTASI",
+      "departure": "çıkış {utc} UTC",
+      "noAnalysis": "nokta analizi yok"
+    },
+    "notChecked": "kontrol edilmedi",
+    "legend": {
+      "sunlit": "güneş alan nokta",
+      "shadow": "gölgedeki nokta",
+      "unknown": "bilinmiyor / kontrol edilmedi"
+    },
+    "table": {
+      "caption": "İniş noktasından rotalar",
+      "route": "Rota",
+      "terrain": "Arazi",
+      "sky": "Güneş / Dünya"
+    },
+    "detour": "dolambaç",
+    "maxSlope": "en fazla {deg}°",
+    "climb": "tırmanış {m} m",
+    "sunlitPoints": "güneş alan nokta: {lit}/{total}",
+    "earthHidden": "Dünya görünmüyor: {hidden}/{total}",
+    "sun": {
+      "full": "güneşli",
+      "partial": "kısmen güneşli",
+      "dark": "gölgede",
+      "unknown": "bilinmiyor"
+    },
+    "assumptions": "Rota modeli ve varsayımlar",
+    "mapLabel": "İniş noktasından {count} hedefe rotalar, kuzey yukarıda; ayrıntılar tabloda."
   },
   "unified": {
     "eyebrow": "Tek oturum · Üç çalışma alanı",
@@ -1516,6 +1934,559 @@
     "completion": "Tam plan tamamlama",
     "source": "Kabul edilen planın kaynağı",
     "quantumCompleted": "Kuantum önerisi + klasik tamamlama"
+  },
+  "assistant": {
+    "launcher": "Navigatöre Sor",
+    "title": "Navigatör asistanı",
+    "close": "Asistanı kapat",
+    "connecting": "Bağlantı kuruluyor…",
+    "offline": "Çevrimdışı",
+    "statusFailed": "Asistan servisine ulaşılamadı.",
+    "offlineTitle": "Asistan kapalı",
+    "offlineBody": "Soru-cevap asistanı isteğe bağlıdır ve bu sunucuda şu an kapalı. Tüm analizler onsuz da çalışır.",
+    "intro": "İniş bölgen, tarih karşılaştırman ya da navigatörün nasıl çalıştığı hakkında soru sor. Cevaplar hesaplanmış sonuçlara ve proje dokümantasyonuna dayanır.",
+    "tokens": "{count} token",
+    "thinking": "Görev verilerine bakılıyor…",
+    "placeholder": "Navigatöre sor",
+    "placeholderOff": "Asistan kullanılamıyor",
+    "send": "Gönder",
+    "askFailed": "Asistan cevap veremedi. Lütfen tekrar dene.",
+    "disclaimer": "Asistan hata yapabilir. Sayılar hesaplanmış sonuçlardan gelir; bu bir uçuş sertifikası değildir.",
+    "suggest": {
+      "explainSite": "Bu bölgenin güneş ışığı ve Dünya görünürlüğünü sade bir dille anlat.",
+      "compare": "İki senaryom nasıl farklı, enerji için hangisi daha iyi?",
+      "darkness": "En uzun karanlık ne kadar sürüyor ve neden önemli?",
+      "limits": "Bu analizin başlıca sınırlamaları neler?",
+      "horizon": "Arazi ufku nasıl hesaplanıyor?",
+      "sites": "Hangi iniş bölgelerini analiz edebilirim?",
+      "data": "Navigatör hangi NASA veri kaynaklarını kullanıyor?"
+    },
+    "greeting": "Merhaba, ne öğrenmek istersin?",
+    "onlineDocs": "Çevrimiçi · dokümantasyon",
+    "onlineLinked": "Çevrimiçi · {count} bağlı sonuç",
+    "sourcesToggle": "Kaynaklar ({count})",
+    "kindDoc": "Doküman",
+    "kindApi": "Sonuç"
+  },
+  "siteNames": {
+    "mons-mouton-feature-center": {
+      "name": "Mons Mouton — oluşum merkezi",
+      "short": "MOUTON"
+    },
+    "peak-near-cabeus-b": {
+      "name": "Cabeus B yakınındaki tepe — LROC mozaik merkezi",
+      "short": "CABEUS B"
+    },
+    "haworth": {
+      "name": "Haworth — NASA bölge merkezi",
+      "short": "HAWORTH"
+    },
+    "mons-mouton-plateau": {
+      "name": "Mons Mouton Platosu — LROC mozaik merkezi",
+      "short": "PLATO"
+    },
+    "nobile-rim-1-r06": {
+      "name": "Nobile Kenarı 1 — R06",
+      "short": "NOBILE 1"
+    },
+    "nobile-rim-2-dm2": {
+      "name": "Nobile Kenarı 2 — DM2",
+      "short": "NOBILE 2"
+    },
+    "de-gerlache-rim-2-sl2": {
+      "name": "de Gerlache Kenarı 2 — SL2",
+      "short": "DE GERLACHE 2"
+    },
+    "slater-plain-crater-anchor": {
+      "name": "Slater Düzlüğü — Slater krateri referansı (bölge merkezi değil)",
+      "short": "SLATER"
+    },
+    "malapert-massif-r23": {
+      "name": "Malapert Masifi — R23",
+      "short": "R23"
+    }
+  },
+  "workspace": {
+    "backScene": "Görev görünümüne dön",
+    "stale": "Ayarlar değişti. Bu sonuç önceki ayarlara ait; yeniden hesaplayın.",
+    "shown": "Hesaplanan sonucu soldaki 3D görünümde inceleyebilirsiniz.",
+    "show3d": "3D’de göster",
+    "selected": "Seçili",
+    "localFrame": "Hedefe göre yerel koordinatlar. Eksenler aynı ölçekte; zemin arazi haritası değildir. Döndürmek için sürükleyin.",
+    "dots": "Yeşil: uygun · kırmızı: elenen · beyaz halka: özgün hedef",
+    "playResult": "Hesaplanan uçuşu oynat veya duraklat",
+    "resultTime": "Hesaplanan uçuşun ilerlemesi",
+    "advanced": "Yörünge ve yakıt ayarları",
+    "source": "Özgün teknik açıklama",
+    "technical": "Teknik ayrıntılar",
+    "events": "Olay anları",
+    "kind": {
+      "descent": "Hesaplanan iniş",
+      "risk": "İnişlerin dağılımı",
+      "backups": "Yedek iniş noktaları",
+      "twin": "Arızalı uçuş karşılaştırması",
+      "recovery": "Özgün ve yeniden planlanan uçuş",
+      "surface": "Hesaplanan yüzey rotaları",
+      "routes": "Hesaplanan görev rotaları"
+    },
+    "line": {
+      "planned": "İniş rotası",
+      "truth": "Benzetimdeki gerçek durum",
+      "estimate": "Sensör tahmini",
+      "original": "Özgün plan",
+      "replanned": "Yeniden planlanan rota",
+      "PRIMARY": "Ana plan",
+      "flown": "Uçulan koşu"
+    },
+    "routeTerrain": "Hedef çevresindeki gerçek LOLA 80 m arazi, gerçek ölçekte (yükseklik abartısı yok). Çizgiler: sapma noktasından hesaplanan rotalar; direkler: iniş noktaları; çarpılar: arazi kontrolünde elenen hücreler. Döndürmek için sürükleyin, yakınlaştırmak için kaydırın."
+  },
+  "missionRun": {
+    "title": "Görev simülasyonu",
+    "intro": "Görev, gerçek fizik kontrollerinden geçer: iniş yanması, temas noktasındaki eğim, yüzeyde batarya ve Dünya ile iletişim. Sonuç zar atılarak değil, seçilen alan, tarih, araç ve arızalardan hesaplanır.",
+    "needsAnalysis": "Simülasyon için önce bir alan ve tarih analizi tamamlayın.",
+    "catalogError": "Arıza kataloğu yüklenemedi.",
+    "invalidInput": "Girdi geçersiz.",
+    "scenarioHeading": "Arıza senaryosu",
+    "noFault": "Arıza yok",
+    "run": "Simüle et",
+    "running": "Hesaplanıyor…",
+    "customHeading": "Kendi arıza senaryonu oluştur",
+    "customIntro": "Arızaları zamanlarıyla birlikte ekleyin. İniş arızaları motor yanmasının başlangıcından (PDI), yüzey arızaları temastan itibaren sayılır.",
+    "removeFault": "Arızayı kaldır",
+    "faultKind": "Arıza türü",
+    "addFault": "Arıza ekle",
+    "namePlaceholder": "Senaryo adı",
+    "save": "Kaydet",
+    "runCustom": "Bu senaryoyu simüle et",
+    "edit": "Düzenle",
+    "delete": "Sil",
+    "vehicleHeading": "Araç ve görev kuralları",
+    "customScenario": "Özel senaryo",
+    "watch": "Sahnede izle",
+    "altitudeChart": "İniş: yükseklik / zaman",
+    "batteryChart": "Batarya enerjisi",
+    "timeline": "Olay akışı",
+    "disclaimer": "Eğitim amaçlı belirlenimci simülasyon. İniş güvenliği sertifikası, termal/güç yeterliliği, DSN rezervasyonu veya bağlantı bütçesi değildir; güç sistemi değerleri örnektir.",
+    "phase": {
+      "descent": "İniş",
+      "landing": "İniş zamanı",
+      "surface": "Yüzey"
+    },
+    "outcome": {
+      "success": "Görev başarılı",
+      "success_with_warnings": "Başarılı, uyarılarla",
+      "failure": "Görev başarısız",
+      "inconclusive": "Sonuç belirsiz"
+    },
+    "status": {
+      "pass": "geçti",
+      "warn": "uyarı",
+      "fail": "başarısız",
+      "unknown": "belirsiz",
+      "not_reached": "ulaşılmadı"
+    },
+    "gates": {
+      "descent": "Motorlu iniş",
+      "touchdown_terrain": "Temas zemini",
+      "power": "Yüzeyde enerji",
+      "communication": "Dünya ile iletişim"
+    },
+    "scenarios": {
+      "nominal": "Arızasız",
+      "engine-thrust-loss": "Motor itki kaybı",
+      "small-propellant-leak": "Küçük yakıt sızıntısı",
+      "marginal-propellant-leak": "Kıl payı sızıntı",
+      "major-propellant-leak": "Büyük yakıt sızıntısı",
+      "engine-efficiency-loss": "Motor verim kaybı",
+      "navigation-drift": "Navigasyon kayması",
+      "wave-off": "İnişi bir tur ertele",
+      "battery-cell-loss": "Batarya hücresi kaybı",
+      "stuck-heater": "Takılı kalan ısıtıcı",
+      "dusty-panels": "Tozlu paneller",
+      "transmitter-fault": "Verici arızası",
+      "cascade": "Zincirleme arızalar"
+    },
+    "faults": {
+      "engine_thrust_loss": "İtki kaybı",
+      "propellant_leak": "Yakıt sızıntısı",
+      "isp_degradation": "Motor verimi (Isp) düşüşü",
+      "navigation_bias": "Navigasyon hatası",
+      "landing_delay": "İniş ertelemesi",
+      "battery_capacity_loss": "Batarya kapasite kaybı",
+      "power_load_increase": "Ek güç yükü",
+      "solar_array_degradation": "Güneş paneli verim kaybı",
+      "communication_outage": "İletişim kesintisi"
+    },
+    "fields": {
+      "start_after_pdi_s": "PDI'dan sonra başlangıç",
+      "thrust_fraction": "Kalan itki oranı",
+      "leak_rate_kg_s": "Sızıntı hızı",
+      "duration_s": "Süre",
+      "isp_fraction": "Kalan Isp oranı",
+      "offset_m": "Kayma mesafesi",
+      "bearing_deg": "Kayma yönü (kuzeyden)",
+      "delay_h": "Erteleme",
+      "start_after_landing_h": "İnişten sonra başlangıç",
+      "capacity_fraction_lost": "Kaybedilen kapasite oranı",
+      "duration_h": "Süre",
+      "extra_load_w": "Ek yük",
+      "output_fraction": "Kalan panel çıkışı",
+      "battery_capacity_wh": "Batarya kapasitesi",
+      "solar_array_power_w": "Panel gücü (tam Güneş)",
+      "base_load_w": "Temel yük",
+      "first_contact_deadline_h": "İlk temas için süre sınırı",
+      "max_contact_gap_h": "En uzun izinli sessizlik"
+    },
+    "reason": {
+      "descent": {
+        "pass": "{v} m/s dikey hızla yumuşak temas; {margin} kg yakıt kaldı (arızasız: {nominal} kg).",
+        "crash": "Çarpma: yere {v} m/s dikey ve {h} m/s yatay hızla değdi; iniş takımı sınırları aşıldı.",
+        "no_contact": "Araç sınırlı iniş süresi içinde yüzeye ulaşamadı.",
+        "hard_landing": "Sert iniş: {v} m/s dikey, {h} m/s yatay; yapısal sınırların içinde.",
+        "propellant_exhausted": "Yakıt yüzeyin {altitude} m üzerinde bitti; araç yedeksiz indi.",
+        "target_miss": "Hedeften {offset} m uzağa inildi; {margin} kg yakıt kaldı."
+      },
+      "touchdown_terrain": {
+        "pass": "Temas noktasında eğim {slope}°, sınır {limit}°.",
+        "tip_over": "Devrilme: temas noktasındaki eğim {slope}°, {limit}° sınırını aşıyor.",
+        "steep_terrain_nearby": "Temas noktası güvenli ({slope}°) ama iniş alanında eğim {area}°'ye çıkıyor.",
+        "landing_area_unknown": "Temas noktası güvenli ({slope}°); iniş alanının bir kısmında eğim verisi yok.",
+        "terrain_unknown": "Temas noktası için DEM eğim verisi yok.",
+        "outside_coverage": "Temas noktası arazi verisinin kapsamı dışında."
+      },
+      "power": {
+        "pass": "Batarya görev boyunca sıfırın üstünde kaldı (en düşük {energy} Wh).",
+        "battery_depleted": "Batarya bitti: Güneş üretimi yükleri karşılayamadı.",
+        "sunlight_unknown": "Batarya ömrü, analizin belirleyemediği güneşlenme aralıklarına bağlı."
+      },
+      "communication": {
+        "pass": "Dünya ile iletişim kuralları sağlandı (en uzun boşluk {gap} sa).",
+        "first_contact_deadline": "İnişten sonraki {deadline} saat içinde Dünya görünmedi; iniş doğrulanamadı.",
+        "contact_gap": "Dünya ile {maxgap} saatten uzun süre temas kurulamadı; görev kayıp sayıldı.",
+        "earth_visibility_unknown": "İletişim, analizin belirleyemediği Dünya görünürlüğüne bağlı."
+      }
+    },
+    "events": {
+      "pdi": "Motorlu iniş başladı (PDI)",
+      "fault_activated": "Arıza başladı: {fault}",
+      "propellant_exhausted": "Yakıt bitti",
+      "contact": "Yere temas",
+      "schedule_end_airborne": "Rehberlik bitti, araç hâlâ havada",
+      "no_contact": "Yüzeye ulaşılamadı",
+      "tip_over": "Araç devrildi",
+      "battery_depleted": "Batarya bitti",
+      "first_contact_deadline": "İlk temas süresi doldu",
+      "contact_gap": "İletişim boşluğu sınırı aşıldı",
+      "window_end": "Analiz penceresinin sonu",
+      "crash": "Çarpma",
+      "nominal_plan_infeasible": "Nominal iniş planı uygulanamaz",
+      "first_contact": "Dünya ile ilk temas",
+      "fault_cleared": "Arıza bitti: {fault}"
+    },
+    "scene": {
+      "crash": "Çarpma",
+      "tip_over": "Devrildi"
+    },
+    "routes": {
+      "heading": "Hesaplanan iniş rotaları",
+      "intro": "{gate} sapma noktasından hesaplanan tüm rotalar: {primary} ana, {backup} yedek, {rejected} reddedilen. Rotayı buradan ya da 3B görünümde uç noktasından seçin.",
+      "divert": {
+        "high_gate": "Yüksek kapı",
+        "low_gate": "Alçak kapı"
+      },
+      "show3d": "Rotaları 3B göster",
+      "pick": "Metriklerini ve neden seçildiğini ya da reddedildiğini görmek için bir rota seçin.",
+      "terrainOnly": "yalnızca arazi kontrolü",
+      "notFlown": "Bu hücre arazi kontrolünden geçemedi; bu yüzden ona iniş uçuşu hesaplanmadı.",
+      "error": "Rota kümesi hesaplanamadı.",
+      "unavailable": "Bu analiz için rotalar kullanılamıyor: {detail}",
+      "disclaimer": "Arızasız araç için 80 m DEM üzerinde uçuş öncesi rota kümesi; koşudaki arızalar buna uygulanmaz. İniş güvenliği sertifikası değildir.",
+      "metricsHeading": "Metrikler",
+      "legend": {
+        "primary": "Ana plan",
+        "backup": "Yedek plan",
+        "rejected": "Reddedilen (kesikli)",
+        "flown": "Uçulan koşu"
+      },
+      "role": {
+        "primary": "Ana plan",
+        "backup": "Yedek #{rank}",
+        "rejected": "Reddedilen {id}"
+      },
+      "why": {
+        "primary": "Neden ana plan",
+        "backup": "Neden yedek, neden ana değil",
+        "rejected": "Neden reddedildi"
+      },
+      "metric": {
+        "distance_m": "Hedefe uzaklık",
+        "safety_score": "R3 güvenlik puanı",
+        "max_landing_slope_deg": "İniş alanı eğimi",
+        "hazard_distance_m": "En yakın dik arazi",
+        "divert_delta_v_mps": "Ek sapma delta-v",
+        "propellant_remaining_kg": "Temasta kalan yakıt",
+        "reserve_margin_kg": "Rezerv üstü pay",
+        "hover_margin_s": "Askıda kalma payı",
+        "time_to_touchdown_s": "Temasa kalan süre",
+        "touchdown_position_error_m": "Temas konum hatası",
+        "touchdown_vertical_speed_mps": "Temas dikey hızı",
+        "touchdown_horizontal_speed_mps": "Temas yatay hızı"
+      },
+      "reason": {
+        "planned_target": "Analizin planlanan iniş hedefi; sapma noktasından yakıt rezervinin {value} kg üzerinde ulaşılabiliyor.",
+        "planned_target_unreachable": "Analizin planlanan iniş hedefi, ancak bu araçla sapma noktasından ulaşılamıyor.",
+        "reachable": "Sapma noktasından yakıt rezervinin {value} kg üzerinde ve temas toleransları içinde ulaşılabiliyor.",
+        "backup_rank": "{limit} yedek içinde {value}. sırada; önce R3 güvenlik puanına ({score}), sonra mesafeye göre sıralandı.",
+        "not_planned_target": "Planlanan hedef değil: {value} m uzakta ve sapma {dv} m/s ek delta-v gerektiriyor.",
+        "propellant": "Sapma, mevcut yakıttan {value} kg daha fazlasını gerektiriyor.",
+        "reserve": "Temasta {value} kg yakıt kalıyor; rezerv {limit} kg gerektiriyor.",
+        "thrust": "Düzlem içi ve yanal ivme birlikte azami itkinin %{pct}'ini gerektiriyor.",
+        "thrust_window": "Motor sapma boyunca tam gazda kalıyor; {value} m yanal hareket için itki kalmıyor.",
+        "touchdown_tolerance": "Temas tolerans dışında (konum hatası {value} m, sınır {limit} m).",
+        "slope": "İniş alanı eğimi {value}°, {limit}° sınırını aşıyor (devrilme riski).",
+        "unknown_terrain": "İniş alanının %{pct}'inde eğim bilinmiyor; bilinmeyen arazi düz sayılmaz."
+      }
+    },
+    "limits": {
+      "earth_never_visible": "Bu pencerede Dünya hiç görünmüyor; arızasız senaryo dahil her iniş \"ilk temas yok\" ile başarısız olur.",
+      "fault_not_reached": "Araç yüzeyde çalışmaya başlamadığı için şu arızalar hiç devreye girmedi: {faults}.",
+      "fault_after_window": "Şu arızalar analiz penceresi bittikten sonra başlıyor, etkisi yok: {faults}.",
+      "fault_after_mission_end": "Şu arızalar hükümden sonra başlıyor; etkileri sadece aşağıdaki \"kendi başına\" bölümünde görünür: {faults}.",
+      "fault_exceeds_window": "Şu arızalar pencere bittiğinde hâlâ sürüyor; tam etkileri için daha uzun bir pencere gerekir: {faults}.",
+      "hint": "Farkları görmek için 3 veya 7 günlük bir pencere ya da Dünya'nın göründüğü bir tarih seçin."
+    },
+    "delta": {
+      "heading": "Arızasız senaryoya göre fark",
+      "propellant": "Kalan yakıt",
+      "offset": "İniş noktası kayması",
+      "delay": "İniş gecikmesi",
+      "energy": "En düşük batarya",
+      "contact": "İlk temas kayması",
+      "none": "yok",
+      "batteryDied": "Batarya {at} UTC'de bitiyor; arızasız senaryoda bitmiyor.",
+      "batteryDiedBoth": "Batarya {at} UTC'de bitiyor; arızasız senaryoda {base} UTC'de."
+    },
+    "outlook": {
+      "heading": "Temas olmasa da lander kendi başına",
+      "intro": "Hüküm ilk hatada verilir. Bu liste, lander'ın temas olmadan pencere sonuna kadar çalışmaya devam etseydi neler yaşayacağını gösterir; hükmü değiştirmez.",
+      "verdictMarker": "Kesikli kırmızı çizgi hüküm anı; sonrası lander'ın kendi başına devam ettiği kısım.",
+      "survived": "Pencere sonu: lander hâlâ çalışıyor"
+    },
+    "highlight": {
+      "battery": "Batarya inişten {h} saat sonra bitiyor",
+      "offset": "İniş {m} m kaydı",
+      "fuel": "Yakıt {kg} kg",
+      "energy": "En düşük batarya {wh} Wh",
+      "contact": "İlk temas {h} saat gecikti",
+      "delay": "İniş {h} saat ertelendi"
+    }
+  },
+  "liveResults": {
+    "nowEyebrow": "ŞU AN",
+    "endEyebrow": "PENCERENİN SONU",
+    "speed": "Oynatma hızı",
+    "soFar": "ŞİMDİYE KADAR",
+    "final": "SONUÇ",
+    "remaining": "{hours} daha böyle sürecek",
+    "untilEnd": "Pencerenin sonuna kadar böyle sürecek",
+    "elevation": "Yükseklik {elevation}° · arazi ufku {horizon}°",
+    "noElevation": "Bu anda örnek yok",
+    "state": {
+      "sun": {
+        "visible": "Güneş görünüyor",
+        "blocked": "Güneş arazinin arkasında",
+        "unknown": "Güneş belirsiz"
+      },
+      "earth": {
+        "visible": "Dünya görünüyor",
+        "blocked": "Dünya arazinin arkasında",
+        "unknown": "Dünya belirsiz"
+      }
+    },
+    "situation": {
+      "both": {
+        "title": "Güneş de Dünya da görünüyor",
+        "detail": "Güneş panelleri şarj olabilir ve Dünya ile doğrudan bağlantı geometrik olarak mümkün."
+      },
+      "sun_only": {
+        "title": "Güneş görünüyor, Dünya görünmüyor",
+        "detail": "Güneş panelleri şarj olabilir ama Dünya'ya doğrudan görüş hattı yok: iletişim için röle ya da bekleme gerekir."
+      },
+      "earth_only": {
+        "title": "Dünya görünüyor, Güneş görünmüyor",
+        "detail": "Dünya ile doğrudan iletişim geometrik olarak mümkün ama bölge gölgede, enerji bataryadan gelir."
+      },
+      "neither": {
+        "title": "Ne Güneş ne Dünya görünüyor",
+        "detail": "Gölge ve Dünya'ya doğrudan görüş yok: yalnızca batarya, doğrudan iletişim yok."
+      },
+      "unknown": {
+        "title": "Bu anda yeterli veri yok",
+        "detail": "En az bir gök cismi arazi ufkuna çok yakın ya da sınıflandırmak için veri eksik."
+      }
+    },
+    "ofElapsed": "Geçen sürenin {percent} kadarı · pencere toplamı {total}",
+    "sunsetsSoFar": "Şimdiye kadarki gün batımı: {count}",
+    "jumpEnd": "Sonuçlara atla",
+    "summaryTitle": "SONUÇ ÖZETİ",
+    "summaryWindow": "{hours} pencerenin tamamı",
+    "joint": {
+      "both": "Güneş + Dünya",
+      "sun_only": "Yalnız Güneş",
+      "earth_only": "Yalnız Dünya",
+      "neither": "Hiçbiri",
+      "unknown": "Belirsiz"
+    },
+    "facts": {
+      "longestSun": "En uzun kesintisiz güneş",
+      "longestEarthGap": "En uzun Dünya kesintisi",
+      "sunsets": "Penceredeki gün batımı",
+      "earthsets": "Penceredeki Dünya batımı",
+      "unknown": "Belirsiz süre (Güneş + Dünya)"
+    },
+    "summaryNote": "Süreler analiz edilen, araziye göre görünürlük aralıklarından gelir. Geometrik görünürlük güç, ısı ya da radyo bağlantısı garantisi değildir."
+  },
+  "savedLibrary": {
+    "title": "KAYITLI SONUÇLAR",
+    "count": "{n} kayıt",
+    "nameLabel": "Sonuç adı",
+    "save": "Sonucu kaydet",
+    "update": "Kaydı güncelle",
+    "savedMessage": "Bu tarayıcıya kaydedildi. Analizin kendisi sunucuda saklanır.",
+    "unavailable": "Bu kayıtlı analiz sunucudan yüklenemedi.",
+    "pickHelp": "Yan yana karşılaştırmak için iki sonuç işaretle.",
+    "pick": "{name} sonucunu karşılaştırma için seç",
+    "ok": "Tamam",
+    "shown": "GÖSTERİLEN",
+    "dark": "En uzun karanlık",
+    "open": "Aç",
+    "compareWithShown": "Gösterilenle karşılaştır",
+    "rename": "Yeniden adlandır",
+    "delete": "Sil",
+    "confirmDelete": "\"{name}\" kayıtlı sonuçlardan silinsin mi?",
+    "comparePicked": "Seçilenleri karşılaştır ({n}/2)",
+    "bestNote": "Vurgulanan değerler kayıtlılar arasındaki en iyisidir (en çok güneş, en çok Dünya görünürlüğü, en kısa karanlık).",
+    "empty": "Henüz kayıtlı sonuç yok. Kısa listeni oluşturmak için gösterilen analizi kaydet.",
+    "comparisons": "Kayıtlı karşılaştırmalar"
+  },
+  "comparisonLive": {
+    "title": "ŞU AN KİM NE GÖRÜYOR",
+    "endTitle": "İKİ PENCERENİN SONUNDA",
+    "differs": "Senaryolar bu anda farklı",
+    "same": "İki senaryo da aynı şeyi görüyor",
+    "sunLead": {
+      "A": "Şimdiye kadar A daha çok güneş topladı.",
+      "B": "Şimdiye kadar B daha çok güneş topladı.",
+      "tie": "Şimdiye kadarki güneş süresi eşit."
+    },
+    "earthLead": {
+      "A": "Dünya, A'dan daha uzun süre görüldü.",
+      "B": "Dünya, B'den daha uzun süre görüldü.",
+      "tie": "Şimdiye kadarki Dünya görünürlüğü eşit."
+    },
+    "pickSaved": "Ya da B'yi kayıtlı sonuçlardan seç",
+    "pickSavedNone": "— kayıtlı bir sonuç seç —",
+    "tie": "EŞİT",
+    "better": "{label} DAHA İYİ",
+    "verdictEyebrow": "KARAR",
+    "verdictTie": "Üç temel ölçütte de açık bir üstün senaryo yok",
+    "verdictWinner": "{label} senaryosu {total} temel ölçütün {wins} tanesinde daha iyi",
+    "verdictNote": "Temel ölçütler: tüm penceredeki toplam güneş, en uzun karanlık ve Dünya görünürlüğü.",
+    "saveName": "Karşılaştırma adı",
+    "save": "Karşılaştırmayı kaydet",
+    "update": "Kaydı güncelle",
+    "savedMessage": "Karşılaştırma kaydedildi. Kayıtlı sonuçlardan yeniden açabilirsin."
+  },
+  "splitSim": {
+    "label": "Bölünmüş A/B simülatörü",
+    "paneLabel": "{label} senaryosunun yerel gökyüzü",
+    "single": "Tek sahne",
+    "split": "Bölünmüş A/B görünümü",
+    "fullscreen": "Tam ekranı değiştir",
+    "noFullscreen": "Bu tarayıcıda tam ekran açılamadı.",
+    "speed": "Oynatma hızı",
+    "soFar": "şu ana kadar",
+    "noScene": "3B görünüm kullanılamıyor; alttaki değerler imleci izlemeye devam ediyor.",
+    "note": "Her taraf kendi penceresini kendi başlangıcından oynatır. Arazi ufku ve Güneş/Dünya konumları backend örnekleridir; düşük kutup açıları okunabilsin diye tüm yükseklik açıları ×{factor} çizilir. Bu bir illüstrasyondur, DEM görüntüsü değildir.",
+    "hint": "3B görünüm ikiye bölündü: A ve B bu imleçle senkron olarak kendi günlerini oynatıyor."
+  },
+  "terrainRecovery": {
+    "abortRequiredManeuverNotModeled": "✕ İptal gerekli · manevra modellenmedi",
+    "landingChecksPassed": "✓ İniş kontrolleri geçti",
+    "landingFails": "✕ İniş başarısız",
+    "originalTarget": "Özgün hedef. ",
+    "fromTarget": "hedef sapması",
+    "downTerrainScore": "düşey hız · arazi skoru",
+    "originalTarget2": "özgün hedef",
+    "newTarget": "yeni hedef",
+    "downrange": "uçuş doğrultusu",
+    "altitude": "yükseklik",
+    "originalPlan": "özgün plan",
+    "withRecovery": "yeniden planlama",
+    "directionOfTravel": "uçuş yönü",
+    "reachableBackup": "erişilebilir yedek",
+    "rejected": "elendi",
+    "chosenTargetShadedSimulatedObstacle": "seçilen hedef · taralı: senaryo engeli",
+    "terrainAwareLandingRecovery": "Araziye bağlı iniş kurtarma",
+    "classicalRetargetingOnTheReal": "Gerçek DEM üzerinde klasik yeniden hedefleme. Arızalar ve engeller senaryodur; bu çalışma hibrit görev planını değiştirmez. Hesaplama gecikmesi sırasında benzetim uçuşu devam eder.",
+    "faultScenario": "Arıza senaryosu",
+    "seed": "Rastgelelik tohumu",
+    "solverLatencyS": "Çözücü gecikmesi · s",
+    "flyingAndReplanning": "Uçuş ve yeniden planlama…",
+    "compareRecoveryFlight": "Kurtarmalı uçuşu karşılaştır ↗",
+    "theSameFaultsAreReplayed": "Aynı arızalar özgün plan ve yeniden planlama ile ayrı ayrı uygulanır. Yeniden hedefleme seçenekleri benzetimin gerçek durumundan ayrıca doğrulanır. Bu, gerçek uçuş güvenliği onayı değildir.",
+    "originalPlan2": "ÖZGÜN PLAN",
+    "withRecovery2": "YENİDEN PLANLAMA",
+    "decisionLogSelectADecision": "Karar günlüğü · harita için bir karar seçin",
+    "trigger": "Tetikleyen olay",
+    "optionsEvaluated": "seçenek değerlendirildi",
+    "safetyMargin": "güvenlik payı",
+    "appliedAt": "uygulama zamanı",
+    "validationFromTrueState": "Benzetim durumundan doğrulama",
+    "passed": "✓ geçti",
+    "failed": "✕ başarısız",
+    "allEvaluatedTargets": "Değerlendirilen tüm hedefler",
+    "feasible": "Uygun",
+    "rejected2": "Elendi",
+    "reserveMargin": "rezerv marjı",
+    "terrainScore": "arazi skoru",
+    "noEventInvalidatedThePlan": "Hiçbir olay planı geçersiz kılmadı.",
+    "reachableBackupsOverTime": "Uçuş boyunca erişilebilir yedekler",
+    "recoveryModelAssumptions": "Model ve varsayımlar",
+    "replanningDeadlineFromPoweredDescent": "Yeniden planlama son zamanı (motorlu iniş başlangıcından):",
+    "targetMoved": "Hedef {m} m değişti. ",
+    "faultPresets": {
+      "boulder": "560 s: hedefte kaya engeli",
+      "engine": "520 s: motor gücü −%25",
+      "sensor": "450 s: yön bulma sensörü kaybı",
+      "double": "550 s: motor −%50 ve 1,5 t yakıt kaybı"
+    },
+    "actions": {
+      "continue": "Devam · plan doğrulandı",
+      "retarget": "Yedek hedefe geç",
+      "abort_required": "İptal gerekli · modellenmedi",
+      "budget_exhausted": "Hesaplama bütçesi tükendi",
+      "no_time_to_replan": "Yeniden planlama için geç",
+      "stale_result_rejected": "Eski sonuç reddedildi"
+    },
+    "unknownTrigger": "Plan koşulları değişti",
+    "backupLabels": {
+      "initial": "Başlangıç",
+      "other": "Yedek hedef kontrolü"
+    }
+  },
+  "serverReasons": {
+    "thrust": "Motorun itki sınırı aşılıyor.",
+    "propellant": "İnişe kadar yakıt yeterli değil.",
+    "reserve": "İniş sonunda gereken yakıt rezervi kalmıyor.",
+    "touchdown_tolerance": "İniş konumu veya hızı izin verilen sınırların dışında.",
+    "obstacle": "Hedef algılanan engelin içinde.",
+    "uncertainty_margin": "Yön bulma belirsizliği için yeterli güvenlik mesafesi yok.",
+    "position": "Hedef konumundan sapma sınırı aşıldı.",
+    "vertical_speed": "Düşey iniş hızı sınırı aşıldı.",
+    "horizontal_speed": "Yatay iniş hızı sınırı aşıldı.",
+    "energy": "Enerji sınırı aşıldı.",
+    "terrain": "Arazi koşulları uygun değil."
   },
   "resilience": {
     "title": "Görev dayanıklılığı",

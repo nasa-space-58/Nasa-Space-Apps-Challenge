@@ -1,4 +1,7 @@
-import { useState } from "react";
+import ServerExplanation from "./ServerExplanation";
+import { useScenarioResult, ResultSceneLink } from "../analysisView";
+import { useEffect, useState } from "react";
+import { useTranslate, type Translate } from "../i18n";
 import "./twin.css";
 
 // R9 (S13): renders the backend digital twin; physics and estimation run in the API.
@@ -40,35 +43,29 @@ type Result = {
   assumptions: string[];
 };
 
-const PRESETS: { id: string; label: string; events: object[] }[] = [
-  { id: "nominal", label: "No fault", events: [] },
+// Labels come from twin.presets.<id>; fault-free flight is the default.
+const PRESETS: { id: string; events: object[] }[] = [
+  { id: "nominal", events: [] },
   {
     id: "lost",
-    label: "Navigation sensor lost at 450 s",
     events: [{ kind: "sensor_degradation", t_s: 450, health: "lost" }],
   },
   {
     id: "thrust",
-    label: "Engine −25 % at 520 s",
     events: [{ kind: "thrust_loss", t_s: 520, available_fraction: 0.75 }],
   },
   {
     id: "leak",
-    label: "700 kg propellant leak at 600 s",
     events: [{ kind: "propellant_leak", t_s: 600, leaked_kg: 700 }],
   },
   {
     id: "obstacle",
-    label: "Boulder field on the target at 640 s",
     events: [{ kind: "obstacle_detected", t_s: 640, down_m: 10, cross_m: 0, radius_m: 60 }],
   },
 ];
-const EVENT_LABEL: Record<string, string> = {
-  thrust_loss: "Engine thrust loss",
-  sensor_degradation: "Navigation sensor change",
-  propellant_leak: "Propellant leak",
-  comm_outage: "Ground link outage",
-  obstacle_detected: "Obstacle detected (synthetic)",
+const eventLabel = (t: Translate, kind: string) => {
+  const text = t(`twin.events.${kind}`);
+  return text === `twin.events.${kind}` ? kind : text;
 };
 
 async function call(path: string, init?: RequestInit) {
@@ -81,13 +78,14 @@ async function call(path: string, init?: RequestInit) {
         ? detail
         : Array.isArray(detail)
           ? detail.map((d: { msg: string }) => d.msg).join("; ")
-          : "Request failed",
+          : "request_failed",
     );
   }
   return body;
 }
 
 function ErrorChart({ result }: { result: Result }) {
+  const { t } = useTranslate();
   const rows = result.run.timeline;
   const W = 720,
     H = 220,
@@ -109,7 +107,7 @@ function ErrorChart({ result }: { result: Result }) {
   const ticks = Array.from({ length: hi - lo + 1 }, (_, i) => lo + i);
   return (
     <div className="descent-chart">
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Navigation estimate error and its expected size over the descent, with fault times marked.">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={t("twin.chartLabel")}>
         {ticks.map((p) => (
           <g key={p}>
             <line x1={L} x2={W - R} y1={y(10 ** p)} y2={y(10 ** p)} className="grid" />
@@ -122,22 +120,22 @@ function ErrorChart({ result }: { result: Result }) {
           <g key={i}>
             <line x1={x(e.t_s)} x2={x(e.t_s)} y1={T} y2={H - B} className="twin-event-line" />
             <text x={x(e.t_s) + 4} y={T + 10 + 12 * i} className="direct-label">
-              {EVENT_LABEL[e.event?.kind ?? ""] ?? e.event?.kind}
+              {eventLabel(t, e.event?.kind ?? "")}
             </text>
           </g>
         ))}
         <polyline points={line("estimate_std_m")} className="twin-std" />
         <polyline points={line("estimate_error_m")} className="twin-error" />
         <text x={L} y={H - 8} className="axis-title">
-          time since powered descent start · 0–{Math.round(tMax)} s
+          {t("twin.axis", { seconds: Math.round(tMax) })}
         </text>
       </svg>
       <div className="risk-legend">
         <span>
-          <i className="twin-swatch error" /> actual estimate error (known only in simulation)
+          <i className="twin-swatch error" /> {t("twin.legend.error")}
         </span>
         <span>
-          <i className="twin-swatch std" /> expected error the vehicle believes
+          <i className="twin-swatch std" /> {t("twin.legend.std")}
         </span>
       </div>
     </div>
@@ -145,18 +143,29 @@ function ErrorChart({ result }: { result: Result }) {
 }
 
 export default function TwinPanel({ base }: { base: Record<string, unknown> }) {
-  const [preset, setPreset] = useState("lost");
+  const { t } = useTranslate();
+  const [preset, setPreset] = useState("nominal");
+  // Advanced inputs; defaults match the backend SensorSettings and BatterySettings.
+  const [positionSigma, setPositionSigma] = useState("5");
+  const [speedSigma, setSpeedSigma] = useState("0.1");
+  const [thrustNoise, setThrustNoise] = useState("0.5");
+  const [energy, setEnergy] = useState("50");
+  const [load, setLoad] = useState("2000");
   const [seed, setSeed] = useState("2026");
-  const [result, setResult] = useState<Result | null>(null);
+  const scenarioInputs = JSON.stringify([base,preset,positionSigma,speedSigma,thrustNoise,energy,load,seed]);
+  const { result, begin, isCurrent, commit, show, stale } = useScenarioResult<Result>("twin", scenarioInputs);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => { setBusy(false); setError(""); }, [scenarioInputs]);
+
   const run = async () => {
+    const ticket = begin();
     setBusy(true);
     setError("");
     try {
       const { allow_plane_change: _ignored, ...plan } = base;
-      setResult(
+      commit(ticket,
         await call("/twin/runs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -164,13 +173,21 @@ export default function TwinPanel({ base }: { base: Record<string, unknown> }) {
             ...plan,
             seed: Number(seed),
             events: PRESETS.find((p) => p.id === preset)?.events ?? [],
+            sensor: {
+              position_sigma_m: Number(positionSigma),
+              speed_sigma_mps: Number(speedSigma),
+              thrust_noise_fraction: Number(thrustNoise) / 100,
+            },
+            battery: { initial_energy_j: Number(energy) * 1e6, load_w: Number(load) },
           }),
         }),
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Request failed");
+      if (!isCurrent(ticket)) return;
+      const message = e instanceof Error ? e.message : "request_failed";
+      setError(message === "request_failed" ? t("risk.requestFailed") : message);
     } finally {
-      setBusy(false);
+      if (isCurrent(ticket)) setBusy(false);
     }
   };
 
@@ -178,8 +195,8 @@ export default function TwinPanel({ base }: { base: Record<string, unknown> }) {
   const notes = result?.run.log.filter((e) => e.kind !== "touchdown") ?? [];
 
   return (
-    <div className="risk-panel twin-panel" aria-label="Descent digital twin">
-      <h3>Digital twin · what the lander knows vs what is true</h3>
+    <div className="risk-panel twin-panel" aria-label={t("twin.label")}>
+      <h3>{t("twin.title")}</h3>
       <form
         className="risk-controls"
         onSubmit={(e) => {
@@ -189,75 +206,105 @@ export default function TwinPanel({ base }: { base: Record<string, unknown> }) {
       >
         <fieldset disabled={busy}>
           <label>
-            Fault scenario
-            <select aria-label="Fault scenario" value={preset} onChange={(e) => setPreset(e.target.value)}>
+            {t("twin.scenario")}
+            <select aria-label={t("twin.scenario")} value={preset} onChange={(e) => setPreset(e.target.value)}>
               {PRESETS.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.label}
+                  {t(`twin.presets.${p.id}`)}
                 </option>
               ))}
             </select>
           </label>
-          <label>
-            Seed
-            <input aria-label="Twin seed" type="number" min="0" step="1" value={seed} onChange={(e) => setSeed(e.target.value)} />
-          </label>
+          <details className="advanced-settings">
+            <summary>{t("common.advancedSettings")}</summary>
+            <label>
+              {t("twin.positionSigma")}
+              <input type="number" min="0" max="5000" step="any" value={positionSigma} onChange={(e) => setPositionSigma(e.target.value)} />
+            </label>
+            <label>
+              {t("twin.speedSigma")}
+              <input type="number" min="0" max="50" step="any" value={speedSigma} onChange={(e) => setSpeedSigma(e.target.value)} />
+            </label>
+            <label>
+              {t("twin.thrustNoise")}
+              <input type="number" min="0" max="10" step="any" value={thrustNoise} onChange={(e) => setThrustNoise(e.target.value)} />
+            </label>
+            <label>
+              {t("twin.energy")}
+              <input type="number" min="0.001" max="10000" step="any" value={energy} onChange={(e) => setEnergy(e.target.value)} />
+            </label>
+            <label>
+              {t("twin.load")}
+              <input type="number" min="0" max="100000" step="any" value={load} onChange={(e) => setLoad(e.target.value)} />
+            </label>
+            <label>
+              {t("risk.seed")}
+              <input aria-label={t("risk.seed")} type="number" min="0" step="1" value={seed} onChange={(e) => setSeed(e.target.value)} />
+            </label>
+          </details>
           <button type="submit" className="text-button">
-            {busy ? "Flying the twin…" : "Fly the twin ↗"}
+            {busy ? t("twin.running") : t("twin.run")}
           </button>
         </fieldset>
-        <p className="field-help">
-          Guidance steers on its own noisy estimate, not the truth. The twin does not replan, so you see what a fault does
-          to the original plan. All telemetry is simulated.
-        </p>
+        <p className="field-help">{t("twin.help")}</p>
       </form>
       {error && (
         <div className="alert" role="alert">
-          {error}
+          <ServerExplanation text={error} />
         </div>
       )}
+      {result && <ResultSceneLink stale={stale} show={show} />}
       {result && check && (
         <div className="risk-result">
           <div className={`panel descent-verdict ${check.success ? "ok" : "blocked"}`} role="status">
             <strong>
-              {check.success ? "✓ Lands within tolerance" : "✕ Landing fails"} ·{" "}
-              {result.run.final.position_error_m.toFixed(result.run.final.position_error_m < 10 ? 2 : 0)} m from the target
+              {check.success ? `✓ ${t("twin.success")}` : `✕ ${t("twin.failure")}`} ·{" "}
+              {t("twin.fromTarget", {
+                m: result.run.final.position_error_m.toFixed(result.run.final.position_error_m < 10 ? 2 : 0),
+              })}
             </strong>
             {check.reasons.map((r) => (
-              <p key={r.reason}>{r.detail}</p>
+              <p key={r.reason}><ServerExplanation text={r.detail} reason={r.reason} /></p>
             ))}
             <p>
               {result.run.plan.valid
-                ? "The original plan stayed valid."
-                : `The original plan became invalid: ${result.run.plan.invalidated_by.map((d) => d.replaceAll("_", " ")).join(", ")}.`}{" "}
-              Replay ID {result.run.log_hash.slice(0, 10)}.
+                ? t("twin.planValid")
+                : t("twin.planInvalid", {
+                    reasons: result.run.plan.invalidated_by.map((d) => eventLabel(t,d)).join(", "),
+                  })}{" "}
+              {t("twin.replay", { id: result.run.log_hash.slice(0, 10) })}
             </p>
           </div>
           <div className="communication-metrics">
             <div>
-              <span className="metric-label">VS. NO-FAULT FLIGHT</span>
+              <span className="metric-label">{t("twin.metrics.versus")}</span>
               <strong>
                 {result.differences.position_error_m >= 0 ? "+" : ""}
                 {result.differences.position_error_m.toFixed(1)} m
               </strong>
-              <small>landing-point error change</small>
+              <small>{t("twin.metrics.errorChange")}</small>
             </div>
             <div>
-              <span className="metric-label">PROPELLANT</span>
+              <span className="metric-label">{t("twin.metrics.propellant")}</span>
               <strong>
                 {result.differences.propellant_remaining_kg >= 0 ? "+" : ""}
                 {result.differences.propellant_remaining_kg.toFixed(0)} kg
               </strong>
               <small>
-                {result.run.propellant_remaining_kg.toFixed(0)} kg left · reserve margin {check.reserve_margin_kg.toFixed(0)} kg
+                {t("twin.metrics.left", {
+                  kg: result.run.propellant_remaining_kg.toFixed(0),
+                  margin: check.reserve_margin_kg.toFixed(0),
+                })}
               </small>
             </div>
             <div>
-              <span className="metric-label">NAVIGATION ERROR AT TOUCHDOWN</span>
+              <span className="metric-label">{t("twin.metrics.navError")}</span>
               <strong>{result.run.final_estimate_error_m.toFixed(result.run.final_estimate_error_m < 10 ? 2 : 0)} m</strong>
               <small>
-                vertical {Math.abs(result.run.final.vertical_speed_mps).toFixed(2)} m/s · horizontal{" "}
-                {result.run.final.horizontal_speed_mps.toFixed(2)} m/s
+                {t("twin.metrics.speeds", {
+                  vertical: Math.abs(result.run.final.vertical_speed_mps).toFixed(2),
+                  horizontal: result.run.final.horizontal_speed_mps.toFixed(2),
+                })}
               </small>
             </div>
           </div>
@@ -268,23 +315,23 @@ export default function TwinPanel({ base }: { base: Record<string, unknown> }) {
                 <li key={i} className={e.kind}>
                   <b>{e.t_s.toFixed(1)} s</b>{" "}
                   {e.kind === "event_applied"
-                    ? `${EVENT_LABEL[e.event?.kind ?? ""] ?? e.event?.kind} applied`
+                    ? t("twin.log.applied", { event: eventLabel(t, e.event?.kind ?? "") })
                     : e.kind === "plan_invalidated"
-                      ? `Plan invalidated — ${e.reason}`
+                      ? <>{t("twin.log.invalidated", { reason: "" })}<ServerExplanation text={e.reason} /></>
                       : e.kind === "no_plan_effect"
-                        ? `No effect on the plan — ${e.reason}`
-                        : `${e.event?.kind ?? e.kind} not reached before touchdown`}
+                        ? <>{t("twin.log.noEffect", { reason: "" })}<ServerExplanation text={e.reason} /></>
+                        : t("twin.log.notReached", { event: eventLabel(t, e.event?.kind ?? e.kind) })}
                 </li>
               ))}
             </ul>
           )}
           <details className="communication-limits">
             <summary>
-              Twin model & assumptions <span>+</span>
+              {t("twin.assumptions")} <span>+</span>
             </summary>
             <ul>
               {result.assumptions.map((a) => (
-                <li key={a}>{a}</li>
+                <li key={a}><ServerExplanation text={a} /></li>
               ))}
             </ul>
           </details>

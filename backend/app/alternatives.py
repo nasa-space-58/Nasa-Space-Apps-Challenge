@@ -152,6 +152,21 @@ def lateral_divert(cross_m: float, time_to_go_s: float) -> dict:
     }
 
 
+def lateral_offset_m(
+    cross_m: float, t_s: float, lateral_start_s: float, window_s: float
+) -> float:
+    """Crossrange position (m) of the minimum-energy lateral divert at t_s.
+
+    c (3 s^2 - 2 s^3) with s = (t_s - lateral_start_s) / window_s clipped to
+    [0, 1]: zero before the divert starts and c once it ends. A non-positive
+    window means no lateral move is possible, so the offset stays zero.
+    """
+    if not window_s > 0 or cross_m == 0.0:
+        return 0.0
+    s = min(max((t_s - lateral_start_s) / window_s, 0.0), 1.0)
+    return float(cross_m) * (3 * s**2 - 2 * s**3)
+
+
 def rotate_state(position_m, velocity_mps, angle_rad: float):
     """Rotate planar state vectors counter-clockwise by angle_rad.
 
@@ -208,12 +223,16 @@ def evaluate_divert(
     cross_m: float,
     divert_from: str,
     request: AlternativesRequest,
+    record_path: bool = False,
 ) -> dict:
     """Fly from the divert state to a target offset (down_m, cross_m).
 
     Returns reachable, rejection_reasons, in-plane and lateral delta-v (m/s),
     total delta-v from the divert, propellant remaining (kg), reserve margin
     (kg), hover margin (s), time to touchdown (s) and the touchdown state.
+    With record_path, also `path`: the flown samples as t_s (since the
+    divert), downrange_m and altitude_m relative to the target, and cross_m
+    from the lateral divert profile.
     """
     site_radius = MOON_REFERENCE_RADIUS_M + target_height_m
     gates = _remaining_gates(site_radius, divert_from)
@@ -331,7 +350,7 @@ def evaluate_divert(
                 "m",
             )
         )
-    return {
+    result = {
         "reachable": not reasons,
         "rejection_reasons": reasons,
         "in_plane_delta_v_mps": float(in_plane_dv),
@@ -350,6 +369,19 @@ def evaluate_divert(
             "horizontal_speed_mps": float(final["horizontal_speed_mps"]),
         },
     }
+    if record_path:
+        # Without crossrange no lateral move is made, so no window applies.
+        window = total_s - lateral_start if lateral_dv > 0 else 0.0
+        result["path"] = [
+            {
+                "t_s": float(s["t_s"]),
+                "downrange_m": float(s["downrange_m"]),
+                "cross_m": lateral_offset_m(cross_m, s["t_s"], lateral_start, window),
+                "altitude_m": float(s["altitude_m"]),
+            }
+            for s in run["samples"]
+        ]
+    return result
 
 
 def _site_pixel(terrain: LocalTerrain) -> tuple[int, int]:
@@ -495,10 +527,16 @@ def _row(identifier, role, place: dict, evaluation: dict, base_in_plane: float):
 
 
 def plan_alternatives(
-    request: AlternativesRequest, terrain: LocalTerrain, terrain_height_m: float
+    request: AlternativesRequest,
+    terrain: LocalTerrain,
+    terrain_height_m: float,
+    trajectories: bool = False,
 ) -> dict:
     """Primary row plus ranked backups with the same metrics, deterministic.
 
+    With trajectories, the output also maps each row id to its flown divert
+    path in the primary frame (t_s since PDI, down_m, cross_m, altitude_m
+    above the primary site sphere); `result_id` is unchanged by this.
     Raises AlternativesError for an unknown vehicle, a plan the R4 model
     rejects or a primary site without terrain margin for the safety check.
     """
@@ -546,7 +584,14 @@ def plan_alternatives(
     )
     state = divert_state(run["samples"], site_radius, request.divert_from)
     primary_eval = evaluate_divert(
-        vehicle, state, terrain_height_m, 0.0, 0.0, request.divert_from, request
+        vehicle,
+        state,
+        terrain_height_m,
+        0.0,
+        0.0,
+        request.divert_from,
+        request,
+        record_path=trajectories,
     )
     base = primary_eval["in_plane_delta_v_mps"]
     primary_score = (
@@ -581,6 +626,7 @@ def plan_alternatives(
             candidate["cross_m"],
             request.divert_from,
             request,
+            record_path=trajectories,
         )
         evaluated.append((candidate, result))
     evaluated.sort(key=lambda pair: not pair[1]["reachable"])  # stable
@@ -609,6 +655,25 @@ def plan_alternatives(
     }
     identity = json.dumps(output, sort_keys=True, allow_nan=False).encode()
     output["result_id"] = hashlib.sha256(identity).hexdigest()
+    if trajectories:
+        # Outside the hashed identity: the paths add detail, not a new result.
+        flown = [("PRIMARY", float(terrain_height_m), 0.0, primary_eval)]
+        flown += [
+            (row["id"], candidate["terrain_height_m"], candidate["down_m"], result)
+            for row, (candidate, result) in zip(rows, evaluated)
+        ]
+        output["trajectories"] = {
+            identifier: [
+                {
+                    "t_s": state["t_s"] + p["t_s"],
+                    "down_m": p["downrange_m"] + down_m,
+                    "cross_m": p["cross_m"],
+                    "altitude_m": p["altitude_m"] + height - float(terrain_height_m),
+                }
+                for p in result["path"]
+            ]
+            for identifier, height, down_m, result in flown
+        }
     return output
 
 

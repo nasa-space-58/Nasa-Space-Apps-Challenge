@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslate } from "../i18n";
-import type { RoutePoint } from "./Rover";
+import type { RoutePoint, RoverState } from "./Rover";
+import { DEPLOY_END, PULSE_END, SEARCH_END, type SurfaceScene } from "./surfaceScene";
 import "./surface-ops.css";
+import { demoRover } from "./demoRover";
 
 // Post-landing HUD: the rover drives a backend R8 route, and the cards show
 // backend values only (vehicle profile, route metrics, DONKI space weather).
@@ -24,7 +26,7 @@ type Route = {
   path: RoutePoint[];
   waypoints: Waypoint[];
 };
-type RouteResult = { sky_evaluated: boolean; routes: Route[] };
+export type RouteResult = { sky_evaluated: boolean; routes: Route[]; scene: SurfaceScene | null };
 type Profile = {
   name: string;
   mass_at_pdi_kg: number;
@@ -58,6 +60,10 @@ const SPEED_MPS = 0.1;
 /** Simulated seconds per wall-clock second. */
 const PLAYBACK_RATES = [60, 600, 3600];
 const TICK_MS = 100;
+/** Wall-clock seconds of the antenna scan and A* playback before driving. */
+const SCAN_SECONDS = 10;
+/** DEM margin around the routes in the 3-D scene (backend default is 400 m). */
+const SCENE_MARGIN_M = 1000;
 const POLL_MS = 2000;
 const routeCache = new Map<string, Promise<RouteResult>>();
 
@@ -66,13 +72,13 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
     const detail = body?.detail;
-    throw Error(
+    throw Object.assign(new Error(
       typeof detail === "string"
         ? detail
         : Array.isArray(detail)
           ? detail.map((d: { msg: string }) => d.msg).join("; ")
           : `HTTP ${response.status}`,
-    );
+    ), { status: response.status, detail });
   }
   return body as T;
 }
@@ -85,6 +91,8 @@ function loadRoutes(lat: number, lon: number, analysisId?: string) {
     targets: TARGETS,
     speed_mps: SPEED_MPS,
     analysis_job_id: analysisId ?? null,
+    include_scene: true,
+    scene_margin_m: SCENE_MARGIN_M,
   });
   let pending = routeCache.get(body);
   if (!pending) {
@@ -92,6 +100,15 @@ function loadRoutes(lat: number, lon: number, analysisId?: string) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body,
+    }).catch((error) => {
+      // Older preview APIs predate the optional scene payload. Retry only those
+      // explicitly rejected fields, never suppress terrain/validation failures.
+      const details = error.detail as {type?: string; loc?: (string | number)[]}[] | undefined;
+      if (error.status !== 422 || !Array.isArray(details) || !details.length ||
+          !details.every(d => d.type === "extra_forbidden" && ["include_scene", "scene_margin_m"].includes(String(d.loc?.at(-1))))) throw error;
+      const legacy = JSON.parse(body);
+      for (const d of details) delete legacy[String(d.loc!.at(-1))];
+      return call<RouteResult>("/surface/routes", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(legacy)});
     });
     pending.catch(() => routeCache.delete(body));
     routeCache.set(body, pending);
@@ -119,14 +136,17 @@ export default function SurfaceOps({
   lon: number;
   analysisId?: string;
   reduced: boolean;
-  onRover: (rover: { path: RoutePoint[]; drive: number } | null) => void;
+  onRover: (rover: RoverState | null) => void;
 }) {
   const { t } = useTranslate();
+  const [demoSeed, setDemoSeed] = useState<number | null>(null);
+  const demo = useMemo(() => demoSeed === null ? null : demoRover(demoSeed), [demoSeed]);
   const [open, setOpen] = useState(true);
   const [routes, setRoutes] = useState<RouteResult | null>(null);
   const [routeError, setRouteError] = useState("");
   const [choice, setChoice] = useState(0);
   const [elapsed, setElapsed] = useState(0);
+  const [scan, setScan] = useState(reduced ? 1 : 0);
   const [playing, setPlaying] = useState(!reduced);
   const [rate, setRate] = useState(PLAYBACK_RATES[1]);
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -137,19 +157,28 @@ export default function SurfaceOps({
   const covered = Number.isFinite(lat) && lat <= -80 && Number.isFinite(lon);
   useEffect(() => {
     setRoutes(null);
+    setDemoSeed(null);
+    setPlaying(!reduced);
     setRouteError("");
     setChoice(0);
     setElapsed(0);
-    if (!covered) return;
+    setScan(reduced ? 1 : 0);
+    if (!covered) { setDemoSeed(Math.floor(Math.random() * 1000000)); return; }
     let live = true;
     loadRoutes(lat, lon, analysisId).then(
-      (result) => live && setRoutes(result),
-      (error: Error) => live && setRouteError(error.message),
+      (result) => {
+        if (!live) return;
+        setRoutes(result);
+        // A route without its terrain cannot be draped onto unrelated craters:
+        // choose the explicitly labelled, scene-aware planner instead.
+        if (!result.scene) setDemoSeed(Math.floor(Math.random() * 1000000));
+      },
+      (error: Error) => { if (live) { setRouteError(error.message); setDemoSeed(Math.floor(Math.random() * 1000000)); } },
     );
     return () => {
       live = false;
     };
-  }, [lat, lon, analysisId, covered]);
+  }, [lat, lon, analysisId, covered, reduced]);
 
   useEffect(() => {
     call<{ profiles: Profile[] }>("/vehicle-profiles").then(
@@ -214,17 +243,25 @@ export default function SurfaceOps({
     };
   }, [analysisId, weatherAttempt]);
 
+  const shownRoutes = demo ?? routes;
   const reachable = useMemo(
-    () => routes?.routes.filter((r) => r.reachable && r.path.length > 0) ?? [],
-    [routes],
+    () => shownRoutes?.routes.filter((r) => r.reachable && r.path.length > 0) ?? [],
+    [shownRoutes],
   );
+  const alternatives = useMemo(() => shownRoutes?.routes.filter(r => r.reachable).map(r => ({id:r.target_id,path:r.path})), [shownRoutes]);
   const route = reachable[Math.min(choice, reachable.length - 1)] ?? null;
   const duration = route?.duration_s ?? 0;
   const drive = duration > 0 ? Math.min(1, elapsed / duration) : 0;
 
+  const scanning = scan < 1;
   useEffect(() => {
     if (!playing || !route || duration <= 0) return;
     const timer = setInterval(() => {
+      // The antenna scan and search playback run first, then the drive.
+      if (scanning) {
+        setScan((value) => Math.min(1, value + TICK_MS / 1000 / SCAN_SECONDS));
+        return;
+      }
       setElapsed((value) => {
         const next = Math.min(duration, value + (TICK_MS / 1000) * rate);
         if (next >= duration) setPlaying(false);
@@ -232,13 +269,34 @@ export default function SurfaceOps({
       });
     }, TICK_MS);
     return () => clearInterval(timer);
-  }, [playing, route, duration, rate]);
+  }, [playing, route, duration, rate, scanning]);
 
   const report = useRef(onRover);
   report.current = onRover;
   useEffect(() => {
-    report.current(route ? { path: route.path, drive } : null);
-  }, [route, drive]);
+    report.current(
+      route
+        ? {
+            path: route.path,
+            drive,
+            scan,
+            scene: shownRoutes?.scene ?? null,
+            targetId: route.target_id,
+            source: demo ? "demo" : "lola",
+            alternatives,
+          }
+        : null,
+    );
+  }, [route, drive, scan, shownRoutes, alternatives, demo]);
+  const scene = shownRoutes?.scene ?? null;
+  const searchedCells = scene && route ? (scene.explored[route.target_id] ?? []).length : 0;
+  const truncated = Boolean(scene && route && scene.explored_truncated[route.target_id]);
+  const scanStage =
+    scan < DEPLOY_END
+      ? "deploy"
+      : scan < PULSE_END
+        ? "pulse"
+        : scan < SEARCH_END ? "search" : scan < 1 ? "route" : "done";
   useEffect(() => () => report.current(null), []);
 
   // Latest backend-sampled waypoint the rover has passed (no interpolation).
@@ -261,17 +319,25 @@ export default function SurfaceOps({
       >
         <span className="eyebrow">{t("surfaceOps.eyebrow")}</span>
         <strong>{t("surfaceOps.title")}</strong>
+        {route && <small className="ops-summary">{route.target_id} · {Math.round(drive * 100)}% · {scanning ? t("surfaceOps.scanning") : playing ? t("surfaceOps.exploring") : t("surfaceOps.standby")}</small>}
         <span aria-hidden="true">{open ? "−" : "+"}</span>
       </button>
       {open && (
         <div className="surface-ops-body">
           <article className="ops-card">
             <h3>{t("surfaceOps.rover.title")}</h3>
-            {!covered ? (
+            <div className="ops-controls">
+              <button type="button" onClick={() => { setDemoSeed(Math.floor(Math.random() * 1000000)); setChoice(0); setElapsed(0); setScan(reduced ? 1 : 0); setPlaying(!reduced); }}>{t("surfaceOps.newCraterExplorationDemo")}</button>
+              {demo && routes?.scene && <button type="button" onClick={() => { setDemoSeed(null); setChoice(0); setElapsed(0); setScan(reduced ? 1 : 0); }}>{t("surfaceOps.returnToApiRoutes")}</button>}
+            </div>
+            {demo && routes && !routes.scene && <p className="ops-note">{t("surfaceOps.theApiDoesNotProvide")}</p>}
+            {demo && routeError && <p className="ops-note">API: {routeError}</p>}
+            {demo && <p className="ops-note">{t("surfaceOps.demoAAndSampledCosts")}</p>}
+            {!covered && !demo ? (
               <p className="ops-note">{t("surfaceOps.rover.outside")}</p>
-            ) : routeError ? (
+            ) : routeError && !demo ? (
               <p className="ops-error" role="alert">{routeError}</p>
-            ) : !routes ? (
+            ) : !shownRoutes ? (
               <p className="ops-note" aria-live="polite">{t("surfaceOps.rover.loading")}</p>
             ) : !route ? (
               <p className="ops-note">{t("surfaceOps.rover.none")}</p>
@@ -284,6 +350,7 @@ export default function SurfaceOps({
                     onChange={(e) => {
                       setChoice(Number(e.target.value));
                       setElapsed(0);
+                      setScan(reduced ? 1 : 0);
                       setPlaying(!reduced);
                     }}
                   >
@@ -304,6 +371,18 @@ export default function SurfaceOps({
                   >
                     {playing ? t("surfaceOps.rover.pause") : t("surfaceOps.rover.play")}
                   </button>
+                  {scene && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setElapsed(0);
+                        setScan(0);
+                        setPlaying(true);
+                      }}
+                    >
+                      {t("surfaceOps.scan.replay")}
+                    </button>
+                  )}
                   <div role="group" aria-label={t("surfaceOps.rover.rate")}>
                     {PLAYBACK_RATES.map((value) => (
                       <button
@@ -326,9 +405,26 @@ export default function SurfaceOps({
                   aria-label={t("surfaceOps.rover.scrub")}
                   onChange={(e) => {
                     setPlaying(false);
+                    setScan(1);
                     setElapsed(Number(e.target.value));
                   }}
                 />
+                {scene && (
+                  <div className="ops-scan" aria-live="polite">
+                    <p>
+                      <b>{t(`surfaceOps.scan.${scanStage}`, { cells: searchedCells.toLocaleString() })}</b>
+                    </p>
+                    <ul className="ops-legend">
+                      <li><i className="swatch open" />{t("surfaceOps.scan.legendOpen", { deg: scene.slope_limit_deg })}</li>
+                      <li><i className="swatch steep" />{t("surfaceOps.scan.legendSteep", { deg: scene.slope_limit_deg })}</li>
+                      <li><i className="swatch searched" />{t("surfaceOps.scan.legendSearched")}</li>
+                      <li><i className="swatch route" />{t("surfaceOps.scan.legendRoute")}</li>
+                    </ul>
+                    {truncated && <p className="ops-foot">{t("surfaceOps.scan.truncated")}</p>}
+                  </div>
+                )}
+                <p className="ops-foot">{t("surfaceOps.goldSelectedRouteTealOther")}</p>
+                <p className="ops-telemetry" aria-live="off">● {scan < 1 ? t("surfaceOps.antennaSweep") : drive >= 1 ? t("surfaceOps.targetReached") : (drive * 8) % 1 < .24 ? t("surfaceOps.telemetryUplinkAnimation") : t("surfaceOps.surfaceTraverse")}</p>
                 <dl className="ops-grid">
                   <dt>{t("surfaceOps.rover.distance")}</dt>
                   <dd>
@@ -347,7 +443,7 @@ export default function SurfaceOps({
                   <dt>{t("surfaceOps.rover.detour")}</dt>
                   <dd>×{route.detour_ratio?.toFixed(2) ?? "—"}</dd>
                 </dl>
-                {routes.sky_evaluated ? (
+                {shownRoutes?.sky_evaluated && !demo ? (
                   <div className="ops-sky">
                     <span className={`ops-pill sun-${sunState}`}>
                       ☀ {t(`surfaceOps.sun.${sunState}`)}
@@ -369,7 +465,25 @@ export default function SurfaceOps({
                 )}
               </>
             )}
-            <p className="ops-foot">{t("surfaceOps.rover.note")}</p>
+            {!demo && <p className="ops-foot">{t("surfaceOps.rover.note")}</p>}
+            <p className="ops-foot">
+              <a
+                className="ops-link"
+                href="https://sketchfab.com/3d-models/lunar-rover-82cab6e9ada74d12a98bd6a342e83048"
+                target="_blank"
+                rel="noreferrer"
+              >
+                {t("surfaceOps.rover.modelCredit")}
+              </a>{" "}
+              <a
+                className="ops-link"
+                href="https://creativecommons.org/licenses/by/4.0/"
+                target="_blank"
+                rel="noreferrer"
+              >
+                ↗ CC BY 4.0
+              </a>
+            </p>
           </article>
 
           <article className="ops-card">

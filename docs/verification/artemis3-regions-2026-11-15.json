@@ -1,0 +1,135 @@
+{
+  "verified_on_utc": "2026-11-15",
+  "purpose": "Containing-pixel heights and 501x501 window checks for Artemis III candidate region presets",
+  "source": "LDEM_80S_80MPP_ADJ.TIF (NASA GSFC PGDA product 90), application raw cache /data/terrain/raw/8ef81362.../source.tif",
+  "procedure": "Transform lon/lat on R=1737400 sphere to dataset CRS with rasterio.warp.transform, take containing pixel, read 501x501 native window centered on it, require all values finite and unmasked. Run inside the backend container; the two Step 0 presets reproduced their recorded heights and windows exactly.",
+  "region_list_source": "https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/",
+  "sites": [
+    {
+      "site_id": "mons-mouton-feature-center",
+      "artemis_iii_region": "Mons Mouton",
+      "latitude_deg": -84.6,
+      "longitude_deg_east": 31.0,
+      "terrain_surface_height_m": 5039.1572265625,
+      "window_bounds_m": [
+        64320.0,
+        120400.0,
+        104400.0,
+        160480.0
+      ],
+      "window_all_finite": true
+    },
+    {
+      "site_id": "peak-near-cabeus-b",
+      "artemis_iii_region": "Peak near Cabeus B",
+      "latitude_deg": -83.6,
+      "longitude_deg_east": 291.2,
+      "terrain_surface_height_m": 4534.78515625,
+      "window_bounds_m": [
+        -201200.0,
+        50240.0,
+        -161120.0,
+        90320.0
+      ],
+      "window_all_finite": true
+    },
+    {
+      "site_id": "haworth",
+      "artemis_iii_region": "Haworth",
+      "latitude_deg": -86.7639,
+      "longitude_deg_east": 337.223,
+      "terrain_surface_height_m": 1631.47998046875,
+      "window_bounds_m": [
+        -58080.0,
+        70480.0,
+        -18000.0,
+        110560.0
+      ],
+      "window_all_finite": true
+    },
+    {
+      "site_id": "mons-mouton-plateau",
+      "artemis_iii_region": "Mons Mouton Plateau",
+      "latitude_deg": -84.3,
+      "longitude_deg_east": 30.6,
+      "terrain_surface_height_m": 5289.48583984375,
+      "window_bounds_m": [
+        68000.0,
+        128880.0,
+        108080.0,
+        168960.0
+      ],
+      "window_all_finite": true
+    },
+    {
+      "site_id": "nobile-rim-1-r06",
+      "artemis_iii_region": "Nobile Rim 1",
+      "latitude_deg": -85.4381,
+      "longitude_deg_east": 37.36667,
+      "terrain_surface_height_m": 5932.138671875,
+      "window_bounds_m": [
+        64000.0,
+        90000.0,
+        104080.0,
+        130080.0
+      ],
+      "window_all_finite": true
+    },
+    {
+      "site_id": "nobile-rim-2-dm2",
+      "artemis_iii_region": "Nobile Rim 2",
+      "latitude_deg": -83.954,
+      "longitude_deg_east": 58.82206,
+      "terrain_surface_height_m": 1009.3218994140625,
+      "window_bounds_m": [
+        136960.0,
+        74960.0,
+        177040.0,
+        115040.0
+      ],
+      "window_all_finite": true
+    },
+    {
+      "site_id": "de-gerlache-rim-2-sl2",
+      "artemis_iii_region": "de Gerlache Rim 2",
+      "latitude_deg": -88.23,
+      "longitude_deg_east": 295.3716,
+      "terrain_surface_height_m": -92.20085906982422,
+      "window_bounds_m": [
+        -68560.0,
+        2960.0,
+        -28480.0,
+        43040.0
+      ],
+      "window_all_finite": true
+    },
+    {
+      "site_id": "slater-plain-crater-anchor",
+      "artemis_iii_region": "Slater Plain",
+      "latitude_deg": -88.08,
+      "longitude_deg_east": 111.29,
+      "terrain_surface_height_m": -1745.476806640625,
+      "window_bounds_m": [
+        34240.0,
+        -41200.0,
+        74320.0,
+        -1120.0
+      ],
+      "window_all_finite": true
+    },
+    {
+      "site_id": "malapert-massif-r23",
+      "artemis_iii_region": "Malapert Massif",
+      "latitude_deg": -85.9948,
+      "longitude_deg_east": 359.76422,
+      "terrain_surface_height_m": 4784.62451171875,
+      "window_bounds_m": [
+        -20560.0,
+        101440.0,
+        19520.0,
+        141520.0
+      ],
+      "window_all_finite": true
+    }
+  ]
+}

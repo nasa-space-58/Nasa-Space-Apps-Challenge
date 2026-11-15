@@ -1,4 +1,7 @@
+import ServerExplanation from "./ServerExplanation";
+import { useScenarioResult, ResultSceneLink } from "../analysisView";
 import { useEffect, useState } from "react";
+import { useTranslate } from "../i18n";
 import "./alternatives.css";
 
 // R7 (S11): renders backend backup plans; reachability is computed in the API.
@@ -37,7 +40,6 @@ type Result = {
 
 const OK = "#199e70";
 const FAIL = "#e66767";
-const GATE = { high_gate: "high gate (start of approach)", low_gate: "low gate (start of terminal descent)" };
 
 async function call(path: string, init?: RequestInit) {
   const response = await fetch(`/api${path}`, init);
@@ -49,7 +51,7 @@ async function call(path: string, init?: RequestInit) {
         ? detail
         : Array.isArray(detail)
           ? detail.map((d: { msg: string }) => d.msg).join("; ")
-          : "Request failed",
+          : "request_failed",
     );
   }
   return body;
@@ -64,6 +66,7 @@ const readMarks = (id: string): string[] => {
 };
 
 function BackupMap({ result }: { result: Result }) {
+  const { t } = useTranslate();
   const rows = [result.primary, ...result.candidates];
   const S = 320,
     C = S / 2,
@@ -77,13 +80,13 @@ function BackupMap({ result }: { result: Result }) {
       className="backup-map"
       viewBox={`0 0 ${S} ${S}`}
       role="img"
-      aria-label={`Primary site at the centre and ${result.candidates.length} backup sites; ${result.reachable_ids.length} are reachable. Details are in the table.`}
+      aria-label={t("backups.mapLabel", { count: result.candidates.length, reachable: result.reachable_ids.length })}
     >
       <circle cx={C} cy={C} r={result.settings.search_radius_m * scale} className="backup-radius" />
       <line x1={C} x2={C} y1={PAD} y2={S - PAD} className="risk-axis" />
       <line x1={PAD} x2={S - PAD} y1={C} y2={C} className="risk-axis" />
       <text x={C + 6} y={PAD + 8} className="risk-tick">
-        ↑ direction of travel
+        ↑ {t("risk.travel")}
       </text>
       {result.candidates.map((r) => (
         <g key={r.id}>
@@ -103,18 +106,24 @@ function BackupMap({ result }: { result: Result }) {
       ))}
       <rect x={C - 6} y={C - 6} width={12} height={12} className="backup-primary" />
       <text x={C + 10} y={C - 8} className="backup-label">
-        Primary
+        {t("backups.primary")}
       </text>
     </svg>
   );
 }
 
 export default function BackupPlans({ base }: { base: Record<string, unknown> }) {
+  const { t } = useTranslate();
+  // Advanced inputs; defaults match the backend AlternativesRequest and SafetySettings.
+  const [spacing, setSpacing] = useState("160");
+  const [separation, setSeparation] = useState("400");
+  const [slope, setSlope] = useState("10");
   const [divertFrom, setDivertFrom] = useState<"high_gate" | "low_gate">("high_gate");
   const [radius, setRadius] = useState("3000");
   const [count, setCount] = useState("6");
   const [azimuth, setAzimuth] = useState("180");
-  const [result, setResult] = useState<Result | null>(null);
+  const scenarioInputs = JSON.stringify([base,spacing,separation,slope,divertFrom,radius,count,azimuth]);
+  const { result, begin, isCurrent, commit, show, stale, select, selected } = useScenarioResult<Result>("backups", scenarioInputs);
   const [marked, setMarked] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -134,11 +143,14 @@ export default function BackupPlans({ base }: { base: Record<string, unknown> })
     }
   };
 
+  useEffect(() => { setBusy(false); setError(""); }, [scenarioInputs]);
+
   const run = async () => {
+    const ticket = begin();
     setBusy(true);
     setError("");
     try {
-      setResult(
+      commit(ticket,
         await call("/descents/alternatives", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -148,21 +160,26 @@ export default function BackupPlans({ base }: { base: Record<string, unknown> })
             search_radius_m: Number(radius),
             max_candidates: Number(count),
             approach_azimuth_deg: Number(azimuth),
+            candidate_spacing_m: Number(spacing),
+            min_separation_m: Number(separation),
+            safety: { slope_limit_deg: Number(slope) },
           }),
         }),
       );
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Request failed");
+      if (!isCurrent(ticket)) return;
+      const message = e instanceof Error ? e.message : "request_failed";
+      setError(message === "request_failed" ? t("risk.requestFailed") : message);
     } finally {
-      setBusy(false);
+      if (isCurrent(ticket)) setBusy(false);
     }
   };
 
   const rows = result ? [result.primary, ...result.candidates] : [];
 
   return (
-    <div className="risk-panel backup-panel" aria-label="Backup landing plans">
-      <h3>Alternative landing plans · backups</h3>
+    <div className="risk-panel backup-panel" aria-label={t("backups.label")}>
+      <h3>{t("backups.title")}</h3>
       <form
         className="risk-controls"
         onSubmit={(e) => {
@@ -172,42 +189,55 @@ export default function BackupPlans({ base }: { base: Record<string, unknown> })
       >
         <fieldset disabled={busy}>
           <label>
-            Divert from
+            {t("backups.divertFrom")}
             <select
-              aria-label="Divert point"
+              aria-label={t("backups.divertFrom")}
               value={divertFrom}
               onChange={(e) => setDivertFrom(e.target.value as "high_gate" | "low_gate")}
             >
-              <option value="high_gate">High gate (≈2 km up)</option>
-              <option value="low_gate">Low gate (≈150 m up)</option>
+              <option value="high_gate">{t("backups.highGate")}</option>
+              <option value="low_gate">{t("backups.lowGate")}</option>
             </select>
           </label>
           <label>
-            Search radius · m
+            {t("backups.radius")}
             <input type="number" min="200" max="10000" step="100" value={radius} onChange={(e) => setRadius(e.target.value)} />
           </label>
           <label>
-            Backups
+            {t("backups.count")}
             <input type="number" min="1" max="12" step="1" value={count} onChange={(e) => setCount(e.target.value)} />
           </label>
-          <label>
-            Approach azimuth · °
-            <input type="number" min="0" max="359.9" step="any" value={azimuth} onChange={(e) => setAzimuth(e.target.value)} />
-          </label>
+          <details className="advanced-settings">
+            <summary>{t("common.advancedSettings")}</summary>
+            <label>
+              {t("risk.azimuth")}
+              <input type="number" min="0" max="359.9" step="any" value={azimuth} onChange={(e) => setAzimuth(e.target.value)} />
+            </label>
+            <label>
+              {t("backups.spacing")}
+              <input type="number" min="80" max="1000" step="10" value={spacing} onChange={(e) => setSpacing(e.target.value)} />
+            </label>
+            <label>
+              {t("backups.separation")}
+              <input type="number" min="0" max="5000" step="50" value={separation} onChange={(e) => setSeparation(e.target.value)} />
+            </label>
+            <label>
+              {t("backups.slope")}
+              <input type="number" min="1" max="45" step="0.5" value={slope} onChange={(e) => setSlope(e.target.value)} />
+            </label>
+          </details>
           <button type="submit" className="text-button">
-            {busy ? "Searching backups…" : "Find backup sites ↗"}
+            {busy ? t("backups.running") : t("backups.run")}
           </button>
         </fieldset>
-        <p className="field-help">
-          Backups pass the terrain hard constraints and are checked for fuel, reserve, touchdown
-          tolerance and engine thrust from the divert point.
-        </p>
+        <p className="field-help">{t("backups.help")}</p>
       </form>
       {error && (
         <div className="alert" role="alert">
-          {error}
+          <ServerExplanation text={error} />
         </div>
       )}
+      {result && <ResultSceneLink stale={stale} show={show} />}
       {result && (
         <div className="risk-result">
           <div
@@ -215,66 +245,72 @@ export default function BackupPlans({ base }: { base: Record<string, unknown> })
             role="status"
           >
             <strong>
-              {result.reachable_ids.length} of {result.candidates.length} backups reachable from the{" "}
-              {GATE[result.divert_from]}
+              {t("backups.verdict", {
+                reachable: result.reachable_ids.length,
+                count: result.candidates.length,
+                gate: t(`backups.gates.${result.divert_from}`),
+              })}
             </strong>
             <p>
-              Divert at {result.divert_state.altitude_m.toFixed(0)} m altitude,{" "}
-              {result.divert_state.speed_mps.toFixed(0)} m/s, {result.divert_state.time_to_go_s.toFixed(0)} s
-              before touchdown. Marked as backup: {marked.length ? marked.join(", ") : "none"}.
+              {t("backups.divertState", {
+                altitude: result.divert_state.altitude_m.toFixed(0),
+                speed: result.divert_state.speed_mps.toFixed(0),
+                seconds: result.divert_state.time_to_go_s.toFixed(0),
+                marked: marked.length ? marked.join(", ") : t("backups.none"),
+              })}
             </p>
           </div>
           <div className="backup-grid">
             <BackupMap result={result} />
             <div className="table-scroll">
               <table className="ranking-table">
-                <caption>Primary and backups, same metrics</caption>
+                <caption>{t("backups.table.caption")}</caption>
                 <thead>
                   <tr>
-                    <th scope="col">Site</th>
-                    <th scope="col">Safety</th>
-                    <th scope="col">Divert</th>
-                    <th scope="col">Fuel above reserve</th>
-                    <th scope="col">Status</th>
+                    <th scope="col">{t("backups.table.site")}</th>
+                    <th scope="col">{t("backups.table.safety")}</th>
+                    <th scope="col">{t("backups.table.divert")}</th>
+                    <th scope="col">{t("backups.table.fuel")}</th>
+                    <th scope="col">{t("backups.table.status")}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {rows.map((r) => (
                     <tr key={r.id} className={r.reachable ? "" : "route-rejected"}>
                       <th scope="row">
-                        {r.id === "PRIMARY" ? "Primary" : r.id}
+                        <button type="button" disabled={stale} aria-pressed={selected===r.id} onClick={()=>select(r.id)}>{r.id === "PRIMARY" ? t("backups.primary") : r.id}</button>
                         <small>
                           {r.role === "primary"
-                            ? "planned site"
+                            ? t("backups.plannedSite")
                             : `${(r.distance_m / 1000).toFixed(2)} km · ${r.bearing_deg.toFixed(0)}°`}
                         </small>
                       </th>
                       <td>
                         {r.safety_score !== null ? r.safety_score.toFixed(2) : "—"}
                         <small>
-                          slope{" "}
+                          {t("backups.slopeShort")}{" "}
                           {r.safety.max_landing_slope_deg !== null
                             ? `${r.safety.max_landing_slope_deg.toFixed(1)}°`
-                            : "unknown"}
+                            : t("backups.unknown")}
                         </small>
                       </td>
                       <td>
                         {r.role === "primary" ? "—" : `${r.divert_delta_v_mps.toFixed(1)} m/s`}
-                        <small>{r.time_to_touchdown_s.toFixed(0)} s to touchdown</small>
+                        <small>{t("backups.toTouchdown", { seconds: r.time_to_touchdown_s.toFixed(0) })}</small>
                       </td>
                       <td>
                         {r.reserve_margin_kg.toFixed(0)} kg
-                        <small>hover {r.hover_margin_s.toFixed(0)} s</small>
+                        <small>{t("backups.hover", { seconds: r.hover_margin_s.toFixed(0) })}</small>
                       </td>
                       <td>
-                        {r.reachable ? "✓ Reachable" : "✕ Not reachable"}
+                        {r.reachable ? `✓ ${t("backups.reachable")}` : `✕ ${t("backups.unreachable")}`}
                         {r.rejection_reasons.map((x) => (
-                          <small key={x.reason}>{x.detail}</small>
+                          <small key={x.reason}><ServerExplanation text={x.detail} reason={x.reason} /></small>
                         ))}
                         {r.role === "backup" && r.reachable && (
                           <label className="backup-mark">
                             <input type="checkbox" checked={marked.includes(r.id)} onChange={() => toggle(r.id)} />
-                            mark as backup
+                            {t("backups.mark")}
                           </label>
                         )}
                       </td>
@@ -286,11 +322,11 @@ export default function BackupPlans({ base }: { base: Record<string, unknown> })
           </div>
           <details className="communication-limits">
             <summary>
-              Backup model & assumptions <span>+</span>
+              {t("backups.assumptions")} <span>+</span>
             </summary>
             <ul>
               {result.assumptions.map((a) => (
-                <li key={a}>{a}</li>
+                <li key={a}><ServerExplanation text={a} /></li>
               ))}
             </ul>
           </details>

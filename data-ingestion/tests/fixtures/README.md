@@ -11,7 +11,7 @@ APPARENT=AIRLESS, CSV_FORMAT=YES, EXTRA_PREC=YES, ELEV_CUT=-90,
 SKIP_DAYLT=NO, TIME_TYPE=UT, TIME_DIGITS=SECONDS.
 
 The 1e-6 degree absolute tolerance checks the six-decimal reference values in
-`docs/2gbram_horizons_veri_notlari.md`; it is a parsing regression tolerance,
+`docs/horizons-data-notes.md`; it is a parsing regression tolerance,
 not a claim about physical prediction accuracy. Angular diameter is in arcseconds.
 The site is a spherical-reference test observer, not a certified landing site.
 

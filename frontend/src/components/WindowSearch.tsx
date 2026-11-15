@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Preset } from "../types";
-import { errorText, useTranslate } from "../i18n";
+import { errorText, siteLabel, useTranslate } from "../i18n";
 
 type Condition = {
   name: string;
@@ -285,7 +285,7 @@ export default function WindowSearch({
                   site !== "custom" && <option value={site}>{site}</option>}
                 {sites.map((s) => (
                   <option key={s.site_id} value={s.site_id}>
-                    {s.display_name}
+                    {siteLabel(t, s)}
                   </option>
                 ))}
               </select>

@@ -951,6 +951,21 @@ footer a {
 .sources-modal li {
   margin-bottom: 12px;
 }
+.sources-modal h3 {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #dac49b;
+  margin: 26px 0 8px;
+}
+.sources-modal .source-group ul {
+  margin: 0 0 8px;
+}
+.sources-modal .source-use {
+  display: block;
+  color: #8a9aa5;
+  line-height: 1.6;
+}
 .sources-modal small {
   font-size: 10px;
   line-height: 1.8;

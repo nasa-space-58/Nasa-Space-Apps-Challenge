@@ -435,6 +435,8 @@ export type FlightView = {
   positionAt: (progress: number) => Vec3;
   headingAt: (progress: number) => Vec3;
   pointsUntil: (progress: number) => Vec3[];
+  /** The whole planned path as drawn at a progress (moves with the Moon). */
+  plannedAt: (progress: number) => Vec3[];
   allPoints: Vec3[];
   parkingRing: Vec3[];
   /** UTC milliseconds at a progress, or null without dated ephemeris. */
@@ -504,18 +506,27 @@ function pointsUntilFrom(
 export function staticFlightView(path: TransferPath, sun_direction: Vec3): FlightView {
   const earth = path.layout.earth_center_scene;
   const sun = unit(sun_direction);
+  // Explicitly illustrative synchronous orbit: one shared transform keeps the
+  // lunar texture, site markers, routes and spacecraft in the same frame.
+  // Dated ephemerides replace this fallback; this is not an orbital prediction.
+  const turn = (v: Vec3, p: number): Vec3 => {
+    const a = Math.max(0, Math.min(1,p)) * Math.PI / 6;
+    return [v[0]*Math.cos(a)+v[2]*Math.sin(a),v[1],-v[0]*Math.sin(a)+v[2]*Math.cos(a)];
+  };
+  const world = (v:Vec3,p:number) => add(earth,turn(sub(v,earth),p));
   return {
     live: false,
     earthCenter: () => earth,
-    moonPose: () => IDENTITY_POSE(path.layout.moon_center_scene),
+    moonPose: p => ({position:world(path.layout.moon_center_scene,p),x:turn([1,0,0],p),y:[0,1,0],z:turn([0,0,1],p)}),
     sunDirection: () => sun,
-    earthRotationRad: () => null,
+    earthRotationRad: p => Math.max(0,Math.min(1,p))*Math.PI*8,
     earthTilt: [0, 0, STATIC_EARTH_TILT_RAD],
-    positionAt: (p) => positionAt(path, p),
-    headingAt: (p) => headingAt(path, p),
-    pointsUntil: (p) => pathPointsUntil(path, p),
+    positionAt: p => world(positionAt(path,p),p),
+    headingAt: p => turn(headingAt(path,p),p),
+    pointsUntil: p => pathPointsUntil(path,p).map(v=>world(v,p)),
+    plannedAt: p => allPathPoints(path).map(v=>world(v,p)),
     allPoints: allPathPoints(path),
-    parkingRing: ringAround(earth, path.layout.parking_orbit_radius_scene, (v) => v),
+    parkingRing: ringAround(earth,path.layout.parking_orbit_radius_scene,v=>v),
     utcAt: () => null,
   };
 }
@@ -624,6 +635,28 @@ export function liveFlightView(path: TransferPath, flight: FlightEphemeris): Fli
       return applyPose(moonAt(landing), path.site_scene);
     return world[phase.id](phase_progress);
   };
+  // Lunar segments are drawn in the Moon's frame at the shown time (never
+  // before insertion), so the orbit stays wrapped around the moving Moon
+  // instead of smearing along its geocentric track. After insertion the
+  // coast's far end bends smoothly to stay attached to the drawn orbit.
+  const loiMs = timeOf("lunar_orbit", 0);
+  const coastSamples = segments.translunar_coast;
+  const segmentsAt = (progress: number): Record<FlightSegment, Vec3[]> => {
+    const pose = moonAt(Math.max(utcAt(progress), loiMs));
+    const shift = sub(applyPose(pose, evaluate.lunar_orbit(0)), capture);
+    const last = coastSamples.length - 1;
+    return {
+      launch: segments.launch,
+      parking_orbit: segments.parking_orbit,
+      translunar_coast: coastSamples.map((v, i) =>
+        add(v, scale(shift, smoothstep(i / last))),
+      ),
+      lunar_orbit: path.segments.lunar_orbit.map((v) => applyPose(pose, v)),
+      descent: path.segments.descent.map((v) => applyPose(pose, v)),
+    };
+  };
+  const joined = (parts: Record<FlightSegment, Vec3[]>) =>
+    flightOrder.flatMap((id, i) => (i === 0 ? parts[id] : parts[id].slice(1)));
   return {
     live: true,
     earthCenter: () => earthCenter,
@@ -646,10 +679,9 @@ export function liveFlightView(path: TransferPath, flight: FlightEphemeris): Fli
       const delta = sub(ahead, behind);
       return norm(delta) > 0 ? unit(delta) : [0, 0, 0];
     },
-    pointsUntil: (p) => pointsUntilFrom(segments, position, p),
-    allPoints: flightOrder.flatMap((id, i) =>
-      i === 0 ? segments[id] : segments[id].slice(1),
-    ),
+    pointsUntil: (p) => pointsUntilFrom(segmentsAt(p), position, p),
+    plannedAt: (p) => joined(segmentsAt(p)),
+    allPoints: joined(segments),
     parkingRing: ringAround(earthCenter, parkingRadius, (v) => rotateByPose(tliPose, v)),
     utcAt,
   };

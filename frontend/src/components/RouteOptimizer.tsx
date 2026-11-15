@@ -189,7 +189,7 @@ function Scatter({ result }: { result: RouteResult }) {
   );
 }
 
-export default function RouteOptimizer({ result }: { result: RouteResult }) {
+export default function RouteOptimizer({ result, onSelect }: { result: RouteResult; onSelect?:(id:string)=>void }) {
   const { t, tText } = useTranslate();
   const tag = (id: string) =>
     [
@@ -239,7 +239,7 @@ export default function RouteOptimizer({ result }: { result: RouteResult }) {
           {sorted.map((r) => (
             <tr key={r.id} className={r.feasible ? "" : "route-rejected"}>
               <th scope="row">
-                {r.id} · {nmi(t, r.orbit_altitude_km)} · {r.approach_s} s + {r.terminal_s} s
+                <button type="button" onClick={()=>onSelect?.(r.id)}>{r.id} · {nmi(t, r.orbit_altitude_km)} · {r.approach_s} s + {r.terminal_s} s</button>
                 {tag(r.id) && <small>{tag(r.id)}</small>}
               </th>
               <td>

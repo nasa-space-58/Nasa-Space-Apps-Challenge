@@ -68,6 +68,7 @@ R10 activates the planned SciPy dependency in the backend (locked version 1.16.3
 | Testing | pytest |
 | Linting / formatting | Ruff |
 | Dependency management | `requirements.txt` with pinned versions |
+| Optional Q&A assistant | Anthropic Python SDK 2.8.0 (Claude API), off by default; see [assistant.md](assistant.md) |
 
 Responsibilities:
 - Reading processed terrain and ephemeris data from the shared data volume.
@@ -75,7 +76,7 @@ Responsibilities:
 - Trajectory, fuel, risk (Monte Carlo) and landing site recommendation calculations.
 - Exposing all results through a REST API.
 - Publishing ingestion requests and consuming dataset events from the message queue.
-- **The backend never downloads data from external sources.**
+- **The backend never downloads data from external sources.** The only outbound call is the optional, opt-in Q&A assistant. It sends questions and result summaries to the Claude API and downloads no data (see [assistant.md](assistant.md)).
 
 ## Data Ingestion Service
 

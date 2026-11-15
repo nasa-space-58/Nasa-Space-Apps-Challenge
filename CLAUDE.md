@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project status
 
-**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo contains the completed Step 0 foundation and Task 1 RabbitMQ ingestion, persistent terrain/Horizons caches, Task 2 bounded terrain horizon computation, Task 3 sampled visibility metrics/refinement, and Task 4 persistent analysis API plus NASA-model scroll interface, and Task 5 saved A/B comparison with synchronized playback and tests. Local Docker runtime verification and frontend lock generation passed on 2026-11-14; Python transitive locks and a clean-clone Docker test also passed; terrain/site input definitions were also verified against NASA/USGS sources; Step 0 is complete; see docs/mvp-roadmap.md. The README is in Turkish; everything else (code, comments, commits, docs) must be in English.
+**Lunar Landing Navigator** (Team 2gbram, NASA Space Apps Challenge "Lunar Landing Site Navigator"). The repo contains the completed Step 0 foundation and Task 1 RabbitMQ ingestion, persistent terrain/Horizons caches, Task 2 bounded terrain horizon computation, Task 3 sampled visibility metrics/refinement, and Task 4 persistent analysis API plus NASA-model scroll interface, and Task 5 saved A/B comparison with synchronized playback and tests. Local Docker runtime verification and frontend lock generation passed on 2026-11-14; Python transitive locks and a clean-clone Docker test also passed; terrain/site input definitions were also verified against NASA/USGS sources; Step 0 is complete; see docs/mvp-roadmap.md. Everything (README, code, comments, commits, docs) must be in English; the only Turkish text is the UI translation in `frontend/src/i18n/` (tr.json and the Turkish server-text patterns in index.tsx).
 
 `docs/` is the source of truth. Read the relevant file before working:
 - `docs/mvp-roadmap.md`: first-release scope, release order, task checklist and acceptance criteria.
@@ -12,13 +12,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `docs/coding-conventions.md`: git, test-first workflow, code style.
 - `docs/user-scenarios.md`: personas, modules, scenarios S1–S16, build order, acceptance criteria. Numeric thresholds there are example defaults.
 - `docs/terrain-and-sites.md`, `docs/initial-sites.json`: verified initial terrain and observer inputs; runtime sourced presets are in shared/presets.json.
-- `docs/data-sources.md`, `docs/2gbram_horizons_veri_notlari.md`: NASA data source catalog and JPL Horizons notes.
+- `docs/data-sources.md`, `docs/horizons-data-notes.md`: NASA data source catalog and JPL Horizons notes.
 
 The first release focuses on site/date comparison, terrain-relative Sun/Earth visibility and understandable energy/communication metrics. Extended mission planning follows the phased roadmap.
 
 ## Latest verified extension
 
 R1 adds explained candidate deficits, CSV/PNG/printable reports, saved-result links, portable input manifests with expected result fingerprints, and two bounded observer-based classroom lessons. See docs/release-r1.md. Surface-wide shadow visualization and human MVP acceptance remain open.
+
+## Optional Q&A assistant
+
+`backend/app/assistant.py` and `backend/app/doc_search.py` add an opt-in Claude-backed Q&A assistant (`/assistant/status`, `/assistant/ask`). It is off unless `ASSISTANT_ENABLED=true` and `ANTHROPIC_API_KEY` are set. Its tools are read-only, it never computes physics, and tests use a fake client, so they spend no credit. Never commit or print the key. Frozen tests: `6db6f82`. See docs/assistant.md.
 
 ## Planned architecture (see docs/technologies.md)
 
@@ -212,6 +216,9 @@ R13 (additional quantum application benchmarks) starts from `main` `456f4ef` on 
 
 The user explicitly authorized integrating the latest main with the completed H10/H11 branch and publishing the combined version to main after resolving conflicts and passing checks. This one-time authorization supersedes the earlier H10/H11 manual-merge boundary. Preserve both teams' features and the unrelated local H6 notebook edit. No new quantum submission or credit spending is authorized by this integration.
 
+### UI simplification and rover scan main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/rover-scan-route` (which contains `ui/simplify-interface`) was fast-forwarded directly onto `main` from `e92174e` without a PR, overriding the no-direct-push rule for this one push only. It adds the simplified mission-control menu, the R8 route scene payload (skeleton `6b3d52c`, frozen tests `93583cf`), the real-DEM rover scan and the CC BY 4.0 Sketchfab rover model (attribution in `frontend/public/models/manifest.json`). The default rules for `main` still apply afterwards.
 ### Unified planner stage 1 (user, 2026-11-15)
 
 Start from current main `e92174e` on `codex/unified-quantum-stage1`. Complete only the first agreed stage: integration inventory, baseline observations and tests. Push only this new branch; do not merge into or push main/tahakrcc. Ask before any real quantum credit spending, including Spark. The new common solver, adapters and live coordinator remain subsequent stages. Preserve the unrelated H6 notebook edit and existing frozen tests. See docs/unified-mission-planner.md and its stage 1 evidence.
@@ -227,3 +234,43 @@ Continue on `codex/unified-quantum-stage1`; implement the full classical mission
 ### Unified planner stage 4 (user, 2026-11-15)
 
 Continue on `codex/unified-quantum-stage1`; connect bounded local quantum proposals to full campaign/physical admission, test and push only this branch. No main/tahakrcc merges or real quantum credits. Preserve the local H6 notebook. Skeleton `8f45b95`; frozen tests `94fb31a`, `d90ddd9`, `bb3df22`. Default mode stays classical, experiments are explicitly local, and unchanged R10/R13 NO-GO policy cannot be bypassed. See docs/unified-quantum-proposals.md for supported scope and attribution rules.
+
+### Branch consolidation and scene refresh (user, 2026-11-15)
+
+The user authorized consolidating the latest GitHub branches into main, cleaning up branch clutter, and implementing the agreed rounded-control / scene-first interface. This authorization supersedes earlier branch-specific no-merge and delivery restrictions for this integration. Preserve active worktrees and unrelated local files. H8–H11 and healthinfo were already squash-integrated via PRs #19 and #18. The divergent early R12 implementation is archived rather than replacing the current H5/H6 and R12 event stack. See docs/verification/branch-consolidation-2026-11-15.md for exact tips, preserved branches and verification. No paid assistant or quantum provider calls are authorized.
+
+### Terrain R12 restoration (user, 2026-11-15)
+
+The user explicitly authorized restoring the archived R12 features without breaking either system, testing and publishing to main. This supersedes the earlier archive-only disposition for this implementation and authorizes this delivery to main. Terrain recovery is isolated in `app.terrain_recovery` / `app.terrain_twin` at `/descents/self-healing`; existing H5/H6 and public R9 remain unchanged. Frozen new test baseline: `1fa44d5`. See docs/terrain-recovery.md. Do not conflate this real-DEM classical experiment with the shared hybrid plan or certified flight control.
+
+### Mission run simulation (user, 2026-11-15)
+
+The user asked for a real simulation instead of an always-successful flight, without a plain failure rate. Branch `feature/mission-run-simulation` from main `de18ad4`; push only this branch, no merge into main/tahakrcc. Skeleton `3c43546`, frozen tests `af70068`, user-approved test correction `d8d990c` (new baseline). Outcomes come from ordered physics gates (faulted R4 descent, R3 touchdown slope, ideal battery over analysed sunlight, Earth-contact rules) and typed fault scenarios in `shared/mission_faults.json`; unknown inputs make the run inconclusive. Never present it as landing-safety, power/thermal or link certification, or the curated scenarios as NASA failure statistics. See docs/mission-run.md.
+
+### Mission run main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/mission-run-simulation` was fast-forwarded directly onto `main` from `de18ad4` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### Split comparison simulator main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/split-comparison-simulator` (split 3D viewport with synchronized A/B day panes; see the split simulator section of docs/scenario-comparison.md) was fast-forwarded directly onto `main` from `3d2b819` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### Sources page main push exception (user, 2026-11-15)
+
+At the user's explicit request, `ui/sources-page-complete` (complete grouped Sources dialog: every model, terrain, ephemeris, mission, communication and quantum source, including the CC BY 4.0 rover attribution; catalog in `frontend/src/sourceCatalog.ts`) was fast-forwarded directly onto `main` from `d57db9a` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### Mission run route set (user, 2026-11-15)
+
+On `feature/mission-run-route-candidates` from main `91ba1ae`. Starting a mission run also shows every computed landing route in the 3D scene: primary green, reachable R7 backups yellow, rejected red (dashed when flown, point only when it failed the R3 terrain check), with metrics and reasons on selection. Skeleton `0b272e0`, frozen tests `58af088`; terrain grid skeleton `c4b60e2`, frozen tests `c7cf970`; the routes are drawn over the real LOLA terrain at true scale. See docs/mission-routes.md. The route set is the nominal pre-flight plan set, not a replay of the run's faults.
+
+### Mission run route set main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/mission-run-route-candidates` was fast-forwarded directly onto `main` from `91ba1ae` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### Mission run outlook (user, 2026-11-15)
+
+On `feature/mission-run-differentiation` from main `99506ea`; push only this branch, no merge into main/tahakrcc. Skeleton `d38369e`, frozen tests `178e38a` (`backend/tests/test_mission_run_outlook.py`). The verdict still stops at the first failed gate; the additive `surface_outlook` (autonomous what-if to the window end), `baseline` (fault-free reference and deltas) and `context` (limitations such as Earth never visible) keep scenarios distinguishable. Never present the outlook as a second verdict. See docs/mission-run.md.
+
+### Mission run outlook main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/mission-run-differentiation` was fast-forwarded directly onto `main` from `99506ea` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.

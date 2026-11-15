@@ -1,11 +1,14 @@
+import { useScenarioResult, ResultSceneLink, useAnalysisView } from "../analysisView";
 import { useEffect, useMemo, useState } from "react";
+import type { MissionCandidate } from "../missionCandidates";
 import type { Preset } from "../types";
 import RouteOptimizer, { type RouteResult } from "./RouteOptimizer";
 import RiskPanel from "./RiskPanel";
 import BackupPlans from "./BackupPlans";
 import SurfaceRoutes from "./SurfaceRoutes";
+import TerrainRecoveryPanel from "./TerrainRecoveryPanel";
 import TwinPanel from "./TwinPanel";
-import { errorText, useTranslate } from "../i18n";
+import { errorText, siteLabel, useTranslate } from "../i18n";
 
 // R4 (S6): renders backend descent plans; all physics runs in the API.
 type Sample = {
@@ -238,8 +241,9 @@ function ProfileChart({ samples, zoom }: { samples: Sample[]; zoom: boolean }) {
   );
 }
 
-export default function Descent({ sites }: { sites: Preset[] }) {
+export default function Descent({ sites, onCandidates, onLocation }: { sites: Preset[]; onLocation?: (lat:number,lon:number)=>void; onCandidates?: (items: MissionCandidate[]) => void }) {
   const { t, tText } = useTranslate();
+  const {setCandidateId,setPreview} = useAnalysisView();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [siteId, setSiteId] = useState("malapert-massif-r23");
   const [lat, setLat] = useState("-85.9948");
@@ -281,11 +285,13 @@ export default function Descent({ sites }: { sites: Preset[] }) {
       : { profile_id: profileId };
 
   const optimize = async () => {
+    const ticket = planScene.begin();
+    onLocation?.(Number(lat),Number(lon));
     setOptimizing(true);
     setError("");
     try {
-      setRoutes(
-        await call("/descents/optimize", {
+      const coordinates = { lat: Number(lat), lon: Number(lon) };
+      const result: RouteResult = await call("/descents/optimize", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -297,16 +303,37 @@ export default function Descent({ sites }: { sites: Preset[] }) {
             reserve_delta_v_mps: Number(reserveFps) * 0.3048,
             ...vehicle(),
           }),
-        }),
-      );
+        });
+      if (!planScene.isCurrent(ticket)) return;
+      setRoutes(result);
+      onCandidates?.(result.routes.map((r) => ({
+        id: `descent:${r.id}`, label: r.id, ...coordinates,
+        status: r.feasible ? "accepted" : "rejected", score: null,
+        source: "Classical descent grid / API", altitudeKm: r.orbit_altitude_km,
+        explanation: r.rejection_reasons.map((v) => `${v.reason}: ${v.detail}`).join("; ") || (result.pareto_ids.includes(r.id) ? "Pareto frontier" : "Feasible alternative"),
+        metrics: [
+          { label: "Orbit", value: `${r.orbit_altitude_km} km` },
+          { label: "Propellant", value: `${r.propellant_used_kg?.toFixed(1) ?? "—"} kg` },
+          { label: "Reserve margin", value: `${r.reserve_margin_kg?.toFixed(1) ?? "—"} kg` },
+          { label: "Assessment", value: `${r.assessment_time_s} s` },
+          { label: "Δv", value: `${r.delta_v_mps?.toFixed(1) ?? "—"} m/s` },
+        ],
+      })));
+
     } catch (e) {
+      if (!planScene.isCurrent(ticket)) return;
       setError(errorText(e, t, "communication.requestFailed"));
     } finally {
-      setOptimizing(false);
+      if (planScene.isCurrent(ticket)) setOptimizing(false);
     }
   };
 
+  const planInputs = JSON.stringify([siteId,lat,lon,profileId,custom,altitude,inclination,allowTurn,reserveFps]);
+  const planScene = useScenarioResult<Plan>("descent", planInputs);
+  useEffect(() => { setPlan(null); setRoutes(null); setBusy(false); setOptimizing(false); onCandidates?.([]); }, [planInputs]);
   const run = async () => {
+    const ticket = planScene.begin();
+    onLocation?.(Number(lat),Number(lon));
     setBusy(true);
     setError("");
     try {
@@ -318,17 +345,19 @@ export default function Descent({ sites }: { sites: Preset[] }) {
         allow_plane_change: allowTurn,
         ...vehicle(),
       };
-      setPlan(
-        await call("/descents", {
+      const response: Plan = await call("/descents", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
-        }),
-      );
+        });
+      if (!planScene.isCurrent(ticket)) return;
+      setPlan(response);
+      planScene.commit(ticket,response);
     } catch (e) {
+      if (!planScene.isCurrent(ticket)) return;
       setError(errorText(e, t, "communication.requestFailed"));
     } finally {
-      setBusy(false);
+      if (planScene.isCurrent(ticket)) setBusy(false);
     }
   };
 
@@ -365,7 +394,7 @@ export default function Descent({ sites }: { sites: Preset[] }) {
             run();
           }}
         >
-          <fieldset disabled={busy}>
+          <fieldset disabled={busy || optimizing}>
             <h3>{t("descent.landingSite")}</h3>
             <label>
               {t("descent.site")}
@@ -384,7 +413,7 @@ export default function Descent({ sites }: { sites: Preset[] }) {
                 <option value="custom">{t("app.form.custom")}</option>
                 {sites.map((s) => (
                   <option key={s.site_id} value={s.site_id}>
-                    {s.display_name}
+                    {siteLabel(t, s)}
                   </option>
                 ))}
               </select>
@@ -445,6 +474,7 @@ export default function Descent({ sites }: { sites: Preset[] }) {
                 })}
               </p>
             )}
+            <details className="scenario-settings"><summary>{t("workspace.advanced")}</summary>
             <h3>{t("descent.initialOrbit")}</h3>
             <label>
               {t("descent.altitude")}
@@ -466,9 +496,7 @@ export default function Descent({ sites }: { sites: Preset[] }) {
               <input type="checkbox" checked={allowTurn} onChange={(e) => setAllowTurn(e.target.checked)} />
               {t("descent.planeChange")}
             </label>
-            <button type="submit" className="primary">
-              {busy ? t("descent.computing") : `${t("descent.compute")} ↗`}
-            </button>
+
             <h3>{t("descent.fuel")}</h3>
             <label>
               {t("descent.reserve")}
@@ -482,6 +510,10 @@ export default function Descent({ sites }: { sites: Preset[] }) {
                 onChange={(e) => setReserveFps(e.target.value)}
               />
             </label>
+            </details>
+            <button type="submit" className="primary">
+              {busy ? t("descent.computing") : `${t("descent.compute")} ↗`}
+            </button>
             <button
               type="button"
               className="text-button"
@@ -653,11 +685,30 @@ export default function Descent({ sites }: { sites: Preset[] }) {
               </details>
             </>
           )}
-          {routes && <RouteOptimizer result={routes} />}
-          <RiskPanel base={planBase} />
-          <BackupPlans base={planBase} />
-          <TwinPanel base={planBase} />
-          <SurfaceRoutes site={planBase} />
+          {routes && <RouteOptimizer result={routes} onSelect={id=>{setPreview(null);setCandidateId(`descent:${id}`);}} />}
+          {plan && <ResultSceneLink stale={planScene.stale} show={planScene.show} />}
+          {/* Deeper analyses stay closed until the user opens one. */}
+          <div className="tool-cards">
+            <h3>{t("descent.more.title")}</h3>
+            <p className="field-help">{t("descent.more.hint")}</p>
+            {(
+              [
+                ["risk", <RiskPanel base={planBase} />],
+                ["backups", <BackupPlans base={planBase} />],
+                ["twin", <TwinPanel base={planBase} />],
+                ["terrainRecovery", <TerrainRecoveryPanel base={planBase} />],
+                ["surface", <SurfaceRoutes site={planBase} />],
+              ] as const
+            ).map(([id, panel]) => (
+              <details className="tool-card" key={id}>
+                <summary>
+                  <b>{t(`descent.more.${id}.title`)}</b>
+                  <span>{t(`descent.more.${id}.desc`)}</span>
+                </summary>
+                {panel}
+              </details>
+            ))}
+          </div>
         </div>
       </div>
     </section>

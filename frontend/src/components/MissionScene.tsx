@@ -1,3 +1,6 @@
+import AnalysisScene from "./AnalysisScene";
+import RouteTerrainScene from "./RouteTerrainScene";
+import type { AnalysisPreview } from "../analysisView";
 import {
   Suspense,
   useEffect,
@@ -13,9 +16,13 @@ import {
   type ThreeEvent,
 } from "@react-three/fiber";
 import * as THREE from "three";
+import type { TouchdownOutcome } from "../missionRunStore";
 import { Dust, Model, Terrain, smooth } from "./LunarSurface";
 import LaunchSite from "./LaunchSite";
-import Rover, { type RoutePoint } from "./Rover";
+import Rover, { preloadRoverModel, type RoutePoint, type RoverState } from "./Rover";
+import { DemTerrain, ScanOverlay } from "./RoverScan";
+import { SEARCH_END, sceneMapping, type SurfaceScene } from "./surfaceScene";
+import { candidateColor, type MissionCandidate } from "../missionCandidates";
 import type { Preset } from "../types";
 import { useTranslate } from "../i18n";
 import {
@@ -318,6 +325,58 @@ function Trail({
   return <primitive object={line} />;
 }
 
+/** Dashed planned path, redrawn each frame so it follows the moving Moon. */
+function PlannedPath({
+  view,
+  progress,
+}: {
+  view: FlightView;
+  progress: MutableRefObject<number>;
+}) {
+  const count = view.allPoints.length;
+  const line = useMemo(() => {
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute(
+      "position",
+      new THREE.BufferAttribute(new Float32Array(count * 3), 3),
+    );
+    return new THREE.Line(
+      geometry,
+      // Solid: dashes recomputed every frame crawl and flicker.
+      new THREE.LineBasicMaterial({
+        color: "#c6d3dc",
+        transparent: true,
+        opacity: 0.22,
+        depthWrite: false,
+      }),
+    );
+  }, [count]);
+  useEffect(
+    () => () => {
+      line.geometry.dispose();
+      (line.material as THREE.Material).dispose();
+    },
+    [line],
+  );
+  const shown = useRef<{ view: FlightView | null; progress: number }>({
+    view: null,
+    progress: -1,
+  });
+  useFrame(() => {
+    const last = shown.current;
+    if (last.view === view && (!view.live || last.progress === progress.current)) return;
+    shown.current = { view, progress: progress.current };
+    const points = view.plannedAt(progress.current);
+    const attribute = line.geometry.getAttribute("position") as THREE.BufferAttribute;
+    const n = Math.min(points.length, count);
+    for (let i = 0; i < n; i++) attribute.setXYZ(i, ...points[i]);
+    attribute.needsUpdate = true;
+    line.geometry.setDrawRange(0, n);
+    line.geometry.computeBoundingSphere();
+  });
+  return <primitive object={line} />;
+}
+
 function Spacecraft({
   view,
   progress,
@@ -564,6 +623,13 @@ function CameraRig({
   const desiredTarget = useMemo(() => new THREE.Vector3(), []);
   const desiredPosition = useMemo(() => new THREE.Vector3(), []);
   const first = useRef(true);
+  // Smoothing state relative to the followed point, so a moving Moon is
+  // tracked exactly (no lag jitter) while view changes still ease.
+  const targetLag = useMemo(() => new THREE.Vector3(), []);
+  const direction = useMemo(() => new THREE.Vector3(0, 0, 1), []);
+  const logDistance = useRef(0);
+  const lastMode = useRef(mode);
+  const wanted = useMemo(() => new THREE.Vector3(), []);
   useFrame((_, delta) => {
     const phase = phaseAt(progress.current).phase.id;
     // Bodies at this moment (fixed layout without a dated ephemeris).
@@ -619,8 +685,9 @@ function CameraRig({
       distance = 1.25;
     } else if (mode === "moon") {
       desiredTarget.copy(moonPoint([0, -0.35, 0]));
-      yaw = siteYaw() + moonYaw;
-      pitch = -1.0;
+      // Keep the overview inertial so synchronous lunar rotation remains visible.
+      yaw = siteYaw();
+      pitch = -0.45;
       distance = 4.6;
     } else {
       // Look over the spacecraft from outside the body it is closest to.
@@ -652,10 +719,31 @@ function CameraRig({
       )
       .multiplyScalar(distance)
       .add(desiredTarget);
-    const k = reduced || first.current ? 1 : 1 - Math.exp(-delta * 3.2);
+    const step = Math.min(delta, 0.05);
+    const k = reduced || first.current ? 1 : 1 - Math.exp(-step * 2.4);
+    if (first.current || reduced) {
+      targetLag.set(0, 0, 0);
+      direction.copy(desiredPosition).sub(desiredTarget).normalize();
+      logDistance.current = Math.log(Math.max(1e-4, distance));
+    } else if (lastMode.current !== mode) {
+      // A new view starts from where the camera is now and eases over.
+      targetLag.copy(target).sub(desiredTarget);
+    }
+    lastMode.current = mode;
     first.current = false;
-    target.lerp(desiredTarget, k);
-    camera.position.lerp(desiredPosition, k);
+    // The look-at point follows the target exactly plus a decaying offset.
+    targetLag.multiplyScalar(1 - k);
+    target.copy(desiredTarget).add(targetLag);
+    // Direction turns on the sphere and distance eases in log space, so a
+    // long zoom (Earth–Moon to close-up) is even and never cuts through.
+    wanted.copy(desiredPosition).sub(desiredTarget).normalize();
+    direction.lerp(wanted, k).normalize();
+    logDistance.current +=
+      (Math.log(Math.max(1e-4, distance)) - logDistance.current) * k;
+    camera.position
+      .copy(direction)
+      .multiplyScalar(Math.exp(logDistance.current))
+      .add(target);
     camera.lookAt(target);
   });
   return null;
@@ -672,12 +760,38 @@ function ProgressEaser({
 }) {
   useFrame((_, delta) => {
     const gap = target - progress.current;
+    // Small steps ease quickly; large jumps (phase buttons, scrubbing) glide
+    // over about a second instead of cutting.
+    const rate = Math.abs(gap) > 0.08 ? 4 : 14;
     progress.current =
-      snap || Math.abs(gap) > 0.08 || Math.abs(gap) < 1e-5
+      snap || Math.abs(gap) < 1e-5
         ? target
-        : progress.current + gap * (1 - Math.exp(-delta * 14));
+        : progress.current + gap * (1 - Math.exp(-Math.min(delta, 0.05) * rate));
   });
   return null;
+}
+
+function CandidateCorridor({ candidate, selected, onSelect }: { candidate: MissionCandidate; selected: boolean; onSelect: () => void }) {
+  const points = useMemo(() => {
+    const end = onSurface(candidate.lat, candidate.lon, 1.006);
+    const normal = end.clone().normalize();
+    const tangent = new THREE.Vector3(0, 1, 0).cross(normal).normalize();
+    // Fan illustrative corridors sharing the same landing point.
+    const hash = [...candidate.id].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 0);
+    const spread = Math.sin(hash * 12.9898) * 43758.5453;
+    tangent.applyAxisAngle(normal, (spread - Math.floor(spread) - 0.5) * 2.6);
+    const height = Math.max(0.07, Math.min(0.35, (candidate.altitudeKm ?? 150) / 1737.4));
+    const start = end.clone().addScaledVector(normal, height).addScaledVector(tangent, 0.3);
+    return new THREE.QuadraticBezierCurve3(start, end.clone().addScaledVector(normal, height * 0.6), end).getPoints(48);
+  }, [candidate]);
+  const color = candidateColor(candidate);
+  return <group>
+    <Line points={points} color={color} opacity={selected ? 1 : 0.4} dashed={candidate.status !== "accepted"} dashSize={0.008} />
+    <mesh position={points[points.length - 1]} onClick={e => { e.stopPropagation(); onSelect(); }}>
+      <sphereGeometry args={[selected ? 0.013 : 0.007, 16, 12]} /><meshBasicMaterial color={color} />
+    </mesh>
+    {selected && <mesh position={points[0]}><sphereGeometry args={[0.008, 12, 8]} /><meshBasicMaterial color={color} /></mesh>}
+  </group>;
 }
 
 function System({
@@ -692,6 +806,7 @@ function System({
   onPick,
   onPreset,
   view,
+  candidates = [], selectedCandidate, onCandidate,
 }: SceneProps & {
   view: FlightView | null;
   progress: MutableRefObject<number>;
@@ -744,7 +859,6 @@ function System({
       ),
     [],
   );
-  const fullPath = useMemo(() => (view ? view.allPoints.map(v3) : []), [view]);
   const parkingRing = useMemo(
     () =>
       view
@@ -891,17 +1005,12 @@ function System({
       {Number.isFinite(lat) && Number.isFinite(lon) && (
         <SiteMarker lat={lat} lon={lon} condition={condition} reduced={reduced} />
       )}
+      {candidates.map(c => <CandidateCorridor key={c.id} candidate={c} selected={selectedCandidate === c.id} onSelect={() => onCandidate?.(c.id)} />)}
       <ScienceOrbiter reduced={reduced} />
       </group>
       {view && (
         <>
-          <Line
-            points={fullPath}
-            color="#c6d3dc"
-            opacity={0.28}
-            dashed
-            dashSize={0.3}
-          />
+          <PlannedPath view={view} progress={progress} />
           <Trail view={view} progress={progress} />
           <Spacecraft
             view={view}
@@ -919,8 +1028,8 @@ function System({
               ? "spacecraft"
               : cameraMode
         }
-        lat={lat}
-        lon={lon}
+        lat={candidates.find(c => c.id === selectedCandidate)?.lat ?? lat}
+        lon={candidates.find(c => c.id === selectedCandidate)?.lon ?? lon}
         spacecraft={spacecraft}
         progress={progress}
         reduced={reduced}
@@ -942,20 +1051,50 @@ function LandingSite({
   compact,
   roverPath,
   roverDrive,
+  roverScan,
+  roverScene,
+  roverTarget,
+  roverAlternatives,
+  showHazards, showSearch, showRoutes,
+  touchdown = "landed",
 }: {
+  touchdown?: TouchdownOutcome;
   progress: MutableRefObject<number>;
   reduced: boolean;
   compact: boolean;
   roverPath: RoutePoint[] | null;
   roverDrive: MutableRefObject<number>;
+  roverScan: MutableRefObject<number>;
+  roverScene: SurfaceScene | null;
+  roverTarget: string;
+  roverAlternatives?: RoverState["alternatives"];
+  showHazards?: boolean;
+  showSearch?: boolean;
+  showRoutes?: boolean;
 }) {
   const lander = useRef<THREE.Group>(null!);
+  // Fetch the rover model during the descent so it is ready at touchdown.
+  useEffect(() => {
+    preloadRoverModel();
+  }, []);
+  // Real LOLA DEM window from the backend route scene, when loaded.
+  const mapping = useMemo(
+    () => (roverScene ? sceneMapping(roverScene) : null),
+    [roverScene],
+  );
+  const reach = roverScene && mapping
+    ? (Math.max(roverScene.rows, roverScene.cols) * roverScene.pixel_m * mapping.scale) / 2
+    : 0;
+  const overview = useRef(0);
   // After touchdown the camera eases from the lander to the driving rover.
   const roverFocus = useMemo(() => new THREE.Vector3(), []);
   const roverLook = useMemo(() => new THREE.Vector3(), []);
   const cameraLook = useRef<THREE.Vector3 | null>(null);
   const follow = useRef(0);
   const plume = useRef<THREE.Mesh>(null!);
+  const flash = useRef<THREE.Mesh>(null!);
+  // Seconds since touchdown, driving the crash flash and the tip-over fall.
+  const impact = useRef(0);
   const user = useOrbitInput("landing");
   const look = useMemo(() => new THREE.Vector3(), []);
   const offset = useMemo(() => new THREE.Vector3(), []);
@@ -976,9 +1115,32 @@ function LandingSite({
     const descent = descentAt(p);
     const height = (1 - descent) * 5;
     const landerX = (1 - descent) * -1.6;
-    lander.current.position.set(landerX, height, 0);
-    lander.current.rotation.set(0, -0.4 + descent * 0.35, (1 - descent) * 0.12);
-    plume.current.visible = descent < 1;
+    if (descent >= 1) impact.current += reduced ? 10 : Math.min(delta, 0.05);
+    else impact.current = 0;
+    // Crash: the engine is out before contact and the vehicle buckles into the
+    // regolith. Tip-over: the lander falls onto its side after touchdown.
+    const crashed = touchdown === "crash";
+    const fall =
+      crashed
+        ? 0.6 * smooth(0, 0.35, impact.current)
+        : touchdown === "tip_over"
+          ? 1.4 * smooth(0, 1.6, impact.current) ** 2
+          : 0;
+    const sink = crashed ? 0.45 * smooth(0, 0.35, impact.current) : 0;
+    lander.current.position.set(
+      landerX,
+      height + (mapping ? mapping.ground(0, 0) : 0) - sink,
+      0,
+    );
+    lander.current.rotation.set(0, -0.4 + descent * 0.35, (1 - descent) * 0.12 + fall);
+    plume.current.visible = crashed ? descent < 0.72 : descent < 1;
+    flash.current.visible = crashed && descent >= 1 && impact.current < 1.4;
+    if (flash.current.visible) {
+      const k = impact.current / 1.4;
+      flash.current.position.set(landerX, height + 0.3, 0);
+      flash.current.scale.setScalar(0.4 + k * 3.2);
+      (flash.current.material as THREE.MeshBasicMaterial).opacity = 0.85 * (1 - k);
+    }
     plume.current.position.set(landerX, height + 0.2, 0);
     plume.current.scale.set(
       1,
@@ -992,6 +1154,13 @@ function LandingSite({
     const driving = descent >= 1 && roverPath !== null;
     follow.current = THREE.MathUtils.clamp(
       follow.current + (driving ? 1 : -1) * Math.min(delta, 0.05) * 0.8,
+      0,
+      1,
+    );
+    // While the antenna scan plays, the camera rises for an overview.
+    const scanning = driving && mapping !== null && roverScan.current < SEARCH_END;
+    overview.current = THREE.MathUtils.clamp(
+      overview.current + (scanning ? 1 : -1) * Math.min(delta, 0.05) * 0.7,
       0,
       1,
     );
@@ -1009,15 +1178,17 @@ function LandingSite({
     );
     spherical.setFromVector3(offset);
     spherical.theta += user.current.yaw + settledTime.current * 0.06;
+    const rise = smooth(0, 1, overview.current);
     spherical.phi = THREE.MathUtils.clamp(
-      spherical.phi - user.current.pitch,
+      THREE.MathUtils.lerp(spherical.phi, 0.55, rise) - user.current.pitch,
       0.2,
       1.5,
     );
     spherical.radius *=
       (compact ? 1.25 : 1) *
       THREE.MathUtils.clamp(user.current.zoom, 0.35, 2.4) *
-      (1 - 0.25 * smooth(0, 1, follow.current));
+      (1 - 0.25 * smooth(0, 1, follow.current)) *
+      (1 + 1.6 * rise);
     camera.position.setFromSpherical(spherical).add(cameraLook.current);
     camera.lookAt(cameraLook.current);
   });
@@ -1035,10 +1206,10 @@ function LandingSite({
         color="#fff1dc"
         castShadow
         shadow-mapSize={[compact ? 1024 : 2048, compact ? 1024 : 2048]}
-        shadow-camera-left={-18}
-        shadow-camera-right={18}
-        shadow-camera-top={18}
-        shadow-camera-bottom={-18}
+        shadow-camera-left={mapping ? -30 : -18}
+        shadow-camera-right={mapping ? 30 : 18}
+        shadow-camera-top={mapping ? 30 : 18}
+        shadow-camera-bottom={mapping ? -30 : -18}
         shadow-normalBias={0.04}
         shadow-bias={-0.0001}
       />
@@ -1060,13 +1231,46 @@ function LandingSite({
           sizeAttenuation
         />
       </points>
-      <Terrain />
+      {roverScene && mapping ? (
+        <>
+          <DemTerrain scene={roverScene} mapping={mapping} />
+          <ScanOverlay
+            scene={roverScene}
+            mapping={mapping}
+            showHazards={showHazards}
+            showSearch={showSearch}
+            target={roverTarget}
+            scan={roverScan}
+          />
+        </>
+      ) : (
+        <Terrain />
+      )}
       <group ref={lander}>
         <Model path="/nasa/apollo.glb" size={2.3} grounded />
       </group>
       {roverPath && (
-        <Rover path={roverPath} drive={roverDrive} focus={roverFocus} />
+        <Rover
+          showRoutes={showRoutes}
+          path={roverPath}
+          alternatives={roverAlternatives}
+          drive={roverDrive}
+          focus={roverFocus}
+          scan={roverScan}
+          mapping={mapping}
+          reach={reach}
+        />
       )}
+      <mesh ref={flash} visible={false}>
+        <sphereGeometry args={[0.5, 24, 16]} />
+        <meshBasicMaterial
+          color="#ffb072"
+          transparent
+          opacity={0}
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
+      </mesh>
       <mesh ref={plume} rotation={[Math.PI, 0, 0]}>
         <coneGeometry args={[0.13, 0.65, 24]} />
         <meshBasicMaterial
@@ -1114,6 +1318,9 @@ function LaunchCloseup({
 }
 
 type SceneProps = {
+  candidates?: MissionCandidate[];
+  selectedCandidate?: string | null;
+  onCandidate?: (id: string) => void;
   lat: number;
   lon: number;
   sites: Preset[];
@@ -1158,10 +1365,24 @@ export default function MissionScene(
     onFailure: () => void;
     /** Dated Moon/Sun/Earth-rotation samples from /flight-ephemeris, if loaded. */
     flight?: FlightEphemeris | null;
+    analysisPreview?: AnalysisPreview | null;
+    analysisProgress?: number;
+    onAnalysisSelect?: (id:string)=>void;
     /** Backend surface route driven after touchdown, if any. */
     roverPath?: RoutePoint[] | null;
     /** Travelled share of the rover route, 0–1. */
     roverDrive?: number;
+    /** Antenna scan / A* playback progress, 0–1. */
+    roverScan?: number;
+    /** Backend DEM window and A* order for the route, if loaded. */
+    roverScene?: SurfaceScene | null;
+    roverTarget?: string;
+    roverAlternatives?: RoverState["alternatives"];
+    showHazards?: boolean;
+    showSearch?: boolean;
+    showRoutes?: boolean;
+    /** How the landing close-up ends, from the latest mission run. */
+    touchdown?: TouchdownOutcome;
   },
 ) {
   const {
@@ -1170,8 +1391,15 @@ export default function MissionScene(
     compact,
     onFailure,
     progressValue,
+    analysisPreview = null, analysisProgress = 0, onAnalysisSelect,
     roverPath = null,
     roverDrive = 0,
+    roverScan = 1,
+    roverScene = null,
+    roverTarget = "",
+    roverAlternatives,
+    showHazards = true, showSearch = true, showRoutes = true,
+    touchdown = "landed",
     flight = null,
     path,
     ...scene
@@ -1190,6 +1418,8 @@ export default function MissionScene(
   const progress = useRef(progressValue);
   const drive = useRef(roverDrive);
   drive.current = roverDrive;
+  const scan = useRef(roverScan);
+  scan.current = roverScan;
   const { t } = useTranslate();
   return (
     <Canvas
@@ -1203,14 +1433,20 @@ export default function MissionScene(
       <ContextGuard onFailure={onFailure} />
       <Invalidator
         deps={[
+          analysisPreview, analysisProgress,
           progressValue,
           scene.lat,
           scene.lon,
           scene.cameraMode,
           scene.condition,
+          scene.candidates,
+          scene.selectedCandidate,
           visible,
           roverPath,
           roverDrive,
+          roverScan,
+          roverScene,
+          touchdown,
         ]}
       />
       <ProgressEaser
@@ -1219,7 +1455,7 @@ export default function MissionScene(
         snap={!animate}
       />
       <Suspense fallback={null}>
-        {scene.cameraMode === "launch" ? (
+        {analysisPreview?.kind === "routes" && analysisPreview.terrain ? <RouteTerrainScene preview={analysisPreview} progress={analysisProgress} onSelect={id=>onAnalysisSelect?.(id)}/> : analysisPreview ? <AnalysisScene preview={analysisPreview} progress={analysisProgress} onSelect={id=>onAnalysisSelect?.(id)}/> : scene.cameraMode === "launch" ? (
           <LaunchCloseup
             progress={progress}
             reduced={scene.reduced}
@@ -1232,6 +1468,12 @@ export default function MissionScene(
             compact={compact}
             roverPath={roverPath}
             roverDrive={drive}
+            roverScan={scan}
+            roverScene={roverScene}
+            roverTarget={roverTarget}
+            roverAlternatives={roverAlternatives}
+            showHazards={showHazards} showSearch={showSearch} showRoutes={showRoutes}
+            touchdown={touchdown}
           />
         ) : (
           <System {...scene} view={view} progress={progress} />

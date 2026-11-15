@@ -1,0 +1,25 @@
+{
+  "branch": "ui/mission-control-usability",
+  "base": "36cf387",
+  "frontend": "TypeScript and Vite build passed; existing bundle-size advisory remains",
+  "backend": {
+    "command": "docker exec nasa-task4-backend-1 pytest -q",
+    "passed": 2057,
+    "warnings": 1,
+    "duration_s": 285.56,
+    "warning": "Starlette test client uses deprecated AnyIO BlockingPortal alias"
+  },
+  "runtime": {
+    "frontend": "http://localhost:5174/ HTTP 200",
+    "backend": "http://localhost:8001/health status ok"
+  },
+  "assets": "No model assets modified",
+  "visual_review": "Pending user review; no screenshots or frontend tests performed per repository instructions",
+  "main_merge": "Not performed; requires user visual review",
+  "main_integrated": "891dec1",
+  "post_integration": {
+    "frontend": "TypeScript + Vite passed",
+    "affected_backend_tests": "56 passed, 1 existing deprecation warning (Artemis regions and analysis API)",
+    "full_suite_scope": "2057 passed before integration; affected tests rerun after integration"
+  }
+}

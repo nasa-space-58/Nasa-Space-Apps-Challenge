@@ -52,7 +52,21 @@
       "awaitsDetail": "Choose a region and time to reveal the terrain, light and visibility.",
       "runExample": "Run the Malapert example",
       "addComparison": "Add comparison",
-      "footnote": "A horizon is a perspective, not a promise. Results describe the sampled terrain and observation window."
+      "footnote": "A horizon is a perspective, not a promise. Results describe the sampled terrain and observation window.",
+      "cards": {
+        "weather": {
+          "title": "Space weather",
+          "desc": "How solar storms and radiation risk affect the observation window."
+        },
+        "share": {
+          "title": "Share and export",
+          "desc": "Download CSV, chart or report; share a link or a scenario file."
+        },
+        "trace": {
+          "title": "Calculation details and limits",
+          "desc": "Data and assumptions behind the result, sources and model limits."
+        }
+      }
     },
     "playback": {
       "eyebrow": "OBSERVATION TIME",
@@ -95,7 +109,8 @@
       "descent": "Descent",
       "classroom": "Classroom",
       "campaign": "Campaign",
-      "recovery": "Self-healing"
+      "recovery": "Self-healing",
+      "missionRun": "Simulation"
     },
     "nav": {
       "skip": "Skip to mission control",
@@ -194,12 +209,46 @@
       "close": "Close sources",
       "eyebrow": "PROVENANCE",
       "title": "A view built on real data.",
-      "body": "NASA models illustrate the journey. The introductory crater terrain is original decorative geometry, not the selected location. The mission-control flight from Earth to the Moon is illustrative: Earth, the Moon and their distance are to scale, the spacecraft are enlarged and the Sun is shown closer at its true apparent size; it is not a computed trajectory. Scientific results use cached Horizons ephemerides and the verified LOLA terrain product.",
-      "lro": "LRO model",
-      "lola": "LOLA south-pole terrain",
-      "horizons": "Sun and Earth observer ephemerides",
+      "body": "NASA models illustrate the journey. The introductory crater terrain is original decorative geometry, not the selected location. In mission control, Earth, the Moon and their distance are to scale; the spacecraft are enlarged, the rover is not to scale with the terrain and the Sun is shown closer at its true apparent size. Once the dated ephemeris for the chosen landing time has loaded, the Moon's position, Earth's rotation and the Sun's direction follow JPL Horizons; the spacecraft path itself is illustrative, not a computed trajectory. Scientific results use cached Horizons ephemerides, the verified LOLA terrain product and the sources listed below.",
       "coordinate": "{name} coordinate source",
-      "disclaimer": "The introduction is an illustrative animation. Apollo is not shown as a historical south-pole mission. NASA does not endorse this application."
+      "groups": {
+        "models": "3-D models and textures",
+        "terrain": "Terrain and site coordinates",
+        "ephemeris": "Ephemerides, orbits and reference constants",
+        "mission": "Mission timeline and lander",
+        "communication": "Ground stations and space weather",
+        "quantum": "Quantum optimization"
+      },
+      "link": {
+        "license": "License",
+        "manual": "Manual",
+        "model": "Dynamical model",
+        "scales": "NOAA Space Weather Scales"
+      },
+      "use": {
+        "lro": "Orbiter model in the introduction and mission-control scenes.",
+        "apollo": "Lander model in the introduction, mission-control and analysis scenes.",
+        "mobileLauncher": "Decorative launch pad in the launch close-up.",
+        "rocket": "Three-stage launch vehicle in the launch close-up. Used under the free 1DesignTool library license.",
+        "rover": "Rover in the landing close-up. Changed from the original: mesh decimated and quantized, texture coordinates removed, colours replaced per part, wheels and dish animated.",
+        "moonKit": "Moon colour map and relief preview for the decorative globe; never used for elevation analysis.",
+        "blueMarble": "Earth texture in the mission-control scene (January 2004).",
+        "lola": "Elevation for terrain horizons, slopes, rover routes and terrain recovery.",
+        "lsdb": "Lunar reference radius and site coordinates.",
+        "siteCoordinate": "Observer location for this preset.",
+        "horizons": "Sun and Earth observer ephemerides for the analysis; Moon and Sun geocentric vectors for the flight scene.",
+        "astroPar": "Lunar gravitational parameter (GM) for descent dynamics.",
+        "iers": "Earth Rotation Angle for the flight scene.",
+        "periodicOrbits": "Earth–Moon L2 halo orbit catalog for relay selection.",
+        "apollo11Report": "Mission phase times for the flight timeline and lunar module mass at powered descent.",
+        "tnD6846": "Powered-descent gates, engine limits and delta-v reserves.",
+        "dpsEvaluation": "Descent engine specific impulse (309.7 s, Apollo 9 time-integrated average).",
+        "dsn": "Deep Space Network station coordinates and elevation limits.",
+        "swpc": "Solar flare and proton event probabilities, GOES X-ray and proton flux, active regions.",
+        "qaoa": "Algorithm used by the local quantum optimization experiments.",
+        "openQuantum": "One archived two-qubit hardware job (2026-11-14), shown only as recorded evidence."
+      },
+      "disclaimer": "The introduction is an illustrative animation. Apollo is not shown as a historical south-pole mission. Example campaigns and fault scenarios are team-made teaching cases, not NASA plans, DSN bookings or failure statistics. Results are not landing-safety, power, thermal or link certification. NASA and the other listed source owners do not endorse this application."
     }
   },
   "language": {
@@ -213,7 +262,8 @@
   "common": {
     "sun": "Sun",
     "earth": "Earth",
-    "terrain": "Terrain"
+    "terrain": "Terrain",
+    "advancedSettings": "Advanced settings"
   },
   "jobState": {
     "pending": "Waiting in queue",
@@ -481,7 +531,39 @@
       "craftMoon": "Craft–Moon (illustrative path)",
       "loading": "Fetching real Moon/Sun positions from JPL Horizons…",
       "failed": "Real positions unavailable; showing the fixed illustrative layout."
-    }
+    },
+    "steps": {
+      "plan": "Place & time",
+      "results": "Results",
+      "compare": "Compare & recommend",
+      "descent": "Landing & surface"
+    },
+    "learn": "Learn",
+    "advanced": "Advanced",
+    "advancedHint": "Planning and research tools for experts",
+    "menuTitle": "Mission steps",
+    "layers": "Layers",
+    "hazards": "Hazards",
+    "scanCoverage": "Scan coverage",
+    "roverRoutes": "Rover routes",
+    "landingCandidates": "Landing candidates",
+    "close": "Close",
+    "toggleFullscreen": "Toggle fullscreen",
+    "fullscreenIsUnavailableInThis": "Fullscreen is unavailable in this browser.",
+    "rover": "Rover",
+    "sceneDetails": "Scene details",
+    "flightDetails": "Flight details",
+    "surfaceOperations": "Surface operations",
+    "candidates": "Candidates",
+    "backToTask": "Back to task",
+    "routeLandingCandidates": "Route & landing candidates",
+    "showIn3d": "Show in 3D",
+    "linesAreIllustrativeApproachCorridors": "Lines are illustrative approach corridors. Scores and reasons come from the API; missing scores appear as —.",
+    "runRecommendationsOrDescentPlanning": "Run recommendations or descent planning to see route and landing candidates.",
+    "theVehicleWasLostAt": "The vehicle was lost at touchdown; no surface operations are possible.",
+    "surfaceOperationsBecomeAvailableAfter": "Surface operations become available after landing.",
+    "controls": "Controls",
+    "cleanView": "Clean view"
   },
   "missionPhases": {
     "launch": {
@@ -790,7 +872,31 @@
     },
     "pdiStart": "Powered descent starts {km} km uprange at {speed} m/s; {n} powered phases.",
     "touchdown": "Touchdown: {error} m from the site, vertical {vertical} m/s, horizontal {horizontal} m/s. Site {height} m above the 1737.4 km sphere.",
-    "assumptions": "Physical assumptions & sources"
+    "assumptions": "Physical assumptions & sources",
+    "more": {
+      "title": "More analyses",
+      "hint": "Uses the landing plan above. Open a heading to start.",
+      "risk": {
+        "title": "Risk and uncertainty",
+        "desc": "Shows how often the landing succeeds under uncertainty, from hundreds of simulations."
+      },
+      "backups": {
+        "title": "Backup landing sites",
+        "desc": "Finds safe alternative sites the lander can still reach mid-descent if the plan fails."
+      },
+      "twin": {
+        "title": "Digital twin",
+        "desc": "Compares what the lander's sensors believe with what really happens in fault scenarios."
+      },
+      "surface": {
+        "title": "After landing: surface routes",
+        "desc": "Plans rover routes to science targets that avoid steep slopes."
+      },
+      "terrainRecovery": {
+        "title": "Terrain-aware landing recovery",
+        "desc": "DEM-derived backup targets, faults and latency-aware replanning."
+      }
+    }
   },
   "recommendations": {
     "criterion": {
@@ -1393,7 +1499,8 @@
       "sample": "Last sampled point: {km} km · {utc}",
       "noSample": "No sampled point reached yet",
       "noAnalysis": "Run the analysis first for Sun/Earth status.",
-      "note": "The route is computed by the backend on the NASA LOLA 80 m DEM; the 3D terrain is illustrative, the route is real. Sun/Earth are evaluated only at sampled points."
+      "note": "The backend computes the route on NASA LOLA 80 m terrain. The 3-D ground is that real terrain window at true height proportions; the rover model is not to scale and the scan animation pace is display-only. Sun/Earth state is evaluated only at sampled points.",
+      "modelCredit": "3-D rover model: “Lunar Rover” by Versal (Sketchfab), CC BY 4.0; colours and motion added in this app."
     },
     "sun": {
       "full": "Fully sunlit",
@@ -1423,7 +1530,256 @@
       "forecast": "Forecast (daily max)",
       "acquired": "Acquired: {utc}",
       "note": "Details and limits are in the Solar activity panel under Results. The Moon has no magnetic field, so the S level matters for the surface crew."
+    },
+    "scan": {
+      "pulse": "Antenna scanning: measuring the slope of every cell…",
+      "search": "A* searching for the shortest safe path: {cells} cells examined",
+      "route": "Route found: it avoids the steep crater walls",
+      "done": "Scan complete: the rover drives the computed route",
+      "replay": "↻ Replay scan",
+      "legendOpen": "Passable (≤{deg}°)",
+      "legendSteep": "Too steep (>{deg}°)",
+      "legendSearched": "Examined by A*",
+      "legendRoute": "Chosen route",
+      "truncated": "Only the first part of the examined cells is shown.",
+      "deploy": "The rover rolls off the lander…"
+    },
+    "scanning": "Scanning",
+    "exploring": "Exploring",
+    "standby": "Standby",
+    "newCraterExplorationDemo": "New crater exploration · Demo",
+    "returnToApiRoutes": "Return to API routes",
+    "theApiDoesNotProvide": "The API does not provide a terrain scan map. 3D exploration uses the labelled demo planner on the visible craters, avoiding red areas.",
+    "demoAAndSampledCosts": "DEMO · A* and sampled costs on the scene’s crater terrain. Not quantum computation. Distances and times use illustrative scale.",
+    "goldSelectedRouteTealOther": "Gold: selected route · Teal: other calculated routes",
+    "antennaSweep": "Antenna sweep",
+    "targetReached": "Target reached",
+    "telemetryUplinkAnimation": "Telemetry uplink · animation",
+    "surfaceTraverse": "Surface traverse"
+  },
+  "risk": {
+    "label": "Landing risk",
+    "title": "Risk & uncertainty · Monte Carlo",
+    "runs": "Runs",
+    "seed": "Random seed",
+    "navigation": "Navigation error 1σ · m",
+    "terrain": "Terrain height error 1σ · m",
+    "thrust": "Thrust error 1σ · %",
+    "isp": "Specific impulse error 1σ · %",
+    "pdiDown": "PDI position error 1σ · m",
+    "pdiSpeed": "PDI speed error 1σ · m/s",
+    "azimuth": "Approach azimuth · °",
+    "run": "Run Monte Carlo ↗",
+    "running": "Flying {runs} descents…",
+    "help": "Uses the site, vehicle, orbit and reserve above. Same seed and inputs reproduce the same result. Error sizes are planning assumptions, not certified vehicle values.",
+    "requestFailed": "Request failed",
+    "verdict": "{rate} of {runs} simulated landings succeed",
+    "confidence": "95 % confidence {low}–{high} · seed {seed} · result {id}",
+    "mainDriver": "main driver of failures:",
+    "metrics": {
+      "ellipse": "3σ LANDING ELLIPSE",
+      "inside": "{share} of landings inside",
+      "steep": "STEEP TERRAIN IN ELLIPSE",
+      "notEvaluated": "not evaluated",
+      "cells": "{count} DEM cells > {limit}° · unknown {unknown}",
+      "noTerrain": "terrain not cached",
+      "fuel": "FUEL ABOVE RESERVE (P5)",
+      "median": "median {kg} kg"
+    },
+    "whyFail": "Why landings fail",
+    "noFailures": "No failures in this sample.",
+    "whichMatters": "Which uncertainty matters",
+    "association": "association {value}",
+    "nothingToExplain": "no failures to explain",
+    "off": "off",
+    "significant": "significant",
+    "barHelp": "Bar: rank correlation with failure. The tick marks the noise level 2/√runs; shorter bars are not distinguishable from chance.",
+    "propellantLeft": "Propellant left at touchdown",
+    "assumptions": "Monte Carlo model & assumptions",
+    "travel": "direction of travel",
+    "legend": {
+      "success": "successful touchdown",
+      "failure": "failed touchdown",
+      "ellipses": "target · dashed 1σ · solid 3σ ellipse"
+    },
+    "plotLabel": "Landing dispersion of {points} simulated touchdowns around the target, with 1-sigma and 3-sigma ellipses; {ok} of {runs} runs succeeded.",
+    "histogramLabel": "Propellant remaining at touchdown, from {min} to {max} kg.",
+    "sources": {
+      "thrust": "Engine thrust",
+      "isp": "Specific impulse",
+      "pdi_downrange": "PDI position",
+      "pdi_speed": "PDI speed",
+      "terrain_height": "Terrain height (DEM)",
+      "navigation_down": "Navigation · downrange",
+      "navigation_cross": "Navigation · crossrange"
+    },
+    "causes": {
+      "propellant_exhausted": "Propellant exhausted",
+      "propellant_reserve": "Reserve not kept",
+      "touchdown_position": "Missed guidance target",
+      "vertical_speed": "Hard landing (vertical speed)",
+      "horizontal_speed": "Sliding landing (horizontal speed)",
+      "hazard_slope": "Landed on steep terrain",
+      "hazard_unknown": "Landed on unknown terrain"
     }
+  },
+  "backups": {
+    "label": "Backup landing plans",
+    "title": "Alternative landing plans · backups",
+    "divertFrom": "Divert from",
+    "highGate": "High gate (≈2 km up)",
+    "lowGate": "Low gate (≈150 m up)",
+    "radius": "Search radius · m",
+    "count": "Backups",
+    "spacing": "Candidate spacing · m",
+    "separation": "Minimum separation · m",
+    "slope": "Maximum slope · °",
+    "run": "Find backup sites ↗",
+    "running": "Searching backups…",
+    "help": "Backups pass the terrain hard constraints and are checked for fuel, reserve, touchdown tolerance and engine thrust from the divert point.",
+    "verdict": "{reachable} of {count} backups reachable from the {gate}",
+    "gates": {
+      "high_gate": "high gate (start of approach)",
+      "low_gate": "low gate (start of terminal descent)"
+    },
+    "divertState": "Divert at {altitude} m altitude, {speed} m/s, {seconds} s before touchdown. Marked as backup: {marked}.",
+    "none": "none",
+    "primary": "Primary",
+    "plannedSite": "planned site",
+    "slopeShort": "slope",
+    "unknown": "unknown",
+    "toTouchdown": "{seconds} s to touchdown",
+    "hover": "hover {seconds} s",
+    "reachable": "Reachable",
+    "unreachable": "Not reachable",
+    "mark": "mark as backup",
+    "assumptions": "Backup model & assumptions",
+    "mapLabel": "Primary site at the centre and {count} backup sites; {reachable} are reachable. Details are in the table.",
+    "table": {
+      "caption": "Primary and backups, same metrics",
+      "site": "Site",
+      "safety": "Safety",
+      "divert": "Divert",
+      "fuel": "Fuel above reserve",
+      "status": "Status"
+    }
+  },
+  "twin": {
+    "label": "Descent digital twin",
+    "title": "Digital twin · what the lander knows vs what is true",
+    "scenario": "Fault scenario",
+    "presets": {
+      "nominal": "No fault",
+      "lost": "Navigation sensor lost at 450 s",
+      "thrust": "Engine −25 % at 520 s",
+      "leak": "700 kg propellant leak at 600 s",
+      "obstacle": "Boulder field on the target at 640 s"
+    },
+    "positionSigma": "Position measurement error 1σ · m",
+    "speedSigma": "Speed measurement error 1σ · m/s",
+    "thrustNoise": "Thrust noise 1σ · %",
+    "energy": "Battery energy · MJ",
+    "load": "Electrical load · W",
+    "run": "Fly the twin ↗",
+    "running": "Flying the twin…",
+    "help": "Guidance steers on its own noisy estimate, not the truth. The twin does not replan, so you see what a fault does to the original plan. All telemetry is simulated.",
+    "success": "Lands within tolerance",
+    "failure": "Landing fails",
+    "fromTarget": "{m} m from the target",
+    "planValid": "The original plan stayed valid.",
+    "planInvalid": "The original plan became invalid: {reasons}.",
+    "replay": "Replay ID {id}.",
+    "metrics": {
+      "versus": "VS. NO-FAULT FLIGHT",
+      "errorChange": "landing-point error change",
+      "propellant": "PROPELLANT",
+      "left": "{kg} kg left · reserve margin {margin} kg",
+      "navError": "NAVIGATION ERROR AT TOUCHDOWN",
+      "speeds": "vertical {vertical} m/s · horizontal {horizontal} m/s"
+    },
+    "log": {
+      "applied": "{event} applied",
+      "invalidated": "Plan invalidated — {reason}",
+      "noEffect": "No effect on the plan — {reason}",
+      "notReached": "{event} not reached before touchdown"
+    },
+    "events": {
+      "thrust_loss": "Engine thrust loss",
+      "sensor_degradation": "Navigation sensor change",
+      "propellant_leak": "Propellant leak",
+      "comm_outage": "Ground link outage",
+      "obstacle_detected": "Obstacle detected (synthetic)"
+    },
+    "chartLabel": "Navigation estimate error and its expected size over the descent, with fault times marked.",
+    "axis": "time since powered descent start · 0–{seconds} s",
+    "legend": {
+      "error": "actual estimate error (known only in simulation)",
+      "std": "expected error the vehicle believes"
+    },
+    "assumptions": "Twin model & assumptions"
+  },
+  "surfaceRoutes": {
+    "label": "Post-landing exploration",
+    "title": "After landing · surface routes to science targets",
+    "north": "N",
+    "target": "Target",
+    "bearing": "Bearing · °",
+    "distance": "Distance · m",
+    "remove": "Remove",
+    "nameLabel": "Target {n} name",
+    "bearingLabel": "Target {n} bearing",
+    "distanceLabel": "Target {n} distance",
+    "removeLabel": "Remove target {n}",
+    "add": "Add target",
+    "defaults": {
+      "north": "North rim",
+      "east": "East slope",
+      "south": "South"
+    },
+    "slope": "Mobility slope limit · °",
+    "speed": "Traverse speed · m/s",
+    "useSky": "Check sunlight & Earth with the latest site analysis",
+    "needAnalysis": "Run a site analysis in Mission control to check sunlight & Earth",
+    "observerHeight": "Observer height · m",
+    "waypoints": "Checked points per route",
+    "run": "Plan routes ↗",
+    "running": "Routing…",
+    "help": "Bearings are clockwise from north. The slope limit and speed are planning assumptions, not a specific rover. With sunlight checks, each sampled point gets its own terrain horizon (about 2 s per point).",
+    "metrics": {
+      "efficiency": "MISSION EFFICIENCY",
+      "efficiencyHelp": "0–1 · reachability, directness",
+      "efficiencyWithSun": "0–1 · reachability, directness, sunlight",
+      "reachable": "TARGETS REACHABLE",
+      "directness": "directness {pct} %",
+      "sunlit": "SUNLIT ROUTE POINTS",
+      "departure": "departure {utc} UTC",
+      "noAnalysis": "no site analysis"
+    },
+    "notChecked": "not checked",
+    "legend": {
+      "sunlit": "sunlit point",
+      "shadow": "point in shadow",
+      "unknown": "unknown / not checked"
+    },
+    "table": {
+      "caption": "Routes from the landing site",
+      "route": "Route",
+      "terrain": "Terrain",
+      "sky": "Sun / Earth"
+    },
+    "detour": "detour",
+    "maxSlope": "max {deg}°",
+    "climb": "climb {m} m",
+    "sunlitPoints": "{lit}/{total} points sunlit",
+    "earthHidden": "Earth hidden at {hidden}/{total}",
+    "sun": {
+      "full": "sunlit",
+      "partial": "partly sunlit",
+      "dark": "in shadow",
+      "unknown": "unknown"
+    },
+    "assumptions": "Route model & assumptions",
+    "mapLabel": "Routes from the landing site to {count} targets, north up; details are in the table."
   },
   "unified": {
     "eyebrow": "One session · Three workspaces",
@@ -1516,6 +1872,535 @@
     "completion": "Full-plan completion",
     "source": "Accepted plan source",
     "quantumCompleted": "Quantum proposal + classical completion"
+  },
+  "assistant": {
+    "launcher": "Ask the Navigator",
+    "title": "Navigator assistant",
+    "close": "Close the assistant",
+    "connecting": "Establishing link…",
+    "offline": "Offline",
+    "statusFailed": "Could not reach the assistant service.",
+    "offlineTitle": "Assistant is off",
+    "offlineBody": "The Q&A assistant is optional and currently switched off on this server. Every analysis still works without it.",
+    "intro": "Ask about your landing site, a date comparison or how the navigator works. Answers use computed results and project documentation.",
+    "tokens": "{count} tokens",
+    "thinking": "Looking through the mission data…",
+    "placeholder": "Ask the navigator",
+    "placeholderOff": "Assistant unavailable",
+    "send": "Send",
+    "askFailed": "The assistant could not answer. Please try again.",
+    "disclaimer": "The assistant can make mistakes. Numbers come from computed results; this is not flight certification.",
+    "suggest": {
+      "explainSite": "Explain this site's sunlight and Earth visibility in plain language.",
+      "compare": "How do my two scenarios differ, and which is better for power?",
+      "darkness": "How long is the longest darkness, and why does it matter?",
+      "limits": "What are the main limitations of this analysis?",
+      "horizon": "How is the terrain horizon computed?",
+      "sites": "Which landing sites can I analyze?",
+      "data": "Which NASA data sources does the navigator use?"
+    },
+    "greeting": "Hello, what would you like to know?",
+    "onlineDocs": "Online · documentation",
+    "onlineLinked": "Online · {count} linked results",
+    "sourcesToggle": "Sources ({count})",
+    "kindDoc": "Doc",
+    "kindApi": "Result"
+  },
+  "siteNames": {
+    "mons-mouton-feature-center": {
+      "name": "Mons Mouton — feature center",
+      "short": "MOUTON"
+    },
+    "peak-near-cabeus-b": {
+      "name": "Peak near Cabeus B — LROC mosaic center",
+      "short": "CABEUS B"
+    },
+    "haworth": {
+      "name": "Haworth — NASA region center",
+      "short": "HAWORTH"
+    },
+    "mons-mouton-plateau": {
+      "name": "Mons Mouton Plateau — LROC mosaic center",
+      "short": "PLATEAU"
+    },
+    "nobile-rim-1-r06": {
+      "name": "Nobile Rim 1 — R06",
+      "short": "NOBILE 1"
+    },
+    "nobile-rim-2-dm2": {
+      "name": "Nobile Rim 2 — DM2",
+      "short": "NOBILE 2"
+    },
+    "de-gerlache-rim-2-sl2": {
+      "name": "de Gerlache Rim 2 — SL2",
+      "short": "DE GERLACHE 2"
+    },
+    "slater-plain-crater-anchor": {
+      "name": "Slater Plain — Slater crater anchor (not region center)",
+      "short": "SLATER"
+    },
+    "malapert-massif-r23": {
+      "name": "Malapert Massif — R23",
+      "short": "R23"
+    }
+  },
+  "workspace": {
+    "backScene": "Back to mission",
+    "stale": "Settings changed. This result uses previous settings; calculate again.",
+    "shown": "Inspect the calculated result in the 3D view.",
+    "show3d": "Show in 3D",
+    "selected": "Selected",
+    "localFrame": "Local target coordinates at uniform scale. The grid is not terrain. Drag to orbit.",
+    "dots": "Green: feasible · red: rejected · white ring: original target",
+    "playResult": "Play or pause calculated flight",
+    "resultTime": "Calculated flight progress",
+    "advanced": "Orbit and fuel settings",
+    "source": "Original technical explanation",
+    "technical": "Technical details",
+    "events": "Event times",
+    "kind": {
+      "descent": "Calculated descent",
+      "risk": "Landing distribution",
+      "backups": "Backup landing sites",
+      "twin": "Fault replay comparison",
+      "recovery": "Original and replanned flight",
+      "surface": "Calculated surface routes",
+      "routes": "Computed mission routes"
+    },
+    "line": {
+      "planned": "Descent route",
+      "truth": "Simulation truth",
+      "estimate": "Sensor estimate",
+      "original": "Original plan",
+      "replanned": "Replanned route",
+      "PRIMARY": "Primary plan",
+      "flown": "Flown run"
+    },
+    "routeTerrain": "Real LOLA 80 m terrain around the target at true scale (no height exaggeration). Lines: calculated routes from the divert point; poles: landing points; crosses: cells rejected by the terrain check. Drag to orbit, scroll to zoom."
+  },
+  "missionRun": {
+    "title": "Mission simulation",
+    "intro": "The mission passes physics checks in order: powered descent, slope at the touchdown point, surface battery and Earth contact. The outcome is computed from the chosen site, date, vehicle and faults, not rolled at random.",
+    "needsAnalysis": "Complete a site and date analysis before simulating.",
+    "catalogError": "The fault catalog could not be loaded.",
+    "invalidInput": "Invalid input.",
+    "scenarioHeading": "Fault scenario",
+    "noFault": "No fault",
+    "run": "Simulate",
+    "running": "Computing…",
+    "customHeading": "Build your own fault scenario",
+    "customIntro": "Add faults with their timing. Descent faults count from powered descent initiation (PDI), surface faults from touchdown.",
+    "removeFault": "Remove fault",
+    "faultKind": "Fault type",
+    "addFault": "Add fault",
+    "namePlaceholder": "Scenario name",
+    "save": "Save",
+    "runCustom": "Simulate this scenario",
+    "edit": "Edit",
+    "delete": "Delete",
+    "vehicleHeading": "Vehicle and mission rules",
+    "customScenario": "Custom scenario",
+    "watch": "Watch in scene",
+    "altitudeChart": "Descent: altitude / time",
+    "batteryChart": "Battery energy",
+    "timeline": "Event timeline",
+    "disclaimer": "Deterministic educational simulation. Not landing-safety certification, a thermal/power qualification, a DSN booking or a link budget; power-system values are illustrative.",
+    "phase": {
+      "descent": "Descent",
+      "landing": "Landing time",
+      "surface": "Surface"
+    },
+    "outcome": {
+      "success": "Mission successful",
+      "success_with_warnings": "Successful, with warnings",
+      "failure": "Mission failed",
+      "inconclusive": "Inconclusive"
+    },
+    "status": {
+      "pass": "passed",
+      "warn": "warning",
+      "fail": "failed",
+      "unknown": "unknown",
+      "not_reached": "not reached"
+    },
+    "gates": {
+      "descent": "Powered descent",
+      "touchdown_terrain": "Touchdown terrain",
+      "power": "Surface power",
+      "communication": "Earth contact"
+    },
+    "scenarios": {
+      "nominal": "No fault",
+      "engine-thrust-loss": "Engine thrust loss",
+      "small-propellant-leak": "Small propellant leak",
+      "marginal-propellant-leak": "Marginal leak",
+      "major-propellant-leak": "Major propellant leak",
+      "engine-efficiency-loss": "Engine efficiency loss",
+      "navigation-drift": "Navigation drift",
+      "wave-off": "Wave off one orbit",
+      "battery-cell-loss": "Battery cell loss",
+      "stuck-heater": "Stuck heater",
+      "dusty-panels": "Dusty panels",
+      "transmitter-fault": "Transmitter fault",
+      "cascade": "Cascading faults"
+    },
+    "faults": {
+      "engine_thrust_loss": "Thrust loss",
+      "propellant_leak": "Propellant leak",
+      "isp_degradation": "Specific impulse loss",
+      "navigation_bias": "Navigation error",
+      "landing_delay": "Landing delay",
+      "battery_capacity_loss": "Battery capacity loss",
+      "power_load_increase": "Extra power load",
+      "solar_array_degradation": "Solar array degradation",
+      "communication_outage": "Communication outage"
+    },
+    "fields": {
+      "start_after_pdi_s": "Start after PDI",
+      "thrust_fraction": "Remaining thrust fraction",
+      "leak_rate_kg_s": "Leak rate",
+      "duration_s": "Duration",
+      "isp_fraction": "Remaining Isp fraction",
+      "offset_m": "Offset distance",
+      "bearing_deg": "Offset bearing (from north)",
+      "delay_h": "Delay",
+      "start_after_landing_h": "Start after landing",
+      "capacity_fraction_lost": "Capacity fraction lost",
+      "duration_h": "Duration",
+      "extra_load_w": "Extra load",
+      "output_fraction": "Remaining array output",
+      "battery_capacity_wh": "Battery capacity",
+      "solar_array_power_w": "Array power (full Sun)",
+      "base_load_w": "Base load",
+      "first_contact_deadline_h": "First-contact deadline",
+      "max_contact_gap_h": "Longest allowed silence"
+    },
+    "reason": {
+      "descent": {
+        "pass": "Soft contact at {v} m/s vertical; {margin} kg propellant left (fault-free: {nominal} kg).",
+        "crash": "Crash: ground contact at {v} m/s vertical and {h} m/s horizontal exceeded the landing-gear limits.",
+        "no_contact": "The vehicle did not reach the surface within the bounded descent.",
+        "hard_landing": "Hard landing: {v} m/s vertical, {h} m/s horizontal; within the structural limits.",
+        "propellant_exhausted": "Propellant ran out {altitude} m above the surface; the vehicle landed without reserve.",
+        "target_miss": "Touched down {offset} m from the target; {margin} kg propellant left."
+      },
+      "touchdown_terrain": {
+        "pass": "Slope at the touchdown point {slope}°, limit {limit}°.",
+        "tip_over": "Tip-over: the touchdown slope {slope}° exceeds the {limit}° limit.",
+        "steep_terrain_nearby": "The touchdown point is safe ({slope}°) but the landing area reaches {area}°.",
+        "landing_area_unknown": "The touchdown point is safe ({slope}°); part of the landing area has no slope data.",
+        "terrain_unknown": "The DEM has no slope at the touchdown point.",
+        "outside_coverage": "The touchdown point is outside terrain coverage."
+      },
+      "power": {
+        "pass": "The battery stayed above zero for the whole mission (minimum {energy} Wh).",
+        "battery_depleted": "Battery depleted: solar generation could not cover the loads.",
+        "sunlight_unknown": "Battery survival depends on sunlight intervals the analysis could not determine."
+      },
+      "communication": {
+        "pass": "Earth-contact rules held (longest gap {gap} h).",
+        "first_contact_deadline": "Earth was not visible within {deadline} h of touchdown; the landing could not be confirmed.",
+        "contact_gap": "No Earth contact for more than {maxgap} h; the mission is declared lost.",
+        "earth_visibility_unknown": "Contact depends on Earth visibility the analysis could not determine."
+      }
+    },
+    "events": {
+      "pdi": "Powered descent initiation (PDI)",
+      "fault_activated": "Fault started: {fault}",
+      "propellant_exhausted": "Propellant exhausted",
+      "contact": "Ground contact",
+      "schedule_end_airborne": "Guidance ended, still airborne",
+      "no_contact": "Surface not reached",
+      "tip_over": "Vehicle tipped over",
+      "battery_depleted": "Battery depleted",
+      "first_contact_deadline": "First-contact deadline passed",
+      "contact_gap": "Contact-gap limit exceeded",
+      "window_end": "End of the analysis window",
+      "crash": "Crash",
+      "nominal_plan_infeasible": "Nominal descent plan infeasible",
+      "first_contact": "First Earth contact",
+      "fault_cleared": "Fault ended: {fault}"
+    },
+    "scene": {
+      "crash": "Crash",
+      "tip_over": "Tipped over"
+    },
+    "routes": {
+      "heading": "Computed landing routes",
+      "intro": "All routes from the {gate} divert point: {primary} primary, {backup} backup, {rejected} rejected. Select a route here or its end point in the 3D view.",
+      "divert": {
+        "high_gate": "high gate",
+        "low_gate": "low gate"
+      },
+      "show3d": "Show routes in 3D",
+      "pick": "Select a route to see its metrics and why it was chosen or rejected.",
+      "terrainOnly": "terrain check only",
+      "notFlown": "This cell failed the terrain check, so no descent was flown to it.",
+      "error": "The route set could not be computed.",
+      "unavailable": "Routes are unavailable for this analysis: {detail}",
+      "disclaimer": "Pre-flight route set for the unfaulted vehicle on the 80 m DEM; the run's faults are not applied to it. Not landing-safety certification.",
+      "metricsHeading": "Metrics",
+      "legend": {
+        "primary": "Primary plan",
+        "backup": "Backup plan",
+        "rejected": "Rejected (dashed)",
+        "flown": "Flown run"
+      },
+      "role": {
+        "primary": "Primary plan",
+        "backup": "Backup #{rank}",
+        "rejected": "Rejected {id}"
+      },
+      "why": {
+        "primary": "Why this is the primary plan",
+        "backup": "Why it is a backup, not the primary",
+        "rejected": "Why it was rejected"
+      },
+      "metric": {
+        "distance_m": "Distance from target",
+        "safety_score": "R3 safety score",
+        "max_landing_slope_deg": "Landing-area slope",
+        "hazard_distance_m": "Nearest steep terrain",
+        "divert_delta_v_mps": "Extra divert delta-v",
+        "propellant_remaining_kg": "Propellant at touchdown",
+        "reserve_margin_kg": "Margin above reserve",
+        "hover_margin_s": "Hover margin",
+        "time_to_touchdown_s": "Time to touchdown",
+        "touchdown_position_error_m": "Touchdown position error",
+        "touchdown_vertical_speed_mps": "Touchdown vertical speed",
+        "touchdown_horizontal_speed_mps": "Touchdown horizontal speed"
+      },
+      "reason": {
+        "planned_target": "Planned landing target of the analysis; reachable from the divert point with {value} kg above the propellant reserve.",
+        "planned_target_unreachable": "Planned landing target of the analysis, but not reachable from the divert point with this vehicle.",
+        "reachable": "Reachable from the divert point with {value} kg above the propellant reserve and within the touchdown tolerances.",
+        "backup_rank": "Backup {value} of {limit}, ranked by R3 safety score ({score}) and then distance.",
+        "not_planned_target": "Not the planned target: it is {value} m away and the divert needs {dv} m/s extra delta-v.",
+        "propellant": "The divert needs {value} kg more propellant than is available.",
+        "reserve": "Leaves {value} kg of propellant at touchdown; the reserve needs {limit} kg.",
+        "thrust": "In-plane plus lateral acceleration needs {pct} % of maximum thrust.",
+        "thrust_window": "The engine stays at full throttle for the whole divert, so no thrust is left for the {value} m lateral move.",
+        "touchdown_tolerance": "Touchdown outside tolerance (position error {value} m, limit {limit} m).",
+        "slope": "Landing-area slope {value}° exceeds the {limit}° limit (tip-over risk).",
+        "unknown_terrain": "{pct} % of the landing area has unknown slope; unknown terrain is never treated as flat."
+      }
+    },
+    "limits": {
+      "earth_never_visible": "Earth is never visible in this window; every landing, including the fault-free one, fails on \"no first contact\".",
+      "fault_not_reached": "The lander never operated on the surface, so these faults never activated: {faults}.",
+      "fault_after_window": "These faults start after the analysis window ends and have no effect: {faults}.",
+      "fault_after_mission_end": "These faults start after the verdict; their effect appears only in the \"on its own\" section below: {faults}.",
+      "fault_exceeds_window": "These faults are still active when the window ends; a longer window shows their full effect: {faults}.",
+      "hint": "To see the differences, choose a 3- or 7-day window or a date when Earth is visible."
+    },
+    "delta": {
+      "heading": "Difference from the fault-free run",
+      "propellant": "Propellant left",
+      "offset": "Touchdown offset",
+      "delay": "Landing delay",
+      "energy": "Lowest battery",
+      "contact": "First-contact shift",
+      "none": "n/a",
+      "batteryDied": "The battery runs out at {at} UTC; it does not in the fault-free run.",
+      "batteryDiedBoth": "The battery runs out at {at} UTC; in the fault-free run at {base} UTC."
+    },
+    "outlook": {
+      "heading": "The lander on its own, without contact",
+      "intro": "The verdict is given at the first failure. This list shows what the lander would go through if it kept operating without contact until the window end; it does not change the verdict.",
+      "verdictMarker": "The dashed red line is the verdict time; after it the lander continues on its own.",
+      "survived": "Window end: the lander is still running"
+    },
+    "highlight": {
+      "battery": "Battery runs out {h} h after landing",
+      "offset": "Landed {m} m off target",
+      "fuel": "Propellant {kg} kg",
+      "energy": "Lowest battery {wh} Wh",
+      "contact": "First contact {h} h later",
+      "delay": "Landing delayed {h} h"
+    }
+  },
+  "liveResults": {
+    "nowEyebrow": "AT THIS MOMENT",
+    "endEyebrow": "END OF THE WINDOW",
+    "speed": "Playback speed",
+    "soFar": "SO FAR",
+    "final": "FINAL",
+    "remaining": "Stays like this for {hours} more",
+    "untilEnd": "Stays like this until the end of the window",
+    "elevation": "Elevation {elevation}° · terrain horizon {horizon}°",
+    "noElevation": "No sample at this moment",
+    "state": {
+      "sun": {
+        "visible": "Sun visible",
+        "blocked": "Sun hidden by terrain",
+        "unknown": "Sun uncertain"
+      },
+      "earth": {
+        "visible": "Earth visible",
+        "blocked": "Earth hidden by terrain",
+        "unknown": "Earth uncertain"
+      }
+    },
+    "situation": {
+      "both": {
+        "title": "Sun and Earth are both visible",
+        "detail": "Solar panels can charge and a direct link to Earth is geometrically possible."
+      },
+      "sun_only": {
+        "title": "Sun visible, Earth hidden",
+        "detail": "Solar panels can charge, but there is no direct line of sight to Earth: a relay or waiting is needed for contact."
+      },
+      "earth_only": {
+        "title": "Earth visible, Sun hidden",
+        "detail": "Direct Earth contact is geometrically possible, but the site is in shadow and runs on batteries."
+      },
+      "neither": {
+        "title": "Neither Sun nor Earth is visible",
+        "detail": "Shadow and no direct Earth line of sight: batteries only and no direct contact."
+      },
+      "unknown": {
+        "title": "Not enough data at this moment",
+        "detail": "At least one body is too close to the terrain horizon or lacks data to classify."
+      }
+    },
+    "ofElapsed": "{percent} of the time elapsed · window total {total}",
+    "sunsetsSoFar": "Sunsets so far: {count}",
+    "jumpEnd": "Skip to the final results",
+    "summaryTitle": "FINAL RESULTS",
+    "summaryWindow": "whole {hours} window",
+    "joint": {
+      "both": "Sun + Earth",
+      "sun_only": "Sun only",
+      "earth_only": "Earth only",
+      "neither": "Neither",
+      "unknown": "Uncertain"
+    },
+    "facts": {
+      "longestSun": "Longest continuous sunlight",
+      "longestEarthGap": "Longest Earth blackout",
+      "sunsets": "Sunsets in window",
+      "earthsets": "Earthsets in window",
+      "unknown": "Uncertain time (Sun + Earth)"
+    },
+    "summaryNote": "Durations come from the analysed, terrain-relative visibility intervals. Geometric visibility is not a power, thermal or radio-link guarantee."
+  },
+  "savedLibrary": {
+    "title": "SAVED RESULTS",
+    "count": "{n} saved",
+    "nameLabel": "Result name",
+    "save": "Save result",
+    "update": "Update saved result",
+    "savedMessage": "Saved in this browser. The analysis itself stays on the server.",
+    "unavailable": "This saved analysis could not be loaded from the server.",
+    "pickHelp": "Tick two results to compare them side by side.",
+    "pick": "Select {name} for comparison",
+    "ok": "OK",
+    "shown": "SHOWN",
+    "dark": "Longest dark",
+    "open": "Open",
+    "compareWithShown": "Compare with shown",
+    "rename": "Rename",
+    "delete": "Delete",
+    "confirmDelete": "Remove \"{name}\" from saved results?",
+    "comparePicked": "Compare selected ({n}/2)",
+    "bestNote": "Highlighted values are the best among saved results (most sunlight, most Earth visibility, shortest darkness).",
+    "empty": "No saved results yet. Save the shown analysis to build your shortlist.",
+    "comparisons": "Saved comparisons"
+  },
+  "comparisonLive": {
+    "title": "WHO SEES WHAT NOW",
+    "endTitle": "AT THE END OF BOTH WINDOWS",
+    "differs": "The scenarios differ at this moment",
+    "same": "Both scenarios see the same",
+    "sunLead": {
+      "A": "A has collected more sunlight so far.",
+      "B": "B has collected more sunlight so far.",
+      "tie": "Sunlight so far is equal."
+    },
+    "earthLead": {
+      "A": "A has had Earth in view longer.",
+      "B": "B has had Earth in view longer.",
+      "tie": "Earth visibility so far is equal."
+    },
+    "pickSaved": "Or choose B from saved results",
+    "pickSavedNone": "— choose a saved result —",
+    "tie": "EQUAL",
+    "better": "{label} BETTER",
+    "verdictEyebrow": "VERDICT",
+    "verdictTie": "Neither scenario is better on all three key metrics",
+    "verdictWinner": "Scenario {label} is better on {wins} of {total} key metrics",
+    "verdictNote": "Key metrics: total sunlight, longest darkness and Earth visibility over the whole window.",
+    "saveName": "Comparison name",
+    "save": "Save comparison",
+    "update": "Update saved comparison",
+    "savedMessage": "Comparison saved. Reopen it from Saved results."
+  },
+  "splitSim": {
+    "label": "Split A/B simulator",
+    "paneLabel": "Local sky of scenario {label}",
+    "single": "Single scene",
+    "split": "Split A/B view",
+    "fullscreen": "Toggle fullscreen",
+    "noFullscreen": "Fullscreen is unavailable in this browser.",
+    "speed": "Playback speed",
+    "soFar": "so far",
+    "noScene": "3D view unavailable; the readout below still follows the cursor.",
+    "note": "Each side plays its own window from its own start. Terrain horizon and Sun/Earth positions are backend samples; all elevation angles are drawn ×{factor} so low polar angles stay readable. Illustration, not a rendering of the DEM.",
+    "hint": "The 3D view is split: A and B each play their own day in sync with this cursor."
+  },
+  "terrainRecovery": {
+    "abortRequiredManeuverNotModeled": "✕ Abort required · maneuver not modeled",
+    "landingChecksPassed": "✓ Landing checks passed",
+    "landingFails": "✕ Landing fails",
+    "originalTarget": "Original target. ",
+    "fromTarget": "from target",
+    "downTerrainScore": "down · terrain score",
+    "originalTarget2": "original target",
+    "newTarget": "new target",
+    "downrange": "downrange",
+    "altitude": "altitude",
+    "originalPlan": "original plan",
+    "withRecovery": "with recovery",
+    "directionOfTravel": "direction of travel",
+    "reachableBackup": "reachable backup",
+    "rejected": "rejected",
+    "chosenTargetShadedSimulatedObstacle": "chosen target · shaded: simulated obstacle",
+    "terrainAwareLandingRecovery": "Terrain-aware landing recovery",
+    "classicalRetargetingOnTheReal": "Classical retargeting on the real DEM. Faults and obstacles are simulated; this experiment does not replace the hybrid mission plan. Simulated flight advances during solver latency.",
+    "faultScenario": "Fault scenario",
+    "seed": "Seed",
+    "solverLatencyS": "Solver latency · s",
+    "flyingAndReplanning": "Flying and replanning…",
+    "compareRecoveryFlight": "Compare recovery flight ↗",
+    "theSameFaultsAreReplayed": "The same faults are replayed with the original plan and with replanning. Retargeting candidates are independently checked from simulation truth. This is not flight safety certification.",
+    "originalPlan2": "ORIGINAL PLAN",
+    "withRecovery2": "WITH RECOVERY",
+    "decisionLogSelectADecision": "Decision log · select a decision for the map",
+    "trigger": "Trigger",
+    "optionsEvaluated": "options evaluated",
+    "safetyMargin": "safety margin",
+    "appliedAt": "applied at",
+    "validationFromTrueState": "Validation from true state",
+    "passed": "✓ passed",
+    "failed": "✕ failed",
+    "allEvaluatedTargets": "All evaluated targets",
+    "feasible": "Feasible",
+    "rejected2": "Rejected",
+    "reserveMargin": "reserve margin",
+    "terrainScore": "terrain score",
+    "noEventInvalidatedThePlan": "No event invalidated the plan.",
+    "reachableBackupsOverTime": "Reachable backups over time",
+    "recoveryModelAssumptions": "Recovery model & assumptions",
+    "replanningDeadlineFromPoweredDescent": "Replanning deadline from powered descent start:",
+    "targetMoved": "Target moved {m} m. ",
+    "actions": {
+      "continue": "Continue — plan re-validated",
+      "retarget": "Retarget to a backup",
+      "abort_required": "Abort required (not simulated)",
+      "budget_exhausted": "Budget exhausted — kept current plan",
+      "no_time_to_replan": "Too late to replan",
+      "stale_result_rejected": "Stale result rejected"
+    }
   },
   "resilience": {
     "title": "Mission resilience",

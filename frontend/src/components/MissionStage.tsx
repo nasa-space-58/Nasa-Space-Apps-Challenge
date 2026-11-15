@@ -1,3 +1,4 @@
+import { useAnalysisView } from "../analysisView";
 import {
   Component,
   lazy,
@@ -10,10 +11,12 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
+import { candidateColor, type MissionCandidate } from "../missionCandidates";
+import "./mission-candidates.css";
 import PolarMap from "./PolarMap";
 import SurfaceOps from "./SurfaceOps";
 import "./flight-readout.css";
-import type { RoutePoint } from "./Rover";
+import type { RoverState } from "./Rover";
 import type { Preset } from "../types";
 import {
   COVERAGE_MAX_LATITUDE_DEG,
@@ -29,6 +32,10 @@ import {
 } from "../missionPath";
 import type { CameraMode, CameraView, SiteCondition } from "./MissionScene";
 import { useTranslate, type Translate } from "../i18n";
+import { runHighlights, touchdownOutcome, useMissionRun } from "../missionRunStore";
+import "./mission-run.css";
+import SplitSimulator from "./SplitSimulator";
+import { useComparisonPlayback } from "../comparisonPlayback";
 
 const MissionScene = lazy(() => import("./MissionScene"));
 /** Wall-clock length of one illustrative flight playback. */
@@ -103,7 +110,18 @@ const PANEL_MAX_SHARE = 0.75;
 const PANEL_KEY_STEP_PX = 32;
 const PANEL_WIDTH_STORAGE_KEY = "lunar-panel-width-px";
 
-export type StageModule = { id: string; label: string; content: ReactNode };
+/**
+ * A mission-control module. `group` places it in one of the four numbered steps
+ * ("results", "compare", "descent"), under "Learn" or in the "Advanced" menu.
+ */
+export type StageModule = {
+  id: string;
+  label: string;
+  content: ReactNode;
+  group: "results" | "compare" | "descent" | "learn" | "advanced";
+};
+/** The numbered steps of mission control, in order. */
+const STEP_GROUPS = ["plan", "results", "compare", "descent"] as const;
 
 const clampPanelWidth = (width_px: number, container_px: number) =>
   Math.round(
@@ -135,6 +153,7 @@ export default function MissionStage({
   lat,
   lon,
   sites,
+  candidates = [],
   busy,
   webgl,
   reduced,
@@ -148,6 +167,7 @@ export default function MissionStage({
   onSelect,
   onPreset,
   onSceneFailure,
+  onArrived,
   timeline,
   status,
   modules,
@@ -155,6 +175,7 @@ export default function MissionStage({
   onModuleChange,
   children,
 }: {
+  candidates?: MissionCandidate[];
   lat: number;
   lon: number;
   sites: Preset[];
@@ -173,6 +194,8 @@ export default function MissionStage({
   onSelect: (latitude_deg: number, longitude_deg_east: number) => void;
   onPreset: (site: Preset) => void;
   onSceneFailure: () => void;
+  /** Called once each time the flight reaches a successful touchdown. */
+  onArrived?: () => void;
   /** Rendered directly below the 3D viewport, e.g. the start-date strip. */
   timeline?: ReactNode;
   /** Short connection/job state shown in the panel header. */
@@ -184,7 +207,38 @@ export default function MissionStage({
   /** Content of the "Plan" tab, above the flight simulation controls. */
   children: ReactNode;
 }) {
-  const { t, locale } = useTranslate();
+  const { t, tOr, locale } = useTranslate();
+  const [inspector, setInspector] = useState<"flight" | "surface" | "candidates" | null>(null);
+  const [cleanView, setCleanView] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  const navigate = (id: string) => { setInspector(null); onModuleChange(id); };
+  const inspect = (view: "flight" | "surface" | "candidates") => { setInspector(view); setPanelOpen(true); };
+  useEffect(() => {
+    const sync = () => setFullscreen(document.fullscreenElement === stageRef.current);
+    document.addEventListener("fullscreenchange", sync);
+    return () => document.removeEventListener("fullscreenchange", sync);
+  }, []);
+  const [showHazards, setShowHazards] = useState(true);
+  const [showSearch, setShowSearch] = useState(true);
+  const [showRoutes, setShowRoutes] = useState(true);
+  const [layersOpen, setLayersOpen] = useState(false);
+  const [showCandidates, setShowCandidates] = useState(true);
+  const {preview,setPreview,candidateId,setCandidateId} = useAnalysisView();
+  const comparisonPlayback = useComparisonPlayback();
+  const [singleScene, setSingleScene] = useState(false);
+  const canSplit = !!comparisonPlayback && activeModule === "comparison" && !inspector && !preview;
+  const split = canSplit && !singleScene;
+  useEffect(() => setSingleScene(false), [comparisonPlayback?.aId, comparisonPlayback?.bId]);
+  const [previewProgress,setPreviewProgress] = useState(0);
+  const [previewPlaying,setPreviewPlaying] = useState(false);
+  useEffect(() => { setPreviewProgress(0); setPreviewPlaying(false); if(preview) setFlying(false); }, [preview?.kind, preview?.lines]);
+  useEffect(() => {
+    if(!previewPlaying || !visible || preview?.stale) return;
+    const timer=setInterval(()=>setPreviewProgress(p=>{if(p>=1){setPreviewPlaying(false);return 1;}return Math.min(1,p+0.005);}),100);
+    return ()=>clearInterval(timer);
+  },[previewPlaying,visible,preview?.stale]);
+  useEffect(() => {if(candidateId){setCameraMode("pole");setShowCandidates(true);}},[candidateId]);
+  const inspected = candidates.find((c) => c.id === candidateId);
   const lockedNotice = t("missionStage.locked");
   const phaseLabel = (id: string) => t(`missionPhases.${id}.label`);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -220,15 +274,33 @@ export default function MissionStage({
     handle.addEventListener("pointerup", stop);
     handle.addEventListener("pointercancel", stop);
   };
-  const tabs = [{ id: "plan", label: t("missionStage.plan") }, ...modules];
+  const groupOf = (id: string) =>
+    id === "plan" ? "plan" : (modules.find((m) => m.id === id)?.group ?? "plan");
+  const activeGroup = inspector === "surface" || inspector === "candidates" ? "descent" : inspector === "flight" ? "plan" : groupOf(activeModule);
+  const lastInGroup = useRef<Record<string, string>>({});
+  if (!inspector) lastInGroup.current[activeGroup] = activeModule;
+  const openGroup = (group: string) => {
+    if (group === "plan") return navigate("plan");
+    const remembered = lastInGroup.current[group];
+    const target =
+      modules.find((m) => m.id === remembered && m.group === group) ??
+      modules.find((m) => m.group === group);
+    if (target) navigate(target.id);
+  };
+  const steps = STEP_GROUPS.filter(
+    (g) => g === "plan" || modules.some((m) => m.group === g),
+  );
+  const learn = modules.find((m) => m.group === "learn");
+  const advanced = modules.filter((m) => m.group === "advanced");
+  const siblings =
+    activeGroup === "plan" ? [] : modules.filter((m) => m.group === activeGroup);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [progress, setProgress] = useState(0);
   const [flying, setFlying] = useState(false);
   const [cameraMode, setCameraMode] = useState<CameraMode>("auto");
   const [notice, setNotice] = useState("");
   const [focusMoon, setFocusMoon] = useState(false);
-  const [rover, setRover] = useState<{ path: RoutePoint[]; drive: number } | null>(
-    null,
-  );
+  const [rover, setRover] = useState<RoverState | null>(null);
   const path = useMemo(() => {
     if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90)
       return null;
@@ -294,9 +366,34 @@ export default function MissionStage({
               ? "landing"
               : "spacecraft";
   const picking = cameraView === "pole" || cameraView === "moon";
-  // Post-landing operations start once the touchdown close-up is complete.
-  const landed =
-    webgl && cameraView === "landing" && active.phase.id === "landed" && progress >= 1;
+  // Launch, space and landing are separate 3-D scenes: a short fade hides
+  // the cut between them.
+  const sceneFamily =
+    cameraView === "launch" || cameraView === "landing" ? cameraView : "space";
+  const [fadeKey, setFadeKey] = useState(0);
+  const lastFamily = useRef(sceneFamily);
+  useEffect(() => {
+    if (lastFamily.current === sceneFamily) return;
+    lastFamily.current = sceneFamily;
+    if (!reduced) setFadeKey((key) => key + 1);
+  }, [sceneFamily, reduced]);
+  // Post-landing operations start once touchdown is complete and stay alive
+  // across camera changes; the rover is drawn only in the landing close-up.
+  // A mission run of this analysis decides how the touchdown ends; a crash or
+  // tip-over leaves no surface operations.
+  const missionRun = useMissionRun(analysisId);
+  const touchdown = touchdownOutcome(missionRun);
+  const arrived = active.phase.id === "landed" && progress >= 1;
+  const landed = webgl && arrived && touchdown === "landed";
+  const wasArrived = useRef(arrived);
+  useEffect(() => {
+    if (arrived && !wasArrived.current && touchdown === "landed") onArrived?.();
+    wasArrived.current = arrived;
+  }, [arrived]);
+  const stageLabel = (id: string) =>
+    id === "landed" && touchdown !== "landed"
+      ? t(`missionRun.scene.${touchdown}`)
+      : phaseLabel(id);
 
   // A new target restarts the illustrative flight from Earth orbit.
   useEffect(() => {
@@ -390,10 +487,38 @@ export default function MissionStage({
         role="region"
         aria-label={t("missionStage.viewLabel")}
       >
+        {split && comparisonPlayback ? (
+          <>
+            <SplitSimulator
+              playback={comparisonPlayback}
+              webgl={webgl}
+              visible={visible}
+              reduced={reduced}
+              compact={compact}
+            />
+            <div className="stage-hud scene-toolbar">
+              <button aria-pressed={false} onClick={() => setSingleScene(true)}>{t("splitSim.single")}</button>
+              <button aria-label={t("splitSim.fullscreen")} aria-pressed={fullscreen} onClick={async () => {
+                try {
+                  if (document.fullscreenElement) await document.exitFullscreen();
+                  else await stageRef.current?.requestFullscreen();
+                } catch { setNotice(t("splitSim.noFullscreen")); }
+              }}>⛶</button>
+            </div>
+          </>
+        ) : (<>
+        {fadeKey > 0 && <div key={fadeKey} className="stage-fade" aria-hidden="true" />}
         {webgl ? (
           <SceneBoundary fallback={fallback}>
             <Suspense fallback={<div className="stage-loading">{t("missionStage.loading")}</div>}>
               <MissionScene
+                analysisPreview={preview}
+                analysisProgress={previewProgress}
+                onAnalysisSelect={id=>setPreview(p=>p?{...p,selected:id}:p)}
+                showHazards={showHazards} showSearch={showSearch} showRoutes={showRoutes}
+                candidates={showCandidates ? candidates : []}
+                selectedCandidate={candidateId}
+                onCandidate={(id) => { setCandidateId(id); inspect("candidates"); }}
                 path={path}
                 lat={lat}
                 lon={lon}
@@ -416,109 +541,89 @@ export default function MissionStage({
                 flight={flight}
                 roverPath={landed ? (rover?.path ?? null) : null}
                 roverDrive={rover?.drive ?? 0}
+                roverScan={rover?.scan ?? 1}
+                roverScene={landed ? (rover?.scene ?? null) : null}
+                roverTarget={rover?.targetId ?? ""}
+                roverAlternatives={rover?.alternatives}
+                touchdown={touchdown}
               />
             </Suspense>
           </SceneBoundary>
         ) : (
           fallback
         )}
-        <div className="stage-hud stage-phase" aria-live="polite">
-          {progress === 0 && !flying ? (
-            <>
-              <span className="eyebrow">{t("missionStage.preLaunch")}</span>
-              <strong>{t("missionStage.chooseSite")}</strong>
-              <p>{t("missionStage.chooseSiteHelp")}</p>
-            </>
-          ) : (
-            <>
-              <span className="eyebrow">
-                {t("missionStage.phase", {
-                  n: active.index + 1,
-                  total: MISSION_PHASES.length,
-                })}
+        {!preview && !cleanView && <button aria-live="polite" className="stage-hud stage-phase phase-chip" onClick={() => inspect("flight")}>
+          <span className="eyebrow">{t("missionStage.phase", { n: active.index + 1, total: MISSION_PHASES.length })}</span>
+          <strong>{progress === 0 && !flying ? t("missionStage.preLaunch") : stageLabel(active.phase.id)}</strong>
+          <span aria-hidden="true">↗</span>
+        </button>}
+        <div className="stage-hud scene-toolbar">
+          {preview && <button onClick={()=>{setPreview(null);setPreviewPlaying(false);}}>{t("workspace.backScene")}</button>}
+          {webgl && !cleanView && !preview && <label className="camera-picker">
+            <span className="sr-only">{t("missionStage.cameraView")}</span>
+            <select aria-label={t("missionStage.cameraView")} value={cameraMode} onChange={e => setCameraMode(e.target.value as CameraMode)}>
+              {cameraModes.map(mode => <option key={mode} value={mode}>{t(`missionStage.camera.${mode}`)}</option>)}
+            </select>
+          </label>}
+          {!preview && !cleanView && <div className="layer-picker">
+            <button aria-expanded={layersOpen} onClick={() => setLayersOpen(!layersOpen)}>{t("missionStage.layers")}</button>
+            {layersOpen && <div className="layer-options" onKeyDown={e => { if (e.key === "Escape") setLayersOpen(false); }}>
+              <label><input type="checkbox" checked={showHazards} onChange={e => setShowHazards(e.target.checked)} />{t("missionStage.hazards")}</label>
+              <label><input type="checkbox" checked={showSearch} onChange={e => setShowSearch(e.target.checked)} />{t("missionStage.scanCoverage")}</label>
+              <label><input type="checkbox" checked={showRoutes} onChange={e => setShowRoutes(e.target.checked)} />{t("missionStage.roverRoutes")}</label>
+              <label><input type="checkbox" checked={showCandidates} onChange={e => setShowCandidates(e.target.checked)} />{t("missionStage.landingCandidates")}</label>
+              <button onClick={() => setLayersOpen(false)}>{t("missionStage.close")}</button>
+            </div>}
+          </div>}
+          {canSplit && <button onClick={() => setSingleScene(false)}>{t("splitSim.split")}</button>}
+          <button aria-pressed={cleanView} onClick={() => setCleanView(!cleanView)}>{t(cleanView ? "missionStage.controls" : "missionStage.cleanView")}</button>
+          <button aria-label={t("missionStage.toggleFullscreen")} aria-pressed={fullscreen} onClick={async () => {
+            try {
+              if (document.fullscreenElement) await document.exitFullscreen();
+              else await stageRef.current?.requestFullscreen();
+            } catch { setNotice(t("missionStage.fullscreenIsUnavailableInThis")); }
+          }}>⛶</button>
+        </div>
+        {preview && !cleanView && <div className="stage-hud analysis-caption">
+          <strong>{t(`workspace.kind.${preview.kind}`)}</strong>
+          <p>{t(preview.stale ? "workspace.stale" : preview.terrain ? "workspace.routeTerrain" : "workspace.localFrame")}</p>
+          {preview.lines.map(line=><button key={line.id} aria-pressed={preview.selected===line.id} onClick={()=>setPreview({...preview,selected:line.id})}><i style={{background:line.color}}/>{t(`workspace.line.${line.id}`) === `workspace.line.${line.id}` ? line.id : t(`workspace.line.${line.id}`)}</button>)}
+          {preview.selected && <small>{t("workspace.selected")}: {preview.selected}</small>}
+          {!preview.lines.length && <p>{t("workspace.dots")}</p>}
+          {!!preview.events.length && <details><summary>{t("workspace.events")}</summary>{preview.events.map((time,i)=><button key={i} disabled={preview.stale} onClick={()=>{const pts=preview.lines.at(-1)?.points??[];const start=pts[0]?.time??0;const end=pts.at(-1)?.time??1;setPreviewPlaying(false);setPreviewProgress(Math.max(0,Math.min(1,(time-start)/Math.max(1e-9,end-start))));}}>{time.toFixed(1)} s</button>)}</details>}
+        </div>}
+        {preview && !cleanView && preview.lines.some(l=>l.points.some(p=>p.time!==undefined)) && <div className="stage-hud scene-dock">
+          <button disabled={preview.stale} onClick={()=>{if(previewProgress>=1)setPreviewProgress(0);setPreviewPlaying(!previewPlaying);}} aria-label={t("workspace.playResult")}>{previewPlaying?"Ⅱ":"▷"}</button>
+          <input type="range" aria-label={t("workspace.resultTime")} min="0" max="1000" value={Math.round(previewProgress*1000)} disabled={preview.stale} onChange={e=>{setPreviewPlaying(false);setPreviewProgress(Number(e.target.value)/1000);}}/>
+          <span>{Math.round(previewProgress*100)}%</span>
+        </div>}
+        {!preview && !cleanView && missionRun && arrived && (
+          <button
+            className={`stage-hud mission-outcome run-${missionRun.outcome}`}
+            onClick={() => onModuleChange("mission-run")}
+          >
+            <strong>{t(`missionRun.outcome.${missionRun.outcome}`)}</strong>
+            {missionRun.failure && (
+              <span>
+                {t(`missionRun.gates.${missionRun.failure.gate}`)} ·{" "}
+                {t(`missionRun.events.${missionRun.failure.code}`)}
               </span>
-              <strong>{phaseLabel(active.phase.id)}</strong>
-              <p>{t(`missionPhases.${active.phase.id}.description`)}</p>
-            </>
-          )}
-          {readout ? (
-            <dl className="flight-readout">
-              <dt>{t("missionStage.flightData.utc")}</dt>
-              <dd>{readout.utc} UTC</dd>
-              <dt>{t("missionStage.flightData.met")}</dt>
-              <dd>{readout.met}</dd>
-              <dt>{t("missionStage.flightData.earthMoon")}</dt>
-              <dd>{readout.earthMoon} km</dd>
-              <dt>{t("missionStage.flightData.craftEarth")}</dt>
-              <dd>{readout.craftEarth} km</dd>
-              <dt>{t("missionStage.flightData.craftMoon")}</dt>
-              <dd>{readout.craftMoon} km</dd>
-            </dl>
-          ) : (
-            flightState !== "off" &&
-            flightState !== "ready" && (
-              <small className="flight-note">
-                {t(`missionStage.flightData.${flightState}`)}
-              </small>
-            )
-          )}
-        </div>
-        {webgl && (
-          <div className="stage-hud stage-cameras" role="group" aria-label={t("missionStage.cameraView")}>
-            {cameraModes.map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                aria-pressed={cameraMode === mode}
-                onClick={() => setCameraMode(mode)}
-              >
-                {t(`missionStage.camera.${mode}`)}
-              </button>
+            )}
+            {runHighlights(missionRun).map((h) => (
+              <small key={h.key}>{t(h.key, h.params)}</small>
             ))}
-          </div>
+          </button>
         )}
-        <div className="stage-hud stage-legend">
-          <span>
-            <i className="legend-sun" /> {t("common.sun")}
-          </span>
-          <span>
-            <i className="legend-earth" /> {t("common.earth")}
-          </span>
-          <span>
-            <i className="legend-trail" /> {t("missionStage.flownPath")}
-          </span>
-          <span>
-            <i className="legend-ring" /> {t("missionStage.coverage")}
-          </span>
-          <small>{t("missionStage.scaleNote")}</small>
-        </div>
-        <div className="stage-hud stage-target">
-          <span className="eyebrow">{t("missionStage.target")}</span>
-          <strong>{coordinateLabel(t, lat, lon)}</strong>
-          {siteStatus && <div className="stage-status">{siteStatus}</div>}
-          {webgl && !busy && (
-            <small>
-              {picking
-                ? t("missionStage.hint.picking")
-                : cameraView === "landing"
-                  ? t("missionStage.hint.landing")
-                  : cameraView === "launch"
-                    ? t("missionStage.hint.launch")
-                  : t("missionStage.hint.default")}
-            </small>
-          )}
-        </div>
-        {landed && (
-          <SceneBoundary fallback={null}>
-            <SurfaceOps
-              lat={lat}
-              lon={lon}
-              analysisId={analysisId}
-              reduced={reduced}
-              onRover={setRover}
-            />
-          </SceneBoundary>
-        )}
+        {!preview && !cleanView && <div className="scene-source">{landed && rover?.source ? (rover.source === "demo" ? "DEMO · A*" : "LOLA DEM · A*") : t("missionStage.illustrative")}</div>}
+        {!preview && !cleanView && <div className="stage-hud scene-dock">
+          <button disabled={!path} onClick={toggleFlight} aria-label={flying ? t("missionStage.pauseFlight") : t("missionStage.simulate")}>{flying ? "Ⅱ" : "▷"}</button>
+          <input type="range" min="0" max="1000" value={Math.round(progress * 1000)} disabled={!path}
+            aria-label={t("missionStage.progress")} aria-valuetext={`${phaseLabel(active.phase.id)}, ${Math.round(progress * 100)}%`}
+            onChange={e => { setFlying(false); setProgress(Number(e.target.value) / 1000); }} />
+          <span>{Math.round(progress * 100)}%</span>
+          {landed && <button onClick={() => inspect("surface")}>{t("missionStage.rover")} ↗</button>}
+        </div>}
+        </>)}
         {notice && (
           <div className="stage-notice" role="status">
             {notice}
@@ -559,40 +664,206 @@ export default function MissionStage({
             e.preventDefault();
           }}
         />
-        <div className="panel-bar">
-          <div className="panel-tabs" role="tablist" aria-label={t("missionStage.modules")}>
-            {tabs.map((tab) => (
+        <nav className="panel-bar menu-bar" aria-label={t("missionStage.modules")}>
+          <div className="menu-top">
+            <span className="menu-title">{t("missionStage.menuTitle")}</span>
+            <div className="panel-bar-end">
+              {status}
               <button
-                key={tab.id}
+                type="button"
+                className="panel-collapse"
+                onClick={() => setPanelOpen(false)}
+                aria-label={t("missionStage.hidePanel")}
+              >
+                ›
+              </button>
+            </div>
+          </div>
+          <div className="step-tabs" role="tablist" aria-label={t("missionStage.modules")}>
+            {steps.map((group, index) => (
+              <button
+                key={group}
                 type="button"
                 role="tab"
-                id={`tab-${tab.id}`}
-                aria-selected={activeModule === tab.id}
-                aria-controls={`tabpanel-${tab.id}`}
-                onClick={() => onModuleChange(tab.id)}
+                id={`step-${group}`}
+                aria-selected={activeGroup === group}
+                onClick={() => {
+                  setAdvancedOpen(false);
+                  openGroup(group);
+                }}
               >
-                {tab.label}
+                <b>{index + 1}</b>
+                <span>{t(`missionStage.steps.${group}`)}</span>
               </button>
             ))}
           </div>
-          <div className="panel-bar-end">
-            {status}
-            <button
-              type="button"
-              className="panel-collapse"
-              onClick={() => setPanelOpen(false)}
-              aria-label={t("missionStage.hidePanel")}
-            >
-              ›
-            </button>
-          </div>
+          {(learn || advanced.length > 0) && (
+            <div className="menu-extra">
+              {learn && (
+                <button
+                  type="button"
+                  id="step-learn"
+                  aria-pressed={activeGroup === "learn"}
+                  onClick={() => {
+                    setAdvancedOpen(false);
+                    navigate(learn.id);
+                  }}
+                >
+                  <span aria-hidden="true">✦</span> {t("missionStage.learn")}
+                </button>
+              )}
+              {advanced.length > 0 && (
+                <div className="advanced-menu">
+                  <button
+                    type="button"
+                    aria-expanded={advancedOpen}
+                    aria-haspopup="menu"
+                    data-active={activeGroup === "advanced" || undefined}
+                    onClick={() => setAdvancedOpen((open) => !open)}
+                  >
+                    <span aria-hidden="true">⚙</span> {t("missionStage.advanced")}
+                    {activeGroup === "advanced"
+                      ? `: ${advanced.find((m) => m.id === activeModule)?.label ?? ""}`
+                      : ""}{" "}
+                    <span aria-hidden="true">{advancedOpen ? "▴" : "▾"}</span>
+                  </button>
+                  {advancedOpen && (
+                    <div className="advanced-list" role="menu">
+                      <p>{t("missionStage.advancedHint")}</p>
+                      {advanced.map((m) => (
+                        <button
+                          key={m.id}
+                          type="button"
+                          role="menuitem"
+                          aria-current={activeModule === m.id || undefined}
+                          onClick={() => {
+                            setAdvancedOpen(false);
+                            navigate(m.id);
+                          }}
+                        >
+                          {m.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </nav>
+        <details className="scene-inspector-tools"><summary>{t("missionStage.sceneDetails")}</summary><div className="scene-inspector-nav" role="group" aria-label={t("missionStage.sceneDetails")}>
+          <button aria-pressed={inspector === "flight"} onClick={() => inspect("flight")}>{t("missionStage.flightDetails")}</button>
+          {landed && <button aria-pressed={inspector === "surface"} onClick={() => inspect("surface")}>{t("missionStage.surfaceOperations")}</button>}
+          <button aria-pressed={inspector === "candidates"} onClick={() => inspect("candidates")}>{t("missionStage.candidates")} · {candidates.length}</button>
+          {inspector && <button onClick={() => setInspector(null)}>{t("missionStage.backToTask")} ↩</button>}
+        </div>
+        </details>
+        <div className="panel-body scene-inspector" hidden={inspector !== "flight"}>
+        <div className="scene-information" aria-live="polite">
+          {progress === 0 && !flying ? (
+            <>
+              <span className="eyebrow">{t("missionStage.preLaunch")}</span>
+              <strong>{t("missionStage.chooseSite")}</strong>
+              <p>{t("missionStage.chooseSiteHelp")}</p>
+            </>
+          ) : (
+            <>
+              <span className="eyebrow">
+                {t("missionStage.phase", {
+                  n: active.index + 1,
+                  total: MISSION_PHASES.length,
+                })}
+              </span>
+              <strong>{phaseLabel(active.phase.id)}</strong>
+              <p>{t(`missionPhases.${active.phase.id}.description`)}</p>
+            </>
+          )}
+          {readout ? (
+            <dl className="flight-readout">
+              <dt>{t("missionStage.flightData.utc")}</dt>
+              <dd>{readout.utc} UTC</dd>
+              <dt>{t("missionStage.flightData.met")}</dt>
+              <dd>{readout.met}</dd>
+              <dt>{t("missionStage.flightData.earthMoon")}</dt>
+              <dd>{readout.earthMoon} km</dd>
+              <dt>{t("missionStage.flightData.craftEarth")}</dt>
+              <dd>{readout.craftEarth} km</dd>
+              <dt>{t("missionStage.flightData.craftMoon")}</dt>
+              <dd>{readout.craftMoon} km</dd>
+            </dl>
+          ) : (
+            flightState !== "off" &&
+            flightState !== "ready" && (
+              <small className="flight-note">
+                {t(`missionStage.flightData.${flightState}`)}
+              </small>
+            )
+          )}
+        </div>
+        <div className="scene-legend">
+          <span>
+            <i className="legend-sun" /> {t("common.sun")}
+          </span>
+          <span>
+            <i className="legend-earth" /> {t("common.earth")}
+          </span>
+          <span>
+            <i className="legend-trail" /> {t("missionStage.flownPath")}
+          </span>
+          <span>
+            <i className="legend-ring" /> {t("missionStage.coverage")}
+          </span>
+          <small>{t("missionStage.scaleNote")}</small>
+        </div>
+        <div className="scene-target">
+          <span className="eyebrow">{t("missionStage.target")}</span>
+          <strong>{coordinateLabel(t, lat, lon)}</strong>
+          {siteStatus && <div className="stage-status">{siteStatus}</div>}
+          {webgl && !busy && (
+            <small>
+              {picking
+                ? t("missionStage.hint.picking")
+                : cameraView === "landing"
+                  ? t("missionStage.hint.landing")
+                  : cameraView === "launch"
+                    ? t("missionStage.hint.launch")
+                  : t("missionStage.hint.default")}
+            </small>
+          )}
+        </div>
+        </div>
+        <div className="panel-body scene-inspector" hidden={inspector !== "candidates"}>
+        {candidates.length > 0 && <details className="mission-candidates" open>
+          <summary>{t("missionStage.routeLandingCandidates")} · {candidates.length}</summary>
+          <label><input type="checkbox" checked={showCandidates} onChange={e => setShowCandidates(e.target.checked)} /> {t("missionStage.showIn3d")}</label>
+          <p>{t("missionStage.linesAreIllustrativeApproachCorridors")}</p>
+          <div className="candidate-list">{candidates.map(c => <button key={c.id} aria-pressed={candidateId === c.id} onClick={() => { setCandidateId(c.id); setShowCandidates(true); setCameraMode("pole"); }} style={{ borderLeftColor: candidateColor(c) }}>
+            <span>{c.label}</span><b>{c.score?.toFixed(3) ?? "—"}</b><small>{tOr(`missionStage.candidateStatus.${c.status}`, c.status)}</small>
+          </button>)}</div>
+          {inspected && <article><strong>{inspected.label}</strong><p>{inspected.source} · {inspected.lat.toFixed(4)}°, {inspected.lon.toFixed(4)}°</p><p>{inspected.explanation}</p><dl>{inspected.metrics.map((m, i) => <div key={i}><dt>{tOr(`missionStage.metricLabels.${m.label}`, m.label)}</dt><dd>{m.value}</dd></div>)}</dl></article>}
+        </details>}
+          {!candidates.length && <p>{t("missionStage.runRecommendationsOrDescentPlanning")}</p>}
+        </div>
+        <div className="panel-body scene-inspector" hidden={inspector !== "surface"}>
+        {landed && (
+          <SceneBoundary fallback={null}>
+            <SurfaceOps
+              lat={lat}
+              lon={lon}
+              analysisId={analysisId}
+              reduced={reduced}
+              onRover={setRover}
+            />
+          </SceneBoundary>
+        )}
+          {!landed && <p>{arrived && touchdown !== "landed" ? t("missionStage.theVehicleWasLostAt") : t("missionStage.surfaceOperationsBecomeAvailableAfter")}</p>}
         </div>
         <div
           className="panel-body"
           role="tabpanel"
           id="tabpanel-plan"
-          aria-labelledby="tab-plan"
-          hidden={activeModule !== "plan"}
+          aria-labelledby="step-plan"
+          hidden={inspector !== null || activeModule !== "plan"}
         >
         {children}
         <section className="panel flight-panel" aria-labelledby="flight-title">
@@ -670,14 +941,39 @@ export default function MissionStage({
           </div>
         </section>
         </div>
+        {!inspector && siblings.length > 1 && (
+          <div
+            className="sub-tabs"
+            role="tablist"
+            aria-label={
+              activeGroup === "advanced"
+                ? t("missionStage.advanced")
+                : t(`missionStage.steps.${activeGroup}`)
+            }
+          >
+            {siblings.map((m) => (
+              <button
+                key={m.id}
+                type="button"
+                role="tab"
+                id={`tab-${m.id}`}
+                aria-selected={activeModule === m.id}
+                aria-controls={`tabpanel-${m.id}`}
+                onClick={() => navigate(m.id)}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+        )}
         {modules.map((module) => (
           <div
             key={module.id}
             className="panel-body"
             role="tabpanel"
             id={`tabpanel-${module.id}`}
-            aria-labelledby={`tab-${module.id}`}
-            hidden={activeModule !== module.id}
+            aria-label={module.label}
+            hidden={inspector !== null || activeModule !== module.id}
           >
             {module.content}
           </div>
