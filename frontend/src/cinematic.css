@@ -1807,3 +1807,21 @@ body.panel-resizing canvas {
   display: grid;
   gap: 10px;
 }
+
+/* Soft cut between the launch, space and landing scenes. */
+.stage-fade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  background: #05080b;
+  pointer-events: none;
+  animation: stage-fade 0.9s ease-out forwards;
+}
+@keyframes stage-fade {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

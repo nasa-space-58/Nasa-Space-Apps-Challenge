@@ -323,6 +323,17 @@ export default function MissionStage({
               ? "landing"
               : "spacecraft";
   const picking = cameraView === "pole" || cameraView === "moon";
+  // Launch, space and landing are separate 3-D scenes: a short fade hides
+  // the cut between them.
+  const sceneFamily =
+    cameraView === "launch" || cameraView === "landing" ? cameraView : "space";
+  const [fadeKey, setFadeKey] = useState(0);
+  const lastFamily = useRef(sceneFamily);
+  useEffect(() => {
+    if (lastFamily.current === sceneFamily) return;
+    lastFamily.current = sceneFamily;
+    if (!reduced) setFadeKey((key) => key + 1);
+  }, [sceneFamily, reduced]);
   // Post-landing operations start once touchdown is complete and stay alive
   // across camera changes; the rover is drawn only in the landing close-up.
   const landed = webgl && active.phase.id === "landed" && progress >= 1;
@@ -419,6 +430,7 @@ export default function MissionStage({
         role="region"
         aria-label={t("missionStage.viewLabel")}
       >
+        {fadeKey > 0 && <div key={fadeKey} className="stage-fade" aria-hidden="true" />}
         {webgl ? (
           <SceneBoundary fallback={fallback}>
             <Suspense fallback={<div className="stage-loading">{t("missionStage.loading")}</div>}>

@@ -337,12 +337,12 @@ function PlannedPath({
     );
     return new THREE.Line(
       geometry,
-      new THREE.LineDashedMaterial({
+      // Solid: dashes recomputed every frame crawl and flicker.
+      new THREE.LineBasicMaterial({
         color: "#c6d3dc",
         transparent: true,
-        opacity: 0.28,
-        dashSize: 0.3,
-        gapSize: 0.3 * 0.78,
+        opacity: 0.22,
+        depthWrite: false,
       }),
     );
   }, [count]);
@@ -367,7 +367,6 @@ function PlannedPath({
     for (let i = 0; i < n; i++) attribute.setXYZ(i, ...points[i]);
     attribute.needsUpdate = true;
     line.geometry.setDrawRange(0, n);
-    line.computeLineDistances();
     line.geometry.computeBoundingSphere();
   });
   return <primitive object={line} />;
@@ -619,6 +618,13 @@ function CameraRig({
   const desiredTarget = useMemo(() => new THREE.Vector3(), []);
   const desiredPosition = useMemo(() => new THREE.Vector3(), []);
   const first = useRef(true);
+  // Smoothing state relative to the followed point, so a moving Moon is
+  // tracked exactly (no lag jitter) while view changes still ease.
+  const targetLag = useMemo(() => new THREE.Vector3(), []);
+  const direction = useMemo(() => new THREE.Vector3(0, 0, 1), []);
+  const logDistance = useRef(0);
+  const lastMode = useRef(mode);
+  const wanted = useMemo(() => new THREE.Vector3(), []);
   useFrame((_, delta) => {
     const phase = phaseAt(progress.current).phase.id;
     // Bodies at this moment (fixed layout without a dated ephemeris).
@@ -707,10 +713,31 @@ function CameraRig({
       )
       .multiplyScalar(distance)
       .add(desiredTarget);
-    const k = reduced || first.current ? 1 : 1 - Math.exp(-delta * 3.2);
+    const step = Math.min(delta, 0.05);
+    const k = reduced || first.current ? 1 : 1 - Math.exp(-step * 2.4);
+    if (first.current || reduced) {
+      targetLag.set(0, 0, 0);
+      direction.copy(desiredPosition).sub(desiredTarget).normalize();
+      logDistance.current = Math.log(Math.max(1e-4, distance));
+    } else if (lastMode.current !== mode) {
+      // A new view starts from where the camera is now and eases over.
+      targetLag.copy(target).sub(desiredTarget);
+    }
+    lastMode.current = mode;
     first.current = false;
-    target.lerp(desiredTarget, k);
-    camera.position.lerp(desiredPosition, k);
+    // The look-at point follows the target exactly plus a decaying offset.
+    targetLag.multiplyScalar(1 - k);
+    target.copy(desiredTarget).add(targetLag);
+    // Direction turns on the sphere and distance eases in log space, so a
+    // long zoom (Earth–Moon to close-up) is even and never cuts through.
+    wanted.copy(desiredPosition).sub(desiredTarget).normalize();
+    direction.lerp(wanted, k).normalize();
+    logDistance.current +=
+      (Math.log(Math.max(1e-4, distance)) - logDistance.current) * k;
+    camera.position
+      .copy(direction)
+      .multiplyScalar(Math.exp(logDistance.current))
+      .add(target);
     camera.lookAt(target);
   });
   return null;
@@ -727,10 +754,13 @@ function ProgressEaser({
 }) {
   useFrame((_, delta) => {
     const gap = target - progress.current;
+    // Small steps ease quickly; large jumps (phase buttons, scrubbing) glide
+    // over about a second instead of cutting.
+    const rate = Math.abs(gap) > 0.08 ? 4 : 14;
     progress.current =
-      snap || Math.abs(gap) > 0.08 || Math.abs(gap) < 1e-5
+      snap || Math.abs(gap) < 1e-5
         ? target
-        : progress.current + gap * (1 - Math.exp(-delta * 14));
+        : progress.current + gap * (1 - Math.exp(-Math.min(delta, 0.05) * rate));
   });
   return null;
 }
