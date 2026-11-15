@@ -261,4 +261,8 @@ At the user's explicit request, `ui/sources-page-complete` (complete grouped Sou
 
 ### Mission run route set (user, 2026-11-15)
 
-On `feature/mission-run-route-candidates` from main `91ba1ae`; commit locally only, no push or merge. Starting a mission run also shows every computed landing route in the 3D scene: primary green, reachable R7 backups yellow, rejected red (dashed when flown, point only when it failed the R3 terrain check), with metrics and reasons on selection. Skeleton `0b272e0`, frozen tests `58af088`; terrain grid skeleton `c4b60e2`, frozen tests `c7cf970`; the routes are drawn over the real LOLA terrain at true scale. See docs/mission-routes.md. The route set is the nominal pre-flight plan set, not a replay of the run's faults.
+On `feature/mission-run-route-candidates` from main `91ba1ae`. Starting a mission run also shows every computed landing route in the 3D scene: primary green, reachable R7 backups yellow, rejected red (dashed when flown, point only when it failed the R3 terrain check), with metrics and reasons on selection. Skeleton `0b272e0`, frozen tests `58af088`; terrain grid skeleton `c4b60e2`, frozen tests `c7cf970`; the routes are drawn over the real LOLA terrain at true scale. See docs/mission-routes.md. The route set is the nominal pre-flight plan set, not a replay of the run's faults.
+
+### Mission run route set main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/mission-run-route-candidates` was fast-forwarded directly onto `main` from `91ba1ae` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
