@@ -117,3 +117,59 @@ longitude/latitude using a lunar longlat CRS with R=1737400 into the dataset CRS
 locate the containing cell, read a 501-cell square centered on that cell, verify
 bounds and all finite/unmasked values, save crops and hash them. This is a
 research verification procedure, not the production ingestion implementation.
+
+## Artemis III candidate region presets (2026-11-15)
+
+`shared/presets.json` now lists one runtime preset for each of the nine
+Artemis III candidate landing regions in
+[NASA release 24-136](https://www.nasa.gov/news-release/nasa-provides-update-on-artemis-iii-moon-landing-regions/)
+(2024-10-28). NASA's [LPSC 2026 update](https://ntrs.nasa.gov/citations/20250011660)
+lists the same nine regions. Each preset carries `artemis_iii_region` and
+`coordinate_basis`. None of them is a certified landing site.
+
+NASA publishes the 2024 regions as outlines on a map, with no point
+coordinates. Each representative point was chosen as follows, in this order
+of preference:
+
+1. `nasa_region_center`: a DEM-derived polygon center from the NASA
+   [Lunar Surface Data Book](https://ntrs.nasa.gov/api/citations/20250002845/downloads/M2M-30044%20Lunar%20Surface%20Data%20Book%20Baseline_Final.pdf#page=75),
+   Table A2.1-1. These are the 2022 region centers, retained because the
+   2024 list kept these region names.
+2. `lroc_region_mosaic_center`: the center of the LROC NAC controlled
+   mosaic that the LRO camera team produced for the named Artemis III
+   candidate region. Centers are published to 0.1°. For Haworth, Nobile
+   Rim 2 and Malapert, these mosaic centers agree with the Data Book
+   centers within about 0.1°.
+3. `iau_feature_center` / `iau_feature_anchor`: the center of the named
+   feature in the USGS/IAU gazetteer.
+
+| Region | Stable ID | Latitude | East lon [0,360) | Basis and source | Containing-pixel height |
+|---|---|---:|---:|---|---:|
+| Peak near Cabeus B | peak-near-cabeus-b | −83.6° | 291.2° | LROC [NAC_ROI_CABEUSPKLO1](https://data.lroc.im-ldi.com/lroc/view_rdr/NAC_ROI_CABEUSPKLO1) | 4534.785 m |
+| Haworth | haworth | −86.7639° | 337.223° | Data Book, Haworth | 1631.480 m |
+| Malapert Massif | malapert-massif-r23 | −85.9948° | 359.76422° | Data Book, R23 | 4784.625 m |
+| Mons Mouton Plateau | mons-mouton-plateau | −84.3° | 30.6° | LROC [NAC_ROI_MOUTNPLTLO1](https://data.lroc.im-ldi.com/lroc/view_rdr/NAC_ROI_MOUTNPLTLO1) | 5289.486 m |
+| Mons Mouton | mons-mouton-feature-center | −84.6° | 31.0° | IAU feature [16070](https://planetarynames.wr.usgs.gov/Feature/16070) | 5039.157 m |
+| Nobile Rim 1 | nobile-rim-1-r06 | −85.4381° | 37.36667° | Data Book, R06 | 5932.139 m |
+| Nobile Rim 2 | nobile-rim-2-dm2 | −83.954° | 58.82206° | Data Book, DM2 | 1009.322 m |
+| de Gerlache Rim 2 | de-gerlache-rim-2-sl2 | −88.23° | 295.3716° | Data Book, SL2 (−64.6284°) | −92.201 m |
+| Slater Plain | slater-plain-crater-anchor | −88.08° | 111.29° | IAU feature [15325](https://planetarynames.wr.usgs.gov/Feature/15325), anchor | −1745.477 m |
+
+**Slater Plain** has no published NASA or LROC point. At the user's decision
+of 2026-11-15, the preset uses the IAU center of Slater crater as an
+anchor. It is not the center of the plain. The point is likely in or near
+permanent shadow, so its Sun results do not represent the region's best
+sites. Replace it when NASA publishes region coordinates or outlines.
+
+Heights come from the containing 80 m cell of `LDEM_80S_80MPP_ADJ.TIF`.
+They were read from the application's raw terrain cache. Every 501 × 501
+window around each point was finite. The two Step 0 presets reproduced
+their recorded heights and windows exactly. Evidence:
+[artemis3-regions-2026-11-15.json](verification/artemis3-regions-2026-11-15.json).
+
+No ingestion change is needed. All points lie within the single 80–90° S
+product that the worker already downloads. The default 100 km horizon
+search stays inside the product's nominal 80° S boundary. The closest case
+is Peak near Cabeus B, which reaches about 294 km against a boundary at
+about 304 km. `Malapert Massif` stays last in the catalog because the
+analysis job bootstraps the raw terrain cache with the last preset.

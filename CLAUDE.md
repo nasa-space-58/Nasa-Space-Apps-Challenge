@@ -242,3 +242,7 @@ The user authorized consolidating the latest GitHub branches into main, cleaning
 ### Q&A assistant delivery (user, 2026-11-15)
 
 `feature/assistant-qa` (merged with main `2ac81c2`) is delivered to `temel` by fast-forward, not to `main`. It adds the opt-in Claude Q&A assistant (skeleton `383ea15`, frozen tests `6db6f82`, see docs/assistant.md) and the simplified "Ask the Navigator" drawer in the site palette with collapsible sources. Main holds only the first drawer version from TK's integration `ba6ef48`. Do not push this work to `main` without a new explicit request.
+
+### Artemis III candidate regions (user, 2026-11-15)
+
+`shared/presets.json` lists all nine NASA Artemis III candidate regions (release 24-136). Corrected frozen test `b1d9871` (user-approved), new frozen tests `ed429f2`; see the Artemis III section of docs/terrain-and-sites.md. Slater Plain uses the IAU Slater crater center as a labeled anchor, not a region center. Keep Malapert last: the terrain bootstrap uses `presets()[-1]`. Pushed to `temel` at the user's request; tests were not run before that push.
