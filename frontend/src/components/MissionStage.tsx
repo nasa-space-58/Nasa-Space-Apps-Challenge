@@ -591,8 +591,22 @@ export default function MissionStage({
             e.preventDefault();
           }}
         />
-        <div className="panel-bar">
-          <div className="panel-tabs step-tabs" role="tablist" aria-label={t("missionStage.modules")}>
+        <nav className="panel-bar menu-bar" aria-label={t("missionStage.modules")}>
+          <div className="menu-top">
+            <span className="menu-title">{t("missionStage.menuTitle")}</span>
+            <div className="panel-bar-end">
+              {status}
+              <button
+                type="button"
+                className="panel-collapse"
+                onClick={() => setPanelOpen(false)}
+                aria-label={t("missionStage.hidePanel")}
+              >
+                ›
+              </button>
+            </div>
+          </div>
+          <div className="step-tabs" role="tablist" aria-label={t("missionStage.modules")}>
             {steps.map((group, index) => (
               <button
                 key={group}
@@ -605,70 +619,65 @@ export default function MissionStage({
                   openGroup(group);
                 }}
               >
-                <b>{index + 1}</b> {t(`missionStage.steps.${group}`)}
+                <b>{index + 1}</b>
+                <span>{t(`missionStage.steps.${group}`)}</span>
               </button>
             ))}
-            {learn && (
-              <button
-                type="button"
-                role="tab"
-                id="step-learn"
-                className="step-extra"
-                aria-selected={activeGroup === "learn"}
-                onClick={() => {
-                  setAdvancedOpen(false);
-                  onModuleChange(learn.id);
-                }}
-              >
-                {t("missionStage.learn")}
-              </button>
-            )}
-            {advanced.length > 0 && (
-              <div className="advanced-menu">
+          </div>
+          {(learn || advanced.length > 0) && (
+            <div className="menu-extra">
+              {learn && (
                 <button
                   type="button"
-                  className="step-extra"
-                  aria-expanded={advancedOpen}
-                  aria-haspopup="menu"
-                  data-active={activeGroup === "advanced" || undefined}
-                  onClick={() => setAdvancedOpen((open) => !open)}
+                  id="step-learn"
+                  aria-pressed={activeGroup === "learn"}
+                  onClick={() => {
+                    setAdvancedOpen(false);
+                    onModuleChange(learn.id);
+                  }}
                 >
-                  {t("missionStage.advanced")} ▾
+                  <span aria-hidden="true">✦</span> {t("missionStage.learn")}
                 </button>
-                {advancedOpen && (
-                  <div className="advanced-list" role="menu">
-                    <p>{t("missionStage.advancedHint")}</p>
-                    {advanced.map((m) => (
-                      <button
-                        key={m.id}
-                        type="button"
-                        role="menuitem"
-                        aria-current={activeModule === m.id || undefined}
-                        onClick={() => {
-                          setAdvancedOpen(false);
-                          onModuleChange(m.id);
-                        }}
-                      >
-                        {m.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-          <div className="panel-bar-end">
-            {status}
-            <button
-              type="button"
-              className="panel-collapse"
-              onClick={() => setPanelOpen(false)}
-              aria-label={t("missionStage.hidePanel")}
-            >
-              ›
-            </button>
-          </div>
-        </div>
+              )}
+              {advanced.length > 0 && (
+                <div className="advanced-menu">
+                  <button
+                    type="button"
+                    aria-expanded={advancedOpen}
+                    aria-haspopup="menu"
+                    data-active={activeGroup === "advanced" || undefined}
+                    onClick={() => setAdvancedOpen((open) => !open)}
+                  >
+                    <span aria-hidden="true">⚙</span> {t("missionStage.advanced")}
+                    {activeGroup === "advanced"
+                      ? `: ${advanced.find((m) => m.id === activeModule)?.label ?? ""}`
+                      : ""}{" "}
+                    <span aria-hidden="true">{advancedOpen ? "▴" : "▾"}</span>
+                  </button>
+                  {advancedOpen && (
+                    <div className="advanced-list" role="menu">
+                      <p>{t("missionStage.advancedHint")}</p>
+                      {advanced.map((m) => (
+                        <button
+                          key={m.id}
+                          type="button"
+                          role="menuitem"
+                          aria-current={activeModule === m.id || undefined}
+                          onClick={() => {
+                            setAdvancedOpen(false);
+                            onModuleChange(m.id);
+                          }}
+                        >
+                          {m.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+        </nav>
         <div
           className="panel-body"
           role="tabpanel"

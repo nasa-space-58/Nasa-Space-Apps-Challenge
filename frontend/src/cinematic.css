@@ -345,12 +345,17 @@
   border-radius: 3px;
 }
 .panel-heading {
-  padding: 18px 22px;
-  font-size: 10px;
-  color: #c6cdcf;
+  gap: 10px;
+  padding: 16px 20px;
+  font: 600 15px/1.3 "DM Sans", sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #eef1f2;
 }
 .panel-heading small {
-  font-size: 10px;
+  font: 400 12px "DM Sans", sans-serif;
+  letter-spacing: 0;
+  text-transform: none;
   color: #a1aeb7;
 }
 .parameters {
@@ -1574,71 +1579,126 @@ body.panel-resizing canvas {
   gap: 18px;
 }
 
-/* Simplified mission control: four numbered steps, Learn, and an Advanced menu. */
-.step-tabs {
-  align-items: stretch;
-  gap: 4px;
+/* Mission control menu: title row, four numbered steps, then Learn and Advanced. */
+.menu-bar {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #0a0f13;
 }
-.step-tabs > button,
-.step-tabs .advanced-menu > button {
-  display: inline-flex;
+.menu-top {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.menu-title {
+  color: #9aa9b3;
+  font: 600 12px "DM Sans", sans-serif;
+  letter-spacing: 0.04em;
+}
+.menu-top .panel-bar-end {
+  padding-top: 0;
+}
+.step-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 6px;
-  padding: 9px 12px;
-  border: 0;
-  border-bottom: 2px solid transparent;
-  background: transparent;
+}
+.step-tabs > button {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 6px;
+  min-height: 64px;
+  padding: 9px 4px 8px;
+  border: 1px solid #ffffff14;
+  border-radius: 8px;
+  background: #0f171d;
   color: #a7b6c0;
-  font: 500 13px "DM Sans", sans-serif;
-  letter-spacing: 0;
+  font: 500 12.5px/1.25 "DM Sans", sans-serif;
+  text-align: center;
   text-transform: none;
+  letter-spacing: 0;
   cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
 .step-tabs > button b {
-  display: inline-grid;
+  display: grid;
   place-items: center;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  border: 1px solid #ffffff30;
-  font: 600 11px "DM Sans", sans-serif;
+  border: 1px solid #ffffff38;
+  font: 700 11px "DM Sans", sans-serif;
+}
+.step-tabs > button span {
+  overflow-wrap: anywhere;
+}
+.step-tabs > button:hover {
+  border-color: #ffffff30;
+  color: #f3eee4;
 }
 .step-tabs > button[aria-selected="true"] {
+  border-color: var(--gold);
+  background: #1d1a12;
   color: #f3eee4;
-  border-bottom-color: var(--gold);
 }
 .step-tabs > button[aria-selected="true"] b {
   background: var(--gold);
   border-color: var(--gold);
   color: #10171e;
 }
-.step-tabs .step-extra {
-  color: #7f8e98;
+.step-tabs > button:focus-visible,
+.menu-extra button:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
-.step-tabs .step-extra:hover,
-.step-tabs > button:hover {
+.menu-extra {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.menu-extra > button,
+.advanced-menu > button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid #ffffff1c;
+  border-radius: 999px;
+  background: transparent;
+  color: #b9c6ce;
+  font: 500 13px "DM Sans", sans-serif;
+  cursor: pointer;
+}
+.menu-extra > button:hover,
+.advanced-menu > button:hover {
+  border-color: #ffffff40;
+  color: #f3eee4;
+}
+.menu-extra > button[aria-pressed="true"],
+.advanced-menu > button[data-active] {
+  border-color: var(--gold);
   color: #f3eee4;
 }
 .advanced-menu {
   position: relative;
-}
-.advanced-menu > button[data-active] {
-  color: #f3eee4;
-  border-bottom-color: var(--gold);
 }
 .advanced-list {
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
   z-index: 20;
-  min-width: 240px;
-  padding: 10px;
+  width: min(300px, 80vw);
+  padding: 8px;
+  border: 1px solid #ffffff24;
+  border-radius: 8px;
   background: #0a0f13;
-  border: 1px solid #ffffff20;
-  box-shadow: 0 12px 32px #0008;
+  box-shadow: 0 14px 36px #000a;
 }
 .advanced-list p {
-  margin: 0 0 8px;
+  margin: 4px 8px 8px;
   color: #7f8e98;
   font-size: 12px;
   line-height: 1.5;
@@ -1646,8 +1706,9 @@ body.panel-resizing canvas {
 .advanced-list button {
   display: block;
   width: 100%;
-  padding: 8px 10px;
+  padding: 9px 10px;
   border: 0;
+  border-radius: 6px;
   background: transparent;
   color: #d5dde2;
   font: 14px "DM Sans", sans-serif;

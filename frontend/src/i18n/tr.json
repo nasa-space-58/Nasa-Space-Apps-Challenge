@@ -505,7 +505,8 @@
     },
     "learn": "Öğren",
     "advanced": "Gelişmiş",
-    "advancedHint": "Uzmanlar için planlama ve araştırma araçları"
+    "advancedHint": "Uzmanlar için planlama ve araştırma araçları",
+    "menuTitle": "Görev adımları"
   },
   "missionPhases": {
     "launch": {

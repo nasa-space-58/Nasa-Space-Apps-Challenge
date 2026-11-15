@@ -505,7 +505,8 @@
     },
     "learn": "Learn",
     "advanced": "Advanced",
-    "advancedHint": "Planning and research tools for experts"
+    "advancedHint": "Planning and research tools for experts",
+    "menuTitle": "Mission steps"
   },
   "missionPhases": {
     "launch": {
