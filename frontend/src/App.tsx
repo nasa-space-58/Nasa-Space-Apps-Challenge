@@ -33,6 +33,7 @@ import LiveResults, { type PlaybackSpeed } from "./components/LiveResults";
 import SavedLibrary from "./components/SavedLibrary";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
 import { LanguageToggle, siteLabel, useTranslate, type Translate } from "./i18n";
+import { SOURCE_GROUPS } from "./sourceCatalog";
 
 const MoonScene = lazy(() => import("./components/MoonScene"));
 const activeStates = ["pending", "preparing", "analyzing", "refining"];
@@ -1471,79 +1472,48 @@ export default function App() {
             <p className="eyebrow">{t("app.sources.eyebrow")}</p>
             <h2 id="sources-title">{t("app.sources.title")}</h2>
             <p>{t("app.sources.body")}</p>
-            <ul>
-              <li>
-                <a
-                  href="https://science.nasa.gov/3d-resources/lunar-reconnaissance-orbiter-a/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t("app.sources.lro")}
-                </a>{" "}
-                · NASA / Christopher R. Meaney
-              </li>
-              <li>
-                <a
-                  href="https://science.nasa.gov/3d-resources/apollo-lunar-module/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Apollo Lunar Module
-                </a>{" "}
-                · NASA / Michael D. Carbajal
-              </li>
-              <li>
-                <a
-                  href="https://svs.gsfc.nasa.gov/4720/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  CGI Moon Kit
-                </a>{" "}
-                · NASA / Goddard / Scientific Visualization Studio
-              </li>
-              <li>
-                <a
-                  href="https://science.nasa.gov/earth/earth-observatory/blue-marble-next-generation/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Blue Marble Next Generation
-                </a>{" "}
-                · NASA Earth Observatory / Reto Stöckli
-              </li>
-              <li>
-                <a
-                  href="https://pgda.gsfc.nasa.gov/products/90"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {t("app.sources.lola")}
-                </a>{" "}
-                · Barker et al. (2023)
-              </li>
-              <li>
-                <a
-                  href="https://ssd.jpl.nasa.gov/horizons/"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  JPL Horizons
-                </a>{" "}
-                · {t("app.sources.horizons")}
-              </li>
-              {sites.map((site) => (
-                <li key={site.site_id}>
-                  <a
-                    href={site.coordinate_source_url}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    {t("app.sources.coordinate", { name: siteLabel(t, site) })}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            {SOURCE_GROUPS.map((group) => (
+              <section key={group.id} className="source-group">
+                <h3>{t(`app.sources.groups.${group.id}`)}</h3>
+                <ul>
+                  {group.entries.map((entry) => (
+                    <li key={entry.id}>
+                      {entry.href ? (
+                        <a href={entry.href} target="_blank" rel="noreferrer">
+                          {entry.title}
+                        </a>
+                      ) : (
+                        <strong>{entry.title}</strong>
+                      )}{" "}
+                      · {entry.credit}
+                      {entry.extra?.map((link) => (
+                        <span key={link.href}>
+                          {" "}
+                          ·{" "}
+                          <a href={link.href} target="_blank" rel="noreferrer">
+                            {link.labelKey ? t(link.labelKey) : link.label}
+                          </a>
+                        </span>
+                      ))}
+                      <span className="source-use">{t(`app.sources.use.${entry.id}`)}</span>
+                    </li>
+                  ))}
+                  {group.id === "terrain" &&
+                    sites.map((site) => (
+                      <li key={site.site_id}>
+                        <a
+                          href={site.coordinate_source_url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          {t("app.sources.coordinate", { name: siteLabel(t, site) })}
+                        </a>
+                        <span className="source-use">{t("app.sources.use.siteCoordinate")}</span>
+                      </li>
+                    ))}
+                </ul>
+              </section>
+            ))}
             <small>{t("app.sources.disclaimer")}</small>
           </section>
         </div>

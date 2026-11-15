@@ -209,12 +209,46 @@
       "close": "Close sources",
       "eyebrow": "PROVENANCE",
       "title": "A view built on real data.",
-      "body": "NASA models illustrate the journey. The introductory crater terrain is original decorative geometry, not the selected location. The mission-control flight from Earth to the Moon is illustrative: Earth, the Moon and their distance are to scale, the spacecraft are enlarged and the Sun is shown closer at its true apparent size; it is not a computed trajectory. Scientific results use cached Horizons ephemerides and the verified LOLA terrain product.",
-      "lro": "LRO model",
-      "lola": "LOLA south-pole terrain",
-      "horizons": "Sun and Earth observer ephemerides",
+      "body": "NASA models illustrate the journey. The introductory crater terrain is original decorative geometry, not the selected location. In mission control, Earth, the Moon and their distance are to scale; the spacecraft are enlarged, the rover is not to scale with the terrain and the Sun is shown closer at its true apparent size. Once the dated ephemeris for the chosen landing time has loaded, the Moon's position, Earth's rotation and the Sun's direction follow JPL Horizons; the spacecraft path itself is illustrative, not a computed trajectory. Scientific results use cached Horizons ephemerides, the verified LOLA terrain product and the sources listed below.",
       "coordinate": "{name} coordinate source",
-      "disclaimer": "The introduction is an illustrative animation. Apollo is not shown as a historical south-pole mission. NASA does not endorse this application."
+      "groups": {
+        "models": "3-D models and textures",
+        "terrain": "Terrain and site coordinates",
+        "ephemeris": "Ephemerides, orbits and reference constants",
+        "mission": "Mission timeline and lander",
+        "communication": "Ground stations and space weather",
+        "quantum": "Quantum optimization"
+      },
+      "link": {
+        "license": "License",
+        "manual": "Manual",
+        "model": "Dynamical model",
+        "scales": "NOAA Space Weather Scales"
+      },
+      "use": {
+        "lro": "Orbiter model in the introduction and mission-control scenes.",
+        "apollo": "Lander model in the introduction, mission-control and analysis scenes.",
+        "mobileLauncher": "Decorative launch pad in the launch close-up.",
+        "rocket": "Three-stage launch vehicle in the launch close-up. Used under the free 1DesignTool library license.",
+        "rover": "Rover in the landing close-up. Changed from the original: mesh decimated and quantized, texture coordinates removed, colours replaced per part, wheels and dish animated.",
+        "moonKit": "Moon colour map and relief preview for the decorative globe; never used for elevation analysis.",
+        "blueMarble": "Earth texture in the mission-control scene (January 2004).",
+        "lola": "Elevation for terrain horizons, slopes, rover routes and terrain recovery.",
+        "lsdb": "Lunar reference radius and site coordinates.",
+        "siteCoordinate": "Observer location for this preset.",
+        "horizons": "Sun and Earth observer ephemerides for the analysis; Moon and Sun geocentric vectors for the flight scene.",
+        "astroPar": "Lunar gravitational parameter (GM) for descent dynamics.",
+        "iers": "Earth Rotation Angle for the flight scene.",
+        "periodicOrbits": "Earth–Moon L2 halo orbit catalog for relay selection.",
+        "apollo11Report": "Mission phase times for the flight timeline and lunar module mass at powered descent.",
+        "tnD6846": "Powered-descent gates, engine limits and delta-v reserves.",
+        "dpsEvaluation": "Descent engine specific impulse (309.7 s, Apollo 9 time-integrated average).",
+        "dsn": "Deep Space Network station coordinates and elevation limits.",
+        "swpc": "Solar flare and proton event probabilities, GOES X-ray and proton flux, active regions.",
+        "qaoa": "Algorithm used by the local quantum optimization experiments.",
+        "openQuantum": "One archived two-qubit hardware job (2026-11-14), shown only as recorded evidence."
+      },
+      "disclaimer": "The introduction is an illustrative animation. Apollo is not shown as a historical south-pole mission. Example campaigns and fault scenarios are team-made teaching cases, not NASA plans, DSN bookings or failure statistics. Results are not landing-safety, power, thermal or link certification. NASA and the other listed source owners do not endorse this application."
     }
   },
   "language": {

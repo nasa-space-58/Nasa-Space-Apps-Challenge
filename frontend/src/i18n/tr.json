@@ -209,12 +209,46 @@
       "close": "Kaynakları kapat",
       "eyebrow": "KAYNAKÇA",
       "title": "Gerçek veriler üzerine kurulu bir görünüm.",
-      "body": "NASA modelleri yolculuğu canlandırır. Giriş bölümündeki krater arazisi seçilen konum değil, özgün dekoratif bir geometridir. Görev kontrolündeki Dünya'dan Ay'a uçuş temsilidir: Dünya, Ay ve aralarındaki mesafe ölçeklidir; uzay araçları büyütülmüş, Güneş ise gerçek görünür boyutunda ama daha yakın gösterilmiştir; hesaplanmış bir yörünge değildir. Bilimsel sonuçlar önbellekteki Horizons efemerislerini ve doğrulanmış LOLA arazi ürününü kullanır.",
-      "lro": "LRO modeli",
-      "lola": "LOLA güney kutbu arazisi",
-      "horizons": "Güneş ve Dünya gözlemci efemerisleri",
+      "body": "NASA modelleri yolculuğu canlandırır. Giriş bölümündeki krater arazisi seçilen konum değil, özgün dekoratif bir geometridir. Görev kontrolünde Dünya, Ay ve aralarındaki mesafe ölçeklidir; uzay araçları büyütülmüştür, gezici araziyle aynı ölçekte değildir, Güneş ise gerçek görünür boyutunda ama daha yakın gösterilir. Seçilen iniş zamanına ait tarihli efemeris yüklendiğinde Ay'ın konumu, Dünya'nın dönüşü ve Güneş'in yönü JPL Horizons'u izler; uzay aracının izlediği yol ise temsilidir, hesaplanmış bir yörünge değildir. Bilimsel sonuçlar önbellekteki Horizons efemerislerini, doğrulanmış LOLA arazi ürününü ve aşağıda listelenen kaynakları kullanır.",
       "coordinate": "{name} koordinat kaynağı",
-      "disclaimer": "Giriş bölümü temsili bir animasyondur. Apollo, tarihi bir güney kutbu görevi olarak gösterilmemektedir. NASA bu uygulamayı onaylamamaktadır."
+      "groups": {
+        "models": "3B modeller ve dokular",
+        "terrain": "Arazi ve konum koordinatları",
+        "ephemeris": "Efemerisler, yörüngeler ve referans sabitleri",
+        "mission": "Görev zaman çizelgesi ve iniş aracı",
+        "communication": "Yer istasyonları ve uzay havası",
+        "quantum": "Kuantum optimizasyonu"
+      },
+      "link": {
+        "license": "Lisans",
+        "manual": "Kılavuz",
+        "model": "Dinamik model",
+        "scales": "NOAA uzay havası ölçekleri"
+      },
+      "use": {
+        "lro": "Giriş ve görev kontrolü sahnelerindeki yörünge aracı modeli.",
+        "apollo": "Giriş, görev kontrolü ve analiz sahnelerindeki iniş aracı modeli.",
+        "mobileLauncher": "Fırlatma yakın planındaki dekoratif fırlatma platformu.",
+        "rocket": "Fırlatma yakın planındaki üç kademeli roket. Ücretsiz 1DesignTool kütüphane lisansıyla kullanılır.",
+        "rover": "İniş yakın planındaki gezici. Özgün modelden farkları: ağ seyreltildi ve nicemlendi, doku koordinatları kaldırıldı, renkler parça başına değiştirildi, tekerlekler ve anten canlandırıldı.",
+        "moonKit": "Dekoratif Ay küresi için renk haritası ve kabartma önizlemesi; yükseklik analizinde hiç kullanılmaz.",
+        "blueMarble": "Görev kontrolü sahnesindeki Dünya dokusu (Ocak 2004).",
+        "lola": "Arazi ufku, eğim, gezici rotaları ve arazi kurtarma için yükseklik verisi.",
+        "lsdb": "Ay referans yarıçapı ve konum koordinatları.",
+        "siteCoordinate": "Bu hazır konumun gözlemci noktası.",
+        "horizons": "Analiz için Güneş ve Dünya gözlemci efemerisleri; uçuş sahnesi için Ay ve Güneş'in yer merkezli vektörleri.",
+        "astroPar": "İniş dinamiği için Ay'ın kütleçekim parametresi (GM).",
+        "iers": "Uçuş sahnesi için Dünya Dönme Açısı.",
+        "periodicOrbits": "Röle seçimi için Dünya–Ay L2 hale yörüngesi kataloğu.",
+        "apollo11Report": "Uçuş zaman çizelgesindeki görev evreleri ve motorlu iniş başındaki ay modülü kütlesi.",
+        "tnD6846": "Motorlu iniş geçitleri, motor sınırları ve delta-v yedekleri.",
+        "dpsEvaluation": "İniş motoru özgül itkisi (309,7 s, Apollo 9 zaman ortalaması).",
+        "dsn": "Derin Uzay Ağı istasyon koordinatları ve yükseklik açısı sınırları.",
+        "swpc": "Güneş patlaması ve proton olayı olasılıkları, GOES X ışını ve proton akısı, aktif bölgeler.",
+        "qaoa": "Yerel kuantum optimizasyon deneylerinde kullanılan algoritma.",
+        "openQuantum": "Arşivlenmiş tek bir iki kübitlik donanım işi (2026-11-14); yalnızca kayıtlı kanıt olarak gösterilir."
+      },
+      "disclaimer": "Giriş bölümü temsili bir animasyondur. Apollo, tarihi bir güney kutbu görevi olarak gösterilmemektedir. Örnek kampanyalar ve arıza senaryoları ekibin hazırladığı öğretici örneklerdir; NASA planı, DSN rezervasyonu veya arıza istatistiği değildir. Sonuçlar iniş güvenliği, güç, ısıl veya bağlantı sertifikası değildir. NASA ve listelenen diğer kaynak sahipleri bu uygulamayı onaylamamaktadır."
     }
   },
   "language": {
