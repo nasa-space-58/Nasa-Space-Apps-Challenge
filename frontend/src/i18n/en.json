@@ -834,6 +834,10 @@
       "surface": {
         "title": "After landing: surface routes",
         "desc": "Plans rover routes to science targets that avoid steep slopes."
+      },
+      "terrainRecovery": {
+        "title": "Terrain-aware landing recovery",
+        "desc": "DEM-derived backup targets, faults and latency-aware replanning."
       }
     }
   },

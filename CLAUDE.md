@@ -239,10 +239,6 @@ Continue on `codex/unified-quantum-stage1`; connect bounded local quantum propos
 
 The user authorized consolidating the latest GitHub branches into main, cleaning up branch clutter, and implementing the agreed rounded-control / scene-first interface. This authorization supersedes earlier branch-specific no-merge and delivery restrictions for this integration. Preserve active worktrees and unrelated local files. H8–H11 and healthinfo were already squash-integrated via PRs #19 and #18. The divergent early R12 implementation is archived rather than replacing the current H5/H6 and R12 event stack. See docs/verification/branch-consolidation-2026-11-15.md for exact tips, preserved branches and verification. No paid assistant or quantum provider calls are authorized.
 
-### Q&A assistant delivery (user, 2026-11-15)
+### Terrain R12 restoration (user, 2026-11-15)
 
-`feature/assistant-qa` (merged with main `2ac81c2`) is delivered to `temel` by fast-forward, not to `main`. It adds the opt-in Claude Q&A assistant (skeleton `383ea15`, frozen tests `6db6f82`, see docs/assistant.md) and the simplified "Ask the Navigator" drawer in the site palette with collapsible sources. Main holds only the first drawer version from TK's integration `ba6ef48`. Do not push this work to `main` without a new explicit request.
-
-### Artemis III candidate regions (user, 2026-11-15)
-
-`shared/presets.json` lists all nine NASA Artemis III candidate regions (release 24-136). Corrected frozen test `b1d9871` (user-approved), new frozen tests `ed429f2`; see the Artemis III section of docs/terrain-and-sites.md. Slater Plain uses the IAU Slater crater center as a labeled anchor, not a region center. Keep Malapert last: the terrain bootstrap uses `presets()[-1]`. Pushed to `temel` at the user's request; tests were not run before that push.
+The user explicitly authorized restoring the archived R12 features without breaking either system, testing and publishing to main. This supersedes the earlier archive-only disposition for this implementation and authorizes this delivery to main. Terrain recovery is isolated in `app.terrain_recovery` / `app.terrain_twin` at `/descents/self-healing`; existing H5/H6 and public R9 remain unchanged. Frozen new test baseline: `1fa44d5`. See docs/terrain-recovery.md. Do not conflate this real-DEM classical experiment with the shared hybrid plan or certified flight control.

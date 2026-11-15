@@ -5,6 +5,7 @@ import RouteOptimizer, { type RouteResult } from "./RouteOptimizer";
 import RiskPanel from "./RiskPanel";
 import BackupPlans from "./BackupPlans";
 import SurfaceRoutes from "./SurfaceRoutes";
+import TerrainRecoveryPanel from "./TerrainRecoveryPanel";
 import TwinPanel from "./TwinPanel";
 import { errorText, siteLabel, useTranslate } from "../i18n";
 
@@ -678,6 +679,7 @@ export default function Descent({ sites, onCandidates }: { sites: Preset[]; onCa
                 ["risk", <RiskPanel base={planBase} />],
                 ["backups", <BackupPlans base={planBase} />],
                 ["twin", <TwinPanel base={planBase} />],
+                ["terrainRecovery", <TerrainRecoveryPanel base={planBase} />],
                 ["surface", <SurfaceRoutes site={planBase} />],
               ] as const
             ).map(([id, panel]) => (
