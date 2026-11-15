@@ -1,0 +1,112 @@
+/* R12: self-healing landing (kept separate from style.css; reuses risk/alternatives CSS). */
+.heal-compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media (max-width: 760px) {
+  .heal-compare {
+    grid-template-columns: 1fr;
+  }
+}
+.heal-compare .descent-verdict {
+  display: grid;
+  gap: 4px;
+}
+.heal-obstacle {
+  fill: #e66767;
+  fill-opacity: 0.18;
+  stroke: #e66767;
+  stroke-dasharray: 4 3;
+}
+.heal-original {
+  fill: none;
+  stroke: #e8edf1;
+  stroke-width: 1.5;
+}
+.heal-chosen {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 2;
+}
+.heal-divert {
+  stroke: var(--gold);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+.heal-log {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 10px;
+  font-size: 13px;
+  color: #e8edf1;
+}
+.heal-log small {
+  display: block;
+  color: #a9b6bf;
+  font-size: 12px;
+  margin-top: 2px;
+}
+.heal-log b {
+  font-family: var(--mono);
+  font-weight: 400;
+  color: var(--gold);
+}
+.heal-log li.abort_required,
+.heal-log li.stale_result_rejected {
+  color: #f0a3a3;
+}
+.heal-backups {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+}
+.heal-backups li {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 40px;
+  gap: 10px;
+  align-items: center;
+}
+.risk-legend .ring {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  vertical-align: middle;
+  border: 1.5px solid var(--gold);
+}
+.heal-original-path {
+  fill: none;
+  stroke: var(--blue);
+  stroke-width: 1.5;
+  stroke-dasharray: 5 4;
+}
+.heal-healed-path {
+  fill: none;
+  stroke: var(--gold);
+  stroke-width: 2;
+}
+.heal-target-line,
+.heal-new-target-line {
+  stroke: #6c7a84;
+  stroke-dasharray: 2 4;
+}
+.heal-new-target-line {
+  stroke: var(--gold);
+}
+.heal-swatch {
+  display: inline-block;
+  width: 18px;
+  vertical-align: middle;
+  border-top: 2px solid var(--gold);
+}
+
+.heal-log button { text-align: left; padding: 8px; border: 1px solid transparent; }
+.heal-log button[aria-pressed="true"] { border-color: var(--gold); }
+.terrain-candidate-detail { padding: 10px 0; border-top: 1px solid var(--line); overflow-wrap: anywhere; }
+.heal-panel { min-width: 0; }
+.heal-panel .backup-grid { grid-template-columns: 1fr; }

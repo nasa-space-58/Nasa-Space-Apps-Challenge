@@ -893,94 +893,15 @@ def _downsample(rows: list[dict]) -> list[dict]:
 
 
 def run_twin(request: TwinRequest, terrain_height_m: float) -> dict:
-    """Event run plus a same-seed no-event baseline and their differences.
+    """Keep ordinary twin runs on the current R9 implementation.
 
-    Raises TwinError for an unknown vehicle or a plan the R4 model rejects.
+    Only terrain recovery uses the isolated stepwise TwinFlight engine. The
+    archived run serializer adds recovery-only fields, so it must not replace
+    the existing public twin output contract.
     """
-    profile = _vehicle(request)
-    try:
-        nominal = plan_descent(
-            DescentRequest(
-                site_id=request.site_id,
-                latitude_deg=request.latitude_deg,
-                longitude_deg_east=request.longitude_deg_east,
-                profile_id=request.profile_id,
-                custom_profile=request.custom_profile,
-                orbit=request.orbit,
-                tolerances=request.tolerances,
-            ),
-            terrain_height_m,
-        )
-    except (DescentError, ValueError) as exc:
-        raise TwinError(str(exc)) from exc
-    site_radius = nominal["site"]["radius_m"]
-    arguments = (
-        profile,
-        site_radius,
-        nominal["pdi_range_m"],
-        nominal["deorbit"]["periapsis_speed_mps"],
-        request.sensor,
-    )
-    common = dict(
-        seed=request.seed,
-        step_s=request.step_s,
-        battery=request.battery,
-        plan_dependencies=tuple(request.plan_dependencies),
-    )
-    run = fly_twin(*arguments, list(request.events), **common)
-    baseline = fly_twin(*arguments, [], **common)
-    run_check = _touchdown_check(run, request, profile)
-    base_check = _touchdown_check(baseline, request, profile)
-    differences = {
-        key: run["final"][key] - baseline["final"][key]
-        for key in ("position_error_m", "vertical_speed_mps", "horizontal_speed_mps")
-    } | {
-        key: run[key] - baseline[key]
-        for key in ("propellant_remaining_kg", "duration_s", "max_estimate_error_m")
-    }
-    output = {
-        "site": {
-            "site_id": request.site_id,
-            "latitude_deg": request.latitude_deg,
-            "longitude_deg_east": request.longitude_deg_east,
-            "terrain_height_m": float(terrain_height_m),
-        },
-        "settings": request.model_dump(mode="json"),
-        "nominal": {
-            "feasible": nominal["feasible"],
-            "pdi_range_m": nominal["pdi_range_m"],
-        },
-        "run": {
-            "timeline": _downsample(run["rows"]),
-            "final": run["final"],
-            "touchdown_check": run_check,
-            "log": run["log"],
-            "obstacles": run["obstacles"],
-            "plan": run["plan"],
-            "phases": run["phases"],
-            "max_estimate_error_m": run["max_estimate_error_m"],
-            "final_estimate_error_m": run["final_estimate_error_m"],
-            "propellant_remaining_kg": run["propellant_remaining_kg"],
-            "propellant_exhausted": run["propellant_exhausted"],
-            "duration_s": run["duration_s"],
-            "battery_energy_j": run["battery_energy_j"],
-            "battery_empty": run["battery_empty"],
-            "engine_bias_fraction": run["engine_bias_fraction"],
-            "log_hash": run["log_hash"],
-        },
-        "baseline": {
-            "final": baseline["final"],
-            "touchdown_check": base_check,
-            "propellant_remaining_kg": baseline["propellant_remaining_kg"],
-            "max_estimate_error_m": baseline["max_estimate_error_m"],
-            "duration_s": baseline["duration_s"],
-            "log_hash": baseline["log_hash"],
-        },
-        "differences": differences,
-        "assumptions": list(ASSUMPTIONS),
-    }
-    output["result_id"] = canonical_hash(output)
-    return output
+    from app.twin import TwinRequest as PublicTwinRequest, run_twin as public_run
+
+    return public_run(PublicTwinRequest.model_validate(request.model_dump()), terrain_height_m)
 
 
 def register_twin_routes(app, data_dir: Path) -> None:

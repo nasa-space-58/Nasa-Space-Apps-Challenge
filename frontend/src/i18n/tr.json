@@ -834,6 +834,10 @@
       "surface": {
         "title": "İnişten sonra: yüzey rotaları",
         "desc": "Gezginin bilim hedeflerine dik yamaçlardan kaçınarak gideceği rotaları planlar."
+      },
+      "terrainRecovery": {
+        "title": "Araziye bağlı iniş kurtarma",
+        "desc": "Gerçek araziden yedek hedefler, arıza ve gecikmeli yeniden planlama."
       }
     }
   },
