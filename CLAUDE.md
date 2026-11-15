@@ -219,3 +219,7 @@ Start from current main `e92174e` on `codex/unified-quantum-stage1`. Complete on
 ### Unified planner stage 2 (user, 2026-11-15)
 
 Continue on `codex/unified-quantum-stage1`, implement the R11/H6 common contracts/adapters, test and push only this branch. Do not merge into main/tahakrcc. All H0–H11 roles must remain in the common architecture; stage 2 does not claim all adapters or a universal solver are implemented. Ask before any real quantum credits, including Spark. Preserve the local H6 notebook. Skeleton `408dbf7`, frozen tests/fixture `73cdc6e`; see docs/unified-planner-contracts.md.
+
+### Unified planner stage 3 (user, 2026-11-15)
+
+Continue on `codex/unified-quantum-stage1`; implement the full classical mission pilot and event/physical revalidation, test and push only this branch. Do not merge into main/tahakrcc or spend real quantum credits. Preserve the local H6 notebook. Skeleton `4c4110b`; frozen tests/fixture `bdeeb7c` and independent admission tests `6dbc897`. See docs/unified-classical-pilot.md for exact limits, including offline paused-clock operation and immutable-allocation rejection.

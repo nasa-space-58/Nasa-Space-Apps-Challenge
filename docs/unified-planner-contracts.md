@@ -100,3 +100,7 @@ Stage 3 remains pending: a multi-mission classical pilot that completes and phys
 ## Full verification
 
 1,771 backend, 218 ingestion and 91 optional-quantum tests passed (2,080 total, including 55 new contract tests). Backend/ingestion Ruff checks and the TypeScript/Vite production build passed. Existing Starlette/AnyIO deprecation and large frontend bundle warnings remain. No frontend tests/screenshots or live provider jobs were run. The local H6 notebook remains untouched and excluded from commits.
+
+## Stage 3 follow-up
+
+The previously pending classical pilot is now delivered in [stage 3](unified-classical-pilot.md). It uses this unchanged native envelope and explicitly rederives full R11 arrival/fuel evidence; it does not turn stage 2 identity mappings into automatic coordinate transforms.

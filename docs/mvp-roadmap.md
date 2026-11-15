@@ -432,7 +432,7 @@ This sequence builds on the merged H0–H11 and R10–R13 implementations. Exist
 
 - [x] Stage 1 — Audit current contracts and connections; record fresh R11 classical and H6/R12 local-replay baselines, explicit adapter rejection and existing R13 NO-GO policy. This is an inventory/evidence delivery, not a new solver.
 - [x] Stage 2 — Versioned native R11/H6 envelope, sealed snapshots and bounded synthetic option-identity adapters; full constraints retained and proposals require classical completion/physical revalidation. All H0–H11 roles are catalogued; unsupported real frame/relay-only mappings reject explicitly. See [contracts and limits](unified-planner-contracts.md).
-- [ ] Stage 3 — End-to-end classical lander/dependent-rover/shared-resource pilot, including feasible replanning, stale results and no-continuation cases.
+- [x] Stage 3 — Full classical lander/dependent-rover/shared-resource pilot, exact arrival/fuel evidence, event replanning, independent physical/campaign admission, stale/expired rejection and no-continuation cases. Completed choices are frozen; incompatible historic allocations reject explicitly. See [pilot and limits](unified-classical-pilot.md).
 - [ ] Stage 4 — Bounded quantum proposal path with full classical completion, original-constraint validation, matched baselines and unchanged production execution gates.
 - [ ] Stage 5 — Event-driven coordination and unified plan identity across existing views; timing, fallback and execution-mode evidence.
 - [ ] Stage 6 — New pre-registered dev/held-out comparisons and separately authorized hardware tests; later rover/activity and orbital-relay extensions only after their own validation.

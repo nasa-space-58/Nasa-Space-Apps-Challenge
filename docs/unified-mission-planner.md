@@ -99,3 +99,7 @@ This branch changes documentation and the recorded baseline evidence only. The p
 ## Stage 2 delivery
 
 The native envelope and bounded synthetic identity adapters are now implemented; see [stage 2 contracts, tests and remaining limits](unified-planner-contracts.md). Earlier pending statements above describe the stage 1 delivery. The common coordinator and general quantum proposal path remain later stages.
+
+## Stage 3 delivery
+
+The full classical synthetic pilot and event replan are implemented; see [stage 3 results, admission checks and bounded execution limits](unified-classical-pilot.md). The quantum proposal path, live coordinator and common UI remain later stages.

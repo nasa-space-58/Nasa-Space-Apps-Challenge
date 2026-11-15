@@ -1,0 +1,618 @@
+{
+  "schema_version": "unified-stage3-pilot-v1",
+  "recorded_utc": "2026-11-15T00:53:15.047786+00:00",
+  "hardware_jobs_submitted": 0,
+  "execution_mode": "classical",
+  "simulated_clock_paused": true,
+  "event": {
+    "event_id": "obstacle-1",
+    "epoch_utc": "2030-01-01T00:00:08Z",
+    "start_downrange_m": -5.0,
+    "end_downrange_m": 5.0
+  },
+  "scenarios": [
+    {
+      "name": "nominal",
+      "snapshot_sha256": "e821387bb2fa368f6270e060e3f9258d835e9bbb37960b8dbe0e88d233ded6ce",
+      "status": "feasible",
+      "selected_target_id": "primary",
+      "optimum_proven_over_screened_targets": true,
+      "elapsed_s": 0.7381462079938501,
+      "checkpoint": {
+        "epoch_utc": "2030-01-01T00:00:00Z",
+        "vehicle_id": "demo-lander",
+        "revision": 0,
+        "reference_frame": "PLANAR_MOON_CENTERED_NONROTATING",
+        "position_m": [
+          0.0,
+          1737500.0
+        ],
+        "velocity_mps": [
+          0.0,
+          -3.0
+        ],
+        "propellant_kg": 100.0
+      },
+      "candidates": [
+        {
+          "target_id": "backup",
+          "status": "feasible",
+          "reasons": [],
+          "solver_status": "optimal",
+          "score": "134568588731680927431/2500000000000000000"
+        },
+        {
+          "target_id": "primary",
+          "status": "feasible",
+          "reasons": [],
+          "solver_status": "optimal",
+          "score": "5019137389739339882581/5000000000000000000"
+        },
+        {
+          "target_id": "remote",
+          "status": "feasible",
+          "reasons": [],
+          "solver_status": "optimal",
+          "score": "754113619956916837487/1500000000000000000"
+        }
+      ],
+      "plan": {
+        "plan_id": "joint-8b30787fe165b9e8",
+        "campaign_id": "unified-stage3-campaign",
+        "campaign_revision": 1,
+        "input_fingerprint": "26b58eb6598348082ae93beae2dde568329fb36120e01da63bf090ef6068dd9a",
+        "selections": {
+          "landing": "landing.land-primary.20300101T000029Z",
+          "other": "other.land-primary.20300101T000100Z",
+          "rover": "rover.land-primary.20300101T000045Z"
+        },
+        "allocations": [
+          {
+            "mission_id": "landing",
+            "station_id": "dss-alpha",
+            "slot_index": 1,
+            "window": {
+              "start_utc": "2030-01-01T00:01:00Z",
+              "end_utc": "2030-01-01T00:02:00Z"
+            },
+            "via_relay_mission_id": null,
+            "bits": 60.0
+          },
+          {
+            "mission_id": "rover",
+            "station_id": "dss-alpha",
+            "slot_index": 2,
+            "window": {
+              "start_utc": "2030-01-01T00:02:00Z",
+              "end_utc": "2030-01-01T00:03:00Z"
+            },
+            "via_relay_mission_id": null,
+            "bits": 60.0
+          },
+          {
+            "mission_id": "other",
+            "station_id": "dss-alpha",
+            "slot_index": 3,
+            "window": {
+              "start_utc": "2030-01-01T00:03:00Z",
+              "end_utc": "2030-01-01T00:04:00Z"
+            },
+            "via_relay_mission_id": null,
+            "bits": 60.0
+          }
+        ],
+        "solver_name": "r11-highs-milp"
+      },
+      "validation": {
+        "input_fingerprint": "26b58eb6598348082ae93beae2dde568329fb36120e01da63bf090ef6068dd9a",
+        "status": "feasible",
+        "issues": [],
+        "outcomes": [
+          {
+            "mission_id": "landing",
+            "status": "nominal",
+            "option_id": "landing.land-primary.20300101T000029Z",
+            "required_bits": 60.0,
+            "delivered_bits": 60.0,
+            "relayed_bits": 0.0
+          },
+          {
+            "mission_id": "other",
+            "status": "nominal",
+            "option_id": "other.land-primary.20300101T000100Z",
+            "required_bits": 60.0,
+            "delivered_bits": 60.0,
+            "relayed_bits": 0.0
+          },
+          {
+            "mission_id": "rover",
+            "status": "nominal",
+            "option_id": "rover.land-primary.20300101T000045Z",
+            "required_bits": 60.0,
+            "delivered_bits": 60.0,
+            "relayed_bits": 0.0
+          }
+        ],
+        "score": 1003.994143697868,
+        "exact_score": "5019970718489339882581/5000000000000000000"
+      },
+      "physical": {
+        "target_id": "primary",
+        "accepted": true,
+        "reasons": [],
+        "coarse_feasible": true,
+        "fine_feasible": true,
+        "numerically_consistent": true,
+        "uncertainty": {
+          "sample_count": 8,
+          "pass_count": 8,
+          "failure_counts": {},
+          "outcomes": [
+            {
+              "sample": 0,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 0.0,
+              "propellant_kg": 82.73949644662753
+            },
+            {
+              "sample": 1,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 0.0,
+              "propellant_kg": 82.73949644662753
+            },
+            {
+              "sample": 2,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 0.0,
+              "propellant_kg": 82.73949644662753
+            },
+            {
+              "sample": 3,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 0.0,
+              "propellant_kg": 82.73949644662753
+            },
+            {
+              "sample": 4,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 0.0,
+              "propellant_kg": 82.73949644662753
+            },
+            {
+              "sample": 5,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 0.0,
+              "propellant_kg": 82.73949644662753
+            },
+            {
+              "sample": 6,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 0.0,
+              "propellant_kg": 82.73949644662753
+            },
+            {
+              "sample": 7,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 0.0,
+              "propellant_kg": 82.73949644662753
+            }
+          ]
+        },
+        "numerical_differences": {
+          "position_m": 0.0,
+          "velocity_mps": 9.471962528928568e-05,
+          "fuel_kg": 3.622906126565795e-05,
+          "time_s": 8.020224051108471e-06
+        },
+        "coarse": {
+          "termination": "contact",
+          "feasible": true,
+          "reasons": [],
+          "state": {
+            "epoch_utc": "2030-01-01T00:00:29.999953Z",
+            "vehicle_id": "demo-lander",
+            "revision": 0,
+            "reference_frame": "PLANAR_MOON_CENTERED_NONROTATING",
+            "position_m": [
+              0.0,
+              1737400.0
+            ],
+            "velocity_mps": [
+              0.0,
+              -0.500258471292985
+            ],
+            "propellant_kg": 82.73946021756626
+          },
+          "t_s": 29.9999533476308,
+          "downrange_m": 0.0,
+          "vertical_speed_mps": -0.500258471292985,
+          "horizontal_speed_mps": 0.0,
+          "propellant_used_kg": 17.26053978243374,
+          "request_sha256": "6200c5a46fb626e89180472043bcb6264443da71d168b2d97e0d6e44078e4bd2"
+        },
+        "fine": {
+          "termination": "contact",
+          "feasible": true,
+          "reasons": [],
+          "state": {
+            "epoch_utc": "2030-01-01T00:00:29.999945Z",
+            "vehicle_id": "demo-lander",
+            "revision": 0,
+            "reference_frame": "PLANAR_MOON_CENTERED_NONROTATING",
+            "position_m": [
+              0.0,
+              1737400.0
+            ],
+            "velocity_mps": [
+              0.0,
+              -0.5003531909182742
+            ],
+            "propellant_kg": 82.73949644662753
+          },
+          "t_s": 29.99994532740675,
+          "downrange_m": 0.0,
+          "vertical_speed_mps": -0.5003531909182742,
+          "horizontal_speed_mps": 0.0,
+          "propellant_used_kg": 17.260503553372473,
+          "request_sha256": "9293c8d60bc417d66da1d8c4f6e127141972129be23bb8e89f16f0c42f694b2e"
+        }
+      },
+      "candidate_window_starts_utc": {
+        "landing": "2030-01-01T00:00:29.999945+00:00",
+        "other": "2030-01-01T00:01:00+00:00",
+        "rover": "2030-01-01T00:00:45+00:00"
+      }
+    },
+    {
+      "name": "landing_exclusion",
+      "snapshot_sha256": "f250a4bef17d349dfe4243233667f4b75ff3a6a82c227b41c8ad583545bcd2ab",
+      "status": "feasible",
+      "selected_target_id": "remote",
+      "optimum_proven_over_screened_targets": true,
+      "elapsed_s": 0.3878886259990395,
+      "checkpoint": {
+        "epoch_utc": "2030-01-01T00:00:08Z",
+        "vehicle_id": "demo-lander",
+        "revision": 1,
+        "reference_frame": "PLANAR_MOON_CENTERED_NONROTATING",
+        "position_m": [
+          0.0,
+          1737470.313336506
+        ],
+        "velocity_mps": [
+          0.0,
+          -4.195162053067819
+        ],
+        "propellant_kg": 95.99806200363366
+      },
+      "candidates": [
+        {
+          "target_id": "backup",
+          "status": "feasible",
+          "reasons": [],
+          "solver_status": "optimal",
+          "score": "1345684432355307921/25000000000000000"
+        },
+        {
+          "target_id": "remote",
+          "status": "feasible",
+          "reasons": [],
+          "solver_status": "optimal",
+          "score": "4909592787296372481/9765625000000000"
+        },
+        {
+          "target_id": "primary",
+          "status": "rejected",
+          "reasons": [
+            "landing_hazard"
+          ],
+          "solver_status": null,
+          "score": null
+        }
+      ],
+      "plan": {
+        "plan_id": "joint-09a59a36a943a2ae",
+        "campaign_id": "unified-stage3-campaign",
+        "campaign_revision": 2,
+        "input_fingerprint": "a514e821a2bccbf31841f9bff317c69364f210bb043c3f88deadf83407c2dafc",
+        "selections": {
+          "landing": "landing.land-remote.20300101T000034Z",
+          "other": "other.land-primary.20300101T000100Z",
+          "rover": "rover.land-primary.20300101T000145Z"
+        },
+        "allocations": [
+          {
+            "mission_id": "other",
+            "station_id": "dss-alpha",
+            "slot_index": 1,
+            "window": {
+              "start_utc": "2030-01-01T00:01:00Z",
+              "end_utc": "2030-01-01T00:02:00Z"
+            },
+            "via_relay_mission_id": null,
+            "bits": 60.0
+          },
+          {
+            "mission_id": "landing",
+            "station_id": "dss-alpha",
+            "slot_index": 2,
+            "window": {
+              "start_utc": "2030-01-01T00:02:00Z",
+              "end_utc": "2030-01-01T00:03:00Z"
+            },
+            "via_relay_mission_id": null,
+            "bits": 60.0
+          },
+          {
+            "mission_id": "rover",
+            "station_id": "dss-alpha",
+            "slot_index": 3,
+            "window": {
+              "start_utc": "2030-01-01T00:03:00Z",
+              "end_utc": "2030-01-01T00:04:00Z"
+            },
+            "via_relay_mission_id": null,
+            "bits": 60.0
+          }
+        ],
+        "solver_name": "r11-highs-milp"
+      },
+      "validation": {
+        "input_fingerprint": "a514e821a2bccbf31841f9bff317c69364f210bb043c3f88deadf83407c2dafc",
+        "status": "feasible",
+        "issues": [],
+        "outcomes": [
+          {
+            "mission_id": "landing",
+            "status": "nominal",
+            "option_id": "landing.land-remote.20300101T000034Z",
+            "required_bits": 60.0,
+            "delivered_bits": 60.0,
+            "relayed_bits": 0.0
+          },
+          {
+            "mission_id": "other",
+            "status": "nominal",
+            "option_id": "other.land-primary.20300101T000100Z",
+            "required_bits": 60.0,
+            "delivered_bits": 60.0,
+            "relayed_bits": 0.0
+          },
+          {
+            "mission_id": "rover",
+            "status": "nominal",
+            "option_id": "rover.land-primary.20300101T000145Z",
+            "required_bits": 60.0,
+            "delivered_bits": 60.0,
+            "relayed_bits": 0.0
+          }
+        ],
+        "score": 502.99230121914854,
+        "exact_score": "4912034191593247481/9765625000000000"
+      },
+      "physical": {
+        "target_id": "remote",
+        "accepted": true,
+        "reasons": [],
+        "coarse_feasible": true,
+        "fine_feasible": true,
+        "numerically_consistent": true,
+        "uncertainty": {
+          "sample_count": 8,
+          "pass_count": 8,
+          "failure_counts": {},
+          "outcomes": [
+            {
+              "sample": 0,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 80.00006153088097,
+              "propellant_kg": 79.66869858090342
+            },
+            {
+              "sample": 1,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 80.00006153088097,
+              "propellant_kg": 79.66869858090342
+            },
+            {
+              "sample": 2,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 80.00006153088097,
+              "propellant_kg": 79.66869858090342
+            },
+            {
+              "sample": 3,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 80.00006153088097,
+              "propellant_kg": 79.66869858090342
+            },
+            {
+              "sample": 4,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 80.00006153088097,
+              "propellant_kg": 79.66869858090342
+            },
+            {
+              "sample": 5,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 80.00006153088097,
+              "propellant_kg": 79.66869858090342
+            },
+            {
+              "sample": 6,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 80.00006153088097,
+              "propellant_kg": 79.66869858090342
+            },
+            {
+              "sample": 7,
+              "accepted": true,
+              "reasons": [],
+              "downrange_m": 80.00006153088097,
+              "propellant_kg": 79.66869858090342
+            }
+          ]
+        },
+        "numerical_differences": {
+          "position_m": 1.1646656086200433e-05,
+          "velocity_mps": 0.0002388225343924721,
+          "fuel_kg": 9.357341900795291e-05,
+          "time_s": 2.807937704574215e-08
+        },
+        "coarse": {
+          "termination": "contact",
+          "feasible": true,
+          "reasons": [],
+          "state": {
+            "epoch_utc": "2030-01-01T00:00:34.999988Z",
+            "vehicle_id": "demo-lander",
+            "revision": 1,
+            "reference_frame": "PLANAR_MOON_CENTERED_NONROTATING",
+            "position_m": [
+              80.00004985595527,
+              1737399.998158165
+            ],
+            "velocity_mps": [
+              0.0004856056070616649,
+              -0.5000684829935184
+            ],
+            "propellant_kg": 79.66860500748442
+          },
+          "t_s": 26.999987960234286,
+          "downrange_m": 80.00004988422488,
+          "vertical_speed_mps": -0.5000684601032707,
+          "horizontal_speed_mps": 0.0005086316820452427,
+          "propellant_used_kg": 16.329456996149247,
+          "request_sha256": "c0750b88f688bd6327dd39030fbbb5aa7b8551fe5980de74f412277a1b476390"
+        },
+        "fine": {
+          "termination": "contact",
+          "feasible": true,
+          "reasons": [],
+          "state": {
+            "epoch_utc": "2030-01-01T00:00:34.999988Z",
+            "vehicle_id": "demo-lander",
+            "revision": 1,
+            "reference_frame": "PLANAR_MOON_CENTERED_NONROTATING",
+            "position_m": [
+              80.00006150261135,
+              1737399.9981581646
+            ],
+            "velocity_mps": [
+              0.0007242484265119337,
+              -0.5000777462358487
+            ],
+            "propellant_kg": 79.66869858090342
+          },
+          "t_s": 26.99998793215491,
+          "downrange_m": 80.00006153088097,
+          "vertical_speed_mps": -0.500077712357076,
+          "horizontal_speed_mps": 0.0007472749311286072,
+          "propellant_used_kg": 16.32936342273024,
+          "request_sha256": "d8bf84a09558e84610d140ee9ab85e07fc4260353ba694b046c3fc90d6eea206"
+        }
+      },
+      "candidate_window_starts_utc": {
+        "landing": "2030-01-01T00:00:34.999988+00:00",
+        "other": "2030-01-01T00:01:00+00:00",
+        "rover": "2030-01-01T00:00:45+00:00"
+      }
+    },
+    {
+      "name": "all_targets_excluded",
+      "snapshot_sha256": "1743cf48c9eadff3b6d6922515f3be1cbbd8ebcc3b6e6da866c9cdcb3f61bd88",
+      "status": "no_feasible_continuation",
+      "selected_target_id": null,
+      "optimum_proven_over_screened_targets": false,
+      "elapsed_s": 0.018223416998807807,
+      "checkpoint": {
+        "epoch_utc": "2030-01-01T00:00:08Z",
+        "vehicle_id": "demo-lander",
+        "revision": 1,
+        "reference_frame": "PLANAR_MOON_CENTERED_NONROTATING",
+        "position_m": [
+          0.0,
+          1737470.313336506
+        ],
+        "velocity_mps": [
+          0.0,
+          -4.195162053067819
+        ],
+        "propellant_kg": 95.99806200363366
+      },
+      "candidates": [
+        {
+          "target_id": "backup",
+          "status": "rejected",
+          "reasons": [
+            "landing_hazard"
+          ],
+          "solver_status": null,
+          "score": null
+        },
+        {
+          "target_id": "primary",
+          "status": "rejected",
+          "reasons": [
+            "landing_hazard"
+          ],
+          "solver_status": null,
+          "score": null
+        },
+        {
+          "target_id": "remote",
+          "status": "rejected",
+          "reasons": [
+            "landing_hazard"
+          ],
+          "solver_status": null,
+          "score": null
+        }
+      ],
+      "plan": null,
+      "validation": null,
+      "physical": null,
+      "candidate_window_starts_utc": null
+    }
+  ],
+  "frozen_test_commits": [
+    "bdeeb7c",
+    "6dbc897"
+  ],
+  "input_sha256": {
+    "shared/examples/unified/classical-pilot.json": "edb87c862ccc7ede6e6b316771dde74e1e1a5d0a76b356e68f41cfe545fdf40c",
+    "backend/app/unified_classical.py": "8c8272a1e8f126c74bfd446991c08ab32a3bf79bdc283ddd7833574d0abe5977",
+    "backend/app/unified_planning.py": "c80cb35920ae61a3b136373f07825c6addbc991f892a76ee60cf001640fddb7f"
+  },
+  "verification": {
+    "new_tests": 35,
+    "backend_tests": 1806,
+    "ingestion_tests": 218,
+    "optional_quantum_tests": 91,
+    "total_tests": 2115,
+    "python_ruff": "passed",
+    "typescript_vite_build": "passed",
+    "frozen_tests_unchanged": true,
+    "frontend_tests_run": false,
+    "live_provider_jobs": 0,
+    "known_warnings": [
+      "Existing Starlette/AnyIO deprecation",
+      "Existing large Vite bundles"
+    ]
+  }
+}
