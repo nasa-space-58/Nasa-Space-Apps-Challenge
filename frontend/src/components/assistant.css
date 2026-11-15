@@ -1,13 +1,15 @@
 /* Q&A drawer: plain, rounded, low-decoration layout. */
 .assistant-launcher,
 .assistant-panel {
-  --a-surface: #1e1f20;
-  --a-surface-2: #282a2c;
-  --a-surface-3: #333537;
-  --a-text: #e3e3e3;
-  --a-muted: #a8abaf;
-  --a-accent: #a8c7fa;
-  --a-accent-ink: #062e6f;
+  /* Site palette: black background, gold accent, hairline borders. */
+  --a-surface: #05080b;
+  --a-surface-2: #0e1418;
+  --a-surface-3: #172026;
+  --a-text: #edece6;
+  --a-muted: #a3aab0;
+  --a-accent: #dab782;
+  --a-accent-ink: #101419;
+  --a-line: #ffffff18;
   --a-radius: 24px;
   font-family: "DM Sans", system-ui, sans-serif;
 }
@@ -21,9 +23,9 @@
   gap: 10px;
   height: 52px;
   padding: 0 22px 0 18px;
-  border: 0;
+  border: 1px solid #dab78266;
   border-radius: 16px;
-  background: var(--a-surface-2);
+  background: var(--a-surface);
   color: var(--a-text);
   font-size: 15px;
   font-weight: 500;
@@ -38,14 +40,15 @@
   color: var(--a-accent);
 }
 .assistant-launcher:hover {
-  background: var(--a-surface-3);
+  border-color: var(--a-accent);
+  background: var(--a-surface-2);
 }
 .assistant-launcher:focus-visible {
   outline: 2px solid var(--a-accent);
   outline-offset: 2px;
 }
 .assistant-launcher.is-open {
-  background: var(--a-surface-3);
+  border-color: var(--a-accent);
 }
 
 .assistant-panel {
@@ -59,6 +62,7 @@
   width: min(420px, calc(100vw - 32px));
   overflow: hidden;
   border-radius: var(--a-radius);
+  border: 1px solid var(--a-line);
   background: var(--a-surface);
   color: var(--a-text);
   box-shadow:
@@ -75,6 +79,7 @@
   }
 }
 .assistant-head {
+  border-bottom: 1px solid var(--a-line);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -85,8 +90,9 @@
   place-items: center;
   width: 36px;
   height: 36px;
+  border: 1px solid #dab78266;
   border-radius: 50%;
-  background: var(--a-surface-2);
+  background: transparent;
   color: var(--a-accent);
 }
 .assistant-heading {
@@ -162,9 +168,9 @@
 }
 .assistant-suggestions button {
   padding: 12px 16px;
-  border: 0;
+  border: 1px solid var(--a-line);
   border-radius: 12px;
-  background: var(--a-surface-2);
+  background: transparent;
   color: var(--a-text);
   text-align: left;
   font-size: 14px;
@@ -173,7 +179,8 @@
 }
 .assistant-suggestions button:hover,
 .assistant-suggestions button:focus-visible {
-  background: var(--a-surface-3);
+  border-color: #dab78288;
+  background: #dab78212;
   outline: none;
 }
 .assistant-notice {
@@ -211,7 +218,7 @@
   max-width: 85%;
   padding: 10px 16px;
   border-radius: 20px 20px 4px 20px;
-  background: var(--a-surface-3);
+  background: #dab7821f;
 }
 .assistant-avatar {
   flex: none;
@@ -280,7 +287,7 @@
   gap: 6px;
   height: 32px;
   padding: 0 12px;
-  border: 1px solid var(--a-surface-3);
+  border: 1px solid var(--a-line);
   border-radius: 16px;
   background: transparent;
   color: var(--a-muted);
@@ -335,12 +342,12 @@
   font-weight: 500;
 }
 .assistant-kind.doc {
-  background: #a8c7fa26;
+  background: #dab78226;
   color: var(--a-accent);
 }
 .assistant-kind.api {
-  background: #6dd58c26;
-  color: #6dd58c;
+  background: #ffffff12;
+  color: var(--a-text);
 }
 .assistant-sources li.assistant-cost {
   padding-top: 2px;
@@ -356,12 +363,13 @@
   align-items: flex-end;
   gap: 4px;
   padding: 6px 6px 6px 18px;
+  border: 1px solid var(--a-line);
   border-radius: 28px;
   background: var(--a-surface-2);
-  transition: background 0.15s;
+  transition: border-color 0.15s;
 }
 .assistant-input:focus-within {
-  background: var(--a-surface-3);
+  border-color: #dab78288;
 }
 .assistant-input textarea {
   flex: 1;
