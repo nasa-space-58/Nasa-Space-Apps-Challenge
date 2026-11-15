@@ -25,6 +25,7 @@ import Recommendations from "./components/Recommendations";
 import Descent from "./components/Descent";
 import MissionPlanner from "./components/MissionPlanner";
 import SelfHealing from "./components/SelfHealing";
+import AssistantPanel from "./components/AssistantPanel";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
 import { LanguageToggle, useTranslate, type Translate } from "./i18n";
 
@@ -1519,6 +1520,12 @@ export default function App() {
           </section>
         </div>
       )}
+      <AssistantPanel
+        analysisIds={[
+          ...(comparisonBase ? [comparisonBase.id] : []),
+          ...(job && result && job.id !== comparisonBase?.id ? [job.id] : []),
+        ]}
+      />
     </main>
   );
 }

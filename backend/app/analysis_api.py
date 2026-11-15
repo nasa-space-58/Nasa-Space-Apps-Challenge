@@ -474,6 +474,26 @@ def create_app(state_dir=None, data_dir=None, broker_url=None, start_worker=True
     from app.twin import register_twin_routes
 
     register_twin_routes(app, data_dir)
+    from app.assistant import ToolBox, register_assistant_routes, settings_from_env
+    from app.doc_search import load_sections
+
+    assistant_settings = settings_from_env(os.environ)
+    assistant_client, doc_sections = None, []
+    if assistant_settings.enabled:
+        docs_dir = (
+            os.environ.get("DOCS_DIR") or Path(__file__).resolve().parents[2] / "docs"
+        )
+        doc_sections = load_sections(Path(docs_dir))
+        if os.environ.get("ANTHROPIC_API_KEY", "").strip():
+            import anthropic
+
+            assistant_client = anthropic.Anthropic(timeout=60.0, max_retries=2)
+    register_assistant_routes(
+        app,
+        ToolBox(store, recommendations, doc_sections, presets()),
+        assistant_settings,
+        assistant_client,
+    )
 
     from app.solver_arena import register_arena_routes
 

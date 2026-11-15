@@ -20,6 +20,10 @@ The first release focuses on site/date comparison, terrain-relative Sun/Earth vi
 
 R1 adds explained candidate deficits, CSV/PNG/printable reports, saved-result links, portable input manifests with expected result fingerprints, and two bounded observer-based classroom lessons. See docs/release-r1.md. Surface-wide shadow visualization and human MVP acceptance remain open.
 
+## Optional Q&A assistant
+
+`backend/app/assistant.py` and `backend/app/doc_search.py` add an opt-in Claude-backed Q&A assistant (`/assistant/status`, `/assistant/ask`). It is off unless `ASSISTANT_ENABLED=true` and `ANTHROPIC_API_KEY` are set. Its tools are read-only, it never computes physics, and tests use a fake client, so they spend no credit. Never commit or print the key. Frozen tests: `6db6f82`. See docs/assistant.md.
+
 ## Planned architecture (see docs/technologies.md)
 
 Four Docker Compose services; the only host requirement is Docker:

@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends libexpat1 && rm
 COPY backend/requirements.lock /tmp/requirements.lock
 RUN pip install --no-cache-dir --require-hashes -r /tmp/requirements.lock && pip check
 COPY shared /workspace/shared
+COPY docs /workspace/docs
 COPY backend /workspace/backend
 WORKDIR /workspace/backend
 CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
