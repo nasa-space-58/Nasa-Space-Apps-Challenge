@@ -246,3 +246,7 @@ The user explicitly authorized restoring the archived R12 features without break
 ### Mission run simulation (user, 2026-11-15)
 
 The user asked for a real simulation instead of an always-successful flight, without a plain failure rate. Branch `feature/mission-run-simulation` from main `de18ad4`; push only this branch, no merge into main/tahakrcc. Skeleton `3c43546`, frozen tests `af70068`, user-approved test correction `d8d990c` (new baseline). Outcomes come from ordered physics gates (faulted R4 descent, R3 touchdown slope, ideal battery over analysed sunlight, Earth-contact rules) and typed fault scenarios in `shared/mission_faults.json`; unknown inputs make the run inconclusive. Never present it as landing-safety, power/thermal or link certification, or the curated scenarios as NASA failure statistics. See docs/mission-run.md.
+
+### Mission run main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/mission-run-simulation` was fast-forwarded directly onto `main` from `de18ad4` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
