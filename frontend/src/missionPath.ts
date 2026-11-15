@@ -506,19 +506,27 @@ function pointsUntilFrom(
 export function staticFlightView(path: TransferPath, sun_direction: Vec3): FlightView {
   const earth = path.layout.earth_center_scene;
   const sun = unit(sun_direction);
+  // Explicitly illustrative synchronous orbit: one shared transform keeps the
+  // lunar texture, site markers, routes and spacecraft in the same frame.
+  // Dated ephemerides replace this fallback; this is not an orbital prediction.
+  const turn = (v: Vec3, p: number): Vec3 => {
+    const a = Math.max(0, Math.min(1,p)) * Math.PI / 6;
+    return [v[0]*Math.cos(a)+v[2]*Math.sin(a),v[1],-v[0]*Math.sin(a)+v[2]*Math.cos(a)];
+  };
+  const world = (v:Vec3,p:number) => add(earth,turn(sub(v,earth),p));
   return {
     live: false,
     earthCenter: () => earth,
-    moonPose: () => IDENTITY_POSE(path.layout.moon_center_scene),
+    moonPose: p => ({position:world(path.layout.moon_center_scene,p),x:turn([1,0,0],p),y:[0,1,0],z:turn([0,0,1],p)}),
     sunDirection: () => sun,
-    earthRotationRad: () => null,
+    earthRotationRad: p => Math.max(0,Math.min(1,p))*Math.PI*8,
     earthTilt: [0, 0, STATIC_EARTH_TILT_RAD],
-    positionAt: (p) => positionAt(path, p),
-    headingAt: (p) => headingAt(path, p),
-    pointsUntil: (p) => pathPointsUntil(path, p),
-    plannedAt: () => allPathPoints(path),
+    positionAt: p => world(positionAt(path,p),p),
+    headingAt: p => turn(headingAt(path,p),p),
+    pointsUntil: p => pathPointsUntil(path,p).map(v=>world(v,p)),
+    plannedAt: p => allPathPoints(path).map(v=>world(v,p)),
     allPoints: allPathPoints(path),
-    parkingRing: ringAround(earth, path.layout.parking_orbit_radius_scene, (v) => v),
+    parkingRing: ringAround(earth,path.layout.parking_orbit_radius_scene,v=>v),
     utcAt: () => null,
   };
 }

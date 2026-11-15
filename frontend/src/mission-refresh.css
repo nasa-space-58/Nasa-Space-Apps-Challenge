@@ -176,3 +176,24 @@ main[data-view="mission"] .stage-controls {
   .scene-toolbar button, .scene-toolbar select { padding: 6px; font-size: 11px; }
   .scene-toolbar select { max-width: 104px; }
 }
+
+/* Result inspection stays compact; all detailed controls remain in the task panel. */
+.analysis-caption { position: absolute; left: 18px; top: 72px; width: min(370px, calc(100% - 36px)); padding: 14px 16px; border-radius: 16px; background: #09121bea; border: 1px solid #40515e; pointer-events: auto; }
+.analysis-caption p { font-size: 12px; line-height: 1.5; color: #b6c7d1; margin: 8px 0; }
+.analysis-caption button { margin: 4px 6px 0 0; padding: 7px 9px; border-radius: 9px; font-size: 12px; }
+.analysis-caption button i { display: inline-block; width: 14px; height: 3px; margin-right: 7px; vertical-align: middle; }
+.analysis-caption button[aria-pressed="true"] { border-color: #e8c58b; }
+.analysis-caption small { display: block; margin-top: 8px; }
+.scene-result-link { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; padding: 12px 14px; margin-block: 14px; border: 1px solid #40515e; border-radius: 12px; font-size: 13px; }
+.scene-result-link span { flex: 1; min-width: 180px; }
+.scene-result-link button { padding: 8px 12px; border-radius: 9px; }
+.scene-result-link.stale { border-color: #bf965e; color: #efce9a; }
+.scenario-settings { margin-block: 16px; padding: 12px; border: 1px solid var(--line, #33404a); border-radius: 12px; }
+.scenario-settings summary, .scene-inspector-tools summary { cursor: pointer; padding: 5px; font-weight: 600; }
+.scene-inspector-tools { padding: 10px 16px; border-bottom: 1px solid #27333a; }
+.scene-inspector-tools .scene-inspector-nav { padding: 12px 0 0; }
+.server-explanation button { font-size: 12px; padding: 4px 8px; border-radius: 8px; }
+.server-explanation .source-text { display: block; margin-top: 6px; color: #a7b8c4; overflow-wrap: anywhere; }
+.scene-inspector, .panel-body, .risk-result { min-width: 0; overflow-wrap: anywhere; }
+.scenario-settings label { margin-block: 10px; }
+@media (max-width: 700px) { .analysis-caption { top: 62px; max-height: 35%; overflow: auto; } }

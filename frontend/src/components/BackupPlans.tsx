@@ -1,3 +1,5 @@
+import ServerExplanation from "./ServerExplanation";
+import { useScenarioResult, ResultSceneLink } from "../analysisView";
 import { useEffect, useState } from "react";
 import { useTranslate } from "../i18n";
 import "./alternatives.css";
@@ -120,7 +122,8 @@ export default function BackupPlans({ base }: { base: Record<string, unknown> })
   const [radius, setRadius] = useState("3000");
   const [count, setCount] = useState("6");
   const [azimuth, setAzimuth] = useState("180");
-  const [result, setResult] = useState<Result | null>(null);
+  const scenarioInputs = JSON.stringify([base,spacing,separation,slope,divertFrom,radius,count,azimuth]);
+  const { result, begin, isCurrent, commit, show, stale, select, selected } = useScenarioResult<Result>("backups", scenarioInputs);
   const [marked, setMarked] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -140,11 +143,14 @@ export default function BackupPlans({ base }: { base: Record<string, unknown> })
     }
   };
 
+  useEffect(() => { setBusy(false); setError(""); }, [scenarioInputs]);
+
   const run = async () => {
+    const ticket = begin();
     setBusy(true);
     setError("");
     try {
-      setResult(
+      commit(ticket,
         await call("/descents/alternatives", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -161,10 +167,11 @@ export default function BackupPlans({ base }: { base: Record<string, unknown> })
         }),
       );
     } catch (e) {
+      if (!isCurrent(ticket)) return;
       const message = e instanceof Error ? e.message : "request_failed";
       setError(message === "request_failed" ? t("risk.requestFailed") : message);
     } finally {
-      setBusy(false);
+      if (isCurrent(ticket)) setBusy(false);
     }
   };
 
@@ -227,9 +234,10 @@ export default function BackupPlans({ base }: { base: Record<string, unknown> })
       </form>
       {error && (
         <div className="alert" role="alert">
-          {error}
+          <ServerExplanation text={error} />
         </div>
       )}
+      {result && <ResultSceneLink stale={stale} show={show} />}
       {result && (
         <div className="risk-result">
           <div
@@ -270,7 +278,7 @@ export default function BackupPlans({ base }: { base: Record<string, unknown> })
                   {rows.map((r) => (
                     <tr key={r.id} className={r.reachable ? "" : "route-rejected"}>
                       <th scope="row">
-                        {r.id === "PRIMARY" ? t("backups.primary") : r.id}
+                        <button type="button" disabled={stale} aria-pressed={selected===r.id} onClick={()=>select(r.id)}>{r.id === "PRIMARY" ? t("backups.primary") : r.id}</button>
                         <small>
                           {r.role === "primary"
                             ? t("backups.plannedSite")
@@ -297,7 +305,7 @@ export default function BackupPlans({ base }: { base: Record<string, unknown> })
                       <td>
                         {r.reachable ? `✓ ${t("backups.reachable")}` : `✕ ${t("backups.unreachable")}`}
                         {r.rejection_reasons.map((x) => (
-                          <small key={x.reason}>{x.detail}</small>
+                          <small key={x.reason}><ServerExplanation text={x.detail} reason={x.reason} /></small>
                         ))}
                         {r.role === "backup" && r.reachable && (
                           <label className="backup-mark">
@@ -318,7 +326,7 @@ export default function BackupPlans({ base }: { base: Record<string, unknown> })
             </summary>
             <ul>
               {result.assumptions.map((a) => (
-                <li key={a}>{a}</li>
+                <li key={a}><ServerExplanation text={a} /></li>
               ))}
             </ul>
           </details>

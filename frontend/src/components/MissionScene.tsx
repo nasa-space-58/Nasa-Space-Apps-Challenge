@@ -1,3 +1,5 @@
+import AnalysisScene from "./AnalysisScene";
+import type { AnalysisPreview } from "../analysisView";
 import {
   Suspense,
   useEffect,
@@ -681,8 +683,9 @@ function CameraRig({
       distance = 1.25;
     } else if (mode === "moon") {
       desiredTarget.copy(moonPoint([0, -0.35, 0]));
-      yaw = siteYaw() + moonYaw;
-      pitch = -1.0;
+      // Keep the overview inertial so synchronous lunar rotation remains visible.
+      yaw = siteYaw();
+      pitch = -0.45;
       distance = 4.6;
     } else {
       // Look over the spacecraft from outside the body it is closest to.
@@ -1322,6 +1325,9 @@ export default function MissionScene(
     onFailure: () => void;
     /** Dated Moon/Sun/Earth-rotation samples from /flight-ephemeris, if loaded. */
     flight?: FlightEphemeris | null;
+    analysisPreview?: AnalysisPreview | null;
+    analysisProgress?: number;
+    onAnalysisSelect?: (id:string)=>void;
     /** Backend surface route driven after touchdown, if any. */
     roverPath?: RoutePoint[] | null;
     /** Travelled share of the rover route, 0–1. */
@@ -1343,6 +1349,7 @@ export default function MissionScene(
     compact,
     onFailure,
     progressValue,
+    analysisPreview = null, analysisProgress = 0, onAnalysisSelect,
     roverPath = null,
     roverDrive = 0,
     roverScan = 1,
@@ -1383,6 +1390,7 @@ export default function MissionScene(
       <ContextGuard onFailure={onFailure} />
       <Invalidator
         deps={[
+          analysisPreview, analysisProgress,
           progressValue,
           scene.lat,
           scene.lon,
@@ -1403,7 +1411,7 @@ export default function MissionScene(
         snap={!animate}
       />
       <Suspense fallback={null}>
-        {scene.cameraMode === "launch" ? (
+        {analysisPreview ? <AnalysisScene preview={analysisPreview} progress={analysisProgress} onSelect={id=>onAnalysisSelect?.(id)}/> : scene.cameraMode === "launch" ? (
           <LaunchCloseup
             progress={progress}
             reduced={scene.reduced}

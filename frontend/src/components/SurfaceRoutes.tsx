@@ -1,3 +1,5 @@
+import ServerExplanation from "./ServerExplanation";
+import { useScenarioResult, ResultSceneLink } from "../analysisView";
 import { useEffect, useState } from "react";
 import { useTranslate } from "../i18n";
 import "./surface.css";
@@ -156,7 +158,8 @@ export default function SurfaceRoutes({ site }: { site: Record<string, unknown> 
   const [speed, setSpeed] = useState("0.1");
   const [analysisId, setAnalysisId] = useState<string | null>(null);
   const [useSky, setUseSky] = useState(true);
-  const [result, setResult] = useState<Result | null>(null);
+  const scenarioInputs = JSON.stringify([site,targets,observerHeight,waypoints,slope,speed,useSky,analysisId]);
+  const { result, begin, isCurrent, commit, show, stale, select, selected } = useScenarioResult<Result>("surface", scenarioInputs);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -167,11 +170,14 @@ export default function SurfaceRoutes({ site }: { site: Record<string, unknown> 
   const update = (i: number, key: keyof TargetRow, value: string) =>
     setTargets(targets.map((row, j) => (j === i ? { ...row, [key]: value } : row)));
 
+  useEffect(() => { setBusy(false); setError(""); }, [scenarioInputs]);
+
   const run = async () => {
+    const ticket = begin();
     setBusy(true);
     setError("");
     try {
-      setResult(
+      commit(ticket,
         await call("/surface/routes", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -195,10 +201,11 @@ export default function SurfaceRoutes({ site }: { site: Record<string, unknown> 
         }),
       );
     } catch (e) {
+      if (!isCurrent(ticket)) return;
       const message = e instanceof Error ? e.message : "request_failed";
       setError(message === "request_failed" ? t("risk.requestFailed") : message);
     } finally {
-      setBusy(false);
+      if (isCurrent(ticket)) setBusy(false);
     }
   };
 
@@ -289,9 +296,10 @@ export default function SurfaceRoutes({ site }: { site: Record<string, unknown> 
       </form>
       {error && (
         <div className="alert" role="alert">
-          {error}
+          <ServerExplanation text={error} />
         </div>
       )}
+      {result && <ResultSceneLink stale={stale} show={show} />}
       {result && (
         <div className="risk-result">
           <div className="communication-metrics">
@@ -356,7 +364,7 @@ export default function SurfaceRoutes({ site }: { site: Record<string, unknown> 
                     <tr key={r.target_id} className={r.reachable ? "" : "route-rejected"}>
                       <th scope="row">
                         <i className="route-swatch" style={{ background: ROUTE_COLORS[i % ROUTE_COLORS.length] }} />
-                        {r.target_id}
+                        <button type="button" disabled={stale} aria-pressed={selected===r.target_id} onClick={()=>select(r.target_id)}>{r.target_id}</button>
                         <small>
                           {r.bearing_deg}° · {(r.distance_m / 1000).toFixed(1)} km
                         </small>
@@ -394,7 +402,7 @@ export default function SurfaceRoutes({ site }: { site: Record<string, unknown> 
                         </>
                       ) : (
                         <td colSpan={3}>
-                          ✕ {t("backups.unreachable")}<small>{r.detail}</small>
+                          ✕ {t("backups.unreachable")}<small><ServerExplanation text={r.detail} reason={r.reason} /></small>
                         </td>
                       )}
                     </tr>
@@ -409,7 +417,7 @@ export default function SurfaceRoutes({ site }: { site: Record<string, unknown> 
             </summary>
             <ul>
               {result.assumptions.map((a) => (
-                <li key={a}>{a}</li>
+                <li key={a}><ServerExplanation text={a} /></li>
               ))}
             </ul>
           </details>

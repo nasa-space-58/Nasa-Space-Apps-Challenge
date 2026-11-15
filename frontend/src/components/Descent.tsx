@@ -1,3 +1,4 @@
+import { useScenarioResult, ResultSceneLink, useAnalysisView } from "../analysisView";
 import { useEffect, useMemo, useState } from "react";
 import type { MissionCandidate } from "../missionCandidates";
 import type { Preset } from "../types";
@@ -240,8 +241,9 @@ function ProfileChart({ samples, zoom }: { samples: Sample[]; zoom: boolean }) {
   );
 }
 
-export default function Descent({ sites, onCandidates }: { sites: Preset[]; onCandidates?: (items: MissionCandidate[]) => void }) {
+export default function Descent({ sites, onCandidates, onLocation }: { sites: Preset[]; onLocation?: (lat:number,lon:number)=>void; onCandidates?: (items: MissionCandidate[]) => void }) {
   const { t, tText } = useTranslate();
+  const {setCandidateId,setPreview} = useAnalysisView();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [siteId, setSiteId] = useState("malapert-massif-r23");
   const [lat, setLat] = useState("-85.9948");
@@ -283,6 +285,8 @@ export default function Descent({ sites, onCandidates }: { sites: Preset[]; onCa
       : { profile_id: profileId };
 
   const optimize = async () => {
+    const ticket = planScene.begin();
+    onLocation?.(Number(lat),Number(lon));
     setOptimizing(true);
     setError("");
     try {
@@ -300,6 +304,7 @@ export default function Descent({ sites, onCandidates }: { sites: Preset[]; onCa
             ...vehicle(),
           }),
         });
+      if (!planScene.isCurrent(ticket)) return;
       setRoutes(result);
       onCandidates?.(result.routes.map((r) => ({
         id: `descent:${r.id}`, label: r.id, ...coordinates,
@@ -316,13 +321,19 @@ export default function Descent({ sites, onCandidates }: { sites: Preset[]; onCa
       })));
 
     } catch (e) {
+      if (!planScene.isCurrent(ticket)) return;
       setError(errorText(e, t, "communication.requestFailed"));
     } finally {
-      setOptimizing(false);
+      if (planScene.isCurrent(ticket)) setOptimizing(false);
     }
   };
 
+  const planInputs = JSON.stringify([siteId,lat,lon,profileId,custom,altitude,inclination,allowTurn,reserveFps]);
+  const planScene = useScenarioResult<Plan>("descent", planInputs);
+  useEffect(() => { setPlan(null); setRoutes(null); setBusy(false); setOptimizing(false); onCandidates?.([]); }, [planInputs]);
   const run = async () => {
+    const ticket = planScene.begin();
+    onLocation?.(Number(lat),Number(lon));
     setBusy(true);
     setError("");
     try {
@@ -334,17 +345,19 @@ export default function Descent({ sites, onCandidates }: { sites: Preset[]; onCa
         allow_plane_change: allowTurn,
         ...vehicle(),
       };
-      setPlan(
-        await call("/descents", {
+      const response: Plan = await call("/descents", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
-        }),
-      );
+        });
+      if (!planScene.isCurrent(ticket)) return;
+      setPlan(response);
+      planScene.commit(ticket,response);
     } catch (e) {
+      if (!planScene.isCurrent(ticket)) return;
       setError(errorText(e, t, "communication.requestFailed"));
     } finally {
-      setBusy(false);
+      if (planScene.isCurrent(ticket)) setBusy(false);
     }
   };
 
@@ -381,7 +394,7 @@ export default function Descent({ sites, onCandidates }: { sites: Preset[]; onCa
             run();
           }}
         >
-          <fieldset disabled={busy}>
+          <fieldset disabled={busy || optimizing}>
             <h3>{t("descent.landingSite")}</h3>
             <label>
               {t("descent.site")}
@@ -461,6 +474,7 @@ export default function Descent({ sites, onCandidates }: { sites: Preset[]; onCa
                 })}
               </p>
             )}
+            <details className="scenario-settings"><summary>{t("workspace.advanced")}</summary>
             <h3>{t("descent.initialOrbit")}</h3>
             <label>
               {t("descent.altitude")}
@@ -482,9 +496,7 @@ export default function Descent({ sites, onCandidates }: { sites: Preset[]; onCa
               <input type="checkbox" checked={allowTurn} onChange={(e) => setAllowTurn(e.target.checked)} />
               {t("descent.planeChange")}
             </label>
-            <button type="submit" className="primary">
-              {busy ? t("descent.computing") : `${t("descent.compute")} ↗`}
-            </button>
+
             <h3>{t("descent.fuel")}</h3>
             <label>
               {t("descent.reserve")}
@@ -498,6 +510,10 @@ export default function Descent({ sites, onCandidates }: { sites: Preset[]; onCa
                 onChange={(e) => setReserveFps(e.target.value)}
               />
             </label>
+            </details>
+            <button type="submit" className="primary">
+              {busy ? t("descent.computing") : `${t("descent.compute")} ↗`}
+            </button>
             <button
               type="button"
               className="text-button"
@@ -669,7 +685,8 @@ export default function Descent({ sites, onCandidates }: { sites: Preset[]; onCa
               </details>
             </>
           )}
-          {routes && <RouteOptimizer result={routes} />}
+          {routes && <RouteOptimizer result={routes} onSelect={id=>{setPreview(null);setCandidateId(`descent:${id}`);}} />}
+          {plan && <ResultSceneLink stale={planScene.stale} show={planScene.show} />}
           {/* Deeper analyses stay closed until the user opens one. */}
           <div className="tool-cards">
             <h3>{t("descent.more.title")}</h3>

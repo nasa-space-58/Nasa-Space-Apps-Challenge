@@ -1,4 +1,6 @@
-import { useState } from "react";
+import ServerExplanation from "./ServerExplanation";
+import { useScenarioResult, ResultSceneLink } from "../analysisView";
+import { useEffect, useState } from "react";
 import { useTranslate, type Translate } from "../i18n";
 import "./twin.css";
 
@@ -150,16 +152,20 @@ export default function TwinPanel({ base }: { base: Record<string, unknown> }) {
   const [energy, setEnergy] = useState("50");
   const [load, setLoad] = useState("2000");
   const [seed, setSeed] = useState("2026");
-  const [result, setResult] = useState<Result | null>(null);
+  const scenarioInputs = JSON.stringify([base,preset,positionSigma,speedSigma,thrustNoise,energy,load,seed]);
+  const { result, begin, isCurrent, commit, show, stale } = useScenarioResult<Result>("twin", scenarioInputs);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => { setBusy(false); setError(""); }, [scenarioInputs]);
+
   const run = async () => {
+    const ticket = begin();
     setBusy(true);
     setError("");
     try {
       const { allow_plane_change: _ignored, ...plan } = base;
-      setResult(
+      commit(ticket,
         await call("/twin/runs", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -177,10 +183,11 @@ export default function TwinPanel({ base }: { base: Record<string, unknown> }) {
         }),
       );
     } catch (e) {
+      if (!isCurrent(ticket)) return;
       const message = e instanceof Error ? e.message : "request_failed";
       setError(message === "request_failed" ? t("risk.requestFailed") : message);
     } finally {
-      setBusy(false);
+      if (isCurrent(ticket)) setBusy(false);
     }
   };
 
@@ -243,9 +250,10 @@ export default function TwinPanel({ base }: { base: Record<string, unknown> }) {
       </form>
       {error && (
         <div className="alert" role="alert">
-          {error}
+          <ServerExplanation text={error} />
         </div>
       )}
+      {result && <ResultSceneLink stale={stale} show={show} />}
       {result && check && (
         <div className="risk-result">
           <div className={`panel descent-verdict ${check.success ? "ok" : "blocked"}`} role="status">
@@ -256,13 +264,13 @@ export default function TwinPanel({ base }: { base: Record<string, unknown> }) {
               })}
             </strong>
             {check.reasons.map((r) => (
-              <p key={r.reason}>{r.detail}</p>
+              <p key={r.reason}><ServerExplanation text={r.detail} reason={r.reason} /></p>
             ))}
             <p>
               {result.run.plan.valid
                 ? t("twin.planValid")
                 : t("twin.planInvalid", {
-                    reasons: result.run.plan.invalidated_by.map((d) => d.replaceAll("_", " ")).join(", "),
+                    reasons: result.run.plan.invalidated_by.map((d) => eventLabel(t,d)).join(", "),
                   })}{" "}
               {t("twin.replay", { id: result.run.log_hash.slice(0, 10) })}
             </p>
@@ -309,9 +317,9 @@ export default function TwinPanel({ base }: { base: Record<string, unknown> }) {
                   {e.kind === "event_applied"
                     ? t("twin.log.applied", { event: eventLabel(t, e.event?.kind ?? "") })
                     : e.kind === "plan_invalidated"
-                      ? t("twin.log.invalidated", { reason: e.reason ?? "" })
+                      ? <>{t("twin.log.invalidated", { reason: "" })}<ServerExplanation text={e.reason} /></>
                       : e.kind === "no_plan_effect"
-                        ? t("twin.log.noEffect", { reason: e.reason ?? "" })
+                        ? <>{t("twin.log.noEffect", { reason: "" })}<ServerExplanation text={e.reason} /></>
                         : t("twin.log.notReached", { event: eventLabel(t, e.event?.kind ?? e.kind) })}
                 </li>
               ))}
@@ -323,7 +331,7 @@ export default function TwinPanel({ base }: { base: Record<string, unknown> }) {
             </summary>
             <ul>
               {result.assumptions.map((a) => (
-                <li key={a}>{a}</li>
+                <li key={a}><ServerExplanation text={a} /></li>
               ))}
             </ul>
           </details>

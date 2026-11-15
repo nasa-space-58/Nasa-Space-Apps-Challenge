@@ -1,3 +1,4 @@
+import { useAnalysisView } from "../analysisView";
 import {
   Component,
   lazy,
@@ -215,7 +216,16 @@ export default function MissionStage({
   const [showRoutes, setShowRoutes] = useState(true);
   const [layersOpen, setLayersOpen] = useState(false);
   const [showCandidates, setShowCandidates] = useState(true);
-  const [candidateId, setCandidateId] = useState<string | null>(null);
+  const {preview,setPreview,candidateId,setCandidateId} = useAnalysisView();
+  const [previewProgress,setPreviewProgress] = useState(0);
+  const [previewPlaying,setPreviewPlaying] = useState(false);
+  useEffect(() => { setPreviewProgress(0); setPreviewPlaying(false); if(preview) setFlying(false); }, [preview?.kind, preview?.lines]);
+  useEffect(() => {
+    if(!previewPlaying || !visible || preview?.stale) return;
+    const timer=setInterval(()=>setPreviewProgress(p=>{if(p>=1){setPreviewPlaying(false);return 1;}return Math.min(1,p+0.005);}),100);
+    return ()=>clearInterval(timer);
+  },[previewPlaying,visible,preview?.stale]);
+  useEffect(() => {if(candidateId){setCameraMode("pole");setShowCandidates(true);}},[candidateId]);
   const inspected = candidates.find((c) => c.id === candidateId);
   const tr = locale.startsWith("tr");
   const lockedNotice = t("missionStage.locked");
@@ -457,6 +467,9 @@ export default function MissionStage({
           <SceneBoundary fallback={fallback}>
             <Suspense fallback={<div className="stage-loading">{t("missionStage.loading")}</div>}>
               <MissionScene
+                analysisPreview={preview}
+                analysisProgress={previewProgress}
+                onAnalysisSelect={id=>setPreview(p=>p?{...p,selected:id}:p)}
                 showHazards={showHazards} showSearch={showSearch} showRoutes={showRoutes}
                 candidates={showCandidates ? candidates : []}
                 selectedCandidate={candidateId}
@@ -493,19 +506,20 @@ export default function MissionStage({
         ) : (
           fallback
         )}
-        {!cleanView && <button aria-live="polite" className="stage-hud stage-phase phase-chip" onClick={() => inspect("flight")}>
+        {!preview && !cleanView && <button aria-live="polite" className="stage-hud stage-phase phase-chip" onClick={() => inspect("flight")}>
           <span className="eyebrow">{t("missionStage.phase", { n: active.index + 1, total: MISSION_PHASES.length })}</span>
           <strong>{progress === 0 && !flying ? t("missionStage.preLaunch") : phaseLabel(active.phase.id)}</strong>
           <span aria-hidden="true">↗</span>
         </button>}
         <div className="stage-hud scene-toolbar">
-          {webgl && !cleanView && <label className="camera-picker">
+          {preview && <button onClick={()=>{setPreview(null);setPreviewPlaying(false);}}>{t("workspace.backScene")}</button>}
+          {webgl && !cleanView && !preview && <label className="camera-picker">
             <span className="sr-only">{t("missionStage.cameraView")}</span>
             <select aria-label={t("missionStage.cameraView")} value={cameraMode} onChange={e => setCameraMode(e.target.value as CameraMode)}>
               {cameraModes.map(mode => <option key={mode} value={mode}>{t(`missionStage.camera.${mode}`)}</option>)}
             </select>
           </label>}
-          {!cleanView && <div className="layer-picker">
+          {!preview && !cleanView && <div className="layer-picker">
             <button aria-expanded={layersOpen} onClick={() => setLayersOpen(!layersOpen)}>{tr ? "Katmanlar" : "Layers"}</button>
             {layersOpen && <div className="layer-options" onKeyDown={e => { if (e.key === "Escape") setLayersOpen(false); }}>
               <label><input type="checkbox" checked={showHazards} onChange={e => setShowHazards(e.target.checked)} />{tr ? "Tehlike bölgeleri" : "Hazards"}</label>
@@ -523,8 +537,21 @@ export default function MissionStage({
             } catch { setNotice(tr ? "Bu tarayıcıda tam ekran açılamadı." : "Fullscreen is unavailable in this browser."); }
           }}>⛶</button>
         </div>
-        {!cleanView && <div className="scene-source">{landed && rover?.source ? (rover.source === "demo" ? "DEMO · A*" : "LOLA DEM · A*") : t("missionStage.illustrative")}</div>}
-        {!cleanView && <div className="stage-hud scene-dock">
+        {preview && !cleanView && <div className="stage-hud analysis-caption">
+          <strong>{t(`workspace.kind.${preview.kind}`)}</strong>
+          <p>{t(preview.stale ? "workspace.stale" : "workspace.localFrame")}</p>
+          {preview.lines.map(line=><button key={line.id} aria-pressed={preview.selected===line.id} onClick={()=>setPreview({...preview,selected:line.id})}><i style={{background:line.color}}/>{t(`workspace.line.${line.id}`) === `workspace.line.${line.id}` ? line.id : t(`workspace.line.${line.id}`)}</button>)}
+          {preview.selected && <small>{t("workspace.selected")}: {preview.selected}</small>}
+          {!preview.lines.length && <p>{t("workspace.dots")}</p>}
+          {!!preview.events.length && <details><summary>{t("workspace.events")}</summary>{preview.events.map((time,i)=><button key={i} disabled={preview.stale} onClick={()=>{const pts=preview.lines.at(-1)?.points??[];const start=pts[0]?.time??0;const end=pts.at(-1)?.time??1;setPreviewPlaying(false);setPreviewProgress(Math.max(0,Math.min(1,(time-start)/Math.max(1e-9,end-start))));}}>{time.toFixed(1)} s</button>)}</details>}
+        </div>}
+        {preview && !cleanView && preview.lines.some(l=>l.points.some(p=>p.time!==undefined)) && <div className="stage-hud scene-dock">
+          <button disabled={preview.stale} onClick={()=>{if(previewProgress>=1)setPreviewProgress(0);setPreviewPlaying(!previewPlaying);}} aria-label={t("workspace.playResult")}>{previewPlaying?"Ⅱ":"▷"}</button>
+          <input type="range" aria-label={t("workspace.resultTime")} min="0" max="1000" value={Math.round(previewProgress*1000)} disabled={preview.stale} onChange={e=>{setPreviewPlaying(false);setPreviewProgress(Number(e.target.value)/1000);}}/>
+          <span>{Math.round(previewProgress*100)}%</span>
+        </div>}
+        {!preview && !cleanView && <div className="scene-source">{landed && rover?.source ? (rover.source === "demo" ? "DEMO · A*" : "LOLA DEM · A*") : t("missionStage.illustrative")}</div>}
+        {!preview && !cleanView && <div className="stage-hud scene-dock">
           <button disabled={!path} onClick={toggleFlight} aria-label={flying ? t("missionStage.pauseFlight") : t("missionStage.simulate")}>{flying ? "Ⅱ" : "▷"}</button>
           <input type="range" min="0" max="1000" value={Math.round(progress * 1000)} disabled={!path}
             aria-label={t("missionStage.progress")} aria-valuetext={`${phaseLabel(active.phase.id)}, ${Math.round(progress * 100)}%`}
@@ -659,12 +686,13 @@ export default function MissionStage({
             </div>
           )}
         </nav>
-        <div className="scene-inspector-nav" role="group" aria-label={tr ? "Sahne ayrıntıları" : "Scene details"}>
+        <details className="scene-inspector-tools"><summary>{tr ? "Sahne ayrıntıları" : "Scene details"}</summary><div className="scene-inspector-nav" role="group" aria-label={tr ? "Sahne ayrıntıları" : "Scene details"}>
           <button aria-pressed={inspector === "flight"} onClick={() => inspect("flight")}>{tr ? "Uçuş bilgisi" : "Flight details"}</button>
           {landed && <button aria-pressed={inspector === "surface"} onClick={() => inspect("surface")}>{tr ? "Yüzey operasyonları" : "Surface operations"}</button>}
           <button aria-pressed={inspector === "candidates"} onClick={() => inspect("candidates")}>{tr ? "Adaylar" : "Candidates"} · {candidates.length}</button>
           {inspector && <button onClick={() => setInspector(null)}>{tr ? "Göreve dön" : "Back to task"} ↩</button>}
         </div>
+        </details>
         <div className="panel-body scene-inspector" hidden={inspector !== "flight"}>
         <div className="scene-information" aria-live="polite">
           {progress === 0 && !flying ? (

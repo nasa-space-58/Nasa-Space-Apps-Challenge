@@ -1839,5 +1839,35 @@
       "sites": "Which landing sites can I analyze?",
       "data": "Which NASA data sources does the navigator use?"
     }
+  },
+  "workspace": {
+    "backScene": "Back to mission",
+    "stale": "Settings changed. This result uses previous settings; calculate again.",
+    "shown": "Inspect the calculated result in the 3D view.",
+    "show3d": "Show in 3D",
+    "selected": "Selected",
+    "localFrame": "Local target coordinates at uniform scale. The grid is not terrain. Drag to orbit.",
+    "dots": "Green: feasible · red: rejected · white ring: original target",
+    "playResult": "Play or pause calculated flight",
+    "resultTime": "Calculated flight progress",
+    "advanced": "Orbit and fuel settings",
+    "source": "Original technical explanation",
+    "technical": "Technical details",
+    "events": "Event times",
+    "kind": {
+      "descent": "Calculated descent",
+      "risk": "Landing distribution",
+      "backups": "Backup landing sites",
+      "twin": "Fault replay comparison",
+      "recovery": "Original and replanned flight",
+      "surface": "Calculated surface routes"
+    },
+    "line": {
+      "planned": "Descent route",
+      "truth": "Simulation truth",
+      "estimate": "Sensor estimate",
+      "original": "Original plan",
+      "replanned": "Replanned route"
+    }
   }
 }

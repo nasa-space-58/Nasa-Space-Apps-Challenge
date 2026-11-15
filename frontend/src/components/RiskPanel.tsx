@@ -1,4 +1,6 @@
-import { useState } from "react";
+import ServerExplanation from "./ServerExplanation";
+import { useScenarioResult, ResultSceneLink } from "../analysisView";
+import { useEffect, useState } from "react";
 import { useTranslate, type Translate } from "../i18n";
 import "./risk.css";
 
@@ -203,15 +205,19 @@ export default function RiskPanel({ base }: { base: Record<string, unknown> }) {
   const [terrain, setTerrain] = useState("2");
   const [thrust, setThrust] = useState("1");
   const [azimuth, setAzimuth] = useState("180");
-  const [result, setResult] = useState<RiskResult | null>(null);
+  const scenarioInputs = JSON.stringify([base,runs,isp,pdiDown,pdiSpeed,seed,navigation,terrain,thrust,azimuth]);
+  const { result, begin, isCurrent, commit, show, stale } = useScenarioResult<RiskResult>("risk", scenarioInputs);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
+  useEffect(() => { setBusy(false); setError(""); }, [scenarioInputs]);
+
   const run = async () => {
+    const ticket = begin();
     setBusy(true);
     setError("");
     try {
-      setResult(
+      commit(ticket,
         await call("/descents/risk", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -232,10 +238,11 @@ export default function RiskPanel({ base }: { base: Record<string, unknown> }) {
         }),
       );
     } catch (e) {
+      if (!isCurrent(ticket)) return;
       const message = e instanceof Error ? e.message : "request_failed";
       setError(message === "request_failed" ? t("risk.requestFailed") : message);
     } finally {
-      setBusy(false);
+      if (isCurrent(ticket)) setBusy(false);
     }
   };
 
@@ -310,9 +317,10 @@ export default function RiskPanel({ base }: { base: Record<string, unknown> }) {
       </form>
       {error && (
         <div className="alert" role="alert">
-          {error}
+          <ServerExplanation text={error} />
         </div>
       )}
+      {result && <ResultSceneLink stale={stale} show={show} />}
       {result && (
         <div className="risk-result">
           <div
@@ -412,7 +420,7 @@ export default function RiskPanel({ base }: { base: Record<string, unknown> }) {
             </summary>
             <ul>
               {result.assumptions.map((a) => (
-                <li key={a}>{a}</li>
+                <li key={a}><ServerExplanation text={a} /></li>
               ))}
             </ul>
           </details>

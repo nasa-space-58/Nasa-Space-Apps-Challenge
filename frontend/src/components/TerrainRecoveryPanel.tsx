@@ -1,3 +1,5 @@
+import ServerExplanation from "./ServerExplanation";
+import { useAnalysisView, previewFor, ResultSceneLink } from "../analysisView";
 import { useEffect, useRef, useState } from "react";
 import "./healing.css";
 import { useTranslate } from "../i18n";
@@ -112,7 +114,7 @@ async function call(path: string, init?: RequestInit) {
 }
 
 function OutcomeCard({ title, outcome }: { title: string; outcome: Outcome }) {
-  const { locale } = useTranslate();
+  const { locale, t } = useTranslate();
   const tr = locale.startsWith("tr");
   const moved = Math.hypot(outcome.target_offset_m.down_m, outcome.target_offset_m.cross_m);
   return (
@@ -132,14 +134,14 @@ function OutcomeCard({ title, outcome }: { title: string; outcome: Outcome }) {
         {outcome.target_safety_score !== null ? outcome.target_safety_score.toFixed(2) : "—"}
       </p>
       {outcome.reasons.slice(0, 3).map((r) => (
-        <p key={r.reason}>{r.detail}</p>
+        <p key={r.reason}><ServerExplanation text={r.detail} reason={r.reason} /></p>
       ))}
     </div>
   );
 }
 
 function TrajectoryChart({ result }: { result: Result }) {
-  const { locale } = useTranslate();
+  const { locale, t } = useTranslate();
   const tr = locale.startsWith("tr");
   // Both flights in the original-target frame (downrange of the original target).
   const frame = (rows: TimelineRow[]) =>
@@ -169,7 +171,7 @@ function TrajectoryChart({ result }: { result: Result }) {
         <line x1={L} x2={W - R} y1={y(0)} y2={y(0)} className="grid" />
         <line x1={x(0)} x2={x(0)} y1={T} y2={H - B} className="heal-target-line" />
         <text x={x(0) - 4} y={T + 10} className="direct-label" textAnchor="end">
-          original target
+          {tr ? "özgün hedef" : "original target"}
         </text>
         {Math.abs(target) > 1 && (
           <>
@@ -182,7 +184,7 @@ function TrajectoryChart({ result }: { result: Result }) {
         <polyline points={line(original)} className="heal-original-path" />
         <polyline points={line(healed)} className="heal-healed-path" />
         <text x={L} y={H - 8} className="axis-title">
-          {tr ? "uçuş doğrultusu" : "downrange"} · {(x0 / 1000).toFixed(1)} to {(x1 / 1000).toFixed(1)} km · {tr ? "yükseklik" : "altitude"} 0–{Math.round(y1)} m
+          {tr ? "uçuş doğrultusu" : "downrange"} · {(x0 / 1000).toFixed(1)} – {(x1 / 1000).toFixed(1)} km · {tr ? "yükseklik" : "altitude"} 0–{Math.round(y1)} m
         </text>
       </svg>
       <div className="risk-legend">
@@ -198,7 +200,7 @@ function TrajectoryChart({ result }: { result: Result }) {
 }
 
 function DecisionMap({ result, selected }: { result: Result; selected: number }) {
-  const { locale } = useTranslate();
+  const { locale, t } = useTranslate();
   const tr = locale.startsWith("tr");
   const first = result.decisions[selected];
   const status = new Map(first?.considered.map((c) => [c.id, c.reachable]) ?? []);
@@ -278,11 +280,12 @@ function DecisionMap({ result, selected }: { result: Result; selected: number })
 }
 
 export default function TerrainRecoveryPanel({ base }: { base: Record<string, unknown> }) {
-  const { locale } = useTranslate();
+  const { locale, t } = useTranslate();
+  const {setPreview} = useAnalysisView();
   const tr = locale.startsWith("tr");
   const version = useRef(0);
   const baseKey = JSON.stringify(base);
-  useEffect(() => { version.current += 1; setResult(null); setError(""); setBusy(false); return () => { version.current += 1; }; }, [baseKey]);
+  useEffect(() => { version.current += 1; setResult(null); setError(""); setBusy(false); setPreview(p => p?.kind === "recovery" ? {...p,stale:true} : p); return () => { version.current += 1; }; }, [baseKey]);
   const [selectedDecision, setSelectedDecision] = useState(0);
   const [preset, setPreset] = useState("boulder");
   const [seed, setSeed] = useState("2026");
@@ -295,6 +298,7 @@ export default function TerrainRecoveryPanel({ base }: { base: Record<string, un
     setResult(null);
     setError("");
     setBusy(false);
+    setPreview(p => p?.kind === "recovery" ? {...p,stale:true} : p);
   }, [preset, seed, latency]);
 
   const run = async () => {
@@ -316,6 +320,7 @@ export default function TerrainRecoveryPanel({ base }: { base: Record<string, un
         });
       if (requestVersion !== version.current) return;
       setResult(response);
+      setPreview(previewFor("recovery",response));
       setSelectedDecision(0);
     } catch (e) {
       if (requestVersion !== version.current) return;
@@ -365,9 +370,10 @@ export default function TerrainRecoveryPanel({ base }: { base: Record<string, un
       </form>
       {error && (
         <div className="alert" role="alert">
-          {error}
+          <ServerExplanation text={error} />
         </div>
       )}
+      {result && <ResultSceneLink stale={false} show={() => setPreview(previewFor("recovery",result))} />}
       {result && (
         <div className="risk-result">
           <div className="heal-compare">
@@ -382,17 +388,16 @@ export default function TerrainRecoveryPanel({ base }: { base: Record<string, un
               <ol className="heal-log">
                 {result.decisions.map((d, i) => (
                   <li key={i} className={d.action}>
-                    <button type="button" aria-pressed={selectedDecision === i} onClick={() => setSelectedDecision(i)}><b>{d.t_s.toFixed(1)} s</b> {tr ? ({continue:"Devam · plan doğrulandı", retarget:"Yedek hedefe geç", abort_required:"İptal gerekli · modellenmedi", budget_exhausted:"Hesaplama bütçesi tükendi", no_time_to_replan:"Yeniden planlama için geç", stale_result_rejected:"Eski sonuç reddedildi"} as Record<string,string>)[d.action] ?? d.action : ACTION_LABEL[d.action] ?? d.action}</button>
+                    <button type="button" aria-pressed={selectedDecision === i} onClick={() => { setSelectedDecision(i); setPreview({...previewFor("recovery",result),selected:d.chosen??undefined}); }}><b>{d.t_s.toFixed(1)} s</b> {tr ? ({continue:"Devam · plan doğrulandı", retarget:"Yedek hedefe geç", abort_required:"İptal gerekli · modellenmedi", budget_exhausted:"Hesaplama bütçesi tükendi", no_time_to_replan:"Yeniden planlama için geç", stale_result_rejected:"Eski sonuç reddedildi"} as Record<string,string>)[d.action] ?? d.action : ACTION_LABEL[d.action] ?? d.action}</button>
                     {d.chosen ? ` → ${d.chosen}` : ""}
                     <small>
-                      after {d.trigger.map((t) => t.replaceAll("_", " ")).join(" + ")} · {d.evaluations}/{d.budget} options
-                      evaluated in {d.solver_wall_ms.toFixed(0)} ms · safety margin {d.margin_m.toFixed(0)} m
-                      {d.applied_at_s !== null && d.applied_at_s > d.t_s ? ` · applied at ${d.applied_at_s.toFixed(1)} s` : ""}
+                      {tr ? "Tetikleyen olay" : "Trigger"}: {d.trigger.map((event) => t(`twin.events.${event}`) === `twin.events.${event}` ? (tr ? "Plan koşulları değişti" : event.replaceAll("_", " ")) : t(`twin.events.${event}`)).join(" + ")} · {d.evaluations}/{d.budget} {tr ? "seçenek değerlendirildi" : "options evaluated"} · {d.solver_wall_ms.toFixed(0)} ms · {tr ? "güvenlik payı" : "safety margin"} {d.margin_m.toFixed(0)} m
+                      {d.applied_at_s !== null && d.applied_at_s > d.t_s ? ` · ${tr ? "uygulama zamanı" : "applied at"} ${d.applied_at_s.toFixed(1)} s` : ""}
                     </small>
-                    <small>{d.explanation}</small>
+                    <small><ServerExplanation text={d.explanation} /></small>
                     {d.validation.map((v) => (
                       <small key={v.id}>
-                        Validation from true state: {v.id} {v.passed ? "✓ passed" : `✕ ${v.reasons[0]?.detail ?? "failed"}`}
+                        {tr ? "Benzetim durumundan doğrulama" : "Validation from true state"}: {v.id} {v.passed ? (tr ? "✓ geçti" : "✓ passed") : (tr ? "✕ başarısız" : "✕ failed")}
                       </small>
                     ))}
                     <details>
@@ -400,13 +405,13 @@ export default function TerrainRecoveryPanel({ base }: { base: Record<string, un
                       {d.considered.map(c => <div key={c.id} className="terrain-candidate-detail">
                         <strong>{c.id} · {c.reachable ? (tr ? "Uygun" : "Feasible") : (tr ? "Elendi" : "Rejected")}</strong>
                         <p>Δv {c.total_delta_v_mps.toFixed(2)} m/s · {tr ? "rezerv marjı" : "reserve margin"} {c.reserve_margin_kg.toFixed(2)} kg · {tr ? "arazi skoru" : "terrain score"} {c.safety_score?.toFixed(3) ?? "—"}</p>
-                        {c.reasons.map((r, index) => <p key={index}>{r.detail}</p>)}
+                        {c.reasons.map((r, index) => <p key={index}><ServerExplanation text={r.detail} reason={r.reason} /></p>)}
                       </div>)}
                     </details>
                     {d.action === "abort_required" &&
                       d.considered.slice(0, 3).map((c) => (
                         <small key={c.id}>
-                          {c.id}: {c.reasons[0]?.detail}
+                          {c.id}: <ServerExplanation text={c.reasons[0]?.detail} reason={c.reasons[0]?.reason} />
                         </small>
                       ))}
                   </li>
@@ -418,7 +423,7 @@ export default function TerrainRecoveryPanel({ base }: { base: Record<string, un
                 {result.backups_over_time.map((b, i) => (
                   <li key={i}>
                     <span>
-                      {b.t_s.toFixed(0)} s · {b.label.replace("_", " ")}
+                      {b.t_s.toFixed(0)} s · {tr ? (b.label === "initial" ? "Başlangıç" : "Yedek hedef kontrolü") : b.label.replaceAll("_", " ")}
                     </span>
                     <span className="risk-meter" aria-label={`${b.reachable} of ${b.evaluated} reachable`}>
                       <i style={{ width: `${b.evaluated ? (100 * b.reachable) / b.evaluated : 0}%` }} />
@@ -437,7 +442,7 @@ export default function TerrainRecoveryPanel({ base }: { base: Record<string, un
             </summary>
             <ul>
               {result.assumptions.map((a) => (
-                <li key={a}>{a}</li>
+                <li key={a}><ServerExplanation text={a} /></li>
               ))}
               <li>{tr ? "Yeniden planlama son zamanı (motorlu iniş başlangıcından):" : "Replanning deadline from powered descent start:"} {result.decision_deadline_s.toFixed(0)} s</li>
             </ul>

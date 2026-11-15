@@ -66,7 +66,22 @@ function makeTranslateText(lang: Language): TranslateText {
   const table = dictionaries[lang].serverText;
   return (text) => {
     const value = typeof table === "object" ? table[text] : undefined;
-    return typeof value === "string" ? value : text;
+    if (typeof value === "string") return value;
+    if (lang === "tr") {
+      const patterns: [RegExp, (...values: string[]) => string][] = [
+        [/^Landed ([\d.]+) m from the target\.$/, (_,m)=>`Hedeften ${m} m uzakta iniş yapıldı.`],
+        [/^Vertical speed ([\d.]+) m\/s at touchdown\.$/, (_,v)=>`Temas anındaki düşey hız: ${v} m/s.`],
+        [/^Horizontal speed ([\d.]+) m\/s at touchdown\.$/, (_,v)=>`Temas anındaki yatay hız: ${v} m/s.`],
+        [/^([\d.-]+) kg left; the reserve needs ([\d.-]+) kg\.$/, (_,left,need)=>`Kalan yakıt ${left} kg; gereken rezerv ${need} kg.`],
+        [/^Needs ([\d.]+) % of maximum thrust for a ([\d.]+) m sideways move\.$/, (_,percent,m)=>`${m} m yanal manevra için azami itkinin %${percent} kadarı gerekiyor.`],
+        [/^Leaves ([\d.-]+) kg; the reserve \(with a ([\d.]+) m correction allowance\) needs ([\d.]+) kg\.$/, (_,left,m,need)=>`Kalan yakıt ${left} kg. ${m} m düzeltme payıyla gereken rezerv ${need} kg.`],
+      ];
+      for (const [pattern,translate] of patterns) {
+        const match = text.match(pattern);
+        if (match) return translate(...match);
+      }
+    }
+    return text;
   };
 }
 

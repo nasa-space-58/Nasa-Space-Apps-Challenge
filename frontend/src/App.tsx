@@ -909,7 +909,7 @@ export default function App() {
           },
         ]
       : []),
-    { id: "descent", group: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} onCandidates={setDescentCandidates} /> },
+    { id: "descent", group: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} onCandidates={setDescentCandidates} onLocation={(latitude,longitude)=>{setLat(String(latitude));setLon(String(longitude));setSiteId("custom");setResolved("");}} /> },
     {
       id: "classroom",
       group: "learn",
