@@ -937,5 +937,41 @@
     "Current conditions describe the Sun when the snapshot was fetched, not at the landing time.": "Güncel koşullar inişin değil, verinin çekildiği andaki Güneş'i anlatır.",
     "GOES measures near Earth; proton flux is a proxy for the lunar surface, not a dose estimate.": "GOES Dünya yakınında ölçer; proton akısı Ay yüzeyi için yaklaşık bir göstergedir, doz tahmini değildir.",
     "The radio blackout scale describes HF radio on Earth's sunlit side, not DSN links.": "Radyo kesintisi ölçeği Dünya'nın gündüz yüzündeki HF radyoyu anlatır, DSN bağlantılarını değil."
+  },
+  "assistant": {
+    "launcherEyebrow": "GÖREV KONTROL",
+    "launcher": "Navigatöre Sor",
+    "eyebrow": "GÖREV KONTROL · SORU-CEVAP",
+    "title": "Navigatöre Sor",
+    "close": "Asistanı kapat",
+    "connecting": "Bağlantı kuruluyor…",
+    "online": "BAĞLANTI AKTİF · {model} · {sections} doküman bölümü",
+    "offline": "BAĞLANTI KAPALI",
+    "statusFailed": "Asistan servisine ulaşılamadı.",
+    "contextLabel": "Bağlı",
+    "noContext": "Henüz kayıtlı analiz yok: sorular yalnızca dokümantasyonla yanıtlanır.",
+    "offlineTitle": "ASİSTAN KAPALI",
+    "offlineBody": "Soru-cevap asistanı isteğe bağlıdır ve bu sunucuda şu an kapalı. Tüm analizler onsuz da çalışır.",
+    "intro": "İniş bölgen, tarih karşılaştırman ya da navigatörün nasıl çalıştığı hakkında soru sor. Cevaplar yalnızca hesaplanmış sonuçlara ve proje dokümantasyonuna dayanır, kaynaklarıyla birlikte gelir.",
+    "you": "SEN",
+    "navigator": "NAVİGATÖR",
+    "signalLost": "SİNYAL KAYBI",
+    "sources": "Kaynaklar",
+    "tokens": "{count} token",
+    "thinking": "Görev verileri sorgulanıyor…",
+    "placeholder": "Güneş ışığı, Dünya görünürlüğü, bölgeler hakkında sor…",
+    "placeholderOff": "Asistan kullanılamıyor",
+    "send": "GÖNDER",
+    "askFailed": "Asistan cevap veremedi. Lütfen tekrar dene.",
+    "disclaimer": "Yapay zekâ cevapları hatalı olabilir. Sayılar backend'in hesapladığı sonuçlardan gelir. Bu bir karar desteğidir, uçuş sertifikası değildir.",
+    "suggest": {
+      "explainSite": "Bu bölgenin güneş ışığı ve Dünya görünürlüğünü sade bir dille anlat.",
+      "compare": "İki senaryom nasıl farklı, enerji için hangisi daha iyi?",
+      "darkness": "En uzun karanlık ne kadar sürüyor ve neden önemli?",
+      "limits": "Bu analizin başlıca sınırlamaları neler?",
+      "horizon": "Arazi ufku nasıl hesaplanıyor?",
+      "sites": "Hangi iniş bölgelerini analiz edebilirim?",
+      "data": "Navigatör hangi NASA veri kaynaklarını kullanıyor?"
+    }
   }
 }

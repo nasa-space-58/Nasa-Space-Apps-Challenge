@@ -937,5 +937,41 @@
     "Current conditions describe the Sun when the snapshot was fetched, not at the landing time.": "Current conditions describe the Sun when the snapshot was fetched, not at the landing time.",
     "GOES measures near Earth; proton flux is a proxy for the lunar surface, not a dose estimate.": "GOES measures near Earth; proton flux is a proxy for the lunar surface, not a dose estimate.",
     "The radio blackout scale describes HF radio on Earth's sunlit side, not DSN links.": "The radio blackout scale describes HF radio on Earth's sunlit side, not DSN links."
+  },
+  "assistant": {
+    "launcherEyebrow": "MISSION CONTROL",
+    "launcher": "Ask the Navigator",
+    "eyebrow": "MISSION CONTROL · Q&A",
+    "title": "Ask the Navigator",
+    "close": "Close the assistant",
+    "connecting": "Establishing link…",
+    "online": "LINK ACTIVE · {model} · {sections} doc sections",
+    "offline": "LINK OFFLINE",
+    "statusFailed": "Could not reach the assistant service.",
+    "contextLabel": "Linked",
+    "noContext": "No saved analysis yet: questions use the documentation only.",
+    "offlineTitle": "ASSISTANT OFFLINE",
+    "offlineBody": "The Q&A assistant is optional and currently switched off on this server. Every analysis still works without it.",
+    "intro": "Ask about your landing site, a date comparison or how the navigator works. Answers use only computed results and project documentation, with sources.",
+    "you": "YOU",
+    "navigator": "NAVIGATOR",
+    "signalLost": "SIGNAL LOST",
+    "sources": "Sources",
+    "tokens": "{count} tokens",
+    "thinking": "Querying mission data…",
+    "placeholder": "Ask about sunlight, Earth visibility, sites…",
+    "placeholderOff": "Assistant unavailable",
+    "send": "SEND",
+    "askFailed": "The assistant could not answer. Please try again.",
+    "disclaimer": "AI answers can be wrong. Numbers come from the backend's computed results. This is decision support, not flight certification.",
+    "suggest": {
+      "explainSite": "Explain this site's sunlight and Earth visibility in plain language.",
+      "compare": "How do my two scenarios differ, and which is better for power?",
+      "darkness": "How long is the longest darkness, and why does it matter?",
+      "limits": "What are the main limitations of this analysis?",
+      "horizon": "How is the terrain horizon computed?",
+      "sites": "Which landing sites can I analyze?",
+      "data": "Which NASA data sources does the navigator use?"
+    }
   }
 }

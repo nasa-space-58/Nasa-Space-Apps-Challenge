@@ -65,7 +65,17 @@ Restart the backend container after changing these values.
 - The test suite never calls the provider. A scripted fake client covers the tool loop, error mapping and routes.
 - Live checks with a real key are manual and spend credit. Run them only with the key holder's approval.
 
+## Interface
+
+A "Mission Control · Ask the Navigator" launcher sits in the lower right corner of every page (`frontend/src/components/AssistantPanel.tsx`). It opens a console drawer that:
+
+- shows the link status (model and indexed documentation sections, or why the assistant is offline),
+- links the open analysis (and the comparison base, when one is open) and the last recommendation, so questions about "this site" use those results,
+- offers context-aware starter questions, keeps the conversation and sends completed turns as `history`,
+- lists each answer's sources as `DOC`/`API` chips and the tokens it used.
+
+Strings are in English and Turkish (`assistant.*` in `frontend/src/i18n`). Esc or the scrim closes the drawer. The panel holds no analysis logic. Per the team rule, it was verified with `npm run build` only.
+
 ## Next steps
 
-- A frontend chat panel (frontend code has no tests, per the team rule).
 - Tools for new modules (for example quantum/hybrid results) as their APIs settle. New documentation is searchable as soon as it is in `docs/`.
