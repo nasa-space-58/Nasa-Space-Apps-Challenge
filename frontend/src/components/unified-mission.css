@@ -1,5 +1,5 @@
 .unified-workspace {
-  color: var(--text);
+  color: inherit;
   min-width: 0;
 }
 .unified-header {
@@ -52,7 +52,7 @@
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--panel);
-  color: var(--text);
+  color: inherit;
   min-height: 42px;
   max-width: 100%;
 }
