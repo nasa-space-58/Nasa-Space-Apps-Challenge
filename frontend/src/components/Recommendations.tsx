@@ -311,10 +311,6 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
   const [busy, setBusy] = useState(false);
   const timer = useRef<number | undefined>(undefined);
 
-  useEffect(() => {
-    if (!picked.length && sites.length) setPicked(sites.map((s) => s.site_id));
-  }, [sites, picked.length]);
-
   const poll = (id: string) => {
     window.clearTimeout(timer.current);
     call(`/recommendations/${encodeURIComponent(id)}`)
