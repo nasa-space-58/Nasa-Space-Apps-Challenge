@@ -1050,6 +1050,7 @@ function LandingSite({
   roverScene,
   roverTarget,
   roverAlternatives,
+  showHazards, showSearch, showRoutes,
 }: {
   progress: MutableRefObject<number>;
   reduced: boolean;
@@ -1060,6 +1061,9 @@ function LandingSite({
   roverScene: SurfaceScene | null;
   roverTarget: string;
   roverAlternatives?: RoverState["alternatives"];
+  showHazards?: boolean;
+  showSearch?: boolean;
+  showRoutes?: boolean;
 }) {
   const lander = useRef<THREE.Group>(null!);
   // Fetch the rover model during the descent so it is ready at touchdown.
@@ -1200,6 +1204,8 @@ function LandingSite({
           <ScanOverlay
             scene={roverScene}
             mapping={mapping}
+            showHazards={showHazards}
+            showSearch={showSearch}
             target={roverTarget}
             scan={roverScan}
           />
@@ -1212,6 +1218,7 @@ function LandingSite({
       </group>
       {roverPath && (
         <Rover
+          showRoutes={showRoutes}
           path={roverPath}
           alternatives={roverAlternatives}
           drive={roverDrive}
@@ -1325,6 +1332,9 @@ export default function MissionScene(
     roverScene?: SurfaceScene | null;
     roverTarget?: string;
     roverAlternatives?: RoverState["alternatives"];
+    showHazards?: boolean;
+    showSearch?: boolean;
+    showRoutes?: boolean;
   },
 ) {
   const {
@@ -1339,6 +1349,7 @@ export default function MissionScene(
     roverScene = null,
     roverTarget = "",
     roverAlternatives,
+    showHazards = true, showSearch = true, showRoutes = true,
     flight = null,
     path,
     ...scene
@@ -1409,6 +1420,7 @@ export default function MissionScene(
             roverScene={roverScene}
             roverTarget={roverTarget}
             roverAlternatives={roverAlternatives}
+            showHazards={showHazards} showSearch={showSearch} showRoutes={showRoutes}
           />
         ) : (
           <System {...scene} view={view} progress={progress} />

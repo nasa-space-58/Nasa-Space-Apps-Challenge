@@ -34,6 +34,7 @@ export type RoverState = {
   scan: number;
   scene: SurfaceScene | null;
   targetId: string;
+  source?: "demo" | "lola";
   alternatives?: { id: string; path: RoutePoint[] }[];
 };
 
@@ -443,8 +444,10 @@ export default function Rover({
   mapping = null,
   reach = 0,
   alternatives = [],
+  showRoutes = true,
 }: {
   path: RoutePoint[];
+  showRoutes?: boolean;
   alternatives?: { id: string; path: RoutePoint[] }[];
   drive: MutableRefObject<number>;
   focus: THREE.Vector3;
@@ -570,9 +573,11 @@ export default function Rover({
   const procedural = <RoverModel spin={spin} scan={scan} drive={drive} />;
   return (
     <>
+      <group visible={showRoutes}>
       {comparisonLines.map((line, i) => <primitive key={i} object={line} />)}
       <primitive object={lines.planned} />
       <primitive object={lines.driven} />
+      </group>
       <group ref={body} rotation-order="YXZ">
         {hasModel ? (
           <ModelBoundary fallback={procedural}>

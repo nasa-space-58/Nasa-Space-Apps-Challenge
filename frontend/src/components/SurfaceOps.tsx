@@ -283,11 +283,12 @@ export default function SurfaceOps({
             scan,
             scene: shownRoutes?.scene ?? null,
             targetId: route.target_id,
+            source: demo ? "demo" : "lola",
             alternatives,
           }
         : null,
     );
-  }, [route, drive, scan, shownRoutes, alternatives]);
+  }, [route, drive, scan, shownRoutes, alternatives, demo]);
   const scene = shownRoutes?.scene ?? null;
   const searchedCells = scene && route ? (scene.explored[route.target_id] ?? []).length : 0;
   const truncated = Boolean(scene && route && scene.explored_truncated[route.target_id]);

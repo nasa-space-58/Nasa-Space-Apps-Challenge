@@ -200,7 +200,20 @@ export default function MissionStage({
   children: ReactNode;
 }) {
   const { t, locale } = useTranslate();
-  const [candidateOpen, setCandidateOpen] = useState(false);
+  const [inspector, setInspector] = useState<"flight" | "surface" | "candidates" | null>(null);
+  const [cleanView, setCleanView] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
+  const navigate = (id: string) => { setInspector(null); onModuleChange(id); };
+  const inspect = (view: "flight" | "surface" | "candidates") => { setInspector(view); setPanelOpen(true); };
+  useEffect(() => {
+    const sync = () => setFullscreen(document.fullscreenElement === stageRef.current);
+    document.addEventListener("fullscreenchange", sync);
+    return () => document.removeEventListener("fullscreenchange", sync);
+  }, []);
+  const [showHazards, setShowHazards] = useState(true);
+  const [showSearch, setShowSearch] = useState(true);
+  const [showRoutes, setShowRoutes] = useState(true);
+  const [layersOpen, setLayersOpen] = useState(false);
   const [showCandidates, setShowCandidates] = useState(true);
   const [candidateId, setCandidateId] = useState<string | null>(null);
   const inspected = candidates.find((c) => c.id === candidateId);
@@ -242,16 +255,16 @@ export default function MissionStage({
   };
   const groupOf = (id: string) =>
     id === "plan" ? "plan" : (modules.find((m) => m.id === id)?.group ?? "plan");
-  const activeGroup = groupOf(activeModule);
+  const activeGroup = inspector === "surface" || inspector === "candidates" ? "descent" : inspector === "flight" ? "plan" : groupOf(activeModule);
   const lastInGroup = useRef<Record<string, string>>({});
-  lastInGroup.current[activeGroup] = activeModule;
+  if (!inspector) lastInGroup.current[activeGroup] = activeModule;
   const openGroup = (group: string) => {
-    if (group === "plan") return onModuleChange("plan");
+    if (group === "plan") return navigate("plan");
     const remembered = lastInGroup.current[group];
     const target =
       modules.find((m) => m.id === remembered && m.group === group) ??
       modules.find((m) => m.group === group);
-    if (target) onModuleChange(target.id);
+    if (target) navigate(target.id);
   };
   const steps = STEP_GROUPS.filter(
     (g) => g === "plan" || modules.some((m) => m.group === g),
@@ -444,9 +457,10 @@ export default function MissionStage({
           <SceneBoundary fallback={fallback}>
             <Suspense fallback={<div className="stage-loading">{t("missionStage.loading")}</div>}>
               <MissionScene
+                showHazards={showHazards} showSearch={showSearch} showRoutes={showRoutes}
                 candidates={showCandidates ? candidates : []}
                 selectedCandidate={candidateId}
-                onCandidate={(id) => { setCandidateId(id); setCandidateOpen(true); }}
+                onCandidate={(id) => { setCandidateId(id); inspect("candidates"); }}
                 path={path}
                 lat={lat}
                 lon={lon}
@@ -479,112 +493,45 @@ export default function MissionStage({
         ) : (
           fallback
         )}
-        {candidates.length > 0 && <details className="mission-candidates" open={candidateOpen} onToggle={e => setCandidateOpen(e.currentTarget.open)}>
-          <summary>{tr ? "Rota ve iniş adayları" : "Route & landing candidates"} · {candidates.length}</summary>
-          <label><input type="checkbox" checked={showCandidates} onChange={e => setShowCandidates(e.target.checked)} /> {tr ? "3D üzerinde göster" : "Show in 3D"}</label>
-          <p>{tr ? "Çizgiler temsili yaklaşım koridorlarıdır. Skor ve gerekçeler API sonuçlarıdır; hesaplanmamış skor — gösterilir." : "Lines are illustrative approach corridors. Scores and reasons come from the API; missing scores appear as —."}</p>
-          <div className="candidate-list">{candidates.map(c => <button key={c.id} aria-pressed={candidateId === c.id} onClick={() => { setCandidateId(c.id); setShowCandidates(true); setCameraMode("pole"); }} style={{ borderLeftColor: candidateColor(c) }}>
-            <span>{c.label}</span><b>{c.score?.toFixed(3) ?? "—"}</b><small>{tr ? ({accepted:"Uygun",rejected:"Elendi",failed:"Hata",unknown:"Veri yetersiz"})[c.status] : c.status}</small>
-          </button>)}</div>
-          {inspected && <article><strong>{inspected.label}</strong><p>{inspected.source} · {inspected.lat.toFixed(4)}°, {inspected.lon.toFixed(4)}°</p><p>{inspected.explanation}</p><dl>{inspected.metrics.map((m, i) => <div key={i}><dt>{tr ? ({Orbit:"Yörünge",Propellant:"Yakıt", "Reserve margin":"Rezerv marjı",Assessment:"Değerlendirme"} as Record<string,string>)[m.label] ?? m.label : m.label}</dt><dd>{m.value}</dd></div>)}</dl></article>}
-        </details>}
-        <div className="stage-hud stage-phase" aria-live="polite">
-          {progress === 0 && !flying ? (
-            <>
-              <span className="eyebrow">{t("missionStage.preLaunch")}</span>
-              <strong>{t("missionStage.chooseSite")}</strong>
-              <p>{t("missionStage.chooseSiteHelp")}</p>
-            </>
-          ) : (
-            <>
-              <span className="eyebrow">
-                {t("missionStage.phase", {
-                  n: active.index + 1,
-                  total: MISSION_PHASES.length,
-                })}
-              </span>
-              <strong>{phaseLabel(active.phase.id)}</strong>
-              <p>{t(`missionPhases.${active.phase.id}.description`)}</p>
-            </>
-          )}
-          {readout ? (
-            <dl className="flight-readout">
-              <dt>{t("missionStage.flightData.utc")}</dt>
-              <dd>{readout.utc} UTC</dd>
-              <dt>{t("missionStage.flightData.met")}</dt>
-              <dd>{readout.met}</dd>
-              <dt>{t("missionStage.flightData.earthMoon")}</dt>
-              <dd>{readout.earthMoon} km</dd>
-              <dt>{t("missionStage.flightData.craftEarth")}</dt>
-              <dd>{readout.craftEarth} km</dd>
-              <dt>{t("missionStage.flightData.craftMoon")}</dt>
-              <dd>{readout.craftMoon} km</dd>
-            </dl>
-          ) : (
-            flightState !== "off" &&
-            flightState !== "ready" && (
-              <small className="flight-note">
-                {t(`missionStage.flightData.${flightState}`)}
-              </small>
-            )
-          )}
+        {!cleanView && <button aria-live="polite" className="stage-hud stage-phase phase-chip" onClick={() => inspect("flight")}>
+          <span className="eyebrow">{t("missionStage.phase", { n: active.index + 1, total: MISSION_PHASES.length })}</span>
+          <strong>{progress === 0 && !flying ? t("missionStage.preLaunch") : phaseLabel(active.phase.id)}</strong>
+          <span aria-hidden="true">↗</span>
+        </button>}
+        <div className="stage-hud scene-toolbar">
+          {webgl && !cleanView && <label className="camera-picker">
+            <span className="sr-only">{t("missionStage.cameraView")}</span>
+            <select aria-label={t("missionStage.cameraView")} value={cameraMode} onChange={e => setCameraMode(e.target.value as CameraMode)}>
+              {cameraModes.map(mode => <option key={mode} value={mode}>{t(`missionStage.camera.${mode}`)}</option>)}
+            </select>
+          </label>}
+          {!cleanView && <div className="layer-picker">
+            <button aria-expanded={layersOpen} onClick={() => setLayersOpen(!layersOpen)}>{tr ? "Katmanlar" : "Layers"}</button>
+            {layersOpen && <div className="layer-options" onKeyDown={e => { if (e.key === "Escape") setLayersOpen(false); }}>
+              <label><input type="checkbox" checked={showHazards} onChange={e => setShowHazards(e.target.checked)} />{tr ? "Tehlike bölgeleri" : "Hazards"}</label>
+              <label><input type="checkbox" checked={showSearch} onChange={e => setShowSearch(e.target.checked)} />{tr ? "Tarama alanı" : "Scan coverage"}</label>
+              <label><input type="checkbox" checked={showRoutes} onChange={e => setShowRoutes(e.target.checked)} />{tr ? "Rover rotaları" : "Rover routes"}</label>
+              <label><input type="checkbox" checked={showCandidates} onChange={e => setShowCandidates(e.target.checked)} />{tr ? "İniş adayları" : "Landing candidates"}</label>
+              <button onClick={() => setLayersOpen(false)}>{tr ? "Kapat" : "Close"}</button>
+            </div>}
+          </div>}
+          <button aria-pressed={cleanView} onClick={() => setCleanView(!cleanView)}>{tr ? (cleanView ? "Kontroller" : "Sade görünüm") : (cleanView ? "Controls" : "Clean view")}</button>
+          <button aria-label={tr ? "Tam ekranı değiştir" : "Toggle fullscreen"} aria-pressed={fullscreen} onClick={async () => {
+            try {
+              if (document.fullscreenElement) await document.exitFullscreen();
+              else await stageRef.current?.requestFullscreen();
+            } catch { setNotice(tr ? "Bu tarayıcıda tam ekran açılamadı." : "Fullscreen is unavailable in this browser."); }
+          }}>⛶</button>
         </div>
-        {webgl && (
-          <div className="stage-hud stage-cameras" role="group" aria-label={t("missionStage.cameraView")}>
-            {cameraModes.map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                aria-pressed={cameraMode === mode}
-                onClick={() => setCameraMode(mode)}
-              >
-                {t(`missionStage.camera.${mode}`)}
-              </button>
-            ))}
-          </div>
-        )}
-        <div className="stage-hud stage-legend">
-          <span>
-            <i className="legend-sun" /> {t("common.sun")}
-          </span>
-          <span>
-            <i className="legend-earth" /> {t("common.earth")}
-          </span>
-          <span>
-            <i className="legend-trail" /> {t("missionStage.flownPath")}
-          </span>
-          <span>
-            <i className="legend-ring" /> {t("missionStage.coverage")}
-          </span>
-          <small>{t("missionStage.scaleNote")}</small>
-        </div>
-        <div className="stage-hud stage-target">
-          <span className="eyebrow">{t("missionStage.target")}</span>
-          <strong>{coordinateLabel(t, lat, lon)}</strong>
-          {siteStatus && <div className="stage-status">{siteStatus}</div>}
-          {webgl && !busy && (
-            <small>
-              {picking
-                ? t("missionStage.hint.picking")
-                : cameraView === "landing"
-                  ? t("missionStage.hint.landing")
-                  : cameraView === "launch"
-                    ? t("missionStage.hint.launch")
-                  : t("missionStage.hint.default")}
-            </small>
-          )}
-        </div>
-        {landed && (
-          <SceneBoundary fallback={null}>
-            <SurfaceOps
-              lat={lat}
-              lon={lon}
-              analysisId={analysisId}
-              reduced={reduced}
-              onRover={setRover}
-            />
-          </SceneBoundary>
-        )}
+        {!cleanView && <div className="scene-source">{landed && rover?.source ? (rover.source === "demo" ? "DEMO · A*" : "LOLA DEM · A*") : t("missionStage.illustrative")}</div>}
+        {!cleanView && <div className="stage-hud scene-dock">
+          <button disabled={!path} onClick={toggleFlight} aria-label={flying ? t("missionStage.pauseFlight") : t("missionStage.simulate")}>{flying ? "Ⅱ" : "▷"}</button>
+          <input type="range" min="0" max="1000" value={Math.round(progress * 1000)} disabled={!path}
+            aria-label={t("missionStage.progress")} aria-valuetext={`${phaseLabel(active.phase.id)}, ${Math.round(progress * 100)}%`}
+            onChange={e => { setFlying(false); setProgress(Number(e.target.value) / 1000); }} />
+          <span>{Math.round(progress * 100)}%</span>
+          {landed && <button onClick={() => inspect("surface")}>{tr ? "Keşif aracı" : "Rover"} ↗</button>}
+        </div>}
         {notice && (
           <div className="stage-notice" role="status">
             {notice}
@@ -667,7 +614,7 @@ export default function MissionStage({
                   aria-pressed={activeGroup === "learn"}
                   onClick={() => {
                     setAdvancedOpen(false);
-                    onModuleChange(learn.id);
+                    navigate(learn.id);
                   }}
                 >
                   <span aria-hidden="true">✦</span> {t("missionStage.learn")}
@@ -699,7 +646,7 @@ export default function MissionStage({
                           aria-current={activeModule === m.id || undefined}
                           onClick={() => {
                             setAdvancedOpen(false);
-                            onModuleChange(m.id);
+                            navigate(m.id);
                           }}
                         >
                           {m.label}
@@ -712,12 +659,118 @@ export default function MissionStage({
             </div>
           )}
         </nav>
+        <div className="scene-inspector-nav" role="group" aria-label={tr ? "Sahne ayrıntıları" : "Scene details"}>
+          <button aria-pressed={inspector === "flight"} onClick={() => inspect("flight")}>{tr ? "Uçuş bilgisi" : "Flight details"}</button>
+          {landed && <button aria-pressed={inspector === "surface"} onClick={() => inspect("surface")}>{tr ? "Yüzey operasyonları" : "Surface operations"}</button>}
+          <button aria-pressed={inspector === "candidates"} onClick={() => inspect("candidates")}>{tr ? "Adaylar" : "Candidates"} · {candidates.length}</button>
+          {inspector && <button onClick={() => setInspector(null)}>{tr ? "Göreve dön" : "Back to task"} ↩</button>}
+        </div>
+        <div className="panel-body scene-inspector" hidden={inspector !== "flight"}>
+        <div className="scene-information" aria-live="polite">
+          {progress === 0 && !flying ? (
+            <>
+              <span className="eyebrow">{t("missionStage.preLaunch")}</span>
+              <strong>{t("missionStage.chooseSite")}</strong>
+              <p>{t("missionStage.chooseSiteHelp")}</p>
+            </>
+          ) : (
+            <>
+              <span className="eyebrow">
+                {t("missionStage.phase", {
+                  n: active.index + 1,
+                  total: MISSION_PHASES.length,
+                })}
+              </span>
+              <strong>{phaseLabel(active.phase.id)}</strong>
+              <p>{t(`missionPhases.${active.phase.id}.description`)}</p>
+            </>
+          )}
+          {readout ? (
+            <dl className="flight-readout">
+              <dt>{t("missionStage.flightData.utc")}</dt>
+              <dd>{readout.utc} UTC</dd>
+              <dt>{t("missionStage.flightData.met")}</dt>
+              <dd>{readout.met}</dd>
+              <dt>{t("missionStage.flightData.earthMoon")}</dt>
+              <dd>{readout.earthMoon} km</dd>
+              <dt>{t("missionStage.flightData.craftEarth")}</dt>
+              <dd>{readout.craftEarth} km</dd>
+              <dt>{t("missionStage.flightData.craftMoon")}</dt>
+              <dd>{readout.craftMoon} km</dd>
+            </dl>
+          ) : (
+            flightState !== "off" &&
+            flightState !== "ready" && (
+              <small className="flight-note">
+                {t(`missionStage.flightData.${flightState}`)}
+              </small>
+            )
+          )}
+        </div>
+        <div className="scene-legend">
+          <span>
+            <i className="legend-sun" /> {t("common.sun")}
+          </span>
+          <span>
+            <i className="legend-earth" /> {t("common.earth")}
+          </span>
+          <span>
+            <i className="legend-trail" /> {t("missionStage.flownPath")}
+          </span>
+          <span>
+            <i className="legend-ring" /> {t("missionStage.coverage")}
+          </span>
+          <small>{t("missionStage.scaleNote")}</small>
+        </div>
+        <div className="scene-target">
+          <span className="eyebrow">{t("missionStage.target")}</span>
+          <strong>{coordinateLabel(t, lat, lon)}</strong>
+          {siteStatus && <div className="stage-status">{siteStatus}</div>}
+          {webgl && !busy && (
+            <small>
+              {picking
+                ? t("missionStage.hint.picking")
+                : cameraView === "landing"
+                  ? t("missionStage.hint.landing")
+                  : cameraView === "launch"
+                    ? t("missionStage.hint.launch")
+                  : t("missionStage.hint.default")}
+            </small>
+          )}
+        </div>
+        </div>
+        <div className="panel-body scene-inspector" hidden={inspector !== "candidates"}>
+        {candidates.length > 0 && <details className="mission-candidates" open>
+          <summary>{tr ? "Rota ve iniş adayları" : "Route & landing candidates"} · {candidates.length}</summary>
+          <label><input type="checkbox" checked={showCandidates} onChange={e => setShowCandidates(e.target.checked)} /> {tr ? "3D üzerinde göster" : "Show in 3D"}</label>
+          <p>{tr ? "Çizgiler temsili yaklaşım koridorlarıdır. Skor ve gerekçeler API sonuçlarıdır; hesaplanmamış skor — gösterilir." : "Lines are illustrative approach corridors. Scores and reasons come from the API; missing scores appear as —."}</p>
+          <div className="candidate-list">{candidates.map(c => <button key={c.id} aria-pressed={candidateId === c.id} onClick={() => { setCandidateId(c.id); setShowCandidates(true); setCameraMode("pole"); }} style={{ borderLeftColor: candidateColor(c) }}>
+            <span>{c.label}</span><b>{c.score?.toFixed(3) ?? "—"}</b><small>{tr ? ({accepted:"Uygun",rejected:"Elendi",failed:"Hata",unknown:"Veri yetersiz"})[c.status] : c.status}</small>
+          </button>)}</div>
+          {inspected && <article><strong>{inspected.label}</strong><p>{inspected.source} · {inspected.lat.toFixed(4)}°, {inspected.lon.toFixed(4)}°</p><p>{inspected.explanation}</p><dl>{inspected.metrics.map((m, i) => <div key={i}><dt>{tr ? ({Orbit:"Yörünge",Propellant:"Yakıt", "Reserve margin":"Rezerv marjı",Assessment:"Değerlendirme"} as Record<string,string>)[m.label] ?? m.label : m.label}</dt><dd>{m.value}</dd></div>)}</dl></article>}
+        </details>}
+          {!candidates.length && <p>{tr ? "Rota ve iniş adayları için Karşılaştır ve öner veya İniş ve yüzey adımında bir hesaplama çalıştırın." : "Run recommendations or descent planning to see route and landing candidates."}</p>}
+        </div>
+        <div className="panel-body scene-inspector" hidden={inspector !== "surface"}>
+        {landed && (
+          <SceneBoundary fallback={null}>
+            <SurfaceOps
+              lat={lat}
+              lon={lon}
+              analysisId={analysisId}
+              reduced={reduced}
+              onRover={setRover}
+            />
+          </SceneBoundary>
+        )}
+          {!landed && <p>{tr ? "Yüzey operasyonları inişten sonra açılır." : "Surface operations become available after landing."}</p>}
+        </div>
         <div
           className="panel-body"
           role="tabpanel"
           id="tabpanel-plan"
           aria-labelledby="step-plan"
-          hidden={activeModule !== "plan"}
+          hidden={inspector !== null || activeModule !== "plan"}
         >
         {children}
         <section className="panel flight-panel" aria-labelledby="flight-title">
@@ -795,7 +848,7 @@ export default function MissionStage({
           </div>
         </section>
         </div>
-        {siblings.length > 1 && (
+        {!inspector && siblings.length > 1 && (
           <div
             className="sub-tabs"
             role="tablist"
@@ -813,7 +866,7 @@ export default function MissionStage({
                 id={`tab-${m.id}`}
                 aria-selected={activeModule === m.id}
                 aria-controls={`tabpanel-${m.id}`}
-                onClick={() => onModuleChange(m.id)}
+                onClick={() => navigate(m.id)}
               >
                 {m.label}
               </button>
@@ -827,7 +880,7 @@ export default function MissionStage({
             role="tabpanel"
             id={`tabpanel-${module.id}`}
             aria-label={module.label}
-            hidden={activeModule !== module.id}
+            hidden={inspector !== null || activeModule !== module.id}
           >
             {module.content}
           </div>

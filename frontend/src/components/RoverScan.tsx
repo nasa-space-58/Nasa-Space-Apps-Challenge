@@ -108,11 +108,15 @@ export function ScanOverlay({
   mapping,
   target,
   scan,
+  showHazards = true,
+  showSearch = true,
 }: {
   scene: SurfaceScene;
   mapping: SceneMapping;
   target: string;
   scan: MutableRefObject<number>;
+  showHazards?: boolean;
+  showSearch?: boolean;
 }) {
   const { rows, cols } = scene;
   const geometry = useMemo(
@@ -164,7 +168,7 @@ export function ScanOverlay({
         THREE.MathUtils.clamp((s - PULSE_END) / (SEARCH_END - PULSE_END), 0, 1),
     );
     const routed = s >= SEARCH_END;
-    const key = `${radius.toFixed(1)}|${searched}|${routed}`;
+    const key = `${radius.toFixed(1)}|${searched}|${routed}|${showHazards}|${showSearch}`;
     if (key === drawn.key) return;
     drawn.key = key;
     const put = (r: number, c: number, color: Rgba) =>
@@ -172,10 +176,11 @@ export function ScanOverlay({
     for (let r = 0; r < rows; r++)
       for (let c = 0; c < cols; c++) {
         if (distance.values[r * cols + c] > radius) put(r, c, UNSCANNED);
+        else if (!showHazards) put(r, c, UNSCANNED);
         else if (scene.heights_m[r][c] === null) put(r, c, UNKNOWN);
         else put(r, c, scene.passable[r][c] ? OPEN : STEEP);
       }
-    for (let k = 0; k < searched; k++) {
+    for (let k = 0; showSearch && k < searched; k++) {
       const [r, c] = explored[k];
       put(r, c, k >= searched - FRONTIER_CELLS && !routed ? FRONTIER : SEARCHED);
     }
