@@ -213,7 +213,8 @@
   "common": {
     "sun": "Sun",
     "earth": "Earth",
-    "terrain": "Terrain"
+    "terrain": "Terrain",
+    "advancedSettings": "Advanced settings"
   },
   "jobState": {
     "pending": "Waiting in queue",
@@ -799,7 +800,27 @@
     },
     "pdiStart": "Powered descent starts {km} km uprange at {speed} m/s; {n} powered phases.",
     "touchdown": "Touchdown: {error} m from the site, vertical {vertical} m/s, horizontal {horizontal} m/s. Site {height} m above the 1737.4 km sphere.",
-    "assumptions": "Physical assumptions & sources"
+    "assumptions": "Physical assumptions & sources",
+    "more": {
+      "title": "More analyses",
+      "hint": "Uses the landing plan above. Open a heading to start.",
+      "risk": {
+        "title": "Risk and uncertainty",
+        "desc": "Shows how often the landing succeeds under uncertainty, from hundreds of simulations."
+      },
+      "backups": {
+        "title": "Backup landing sites",
+        "desc": "Finds safe alternative sites the lander can still reach mid-descent if the plan fails."
+      },
+      "twin": {
+        "title": "Digital twin",
+        "desc": "Compares what the lander's sensors believe with what really happens in fault scenarios."
+      },
+      "surface": {
+        "title": "After landing: surface routes",
+        "desc": "Plans rover routes to science targets that avoid steep slopes."
+      }
+    }
   },
   "recommendations": {
     "criterion": {
@@ -1432,6 +1453,72 @@
       "forecast": "Forecast (daily max)",
       "acquired": "Acquired: {utc}",
       "note": "Details and limits are in the Solar activity panel under Results. The Moon has no magnetic field, so the S level matters for the surface crew."
+    }
+  },
+  "risk": {
+    "label": "Landing risk",
+    "title": "Risk & uncertainty · Monte Carlo",
+    "runs": "Runs",
+    "seed": "Random seed",
+    "navigation": "Navigation error 1σ · m",
+    "terrain": "Terrain height error 1σ · m",
+    "thrust": "Thrust error 1σ · %",
+    "isp": "Specific impulse error 1σ · %",
+    "pdiDown": "PDI position error 1σ · m",
+    "pdiSpeed": "PDI speed error 1σ · m/s",
+    "azimuth": "Approach azimuth · °",
+    "run": "Run Monte Carlo ↗",
+    "running": "Flying {runs} descents…",
+    "help": "Uses the site, vehicle, orbit and reserve above. Same seed and inputs reproduce the same result. Error sizes are planning assumptions, not certified vehicle values.",
+    "requestFailed": "Request failed",
+    "verdict": "{rate} of {runs} simulated landings succeed",
+    "confidence": "95 % confidence {low}–{high} · seed {seed} · result {id}",
+    "mainDriver": "main driver of failures:",
+    "metrics": {
+      "ellipse": "3σ LANDING ELLIPSE",
+      "inside": "{share} of landings inside",
+      "steep": "STEEP TERRAIN IN ELLIPSE",
+      "notEvaluated": "not evaluated",
+      "cells": "{count} DEM cells > {limit}° · unknown {unknown}",
+      "noTerrain": "terrain not cached",
+      "fuel": "FUEL ABOVE RESERVE (P5)",
+      "median": "median {kg} kg"
+    },
+    "whyFail": "Why landings fail",
+    "noFailures": "No failures in this sample.",
+    "whichMatters": "Which uncertainty matters",
+    "association": "association {value}",
+    "nothingToExplain": "no failures to explain",
+    "off": "off",
+    "significant": "significant",
+    "barHelp": "Bar: rank correlation with failure. The tick marks the noise level 2/√runs; shorter bars are not distinguishable from chance.",
+    "propellantLeft": "Propellant left at touchdown",
+    "assumptions": "Monte Carlo model & assumptions",
+    "travel": "direction of travel",
+    "legend": {
+      "success": "successful touchdown",
+      "failure": "failed touchdown",
+      "ellipses": "target · dashed 1σ · solid 3σ ellipse"
+    },
+    "plotLabel": "Landing dispersion of {points} simulated touchdowns around the target, with 1-sigma and 3-sigma ellipses; {ok} of {runs} runs succeeded.",
+    "histogramLabel": "Propellant remaining at touchdown, from {min} to {max} kg.",
+    "sources": {
+      "thrust": "Engine thrust",
+      "isp": "Specific impulse",
+      "pdi_downrange": "PDI position",
+      "pdi_speed": "PDI speed",
+      "terrain_height": "Terrain height (DEM)",
+      "navigation_down": "Navigation · downrange",
+      "navigation_cross": "Navigation · crossrange"
+    },
+    "causes": {
+      "propellant_exhausted": "Propellant exhausted",
+      "propellant_reserve": "Reserve not kept",
+      "touchdown_position": "Missed guidance target",
+      "vertical_speed": "Hard landing (vertical speed)",
+      "horizontal_speed": "Sliding landing (horizontal speed)",
+      "hazard_slope": "Landed on steep terrain",
+      "hazard_unknown": "Landed on unknown terrain"
     }
   }
 }

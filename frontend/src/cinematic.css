@@ -1679,3 +1679,70 @@ body.panel-resizing canvas {
   border-color: #f3eee4;
   color: #10171e;
 }
+
+/* Descent: deeper analyses as collapsible cards. */
+.tool-cards {
+  margin-top: 28px;
+}
+.tool-cards > h3 {
+  margin: 0 0 4px;
+  font: 600 16px "DM Sans", sans-serif;
+}
+.tool-card {
+  margin-top: 10px;
+  border: 1px solid #ffffff1c;
+  background: #0d141a;
+}
+.tool-card > summary {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  cursor: pointer;
+  list-style: none;
+}
+.tool-card > summary::-webkit-details-marker {
+  display: none;
+}
+.tool-card > summary b {
+  font: 600 15px "DM Sans", sans-serif;
+  color: #f3eee4;
+}
+.tool-card > summary b::after {
+  content: " +";
+  color: var(--gold);
+}
+.tool-card[open] > summary b::after {
+  content: " −";
+}
+.tool-card > summary span {
+  color: #9aa9b3;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.tool-card[open] {
+  padding-bottom: 12px;
+}
+.tool-card > div {
+  padding: 0 16px;
+}
+/* The card summary already names the panel. */
+.tool-card > div > h3:first-child {
+  display: none;
+}
+
+/* Shared: collapsed "advanced settings" inside panel forms. */
+.advanced-settings {
+  grid-column: 1 / -1;
+  border-top: 1px solid #ffffff14;
+  padding-top: 8px;
+}
+.advanced-settings > summary {
+  cursor: pointer;
+  color: #9aa9b3;
+  font-size: 13px;
+  padding: 4px 0 8px;
+}
+.advanced-settings[open] {
+  display: grid;
+  gap: 10px;
+}

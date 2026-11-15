@@ -213,7 +213,8 @@
   "common": {
     "sun": "Güneş",
     "earth": "Dünya",
-    "terrain": "Arazi"
+    "terrain": "Arazi",
+    "advancedSettings": "Gelişmiş ayarlar"
   },
   "jobState": {
     "pending": "Kuyrukta bekliyor",
@@ -799,7 +800,27 @@
     },
     "pdiStart": "Motorlu iniş {km} km geriden {speed} m/s hızla başlar; {n} motorlu aşama.",
     "touchdown": "Temas: bölgeden {error} m uzakta, dikey {vertical} m/s, yatay {horizontal} m/s. Bölge 1737,4 km kürenin {height} m üzerinde.",
-    "assumptions": "Fiziksel varsayımlar ve kaynaklar"
+    "assumptions": "Fiziksel varsayımlar ve kaynaklar",
+    "more": {
+      "title": "Daha fazla analiz",
+      "hint": "Yukarıdaki iniş planını kullanır. Açmak için bir başlığa dokunun.",
+      "risk": {
+        "title": "Risk ve belirsizlik",
+        "desc": "Belirsizlikler altında inişin ne sıklıkla başarılı olduğunu yüzlerce simülasyonla gösterir."
+      },
+      "backups": {
+        "title": "Yedek iniş noktaları",
+        "desc": "Plan bozulursa inişin ortasında ulaşılabilecek güvenli alternatif noktaları bulur."
+      },
+      "twin": {
+        "title": "Dijital ikiz",
+        "desc": "Aracın sensörlerle bildiği ile gerçekte olanı arıza senaryolarında karşılaştırır."
+      },
+      "surface": {
+        "title": "İnişten sonra: yüzey rotaları",
+        "desc": "Gezginin bilim hedeflerine dik yamaçlardan kaçınarak gideceği rotaları planlar."
+      }
+    }
   },
   "recommendations": {
     "criterion": {
@@ -1432,6 +1453,72 @@
       "forecast": "Tahmin (günlük en yüksek)",
       "acquired": "Veri çekilme zamanı: {utc}",
       "note": "Ayrıntılar ve sınırlar Sonuçlar sekmesindeki Güneş aktivitesi panelinde. Ay'ın manyetik alanı olmadığından S seviyesi yüzeydeki ekip için önemlidir."
+    }
+  },
+  "risk": {
+    "label": "İniş riski",
+    "title": "Risk ve belirsizlik · Monte Carlo",
+    "runs": "Simülasyon sayısı",
+    "seed": "Rastgelelik tohumu (seed)",
+    "navigation": "Navigasyon hatası 1σ · m",
+    "terrain": "Arazi yüksekliği hatası 1σ · m",
+    "thrust": "İtki hatası 1σ · %",
+    "isp": "Özgül itki (Isp) hatası 1σ · %",
+    "pdiDown": "İniş başlangıcı (PDI) konum hatası 1σ · m",
+    "pdiSpeed": "İniş başlangıcı (PDI) hız hatası 1σ · m/s",
+    "azimuth": "Yaklaşma yönü · °",
+    "run": "Simülasyonları çalıştır ↗",
+    "running": "{runs} iniş simüle ediliyor…",
+    "help": "Yukarıdaki nokta, araç, yörünge ve rezervi kullanır. Aynı tohum ve girdiler aynı sonucu verir. Hata büyüklükleri planlama varsayımıdır, onaylı araç değerleri değildir.",
+    "requestFailed": "İstek başarısız oldu",
+    "verdict": "Başarılı iniş oranı: {rate} ({runs} simülasyon)",
+    "confidence": "%95 güven aralığı {low}–{high} · tohum {seed} · sonuç {id}",
+    "mainDriver": "başarısızlıkların ana nedeni:",
+    "metrics": {
+      "ellipse": "3σ İNİŞ ELİPSİ",
+      "inside": "elips içinde kalan iniş: {share}",
+      "steep": "ELİPS İÇİNDE DİK ARAZİ",
+      "notEvaluated": "değerlendirilmedi",
+      "cells": "{count} hücre > {limit}° · bilinmeyen {unknown}",
+      "noTerrain": "arazi verisi yok",
+      "fuel": "REZERV ÜSTÜ YAKIT (P5)",
+      "median": "medyan {kg} kg"
+    },
+    "whyFail": "İnişler neden başarısız oluyor",
+    "noFailures": "Bu örnekte başarısız iniş yok.",
+    "whichMatters": "Hangi belirsizlik önemli",
+    "association": "ilişki {value}",
+    "nothingToExplain": "açıklanacak başarısızlık yok",
+    "off": "kapalı",
+    "significant": "anlamlı",
+    "barHelp": "Çubuk: başarısızlıkla sıra korelasyonu. Çizgi, 2/√simülasyon gürültü seviyesini gösterir; daha kısa çubuklar şanstan ayırt edilemez.",
+    "propellantLeft": "Temasta kalan yakıt",
+    "assumptions": "Monte Carlo modeli ve varsayımlar",
+    "travel": "hareket yönü",
+    "legend": {
+      "success": "başarılı iniş",
+      "failure": "başarısız iniş",
+      "ellipses": "hedef · kesikli 1σ · düz 3σ elips"
+    },
+    "plotLabel": "Hedef çevresinde {points} simüle iniş noktası, 1σ ve 3σ elipslerle; başarılı: {ok} / {runs}.",
+    "histogramLabel": "Temasta kalan yakıt, {min} ile {max} kg arası.",
+    "sources": {
+      "thrust": "Motor itkisi",
+      "isp": "Özgül itki",
+      "pdi_downrange": "PDI konumu",
+      "pdi_speed": "PDI hızı",
+      "terrain_height": "Arazi yüksekliği (DEM)",
+      "navigation_down": "Navigasyon · menzil yönü",
+      "navigation_cross": "Navigasyon · yan yön"
+    },
+    "causes": {
+      "propellant_exhausted": "Yakıt bitti",
+      "propellant_reserve": "Rezerv korunamadı",
+      "touchdown_position": "Güdüm hedefi kaçırıldı",
+      "vertical_speed": "Sert iniş (dikey hız)",
+      "horizontal_speed": "Kayarak iniş (yatay hız)",
+      "hazard_slope": "Dik araziye iniş",
+      "hazard_unknown": "Bilinmeyen araziye iniş"
     }
   }
 }
