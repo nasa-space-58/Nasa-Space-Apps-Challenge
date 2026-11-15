@@ -425,3 +425,14 @@ Completed demonstrations are checked below; unchecked items remain planned conce
   - Hybrid decision: encode "select k relay orbits from n candidates" with coverage, gap and per-mission communication-demand constraints as a QUBO, solved by the H8 classical/QAOA pair.
   - Independent validation: check every selected set against the original coverage constraints, independent of the QUBO objective value.
   - Scope: quantum computation selects among classically computed orbits; it does not propagate trajectories. Relay link budgets, station keeping and launch constraints remain outside this concept unless separately modeled.
+
+## Unified mission planner integration
+
+This sequence builds on the merged H0–H11 and R10–R13 implementations. Existing modules are retained; completing their individual milestones does not imply a lossless common planner. See [stage 1 inventory, baseline and acceptance gates](unified-mission-planner.md).
+
+- [x] Stage 1 — Audit current contracts and connections; record fresh R11 classical and H6/R12 local-replay baselines, explicit adapter rejection and existing R13 NO-GO policy. This is an inventory/evidence delivery, not a new solver.
+- [ ] Stage 2 — Versioned integration envelope and bounded, semantics-preserving adapters for R11 campaigns, H6 estimated state, evidence and decision deadlines.
+- [ ] Stage 3 — End-to-end classical lander/dependent-rover/shared-resource pilot, including feasible replanning, stale results and no-continuation cases.
+- [ ] Stage 4 — Bounded quantum proposal path with full classical completion, original-constraint validation, matched baselines and unchanged production execution gates.
+- [ ] Stage 5 — Event-driven coordination and unified plan identity across existing views; timing, fallback and execution-mode evidence.
+- [ ] Stage 6 — New pre-registered dev/held-out comparisons and separately authorized hardware tests; later rover/activity and orbital-relay extensions only after their own validation.

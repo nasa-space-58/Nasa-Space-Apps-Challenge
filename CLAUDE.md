@@ -211,3 +211,7 @@ R13 (additional quantum application benchmarks) starts from `main` `456f4ef` on 
 ### H11 and current main integration (user, 2026-11-15)
 
 The user explicitly authorized integrating the latest main with the completed H10/H11 branch and publishing the combined version to main after resolving conflicts and passing checks. This one-time authorization supersedes the earlier H10/H11 manual-merge boundary. Preserve both teams' features and the unrelated local H6 notebook edit. No new quantum submission or credit spending is authorized by this integration.
+
+### Unified planner stage 1 (user, 2026-11-15)
+
+Start from current main `e92174e` on `codex/unified-quantum-stage1`. Complete only the first agreed stage: integration inventory, baseline observations and tests. Push only this new branch; do not merge into or push main/tahakrcc. Ask before any real quantum credit spending, including Spark. The new common solver, adapters and live coordinator remain subsequent stages. Preserve the unrelated H6 notebook edit and existing frozen tests. See docs/unified-mission-planner.md and its stage 1 evidence.
