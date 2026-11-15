@@ -6,9 +6,11 @@ import {
   useEffect,
   useRef,
   useState,
+  useMemo,
   type ReactNode,
 } from "react";
 import HorizonPlot from "./components/HorizonPlot";
+import type { MissionCandidate } from "./missionCandidates";
 import MissionStage, { type StageModule } from "./components/MissionStage";
 import Comparison from "./components/Comparison";
 import WindowSearch from "./components/WindowSearch";
@@ -182,6 +184,9 @@ function Timeline({
   );
 }
 export default function App() {
+  const [siteCandidates, setSiteCandidates] = useState<MissionCandidate[]>([]);
+  const [descentCandidates, setDescentCandidates] = useState<MissionCandidate[]>([]);
+  const missionCandidates = useMemo(() => [...siteCandidates, ...descentCandidates], [siteCandidates, descentCandidates]);
   const { t, locale } = useTranslate();
   const h = (seconds: number | undefined) => hours(t, seconds);
   const utc = (value: string) => utcLabel(value, locale);
@@ -873,7 +878,7 @@ export default function App() {
       id: "recommendations",
       group: "compare",
       label: t("app.modules.recommend"),
-      content: <Recommendations sites={sites} />,
+      content: <Recommendations sites={sites} onCandidates={setSiteCandidates} />,
     },
     {
       id: "window-search",
@@ -904,7 +909,7 @@ export default function App() {
           },
         ]
       : []),
-    { id: "descent", group: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} /> },
+    { id: "descent", group: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} onCandidates={setDescentCandidates} /> },
     {
       id: "classroom",
       group: "learn",
@@ -1185,6 +1190,7 @@ export default function App() {
         hidden={view !== "mission"}
       >
         <MissionStage
+          candidates={missionCandidates}
           lat={Number(lat)}
           lon={Number(lon)}
           sites={sites}

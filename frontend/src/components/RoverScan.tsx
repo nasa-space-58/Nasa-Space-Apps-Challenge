@@ -89,13 +89,13 @@ export function DemTerrain({
 type Rgba = [number, number, number, number];
 const UNSCANNED: Rgba = [0, 0, 0, 0];
 const OPEN: Rgba = [70, 190, 160, 22];
-const STEEP: Rgba = [217, 89, 38, 120];
+const STEEP: Rgba = [235, 58, 48, 180];
 const UNKNOWN: Rgba = [30, 30, 34, 110];
 const SEARCHED: Rgba = [57, 135, 229, 90];
 const FRONTIER: Rgba = [170, 215, 255, 190];
 const FRONTIER_CELLS = 60;
-/** Overlay strength once the scan is over: a faint hint under the route. */
-const SETTLED_OPACITY = 0.3;
+/** Keep hazards legible while the rover follows the planned route. */
+const SETTLED_OPACITY = 0.7;
 
 /**
  * Scan reveal draped on the DEM: the antenna pulse front marks traversable

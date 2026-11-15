@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import type { MissionCandidate } from "../missionCandidates";
 import type { Preset } from "../types";
 import { errorText, useTranslate, type Translate } from "../i18n";
 
@@ -184,7 +185,7 @@ function RankingTable({
   );
 }
 
-export default function Recommendations({ sites }: { sites: Preset[] }) {
+export default function Recommendations({ sites, onCandidates }: { sites: Preset[]; onCandidates?: (items: MissionCandidate[]) => void }) {
   const { t, tText } = useTranslate();
   const CRITERION_LABEL = (c: Criterion) => criterionLabel(t, c);
   const [picked, setPicked] = useState<string[]>([]);
@@ -200,6 +201,27 @@ export default function Recommendations({ sites }: { sites: Preset[] }) {
   const [weights, setWeights] = useState<Weights>(defaults);
   const [rec, setRec] = useState<Recommendation | null>(null);
   const [rescored, setRescored] = useState<Rescore | null>(null);
+  useEffect(() => {
+    if (!rec) return;
+    const ranking = rescored?.current ?? rec.ranking;
+    onCandidates?.(rec.candidates.map((c) => {
+      const row = ranking?.ranked.find((r) => r.candidate_id === c.candidate_id);
+      const rejected = ranking?.rejected.find((r) => r.candidate_id === c.candidate_id);
+      const insufficient = ranking?.insufficient_data.find((r) => r.candidate_id === c.candidate_id);
+      const failed = ranking?.failed?.find((r) => r.candidate_id === c.candidate_id);
+      return {
+        id: `site:${c.candidate_id}`, label: c.site.site_id,
+        lat: c.site.latitude_deg, lon: c.site.longitude_deg_east,
+        status: failed || c.error ? "failed" : rejected ? "rejected" : row ? "accepted" : "unknown",
+        score: row?.total_score ?? null,
+        explanation: failed?.error ?? c.error ?? rejected?.explanation ?? insufficient?.explanation ?? row?.explanation ?? c.state,
+        source: "Landing recommendation / API",
+        metrics: Object.entries(row?.criteria ?? {}).map(([key, value]) => ({
+          label: key, value: `${value?.value ?? "—"} ${value?.unit ?? ""} · score ${value?.score ?? "—"} · ${value?.rule ?? ""}`,
+        })),
+      };
+    }));
+  }, [rec, rescored, onCandidates]);
   const [delay, setDelay] = useState("48");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);

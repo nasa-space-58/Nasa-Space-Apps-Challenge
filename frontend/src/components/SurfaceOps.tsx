@@ -3,6 +3,7 @@ import { useTranslate } from "../i18n";
 import type { RoutePoint, RoverState } from "./Rover";
 import { DEPLOY_END, PULSE_END, SEARCH_END, type SurfaceScene } from "./surfaceScene";
 import "./surface-ops.css";
+import { demoRover } from "./demoRover";
 
 // Post-landing HUD: the rover drives a backend R8 route, and the cards show
 // backend values only (vehicle profile, route metrics, DONKI space weather).
@@ -25,7 +26,7 @@ type Route = {
   path: RoutePoint[];
   waypoints: Waypoint[];
 };
-type RouteResult = { sky_evaluated: boolean; routes: Route[]; scene: SurfaceScene | null };
+export type RouteResult = { sky_evaluated: boolean; routes: Route[]; scene: SurfaceScene | null };
 type Profile = {
   name: string;
   mass_at_pdi_kg: number;
@@ -71,13 +72,13 @@ async function call<T>(path: string, init?: RequestInit): Promise<T> {
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
     const detail = body?.detail;
-    throw Error(
+    throw Object.assign(new Error(
       typeof detail === "string"
         ? detail
         : Array.isArray(detail)
           ? detail.map((d: { msg: string }) => d.msg).join("; ")
           : `HTTP ${response.status}`,
-    );
+    ), { status: response.status, detail });
   }
   return body as T;
 }
@@ -99,6 +100,15 @@ function loadRoutes(lat: number, lon: number, analysisId?: string) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body,
+    }).catch((error) => {
+      // Older preview APIs predate the optional scene payload. Retry only those
+      // explicitly rejected fields, never suppress terrain/validation failures.
+      const details = error.detail as {type?: string; loc?: (string | number)[]}[] | undefined;
+      if (error.status !== 422 || !Array.isArray(details) || !details.length ||
+          !details.every(d => d.type === "extra_forbidden" && ["include_scene", "scene_margin_m"].includes(String(d.loc?.at(-1))))) throw error;
+      const legacy = JSON.parse(body);
+      for (const d of details) delete legacy[String(d.loc!.at(-1))];
+      return call<RouteResult>("/surface/routes", {method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(legacy)});
     });
     pending.catch(() => routeCache.delete(body));
     routeCache.set(body, pending);
@@ -128,7 +138,10 @@ export default function SurfaceOps({
   reduced: boolean;
   onRover: (rover: RoverState | null) => void;
 }) {
-  const { t } = useTranslate();
+  const { t, locale } = useTranslate();
+  const [demoSeed, setDemoSeed] = useState<number | null>(null);
+  const demo = useMemo(() => demoSeed === null ? null : demoRover(demoSeed), [demoSeed]);
+  const tr = locale.startsWith("tr");
   const [open, setOpen] = useState(true);
   const [routes, setRoutes] = useState<RouteResult | null>(null);
   const [routeError, setRouteError] = useState("");
@@ -145,15 +158,23 @@ export default function SurfaceOps({
   const covered = Number.isFinite(lat) && lat <= -80 && Number.isFinite(lon);
   useEffect(() => {
     setRoutes(null);
+    setDemoSeed(null);
+    setPlaying(!reduced);
     setRouteError("");
     setChoice(0);
     setElapsed(0);
     setScan(reduced ? 1 : 0);
-    if (!covered) return;
+    if (!covered) { setDemoSeed(Math.floor(Math.random() * 1000000)); return; }
     let live = true;
     loadRoutes(lat, lon, analysisId).then(
-      (result) => live && setRoutes(result),
-      (error: Error) => live && setRouteError(error.message),
+      (result) => {
+        if (!live) return;
+        setRoutes(result);
+        // A route without its terrain cannot be draped onto unrelated craters:
+        // choose the explicitly labelled, scene-aware planner instead.
+        if (!result.scene) setDemoSeed(Math.floor(Math.random() * 1000000));
+      },
+      (error: Error) => { if (live) { setRouteError(error.message); setDemoSeed(Math.floor(Math.random() * 1000000)); } },
     );
     return () => {
       live = false;
@@ -223,10 +244,12 @@ export default function SurfaceOps({
     };
   }, [analysisId, weatherAttempt]);
 
+  const shownRoutes = demo ?? routes;
   const reachable = useMemo(
-    () => routes?.routes.filter((r) => r.reachable && r.path.length > 0) ?? [],
-    [routes],
+    () => shownRoutes?.routes.filter((r) => r.reachable && r.path.length > 0) ?? [],
+    [shownRoutes],
   );
+  const alternatives = useMemo(() => shownRoutes?.routes.filter(r => r.reachable).map(r => ({id:r.target_id,path:r.path})), [shownRoutes]);
   const route = reachable[Math.min(choice, reachable.length - 1)] ?? null;
   const duration = route?.duration_s ?? 0;
   const drive = duration > 0 ? Math.min(1, elapsed / duration) : 0;
@@ -258,13 +281,14 @@ export default function SurfaceOps({
             path: route.path,
             drive,
             scan,
-            scene: routes?.scene ?? null,
+            scene: shownRoutes?.scene ?? null,
             targetId: route.target_id,
+            alternatives,
           }
         : null,
     );
-  }, [route, drive, scan, routes]);
-  const scene = routes?.scene ?? null;
+  }, [route, drive, scan, shownRoutes, alternatives]);
+  const scene = shownRoutes?.scene ?? null;
   const searchedCells = scene && route ? (scene.explored[route.target_id] ?? []).length : 0;
   const truncated = Boolean(scene && route && scene.explored_truncated[route.target_id]);
   const scanStage =
@@ -295,17 +319,25 @@ export default function SurfaceOps({
       >
         <span className="eyebrow">{t("surfaceOps.eyebrow")}</span>
         <strong>{t("surfaceOps.title")}</strong>
+        {route && <small className="ops-summary">{route.target_id} · {Math.round(drive * 100)}% · {scanning ? (tr ? "Tarama" : "Scanning") : playing ? (tr ? "Keşif" : "Exploring") : (tr ? "Beklemede" : "Standby")}</small>}
         <span aria-hidden="true">{open ? "−" : "+"}</span>
       </button>
       {open && (
         <div className="surface-ops-body">
           <article className="ops-card">
             <h3>{t("surfaceOps.rover.title")}</h3>
-            {!covered ? (
+            <div className="ops-controls">
+              <button type="button" onClick={() => { setDemoSeed(Math.floor(Math.random() * 1000000)); setChoice(0); setElapsed(0); setScan(reduced ? 1 : 0); setPlaying(!reduced); }}>{tr ? "Yeni krater keşfi · Demo" : "New crater exploration · Demo"}</button>
+              {demo && routes?.scene && <button type="button" onClick={() => { setDemoSeed(null); setChoice(0); setElapsed(0); setScan(reduced ? 1 : 0); }}>{tr ? "API rotalarına dön" : "Return to API routes"}</button>}
+            </div>
+            {demo && routes && !routes.scene && <p className="ops-note">{tr ? "API arazi tarama haritası sağlamıyor. 3D keşif, görünen kraterleri tarayan demo planlayıcıyla çalışıyor; kırmızı bölgelerden kaçınılıyor." : "The API does not provide a terrain scan map. 3D exploration uses the labelled demo planner on the visible craters, avoiding red areas."}</p>}
+            {demo && routeError && <p className="ops-note">API: {routeError}</p>}
+            {demo && <p className="ops-note">{tr ? "DEMO · Sahnedeki kraterler üzerinde A* ve rastgele maliyet örnekleme. Kuantum hesaplama değildir. Mesafe ve süre temsili ölçek kullanır." : "DEMO · A* and sampled costs on the scene’s crater terrain. Not quantum computation. Distances and times use illustrative scale."}</p>}
+            {!covered && !demo ? (
               <p className="ops-note">{t("surfaceOps.rover.outside")}</p>
-            ) : routeError ? (
+            ) : routeError && !demo ? (
               <p className="ops-error" role="alert">{routeError}</p>
-            ) : !routes ? (
+            ) : !shownRoutes ? (
               <p className="ops-note" aria-live="polite">{t("surfaceOps.rover.loading")}</p>
             ) : !route ? (
               <p className="ops-note">{t("surfaceOps.rover.none")}</p>
@@ -391,6 +423,8 @@ export default function SurfaceOps({
                     {truncated && <p className="ops-foot">{t("surfaceOps.scan.truncated")}</p>}
                   </div>
                 )}
+                <p className="ops-foot">{tr ? "Altın: seçilen rota · Turkuaz: diğer hesaplanan rotalar" : "Gold: selected route · Teal: other calculated routes"}</p>
+                <p className="ops-telemetry" aria-live="off">● {scan < 1 ? (tr ? "Anten taraması" : "Antenna sweep") : drive >= 1 ? (tr ? "Hedefe ulaşıldı" : "Target reached") : (drive * 8) % 1 < .24 ? (tr ? "Telemetri aktarımı · animasyon" : "Telemetry uplink · animation") : (tr ? "Yüzey keşfi" : "Surface traverse")}</p>
                 <dl className="ops-grid">
                   <dt>{t("surfaceOps.rover.distance")}</dt>
                   <dd>
@@ -409,7 +443,7 @@ export default function SurfaceOps({
                   <dt>{t("surfaceOps.rover.detour")}</dt>
                   <dd>×{route.detour_ratio?.toFixed(2) ?? "—"}</dd>
                 </dl>
-                {routes.sky_evaluated ? (
+                {shownRoutes?.sky_evaluated && !demo ? (
                   <div className="ops-sky">
                     <span className={`ops-pill sun-${sunState}`}>
                       ☀ {t(`surfaceOps.sun.${sunState}`)}
@@ -431,7 +465,7 @@ export default function SurfaceOps({
                 )}
               </>
             )}
-            <p className="ops-foot">{t("surfaceOps.rover.note")}</p>
+            {!demo && <p className="ops-foot">{t("surfaceOps.rover.note")}</p>}
             <p className="ops-foot">
               <a
                 className="ops-link"

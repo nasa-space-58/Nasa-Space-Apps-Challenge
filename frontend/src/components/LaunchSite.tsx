@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, type MutableRefObject } from "react";
-import { useFrame, useLoader } from "@react-three/fiber";
+import { useFrame, useLoader, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
@@ -307,6 +307,12 @@ export default function LaunchSite({
   user: OrbitInput;
 }) {
   const rocket = useStagedRocket();
+  const sceneCamera = useThree(state => state.camera);
+  useEffect(() => {
+    if (!(sceneCamera instanceof THREE.PerspectiveCamera)) return;
+    const fov = sceneCamera.fov;
+    return () => { sceneCamera.fov = fov; sceneCamera.updateProjectionMatrix(); };
+  }, [sceneCamera]);
   const vehicle = useRef<THREE.Group>(null!);
   const flame1 = useRef<THREE.Group>(null!);
   const flame2 = useRef<THREE.Group>(null!);
@@ -343,10 +349,16 @@ export default function LaunchSite({
     return values;
   }, []);
 
-  useFrame(({ camera, clock }) => {
+  useFrame(({ camera, clock }, delta) => {
     const s = scratch;
     const u = closeupAt(progress.current);
     const c = climbAt(u);
+    // A restrained lens pull opens the frame for staging, then settles for cruise.
+    if (camera instanceof THREE.PerspectiveCamera) {
+      const targetFov = 45 + 9 * smooth(0.08, 0.42, c) - 6 * smooth(0.8, 1, c);
+      camera.fov = reduced ? targetFov : THREE.MathUtils.damp(camera.fov, targetFov, 3, Math.min(delta, 0.05));
+      camera.updateProjectionMatrix();
+    }
     const { height, pitch } = vehicleState(c, s.position);
     vehicle.current.position.copy(s.position);
     vehicle.current.rotation.set(0, 0, pitch);
@@ -430,13 +442,13 @@ export default function LaunchSite({
     // beside the vehicle that keeps the separating stages in frame.
     vehicle.current.updateMatrixWorld();
     const lookLocalY =
-      22 + 11 * smooth(STAGE1_SEP, STAGE1_SEP + 0.08, c) +
-      8 * smooth(STAGE2_SEP, STAGE2_SEP + 0.06, c);
+      (22 + 11 * smooth(STAGE1_SEP, STAGE1_SEP + 0.08, c) +
+      8 * smooth(STAGE2_SEP, STAGE2_SEP + 0.06, c)) * ROCKET_SCALE;
     s.look.set(0, lookLocalY, 0);
     vehicle.current.localToWorld(s.look);
-    s.chase.set(22, lookLocalY - 18, 75);
+    s.chase.set(22 * ROCKET_SCALE, lookLocalY - 18 * ROCKET_SCALE, 75 * ROCKET_SCALE);
     vehicle.current.localToWorld(s.chase);
-    s.ground.set(VEHICLE_AXIS_X + 22, 3 + height * 0.08, 34);
+    s.ground.set(VEHICLE_AXIS_X + 11, 4 + height * 0.08, 20);
     const chase = smooth(0.04, 0.3, c);
     s.offset.copy(s.ground).lerp(s.chase, chase).sub(s.look);
     s.spherical.setFromVector3(s.offset);

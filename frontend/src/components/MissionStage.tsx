@@ -10,6 +10,8 @@ import {
   type PointerEvent as ReactPointerEvent,
   type ReactNode,
 } from "react";
+import { candidateColor, type MissionCandidate } from "../missionCandidates";
+import "./mission-candidates.css";
 import PolarMap from "./PolarMap";
 import SurfaceOps from "./SurfaceOps";
 import "./flight-readout.css";
@@ -146,6 +148,7 @@ export default function MissionStage({
   lat,
   lon,
   sites,
+  candidates = [],
   busy,
   webgl,
   reduced,
@@ -166,6 +169,7 @@ export default function MissionStage({
   onModuleChange,
   children,
 }: {
+  candidates?: MissionCandidate[];
   lat: number;
   lon: number;
   sites: Preset[];
@@ -196,6 +200,11 @@ export default function MissionStage({
   children: ReactNode;
 }) {
   const { t, locale } = useTranslate();
+  const [candidateOpen, setCandidateOpen] = useState(false);
+  const [showCandidates, setShowCandidates] = useState(true);
+  const [candidateId, setCandidateId] = useState<string | null>(null);
+  const inspected = candidates.find((c) => c.id === candidateId);
+  const tr = locale.startsWith("tr");
   const lockedNotice = t("missionStage.locked");
   const phaseLabel = (id: string) => t(`missionPhases.${id}.label`);
   const stageRef = useRef<HTMLDivElement>(null);
@@ -435,6 +444,9 @@ export default function MissionStage({
           <SceneBoundary fallback={fallback}>
             <Suspense fallback={<div className="stage-loading">{t("missionStage.loading")}</div>}>
               <MissionScene
+                candidates={showCandidates ? candidates : []}
+                selectedCandidate={candidateId}
+                onCandidate={(id) => { setCandidateId(id); setCandidateOpen(true); }}
                 path={path}
                 lat={lat}
                 lon={lon}
@@ -460,12 +472,22 @@ export default function MissionStage({
                 roverScan={rover?.scan ?? 1}
                 roverScene={landed ? (rover?.scene ?? null) : null}
                 roverTarget={rover?.targetId ?? ""}
+                roverAlternatives={rover?.alternatives}
               />
             </Suspense>
           </SceneBoundary>
         ) : (
           fallback
         )}
+        {candidates.length > 0 && <details className="mission-candidates" open={candidateOpen} onToggle={e => setCandidateOpen(e.currentTarget.open)}>
+          <summary>{tr ? "Rota ve iniş adayları" : "Route & landing candidates"} · {candidates.length}</summary>
+          <label><input type="checkbox" checked={showCandidates} onChange={e => setShowCandidates(e.target.checked)} /> {tr ? "3D üzerinde göster" : "Show in 3D"}</label>
+          <p>{tr ? "Çizgiler temsili yaklaşım koridorlarıdır. Skor ve gerekçeler API sonuçlarıdır; hesaplanmamış skor — gösterilir." : "Lines are illustrative approach corridors. Scores and reasons come from the API; missing scores appear as —."}</p>
+          <div className="candidate-list">{candidates.map(c => <button key={c.id} aria-pressed={candidateId === c.id} onClick={() => { setCandidateId(c.id); setShowCandidates(true); setCameraMode("pole"); }} style={{ borderLeftColor: candidateColor(c) }}>
+            <span>{c.label}</span><b>{c.score?.toFixed(3) ?? "—"}</b><small>{tr ? ({accepted:"Uygun",rejected:"Elendi",failed:"Hata",unknown:"Veri yetersiz"})[c.status] : c.status}</small>
+          </button>)}</div>
+          {inspected && <article><strong>{inspected.label}</strong><p>{inspected.source} · {inspected.lat.toFixed(4)}°, {inspected.lon.toFixed(4)}°</p><p>{inspected.explanation}</p><dl>{inspected.metrics.map((m, i) => <div key={i}><dt>{tr ? ({Orbit:"Yörünge",Propellant:"Yakıt", "Reserve margin":"Rezerv marjı",Assessment:"Değerlendirme"} as Record<string,string>)[m.label] ?? m.label : m.label}</dt><dd>{m.value}</dd></div>)}</dl></article>}
+        </details>}
         <div className="stage-hud stage-phase" aria-live="polite">
           {progress === 0 && !flying ? (
             <>
