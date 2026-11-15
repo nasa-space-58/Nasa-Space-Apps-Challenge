@@ -5,6 +5,9 @@ embedding model or vector store: the corpus is a few dozen files, so an
 in-process lexical index is enough and keeps results reproducible.
 """
 
+import math
+import re
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -12,6 +15,9 @@ from pathlib import Path
 # "The Probabilistic Relevance Framework: BM25 and Beyond", 2009; common defaults).
 BM25_K1 = 1.5
 BM25_B = 0.75
+
+_HEADING = re.compile(r"^(#{1,2})\s+(.*?)\s*#*\s*$")
+_TOKEN = re.compile(r"[^\W_]+")
 
 
 @dataclass(frozen=True)
@@ -32,12 +38,32 @@ def load_sections(docs_dir: Path) -> list[DocSection]:
     whose body is blank are dropped. Raises ``FileNotFoundError`` when
     ``docs_dir`` does not exist or holds no Markdown file.
     """
-    raise NotImplementedError
+    docs_dir = Path(docs_dir)
+    if not docs_dir.is_dir():
+        raise FileNotFoundError(f"Documentation directory not found: {docs_dir}")
+    files = sorted(p for p in docs_dir.glob("*.md") if p.is_file())
+    if not files:
+        raise FileNotFoundError(f"No Markdown files in {docs_dir}")
+    sections = []
+    for file in files:
+        rel = f"{docs_dir.name}/{file.name}"
+        heading, lines, fence = file.stem, [], False
+        for line in file.read_text(encoding="utf-8").splitlines():
+            if line.lstrip().startswith(("```", "~~~")):
+                fence = not fence
+            match = None if fence else _HEADING.match(line)
+            if match:
+                sections.append(DocSection(rel, heading, "\n".join(lines).strip()))
+                heading, lines = match.group(2), []
+            else:
+                lines.append(line)
+        sections.append(DocSection(rel, heading, "\n".join(lines).strip()))
+    return [s for s in sections if s.text]
 
 
 def tokenize(text: str) -> list[str]:
     """Lower-case alphanumeric tokens (Unicode letters and digits), in order."""
-    raise NotImplementedError
+    return _TOKEN.findall(text.lower())
 
 
 def search(sections: list[DocSection], query: str, limit: int = 4) -> list[DocSection]:
@@ -47,4 +73,30 @@ def search(sections: list[DocSection], query: str, limit: int = 4) -> list[DocSe
     ``(path, heading)`` so the result is deterministic. Raises ``ValueError``
     when ``limit`` is below 1 or the query contains no tokens.
     """
-    raise NotImplementedError
+    if limit < 1:
+        raise ValueError("limit must be at least 1")
+    terms = sorted(set(tokenize(query)))
+    if not terms:
+        raise ValueError("Query contains no searchable words")
+    if not sections:
+        return []
+    counts = [Counter(tokenize(f"{s.heading}\n{s.text}")) for s in sections]
+    lengths = [sum(c.values()) for c in counts]
+    average = sum(lengths) / len(lengths) or 1.0
+    total = len(sections)
+    scored = []
+    for section, count, length in zip(sections, counts, lengths):
+        score = 0.0
+        for term in terms:
+            tf = count.get(term, 0)
+            if not tf:
+                continue
+            df = sum(1 for c in counts if term in c)
+            # Lucene-style IDF stays positive for terms present in every section.
+            idf = math.log(1 + (total - df + 0.5) / (df + 0.5))
+            norm = BM25_K1 * (1 - BM25_B + BM25_B * length / average)
+            score += idf * tf * (BM25_K1 + 1) / (tf + norm)
+        if score > 0:
+            scored.append((-score, section.path, section.heading, section))
+    scored.sort(key=lambda item: item[:3])
+    return [item[3] for item in scored[:limit]]
