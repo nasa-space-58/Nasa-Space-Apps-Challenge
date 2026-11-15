@@ -1,3 +1,4 @@
+import UnifiedMissionWorkspace from "./components/UnifiedMissionWorkspace";
 import {
   Component,
   lazy,
@@ -909,12 +910,12 @@ export default function App() {
       label: t("app.modules.classroom"),
       content: <Classroom onOpen={openSearchResult} />,
     },
-    { id: "campaign", group: "advanced", label: t("app.modules.campaign"), content: <MissionPlanner /> },
-    { id: "recovery", group: "advanced", label: t("app.modules.recovery"), content: <SelfHealing /> },
+    { id: "campaign", group: "advanced", label: t("app.modules.campaign"), content: <UnifiedMissionWorkspace view="plan"><MissionPlanner /></UnifiedMissionWorkspace> },
+    { id: "recovery", group: "advanced", label: t("app.modules.recovery"), content: <UnifiedMissionWorkspace view="recovery"><SelfHealing /></UnifiedMissionWorkspace> },
     { id: "scaling", group: "advanced", label: t("research.scaling"), content: <ResearchLab kind="scaling" active={view === "mission" && panel === "scaling" && pageVisible} /> },
     { id: "relays", group: "advanced", label: t("research.relays"), content: <ResearchLab kind="relays" active={view === "mission" && panel === "relays" && pageVisible} /> },
     { id: "shared-antenna", group: "advanced", label: t("sharedAntenna.tab"), content: <SharedAntenna active={view === "mission" && panel === "shared-antenna" && pageVisible} /> },
-    { id: "arena", group: "advanced", label: t("arena.tab"), content: <SolverArena active={view === "mission" && panel === "arena" && pageVisible} /> },
+    { id: "arena", group: "advanced", label: t("arena.tab"), content: <UnifiedMissionWorkspace view="comparison"><SolverArena active={view === "mission" && panel === "arena" && pageVisible} /></UnifiedMissionWorkspace> },
   ];
 
   return (

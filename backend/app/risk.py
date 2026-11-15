@@ -54,6 +54,7 @@ from app.descent import (
 )
 from app.fuel_optimization import DEFAULT_RESERVE_DELTA_V_MPS, reserve_propellant_kg
 from app.horizon import _validate_dataset, ray_coordinates
+from app.physics_cache import PhysicsCache
 from app.terrain_safety import (
     DEFAULT_SLOPE_LIMIT_DEG,
     DEM_PIXEL_M,
@@ -386,11 +387,15 @@ def run_monte_carlo(
     request: RiskRequest,
     terrain_height_m: float,
     slope_map: LocalSlopeMap | None = None,
+    *,
+    physics_cache: PhysicsCache | None = None,
 ) -> dict:
     """Fly `request.runs` perturbed descents and aggregate success and causes.
 
     Raises RiskError for an unknown vehicle or a site/orbit the R4 model rejects.
     Without a slope map, hazard checks are reported as not evaluated.
+    Optional process-local reuse caches only identical dynamics/nominal calls;
+    all terrain, reserve, touchdown and uncertainty checks still execute.
     """
     profile = _vehicle(request)
     descent = DescentRequest(
@@ -404,7 +409,11 @@ def run_monte_carlo(
         allow_plane_change=request.allow_plane_change,
     )
     try:
-        nominal = plan_descent(descent, terrain_height_m)
+        nominal = (
+            plan_descent(descent, terrain_height_m)
+            if physics_cache is None
+            else physics_cache.plan(descent, terrain_height_m)
+        )
     except (DescentError, ValueError) as exc:
         raise RiskError(str(exc)) from exc
     vehicle = profile
@@ -438,7 +447,12 @@ def run_monte_carlo(
                 "isp_s": vehicle.isp_s * (1 + error[1]),
             }
         )
-        run = simulate_powered_descent(
+        simulate = (
+            simulate_powered_descent
+            if physics_cache is None
+            else physics_cache.simulate
+        )
+        run = simulate(
             perturbed,
             site_radius,
             pdi_range + error[2],

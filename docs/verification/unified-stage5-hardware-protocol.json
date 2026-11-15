@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "trial": "unified-stage5-256-v1",
+  "fixed_before_hardware_result": true,
+  "observed_status_at_registration": "Queued",
+  "job_id": "dd340d59-3d25-43e0-8268-df5607b84e3a",
+  "backend_code": "rigetti:cepheus-1-108q",
+  "logical_qubits": 1,
+  "physical_layout": [
+    0
+  ],
+  "shots": 256,
+  "depth": 1,
+  "local_evaluations": 32,
+  "seed": 17,
+  "max_credits": 1,
+  "max_jobs": 1,
+  "gammas": [
+    -0.7803374051486347
+  ],
+  "betas": [
+    -2.3467293182456554
+  ],
+  "snapshot_sha256": "e16b0526c89756c553daca5716f903df7045c953280463796e80b6275696806c",
+  "problem_fingerprint": "9ea6a5890b3050cbffff358cdd080fb06f3132a6cd0a0a5c4bd64471d696f77d",
+  "circuit_sha256": "e65e8e13dbc4c2ea3d90e4cf90ebac48ec4b6f282606b463a39c805a2fd8e7e0",
+  "mapping": {
+    "0": "land-backup",
+    "1": "land-remote"
+  },
+  "primary_metric": "raw land-remote frequency; Wilson 95% interval",
+  "reference_uniform_optimal_probability": 0.5,
+  "reference_ideal_optimal_probability": 0.99988480672883,
+  "admission": "At most two observed distinct choices, each completed with frozen outside selections and independently physically validated. No repair. No automatic application to a session.",
+  "success_scope": "Device sampling and full-plan compatibility only; no quantum advantage claim.",
+  "auto_refill": "Observed off in authenticated portal before submission",
+  "spark_before": 22,
+  "spark_after_submission": 21,
+  "full_before_and_after": 0,
+  "event": {
+    "event_id": "stage5-hardware-obstacle",
+    "epoch_utc": "2030-01-01T00:00:08Z",
+    "start_downrange_m": -5.0,
+    "end_downrange_m": 5.0
+  }
+}

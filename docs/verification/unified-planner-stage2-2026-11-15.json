@@ -1,0 +1,181 @@
+{
+  "schema_version": "unified-stage2-verification-v1",
+  "recorded_utc": "2026-11-15T00:36:30.314098+00:00",
+  "synthetic_only": true,
+  "hardware_jobs_submitted": 0,
+  "provider_credentials_loaded": false,
+  "quantum_optimizer_called": false,
+  "snapshot_sha256": "759ef5578466327f226463d722663b93249b94617207a10a325ec31d1069134c",
+  "campaign_sha256": "390c445d54aab6b9b013c9a38166a8fc049ef4289aafb9cc3e68597ddda4cd1e",
+  "recovery_sha256": "20fca2748baae674f108647ea20e9c66773bc3e66aee71d2f2b58c176902b29c",
+  "r11_roundtrip_equal": true,
+  "h6_roundtrip_equal": true,
+  "nominal_proposal": {
+    "schema_version": 1,
+    "snapshot_sha256": "759ef5578466327f226463d722663b93249b94617207a10a325ec31d1069134c",
+    "campaign_fingerprint": "390c445d54aab6b9b013c9a38166a8fc049ef4289aafb9cc3e68597ddda4cd1e",
+    "proposed_utc": "2030-01-01T00:00:00Z",
+    "source_module": "H6",
+    "selections": {
+      "landing": "landing.land-backup.20300101T000030Z"
+    },
+    "validation_status": "unvalidated",
+    "requires_classical_completion": true,
+    "requires_physical_revalidation": true
+  },
+  "independent_r11_baseline": {
+    "status": "optimal",
+    "plan": {
+      "plan_id": "joint-05dcc4673b096083",
+      "campaign_id": "unified-synthetic-r11",
+      "campaign_revision": 0,
+      "input_fingerprint": "390c445d54aab6b9b013c9a38166a8fc049ef4289aafb9cc3e68597ddda4cd1e",
+      "selections": {
+        "landing": "landing.land-primary.20300101T000030Z"
+      },
+      "allocations": [
+        {
+          "mission_id": "landing",
+          "station_id": "dss-alpha",
+          "slot_index": 1,
+          "window": {
+            "start_utc": "2030-01-01T00:01:00Z",
+            "end_utc": "2030-01-01T00:02:00Z"
+          },
+          "via_relay_mission_id": null,
+          "bits": 600.0
+        }
+      ],
+      "solver_name": "r11-highs-milp"
+    },
+    "validation": {
+      "input_fingerprint": "390c445d54aab6b9b013c9a38166a8fc049ef4289aafb9cc3e68597ddda4cd1e",
+      "status": "feasible",
+      "issues": [],
+      "outcomes": [
+        {
+          "mission_id": "landing",
+          "status": "nominal",
+          "option_id": "landing.land-primary.20300101T000030Z",
+          "required_bits": 60.0,
+          "delivered_bits": 600.0,
+          "relayed_bits": 0.0
+        }
+      ],
+      "score": 999.9975,
+      "exact_score": "399999/400"
+    },
+    "without_allocations": {
+      "input_fingerprint": "390c445d54aab6b9b013c9a38166a8fc049ef4289aafb9cc3e68597ddda4cd1e",
+      "status": "infeasible",
+      "issues": [
+        {
+          "code": "downlink_shortfall",
+          "mission_ids": [
+            "landing"
+          ],
+          "station_id": null,
+          "window": null,
+          "detail": "landing delivers 0 of 60 bits."
+        }
+      ],
+      "outcomes": [
+        {
+          "mission_id": "landing",
+          "status": "nominal",
+          "option_id": "landing.land-primary.20300101T000030Z",
+          "required_bits": 60.0,
+          "delivered_bits": 0.0,
+          "relayed_bits": 0.0
+        }
+      ],
+      "score": 999.9975,
+      "exact_score": "399999/400"
+    }
+  },
+  "deadline_rejection": "outside_decision_window",
+  "modules": [
+    {
+      "module_id": "H0",
+      "role": "Native mission contracts and provenance",
+      "stage2_status": "native_input"
+    },
+    {
+      "module_id": "H1",
+      "role": "Classical reference and independent validation",
+      "stage2_status": "reference_only"
+    },
+    {
+      "module_id": "H2",
+      "role": "Bounded QUBO/QAOA proposals",
+      "stage2_status": "reference_only"
+    },
+    {
+      "module_id": "H3",
+      "role": "Resource, calendar and storage constraints",
+      "stage2_status": "reference_only"
+    },
+    {
+      "module_id": "H4",
+      "role": "Native terminal descent inputs",
+      "stage2_status": "native_input"
+    },
+    {
+      "module_id": "H5",
+      "role": "Native fault scenario and estimated checkpoint",
+      "stage2_status": "native_input"
+    },
+    {
+      "module_id": "H6",
+      "role": "Native recovery request and selection identity bridge",
+      "stage2_status": "native_input"
+    },
+    {
+      "module_id": "H7",
+      "role": "Optional quoted hardware execution",
+      "stage2_status": "approval_required"
+    },
+    {
+      "module_id": "H8",
+      "role": "Comparison and solver provenance presentation",
+      "stage2_status": "reference_only"
+    },
+    {
+      "module_id": "H9",
+      "role": "Shared-antenna scheduling evidence",
+      "stage2_status": "reference_only"
+    },
+    {
+      "module_id": "H10",
+      "role": "Scaling and matched performance benchmarks",
+      "stage2_status": "reference_only"
+    },
+    {
+      "module_id": "H11",
+      "role": "Orbital-relay selection evidence; separate frame/model",
+      "stage2_status": "reference_only"
+    }
+  ],
+  "test_commit": "73cdc6e",
+  "verification": {
+    "new_contract_tests": 55,
+    "backend_tests": 1771,
+    "ingestion_tests": 218,
+    "optional_quantum_tests": 91,
+    "total_tests": 2080,
+    "python_ruff": "passed",
+    "typescript_vite_build": "passed",
+    "frozen_tests_unchanged": true,
+    "hardware_jobs": 0,
+    "frontend_tests_run": false,
+    "known_warnings": [
+      "Starlette/AnyIO deprecation",
+      "Large Vite bundles"
+    ]
+  },
+  "input_sha256": {
+    "shared/examples/unified/r11-h6.json": "836ea57f1ba4f3affc37733532c1976b5cbf8115155730e4c25a3332748ebffc",
+    "shared/unified_planning.py": "9c13c0ee8105a26bd20432a1e82e01c4237787d7308c37d94f07dff24212925d",
+    "backend/app/unified_planning.py": "c80cb35920ae61a3b136373f07825c6addbc991f892a76ee60cf001640fddb7f"
+  }
+}

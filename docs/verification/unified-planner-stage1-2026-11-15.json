@@ -1,0 +1,365 @@
+{
+  "schema_version": "unified-planner-stage1-baseline-v1",
+  "checked_utc": "2026-11-15T00:22:29.837231+00:00",
+  "hardware_jobs_submitted": 0,
+  "provider_credentials_loaded": false,
+  "campaigns": [
+    {
+      "name": "shared-dsn-conflict",
+      "input_fingerprint": "91b1751835e6cb58b90ab6c7edfd51f0a095618c7305719f1df38ee21f989eb9",
+      "joint_status": "optimal",
+      "independent_status": "infeasible",
+      "independent_issue_codes": [
+        "dependency_lag",
+        "exclusive_link",
+        "station_capacity"
+      ],
+      "variables": 426,
+      "constraints": 566,
+      "selections": {
+        "clps-1": "clps-1.rim-b.20261201T120000Z",
+        "crew-1": "crew-1.ridge-a.20261201T000000Z",
+        "rover-1": "rover-1.rim-b.20261201T180000Z"
+      },
+      "validation": {
+        "input_fingerprint": "91b1751835e6cb58b90ab6c7edfd51f0a095618c7305719f1df38ee21f989eb9",
+        "status": "feasible",
+        "issues": [],
+        "outcomes": [
+          {
+            "mission_id": "clps-1",
+            "status": "deferred",
+            "option_id": "clps-1.rim-b.20261201T120000Z",
+            "required_bits": 21600000000.0,
+            "delivered_bits": 21600000000.0,
+            "relayed_bits": 0.0
+          },
+          {
+            "mission_id": "crew-1",
+            "status": "nominal",
+            "option_id": "crew-1.ridge-a.20261201T000000Z",
+            "required_bits": 57600000000.0,
+            "delivered_bits": 57600000000.0,
+            "relayed_bits": 0.0
+          },
+          {
+            "mission_id": "rover-1",
+            "status": "nominal",
+            "option_id": "rover-1.rim-b.20261201T180000Z",
+            "required_bits": 14400000000.0,
+            "delivered_bits": 14400000000.0,
+            "relayed_bits": 0.0
+          }
+        ],
+        "score": 28.122,
+        "exact_score": "14061/500"
+      },
+      "conflict_sets": []
+    },
+    {
+      "name": "infeasible-mandatory",
+      "input_fingerprint": "5daef173229d359be53fba75433f0e82a44d281b29e5dccfff48f2a08f0d5ecf",
+      "joint_status": "infeasible",
+      "independent_status": "infeasible",
+      "independent_issue_codes": [
+        "exclusive_link",
+        "station_capacity"
+      ],
+      "variables": 47,
+      "constraints": 83,
+      "selections": null,
+      "validation": null,
+      "conflict_sets": [
+        {
+          "mission_ids": [
+            "crew-2",
+            "science-2"
+          ],
+          "detail": "Mandatory missions crew-2, science-2 cannot all be completed together (downlink: crew-2 2.16e+10 bits, science-2 1.44e+10 bits; usable stations: dss-alpha). Dropping any one of them restores a feasible plan; allow cancellation or deferral, add station time or relax a deadline."
+        }
+      ]
+    },
+    {
+      "name": "relay-support",
+      "input_fingerprint": "afa7f784abd5f5a95a450ae13e02c6d83c4e0b7d266cb40418636314f4d56c39",
+      "joint_status": "optimal",
+      "independent_status": "feasible",
+      "independent_issue_codes": [],
+      "variables": 58,
+      "constraints": 127,
+      "selections": {
+        "crater-3": "crater-3.crater-floor.20261201T060000Z",
+        "relay-3": "relay-3.relay-ridge.20261201T000000Z"
+      },
+      "validation": {
+        "input_fingerprint": "afa7f784abd5f5a95a450ae13e02c6d83c4e0b7d266cb40418636314f4d56c39",
+        "status": "feasible",
+        "issues": [],
+        "outcomes": [
+          {
+            "mission_id": "crater-3",
+            "status": "nominal",
+            "option_id": "crater-3.crater-floor.20261201T060000Z",
+            "required_bits": 5400000000.0,
+            "delivered_bits": 5400000000.0,
+            "relayed_bits": 5400000000.0
+          },
+          {
+            "mission_id": "relay-3",
+            "status": "nominal",
+            "option_id": "relay-3.relay-ridge.20261201T000000Z",
+            "required_bits": 7200000000.0,
+            "delivered_bits": 7200000000.0,
+            "relayed_bits": 0.0
+          }
+        ],
+        "score": 32.152,
+        "exact_score": "4019/125"
+      },
+      "conflict_sets": []
+    }
+  ],
+  "existing_h6_r12_replay": {
+    "scenario_sha256": "b79682db327d817065d33f54b9be7bba940d0c44809c7aaf53e4733aa8d6ca96",
+    "branches": [
+      {
+        "branch": "original",
+        "status": "failed",
+        "selected_target_id": "primary",
+        "propellant_remaining_kg": 79.78400372154715,
+        "reserve_margin_kg": 69.78400372154715,
+        "fuel_accounting_error_kg": 0.0,
+        "applied_event_ids": [
+          "fuel-loss",
+          "thrust-loss",
+          "primary-blocked"
+        ],
+        "decisions": []
+      },
+      {
+        "branch": "classical",
+        "status": "landed",
+        "selected_target_id": "backup",
+        "propellant_remaining_kg": 79.66697817040176,
+        "reserve_margin_kg": 69.66697817040176,
+        "fuel_accounting_error_kg": 0.0,
+        "applied_event_ids": [
+          "fuel-loss",
+          "thrust-loss",
+          "primary-blocked"
+        ],
+        "decisions": [
+          {
+            "revision": 0,
+            "action": "continue",
+            "selected_target_id": "primary",
+            "hybrid": null
+          },
+          {
+            "revision": 3,
+            "action": "retarget",
+            "selected_target_id": "backup",
+            "hybrid": null
+          }
+        ]
+      },
+      {
+        "branch": "hybrid",
+        "status": "landed",
+        "selected_target_id": "remote",
+        "propellant_remaining_kg": 76.81443885247882,
+        "reserve_margin_kg": 66.81443885247882,
+        "fuel_accounting_error_kg": 0.0,
+        "applied_event_ids": [
+          "fuel-loss",
+          "thrust-loss",
+          "primary-blocked"
+        ],
+        "decisions": [
+          {
+            "revision": 0,
+            "action": "continue",
+            "selected_target_id": "primary",
+            "hybrid": {
+              "status": "selected",
+              "source": "classical_fallback",
+              "reason": "unsupported",
+              "classical_status": "optimal",
+              "selected_option_ids": [
+                "follow-early",
+                "land-primary"
+              ],
+              "objective_exact_score": "239982739496446627527/1000000000000000000",
+              "preparation_s": 0.7379817920009373,
+              "revalidation_s": 0.7607901669980492,
+              "elapsed_since_submission_s": 0.8215277510025771,
+              "quantum_elapsed_s": null,
+              "logical_qubits": null,
+              "deadline_s": 10.0,
+              "schedule_rejections": {}
+            }
+          },
+          {
+            "revision": 3,
+            "action": "retarget",
+            "selected_target_id": "remote",
+            "hybrid": {
+              "status": "selected",
+              "source": "quantum",
+              "reason": "quantum_accepted",
+              "classical_status": "optimal",
+              "selected_option_ids": [
+                "follow-late",
+                "land-remote"
+              ],
+              "objective_exact_score": "13747782949465427933/125000000000000000",
+              "preparation_s": 0.8676779169982183,
+              "revalidation_s": 0.655035042000236,
+              "elapsed_since_submission_s": 0.7184065420005936,
+              "quantum_elapsed_s": 0.06289733300218359,
+              "logical_qubits": 2,
+              "deadline_s": 10.0,
+              "schedule_rejections": {
+                "land-primary": "physical_rejection"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "hybrid": {
+      "execution_mode": "noiseless_simulator",
+      "hardware_jobs": 0,
+      "simulated_clock_paused_during_planning": true,
+      "landing_mission_id": "landing",
+      "campaign_id": "h6-campaign",
+      "quantum_budget": {
+        "deadline_s": 10.0,
+        "depth": 1,
+        "evaluations": 64,
+        "shots": 256,
+        "seed": 17,
+        "max_qubits": 4
+      },
+      "final_selected_option_ids": [
+        "follow-late",
+        "land-remote"
+      ]
+    },
+    "scope": "Existing synthetic H0 campaign, not an R11 multi-mission integration."
+  },
+  "api_statuses": {
+    "/health": 200,
+    "/campaigns/examples": 200,
+    "/recovery/examples": 200,
+    "/arena/presets": 200,
+    "/campaign/catalog": 200,
+    "/research/scaling": 200,
+    "/research/relays": 200
+  },
+  "r11_to_existing_recovery_contract": {
+    "status": "rejected",
+    "http_status": 422,
+    "lossless_adapter_implemented": false,
+    "reason": "R12 HybridReplayInputs.campaign requires H0 Scenario, not R11 CampaignProblem."
+  },
+  "contract_fields": {
+    "h0_scenario": [
+      "candidates",
+      "description",
+      "events",
+      "incompatibilities",
+      "missions",
+      "objectives",
+      "resources",
+      "revision",
+      "scenario_id",
+      "schema_version",
+      "seed",
+      "selection_rule",
+      "sources",
+      "states",
+      "window"
+    ],
+    "r11_campaign": [
+      "campaign_id",
+      "description",
+      "landing_step_s",
+      "link_rates",
+      "missions",
+      "preferences",
+      "relay_geometry",
+      "revision",
+      "schema_version",
+      "sites",
+      "slot_s",
+      "sources",
+      "stations",
+      "vehicles",
+      "window"
+    ]
+  },
+  "base_commit": "e92174ef89e5eb5295ce73a97cf549224ec7d2ad",
+  "scope": {
+    "stage": 1,
+    "type": "integration_inventory_and_baseline",
+    "new_unified_solver_implemented": false,
+    "r11_h6_lossless_adapter_implemented": false,
+    "live_hardware_called": false,
+    "fixtures": "Synthetic teaching campaigns and synthetic offline fault replay; not real mission validation."
+  },
+  "input_sha256": {
+    "shared/examples/r11/shared-dsn-conflict.json": "d33fe60afc4ed1d7eff7abb4f412a860dd6706af0482cde9a443649d2ed09d40",
+    "shared/examples/r11/infeasible-mandatory.json": "1a56710b7b3706e1a746c77f6ad7d040ffad5350ebea62522fb7c569fb21593c",
+    "shared/examples/r11/relay-support.json": "faf7c0327a965b3bb87d686a2ba3fd56a9f3913fb2164d53306100c52ee7808e",
+    "shared/examples/recovery/hybrid_campaign.json": "a5798b114e46c1b3c4f8ed0c0087894188fc4abf4e8f7575654501b8cdbad1bd",
+    "shared/hybrid.py": "5bd990316ba37931d320af235e9ce13cfe35d12afeafba53d66fa835fed82d24",
+    "shared/campaign.py": "34cefb9d6d2bbdac9085d1a0687b44fca48da5396337b69cceeea6268abb89b2",
+    "backend/app/hybrid_recovery.py": "fd91ba0ae24deadc86b67a95423fd561ccb9df68af220caadb230f6804989d6f",
+    "backend/app/recovery_api.py": "f40c3f8b6204cecfb0aecda2b986921f099bfdd338d22e0b630baa160c678ac0",
+    "backend/app/campaign_planning.py": "c393d9f2c37a4cb9f18cc46cf7a1547b4ae8abbd24f072829b2ec924de695b8e",
+    "docs/verification/r13-application-benchmark-2026-11-15.json": "96d6f61656545e28f9fe3473b59cc054ed584d5ce40d2f184934066753e7141a"
+  },
+  "archived_r13_policy": {
+    "comm_slots": {
+      "verdict": "no_go",
+      "quantum_enabled": false,
+      "retained_solver": "r13-highs-milp-v1"
+    },
+    "relay_selection": {
+      "verdict": "no_go",
+      "quantum_enabled": false,
+      "retained_solver": "r13-highs-milp-v1"
+    },
+    "robust_plans": {
+      "verdict": "no_go",
+      "quantum_enabled": false,
+      "retained_solver": "r13-highs-milp-v1"
+    },
+    "rover_routes": {
+      "verdict": "no_go",
+      "quantum_enabled": false,
+      "retained_solver": "r13-highs-milp-v1"
+    },
+    "science_activities": {
+      "verdict": "no_go",
+      "quantum_enabled": false,
+      "retained_solver": "r13-highs-milp-v1"
+    }
+  },
+  "archived_r13_policy_scope": "Read from the published held-out report; no new benchmark tuning and no gate override.",
+  "verification": {
+    "backend_tests_passed": 1716,
+    "ingestion_tests_passed": 218,
+    "optional_quantum_tests_passed": 91,
+    "total_tests_passed": 2025,
+    "backend_and_ingestion_ruff": "passed",
+    "frontend_typescript_vite_build": "passed",
+    "frontend_tests_run": false,
+    "screenshots_taken": false,
+    "warnings": [
+      "Existing Starlette/AnyIO deprecation warning",
+      "Existing Vite chunks larger than 500 kB warning"
+    ]
+  }
+}
