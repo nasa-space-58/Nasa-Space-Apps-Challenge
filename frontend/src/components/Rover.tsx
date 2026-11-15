@@ -13,7 +13,13 @@ import * as THREE from "three";
 import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { terrainHeight } from "./LunarSurface";
-import { PULSE_END, SEARCH_END, type SceneMapping, type SurfaceScene } from "./surfaceScene";
+import {
+  DEPLOY_END,
+  PULSE_END,
+  SEARCH_END,
+  type SceneMapping,
+  type SurfaceScene,
+} from "./surfaceScene";
 
 /** A backend R8 route cell, metres north/east of the landing cell. */
 export type RoutePoint = { north_m: number; east_m: number };
@@ -31,6 +37,8 @@ export type RoverState = {
 
 /** Where the rover rolls off, beside the lander (scene units). */
 const START_OFFSET_SCENE = new THREE.Vector3(1.9, 0, 1.4);
+/** Where the rover is unloaded at the foot of the lander (scene units). */
+const LANDER_EXIT_SCENE = new THREE.Vector3(0.85, 0, 0.6);
 /** On the art terrain the longest route is scaled to this many scene units. */
 const ROUTE_SPAN_SCENE = 22;
 const WHEEL_RADIUS_SCENE = 0.12;
@@ -355,8 +363,9 @@ function Pulses({
   useEffect(() => () => geometry.dispose(), [geometry]);
   useFrame(({ clock }) => {
     const s = scan.current;
-    const active = s < SEARCH_END;
-    const front = reach * Math.min(1, s / PULSE_END);
+    const active = s > DEPLOY_END && s < SEARCH_END;
+    const front =
+      reach * THREE.MathUtils.clamp((s - DEPLOY_END) / (PULSE_END - DEPLOY_END), 0, 1);
     rings.current.forEach((ring, k) => {
       ring.visible = active;
       if (!active) return;
@@ -468,6 +477,14 @@ export default function Rover({
     const distance = THREE.MathUtils.clamp(drive.current, 0, 1) * route.total;
     pointAt(distance, position);
     pointAt(Math.min(route.total, distance + 0.3), ahead);
+    // Before the scan the rover rolls off the lander to the route start.
+    if (scan.current < DEPLOY_END) {
+      const k = THREE.MathUtils.smoothstep(scan.current / DEPLOY_END, 0, 1);
+      position.lerpVectors(LANDER_EXIT_SCENE, route.points[0], k);
+      position.y = route.ground(position.x, position.z);
+      ahead.copy(route.points[0]);
+      if (k > 0.98) pointAt(0.3, ahead);
+    }
     const run = Math.hypot(ahead.x - position.x, ahead.z - position.z);
     if (run > 1e-3) {
       const yaw = Math.atan2(ahead.x - position.x, ahead.z - position.z);
@@ -483,8 +500,12 @@ export default function Rover({
         Math.min(1, delta * 6),
       );
     }
-    spin.current += (distance - lastDistance.current) / WHEEL_RADIUS_SCENE;
-    lastDistance.current = distance;
+    const travelled =
+      scan.current < DEPLOY_END
+        ? -position.distanceTo(route.points[0])
+        : distance;
+    spin.current += (travelled - lastDistance.current) / WHEEL_RADIUS_SCENE;
+    lastDistance.current = travelled;
     body.current.position.set(position.x, position.y + RIDE_HEIGHT_SCENE, position.z);
     body.current.rotation.y = heading.current ?? 0;
     focus.copy(position);

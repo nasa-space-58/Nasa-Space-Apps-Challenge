@@ -1480,7 +1480,8 @@
       "legendSteep": "Too steep (>{deg}°)",
       "legendSearched": "Examined by A*",
       "legendRoute": "Chosen route",
-      "truncated": "Only the first part of the examined cells is shown."
+      "truncated": "Only the first part of the examined cells is shown.",
+      "deploy": "The rover rolls off the lander…"
     }
   },
   "risk": {

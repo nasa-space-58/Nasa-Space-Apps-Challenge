@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslate } from "../i18n";
 import type { RoutePoint, RoverState } from "./Rover";
-import { PULSE_END, SEARCH_END, type SurfaceScene } from "./surfaceScene";
+import { DEPLOY_END, PULSE_END, SEARCH_END, type SurfaceScene } from "./surfaceScene";
 import "./surface-ops.css";
 
 // Post-landing HUD: the rover drives a backend R8 route, and the cards show
@@ -60,7 +60,7 @@ const SPEED_MPS = 0.1;
 const PLAYBACK_RATES = [60, 600, 3600];
 const TICK_MS = 100;
 /** Wall-clock seconds of the antenna scan and A* playback before driving. */
-const SCAN_SECONDS = 9;
+const SCAN_SECONDS = 10;
 /** DEM margin around the routes in the 3-D scene (backend default is 400 m). */
 const SCENE_MARGIN_M = 1000;
 const POLL_MS = 2000;
@@ -268,7 +268,11 @@ export default function SurfaceOps({
   const searchedCells = scene && route ? (scene.explored[route.target_id] ?? []).length : 0;
   const truncated = Boolean(scene && route && scene.explored_truncated[route.target_id]);
   const scanStage =
-    scan < PULSE_END ? "pulse" : scan < SEARCH_END ? "search" : scan < 1 ? "route" : "done";
+    scan < DEPLOY_END
+      ? "deploy"
+      : scan < PULSE_END
+        ? "pulse"
+        : scan < SEARCH_END ? "search" : scan < 1 ? "route" : "done";
   useEffect(() => () => report.current(null), []);
 
   // Latest backend-sampled waypoint the rover has passed (no interpolation).

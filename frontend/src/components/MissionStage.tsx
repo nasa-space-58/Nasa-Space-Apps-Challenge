@@ -323,9 +323,9 @@ export default function MissionStage({
               ? "landing"
               : "spacecraft";
   const picking = cameraView === "pole" || cameraView === "moon";
-  // Post-landing operations start once the touchdown close-up is complete.
-  const landed =
-    webgl && cameraView === "landing" && active.phase.id === "landed" && progress >= 1;
+  // Post-landing operations start once touchdown is complete and stay alive
+  // across camera changes; the rover is drawn only in the landing close-up.
+  const landed = webgl && active.phase.id === "landed" && progress >= 1;
 
   // A new target restarts the illustrative flight from Earth orbit.
   useEffect(() => {

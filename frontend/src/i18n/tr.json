@@ -1480,7 +1480,8 @@
       "legendSteep": "Çok dik (>{deg}°)",
       "legendSearched": "A* tarafından incelendi",
       "legendRoute": "Seçilen rota",
-      "truncated": "İncelenen hücrelerin yalnızca ilk kısmı gösteriliyor."
+      "truncated": "İncelenen hücrelerin yalnızca ilk kısmı gösteriliyor.",
+      "deploy": "Gezgin iniş aracından iniyor…"
     }
   },
   "risk": {

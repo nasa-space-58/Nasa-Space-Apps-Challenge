@@ -26,7 +26,9 @@ export type SurfaceScene = {
 };
 
 /** Scan timeline shares of the 0–1 scan clock (display pacing only). */
-export const PULSE_END = 0.4;
+/** The rover first rolls off the lander, then the antenna scan starts. */
+export const DEPLOY_END = 0.15;
+export const PULSE_END = 0.45;
 export const SEARCH_END = 0.85;
 
 /** The longest route spans this many scene units (same as the art terrain). */

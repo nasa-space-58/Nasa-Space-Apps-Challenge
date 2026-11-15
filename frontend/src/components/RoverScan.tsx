@@ -3,6 +3,7 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { noise } from "./LunarSurface";
 import {
+  DEPLOY_END,
   PULSE_END,
   SEARCH_END,
   gridGeometry,
@@ -155,7 +156,9 @@ export function ScanOverlay({
     const goal = s >= 1 ? SETTLED_OPACITY : 1;
     material.current.opacity +=
       (goal - material.current.opacity) * Math.min(1, Math.min(delta, 0.05) * 3);
-    const radius = distance.max * Math.min(1, s / PULSE_END);
+    const radius =
+      distance.max *
+      THREE.MathUtils.clamp((s - DEPLOY_END) / (PULSE_END - DEPLOY_END), 0, 1);
     const searched = Math.floor(
       explored.length *
         THREE.MathUtils.clamp((s - PULSE_END) / (SEARCH_END - PULSE_END), 0, 1),
