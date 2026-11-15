@@ -124,6 +124,10 @@ class RiskError(ValueError):
     """Invalid risk inputs or unusable terrain for the dispersion map."""
 
 
+class RiskCancelled(RuntimeError):
+    """Cooperatively cancelled risk evaluation; no partial result is valid."""
+
+
 class UncertaintySettings(BaseModel):
     """One-sigma Gaussian errors; zero disables a source."""
 
