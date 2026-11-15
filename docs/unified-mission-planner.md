@@ -103,3 +103,7 @@ The native envelope and bounded synthetic identity adapters are now implemented;
 ## Stage 3 delivery
 
 The full classical synthetic pilot and event replan are implemented; see [stage 3 results, admission checks and bounded execution limits](unified-classical-pilot.md). The quantum proposal path, live coordinator and common UI remain later stages.
+
+## Stage 4 delivery
+
+The bounded local H2/H6 proposal path now completes and admits full R11 plans; see [stage 4 scope, matched comparison and measured outcome](unified-quantum-proposals.md). No strict full-plan improvement was observed in the recorded small pilot, and the classical incumbent stays selected. General domain adapters, live coordination and shared views remain later work.

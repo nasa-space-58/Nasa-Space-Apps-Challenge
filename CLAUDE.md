@@ -223,3 +223,7 @@ Continue on `codex/unified-quantum-stage1`, implement the R11/H6 common contract
 ### Unified planner stage 3 (user, 2026-11-15)
 
 Continue on `codex/unified-quantum-stage1`; implement the full classical mission pilot and event/physical revalidation, test and push only this branch. Do not merge into main/tahakrcc or spend real quantum credits. Preserve the local H6 notebook. Skeleton `4c4110b`; frozen tests/fixture `bdeeb7c` and independent admission tests `6dbc897`. See docs/unified-classical-pilot.md for exact limits, including offline paused-clock operation and immutable-allocation rejection.
+
+### Unified planner stage 4 (user, 2026-11-15)
+
+Continue on `codex/unified-quantum-stage1`; connect bounded local quantum proposals to full campaign/physical admission, test and push only this branch. No main/tahakrcc merges or real quantum credits. Preserve the local H6 notebook. Skeleton `8f45b95`; frozen tests `94fb31a`, `d90ddd9`, `bb3df22`. Default mode stays classical, experiments are explicitly local, and unchanged R10/R13 NO-GO policy cannot be bypassed. See docs/unified-quantum-proposals.md for supported scope and attribution rules.

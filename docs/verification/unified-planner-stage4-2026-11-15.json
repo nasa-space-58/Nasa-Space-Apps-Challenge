@@ -1,0 +1,374 @@
+{
+  "schema_version": "unified-stage4-local-comparison-v1",
+  "recorded_utc": "2026-11-15T01:10:20.221513+00:00",
+  "hardware_jobs_submitted": 0,
+  "credits_spent": 0,
+  "production_policy": "classical_no_go_unchanged",
+  "scope": "Synthetic single-active-lander H0 proposals; full R11 completion and independent admission; no end-to-end advantage claim",
+  "cases": [
+    {
+      "name": "nominal_unsupported",
+      "snapshot_sha256": "e821387bb2fa368f6270e060e3f9258d835e9bbb37960b8dbe0e88d233ded6ce",
+      "result_sha256": "48cea3e9f517e5dc0201e7a181aef5a62edee3e9e1519b5da96b8517053ef47c",
+      "mode": "local_experiment",
+      "budget": {
+        "depth": 1,
+        "evaluations": 32,
+        "shots": 64,
+        "seed": 17,
+        "max_qubits": 4,
+        "max_completions": 2,
+        "completion_limit_s": 5.0
+      },
+      "selected_source": "classical",
+      "selection_reason": "unsupported_projection",
+      "unsupported_reason": "Compact encoding requires power-of-two options per mission",
+      "option_to_target": {
+        "land-primary": "primary",
+        "land-backup": "backup",
+        "land-remote": "remote"
+      },
+      "frozen_outside_selections": {
+        "other": "other.land-primary.20300101T000100Z",
+        "rover": "rover.land-primary.20300101T000045Z"
+      },
+      "final_plan": {
+        "plan_id": "joint-8b30787fe165b9e8",
+        "campaign_id": "unified-stage3-campaign",
+        "campaign_revision": 1,
+        "input_fingerprint": "26b58eb6598348082ae93beae2dde568329fb36120e01da63bf090ef6068dd9a",
+        "selections": {
+          "landing": "landing.land-primary.20300101T000029Z",
+          "other": "other.land-primary.20300101T000100Z",
+          "rover": "rover.land-primary.20300101T000045Z"
+        },
+        "allocations": [
+          {
+            "mission_id": "landing",
+            "station_id": "dss-alpha",
+            "slot_index": 1,
+            "window": {
+              "start_utc": "2030-01-01T00:01:00Z",
+              "end_utc": "2030-01-01T00:02:00Z"
+            },
+            "via_relay_mission_id": null,
+            "bits": 60.0
+          },
+          {
+            "mission_id": "rover",
+            "station_id": "dss-alpha",
+            "slot_index": 2,
+            "window": {
+              "start_utc": "2030-01-01T00:02:00Z",
+              "end_utc": "2030-01-01T00:03:00Z"
+            },
+            "via_relay_mission_id": null,
+            "bits": 60.0
+          },
+          {
+            "mission_id": "other",
+            "station_id": "dss-alpha",
+            "slot_index": 3,
+            "window": {
+              "start_utc": "2030-01-01T00:03:00Z",
+              "end_utc": "2030-01-01T00:04:00Z"
+            },
+            "via_relay_mission_id": null,
+            "bits": 60.0
+          }
+        ],
+        "solver_name": "r11-highs-milp"
+      },
+      "final_score_exact": "5019137389739339882581/5000000000000000000",
+      "final_validation": {
+        "input_fingerprint": "26b58eb6598348082ae93beae2dde568329fb36120e01da63bf090ef6068dd9a",
+        "status": "feasible",
+        "issues": [],
+        "outcomes": [
+          {
+            "mission_id": "landing",
+            "status": "nominal",
+            "option_id": "landing.land-primary.20300101T000029Z",
+            "required_bits": 60.0,
+            "delivered_bits": 60.0,
+            "relayed_bits": 0.0
+          },
+          {
+            "mission_id": "other",
+            "status": "nominal",
+            "option_id": "other.land-primary.20300101T000100Z",
+            "required_bits": 60.0,
+            "delivered_bits": 60.0,
+            "relayed_bits": 0.0
+          },
+          {
+            "mission_id": "rover",
+            "status": "nominal",
+            "option_id": "rover.land-primary.20300101T000045Z",
+            "required_bits": 60.0,
+            "delivered_bits": 60.0,
+            "relayed_bits": 0.0
+          }
+        ],
+        "score": 1003.994143697868,
+        "exact_score": "5019970718489339882581/5000000000000000000"
+      },
+      "final_propellant_kg": 82.73949644662753,
+      "elapsed_comparison_s": 1.3615828760011937,
+      "preparation_s": 0.6573764580025454,
+      "classical_baseline_s": 0.7031543760022032,
+      "methods": [],
+      "quantum": null
+    },
+    {
+      "name": "post_exclusion",
+      "snapshot_sha256": "f250a4bef17d349dfe4243233667f4b75ff3a6a82c227b41c8ad583545bcd2ab",
+      "result_sha256": "aa4a8d30a3d1aac54da7c89d21445c885ae6fd87aa7915c63e4977befc53462d",
+      "mode": "local_experiment",
+      "budget": {
+        "depth": 1,
+        "evaluations": 32,
+        "shots": 64,
+        "seed": 17,
+        "max_qubits": 4,
+        "max_completions": 2,
+        "completion_limit_s": 5.0
+      },
+      "selected_source": "classical",
+      "selection_reason": "no_strict_full_plan_improvement",
+      "unsupported_reason": null,
+      "option_to_target": {
+        "land-backup": "backup",
+        "land-remote": "remote"
+      },
+      "frozen_outside_selections": {
+        "other": "other.land-primary.20300101T000100Z",
+        "rover": "rover.land-primary.20300101T000145Z"
+      },
+      "final_plan": {
+        "plan_id": "joint-09a59a36a943a2ae",
+        "campaign_id": "unified-stage3-campaign",
+        "campaign_revision": 2,
+        "input_fingerprint": "a514e821a2bccbf31841f9bff317c69364f210bb043c3f88deadf83407c2dafc",
+        "selections": {
+          "landing": "landing.land-remote.20300101T000034Z",
+          "other": "other.land-primary.20300101T000100Z",
+          "rover": "rover.land-primary.20300101T000145Z"
+        },
+        "allocations": [
+          {
+            "mission_id": "other",
+            "station_id": "dss-alpha",
+            "slot_index": 1,
+            "window": {
+              "start_utc": "2030-01-01T00:01:00Z",
+              "end_utc": "2030-01-01T00:02:00Z"
+            },
+            "via_relay_mission_id": null,
+            "bits": 60.0
+          },
+          {
+            "mission_id": "landing",
+            "station_id": "dss-alpha",
+            "slot_index": 2,
+            "window": {
+              "start_utc": "2030-01-01T00:02:00Z",
+              "end_utc": "2030-01-01T00:03:00Z"
+            },
+            "via_relay_mission_id": null,
+            "bits": 60.0
+          },
+          {
+            "mission_id": "rover",
+            "station_id": "dss-alpha",
+            "slot_index": 3,
+            "window": {
+              "start_utc": "2030-01-01T00:03:00Z",
+              "end_utc": "2030-01-01T00:04:00Z"
+            },
+            "via_relay_mission_id": null,
+            "bits": 60.0
+          }
+        ],
+        "solver_name": "r11-highs-milp"
+      },
+      "final_score_exact": "4909592787296372481/9765625000000000",
+      "final_validation": {
+        "input_fingerprint": "a514e821a2bccbf31841f9bff317c69364f210bb043c3f88deadf83407c2dafc",
+        "status": "feasible",
+        "issues": [],
+        "outcomes": [
+          {
+            "mission_id": "landing",
+            "status": "nominal",
+            "option_id": "landing.land-remote.20300101T000034Z",
+            "required_bits": 60.0,
+            "delivered_bits": 60.0,
+            "relayed_bits": 0.0
+          },
+          {
+            "mission_id": "other",
+            "status": "nominal",
+            "option_id": "other.land-primary.20300101T000100Z",
+            "required_bits": 60.0,
+            "delivered_bits": 60.0,
+            "relayed_bits": 0.0
+          },
+          {
+            "mission_id": "rover",
+            "status": "nominal",
+            "option_id": "rover.land-primary.20300101T000145Z",
+            "required_bits": 60.0,
+            "delivered_bits": 60.0,
+            "relayed_bits": 0.0
+          }
+        ],
+        "score": 502.99230121914854,
+        "exact_score": "4912034191593247481/9765625000000000"
+      },
+      "final_propellant_kg": 79.66869858090342,
+      "elapsed_comparison_s": 2.6199487510020845,
+      "preparation_s": 0.35961841700191144,
+      "classical_baseline_s": 0.36891266699967673,
+      "methods": [
+        {
+          "method": "qaoa",
+          "raw_counts": {
+            "land-remote": 64
+          },
+          "raw_local_feasible_count": 64,
+          "skipped_by_completion_cap": [],
+          "proposal_s": 0.009174333004921209,
+          "attempts": [
+            {
+              "option_ids": [
+                "land-remote"
+              ],
+              "sample_count": 64,
+              "status": "accepted",
+              "reason": null,
+              "target_id": "remote",
+              "comparison_score_exact": "4909592787296372481/9765625000000000",
+              "completion_s": 0.01197649999812711,
+              "admission_s": 0.3573570419976022,
+              "full_campaign_validation": "feasible"
+            }
+          ]
+        },
+        {
+          "method": "random",
+          "raw_counts": {
+            "land-backup": 24,
+            "land-remote": 40
+          },
+          "raw_local_feasible_count": 64,
+          "skipped_by_completion_cap": [],
+          "proposal_s": 2.2958003683015704e-05,
+          "attempts": [
+            {
+              "option_ids": [
+                "land-remote"
+              ],
+              "sample_count": 40,
+              "status": "accepted",
+              "reason": null,
+              "target_id": "remote",
+              "comparison_score_exact": "4909592787296372481/9765625000000000",
+              "completion_s": 0.011997000001429114,
+              "admission_s": 0.36400987499655457,
+              "full_campaign_validation": "feasible"
+            },
+            {
+              "option_ids": [
+                "land-backup"
+              ],
+              "sample_count": 24,
+              "status": "accepted",
+              "reason": null,
+              "target_id": "backup",
+              "comparison_score_exact": "1320684432355307921/25000000000000000",
+              "completion_s": 0.012266666999494191,
+              "admission_s": 0.3614063329951023,
+              "full_campaign_validation": "feasible"
+            }
+          ]
+        },
+        {
+          "method": "greedy",
+          "raw_counts": {
+            "land-remote": 32,
+            "land-backup": 32
+          },
+          "raw_local_feasible_count": 64,
+          "skipped_by_completion_cap": [],
+          "proposal_s": 3.4999975468963385e-06,
+          "attempts": [
+            {
+              "option_ids": [
+                "land-backup"
+              ],
+              "sample_count": 32,
+              "status": "accepted",
+              "reason": null,
+              "target_id": "backup",
+              "comparison_score_exact": "1320684432355307921/25000000000000000",
+              "completion_s": 0.012614333005330991,
+              "admission_s": 0.3716393330032588,
+              "full_campaign_validation": "feasible"
+            },
+            {
+              "option_ids": [
+                "land-remote"
+              ],
+              "sample_count": 32,
+              "status": "accepted",
+              "reason": null,
+              "target_id": "remote",
+              "comparison_score_exact": "4909592787296372481/9765625000000000",
+              "completion_s": 0.012176833995908964,
+              "admission_s": 0.3613592920009978,
+              "full_campaign_validation": "feasible"
+            }
+          ]
+        }
+      ],
+      "quantum": {
+        "execution_mode": "noiseless_simulator",
+        "logical_qubits": 1,
+        "shots": 64,
+        "evaluations": 32,
+        "seed": 17,
+        "local_sampled_feasible_rate": 1.0,
+        "local_sampled_optimal_rate": 1.0,
+        "cx_gate_estimate": 0,
+        "hardware_jobs": 0
+      }
+    }
+  ],
+  "input_sha256": {
+    "backend/app/unified_quantum.py": "9f2908cc6f356e2e2127cc5c1583e2517ea81fefc6d8766b55d5d1bd02f193da",
+    "backend/app/unified_classical.py": "8c8272a1e8f126c74bfd446991c08ab32a3bf79bdc283ddd7833574d0abe5977",
+    "shared/examples/unified/classical-pilot.json": "edb87c862ccc7ede6e6b316771dde74e1e1a5d0a76b356e68f41cfe545fdf40c"
+  },
+  "frozen_test_commits": [
+    "94fb31a",
+    "d90ddd9",
+    "bb3df22"
+  ],
+  "verification": {
+    "new_tests": 31,
+    "backend_tests": 1837,
+    "ingestion_tests": 218,
+    "optional_quantum_tests": 91,
+    "total_tests": 2146,
+    "python_ruff": "passed",
+    "typescript_vite_build": "passed",
+    "frozen_tests_unchanged": true,
+    "frontend_tests_run": false,
+    "live_provider_jobs": 0,
+    "known_warnings": [
+      "Existing Starlette/AnyIO deprecation",
+      "Existing large Vite bundles"
+    ]
+  }
+}
