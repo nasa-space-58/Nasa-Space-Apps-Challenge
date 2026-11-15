@@ -250,3 +250,7 @@ The user asked for a real simulation instead of an always-successful flight, wit
 ### Mission run main push exception (user, 2026-11-15)
 
 At the user's explicit request, `feature/mission-run-simulation` was fast-forwarded directly onto `main` from `de18ad4` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
+
+### Split comparison simulator main push exception (user, 2026-11-15)
+
+At the user's explicit request, `feature/split-comparison-simulator` (split 3D viewport with synchronized A/B day panes; see the split simulator section of docs/scenario-comparison.md) was fast-forwarded directly onto `main` from `3d2b819` without a PR, overriding the no-direct-push rule for this one push only. The default rules for `main` still apply afterwards.
