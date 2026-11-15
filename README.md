@@ -294,3 +294,26 @@ H10 measures exhaustive-search and MILP times on the same example problems and s
 
 - [H10 measurements and verification](docs/problem-scaling.md), [notebook](notebooks/H10_problem_scaling.ipynb), interface: `#/scaling`.
 - [H11 sources and results](docs/relay-orbit-selection.md), [notebook](notebooks/H11_relay_orbits.ipynb), interface: `#/relays`.
+
+### Mission resilience simulation
+
+The **Mission resilience** tab in mission control (`#/resilience`) replays
+successive faults across launch, cruise, descent and surface operations. Pick an
+example and press **Run mission simulation**; the timeline shows resources,
+observed events and replanning decisions. Cancellation and result download are
+supported. Decisions are classical; no quantum job or credit is used.
+
+These are synthetic, offline examples. Launch and cruise use resource
+bookkeeping, descent uses planar physics, and the surface uses a simple
+energy/temperature model. No real flight-safety guarantee is given.
+[Scope, API and limits](docs/mission-resilience.md).
+
+### C3: Is there a real quantum contribution?
+
+This offline experiment compares a local 6-qubit scenario generator with five
+classical search methods. The goal is to find more distinct task shortfalls for
+the same simulation budget or time. The result is **NO-GO**: no quantum
+contribution was shown on these small surface examples. It is not added to the
+application's decisions and spends no real quantum credit.
+[Protocol](docs/stress-discovery-c3-protocol.md) and
+[results, limits and rerunning](docs/stress-discovery-c3-results.md).

@@ -1,0 +1,471 @@
+{
+  "source_commit": "b1129c6b8b94e13fbb2a3a33126e9571bc950614",
+  "source_sha256": {
+    "backend/app/mission_resilience.py": "8e064235b43f49e47933459c63326bbfa85b255703ce635f5f38f8f96ec2e65c",
+    "backend/app/mission_resilience_api.py": "14248c90abb8f2432cf4d4f5832975b5c5cb850012471585ee0908347cdcf2ad",
+    "backend/app/analysis_api.py": "854a04672ebf53ab0bf98b359d8e8f7738ff30a445464be945db77f506f10658",
+    "frontend/src/components/MissionResilience.tsx": "2b8a0b66ac59bc86b17ef4af321f62579af26f679bd54f79ce24cdb7ff26d9c9",
+    "frontend/src/components/mission-resilience.css": "f495a364d6f73efcc3296952ca62ffdbb4447f2f9128f3d388682809b8d56f84",
+    "frontend/src/App.tsx": "e95ca87a436b40bd6f3a72014360c2c17ee8acd4971c104a769e13df3b8146f0",
+    "frontend/src/i18n/en.json": "2fd6c32e1762d066e6d0b0cb6f37be972a77c6bd8eab2a4bd79ee96ecc9639e3",
+    "frontend/src/i18n/tr.json": "f34ea909a84c8edbbb939ae35d622abeef248e2a1993419cddcc85ab7796d697"
+  },
+  "scope": "Synthetic offline classical mission resilience replay; no flight qualification",
+  "hardware_jobs": 0,
+  "credits_spent": 0,
+  "merge": false,
+  "production_deployment": false,
+  "shared_services_restarted": false,
+  "http_mode": "Actual create_app routes and replay worker, isolated loopback Uvicorn/SQLite, acquisition workers disabled",
+  "raw_http_sha256": "74047b3db4b856c3324f50db7637d43e7d4437b2c2c2dc32ad312ae4f947a33b",
+  "cases": [
+    {
+      "name": "Nominal four-phase mission",
+      "job_id": "89ea5a3a-04e0-4f45-a450-cd4a388c66f8",
+      "input_sha256": "7b9862fd7a698e83b7ee6e5532114f73fdf614d634f1c890a225898cd17d69a1",
+      "mission_status": "completed",
+      "met_s": 53.99994533,
+      "compute_s": 1.1341498340043472,
+      "completed_tasks": [
+        "science",
+        "transmit"
+      ],
+      "reasons": [],
+      "decision_count": 6,
+      "transitions": [
+        {
+          "phase": "launch",
+          "met_s": 0.0,
+          "fuel_kg": 100.0,
+          "energy_wh": 15.0
+        },
+        {
+          "phase": "cruise",
+          "met_s": 2.0,
+          "fuel_kg": 98.0,
+          "energy_wh": 15.001111111111111
+        },
+        {
+          "phase": "descent",
+          "met_s": 13.0,
+          "fuel_kg": 95.00000000000003,
+          "energy_wh": 15.007222222222223
+        },
+        {
+          "phase": "surface",
+          "met_s": 42.99994533,
+          "fuel_kg": 77.8257989619126,
+          "energy_wh": 15.02388885851598
+        }
+      ],
+      "selected_history": [
+        {
+          "met_s": 0.0,
+          "status": "accepted",
+          "choice": "launch"
+        },
+        {
+          "met_s": 3.0,
+          "status": "accepted",
+          "choice": "direct"
+        },
+        {
+          "met_s": 10.0,
+          "status": "accepted",
+          "choice": "direct"
+        },
+        {
+          "met_s": 14.0,
+          "status": "accepted",
+          "choice": "primary"
+        },
+        {
+          "met_s": 43.99994533,
+          "status": "accepted",
+          "choice": "science"
+        },
+        {
+          "met_s": 50.99994533,
+          "status": "accepted",
+          "choice": "transmit"
+        }
+      ],
+      "idempotency_verified": true
+    },
+    {
+      "name": "Weather delay and cruise outage",
+      "job_id": "5f9aa382-de15-40bb-8d97-e747885eb920",
+      "input_sha256": "31f31715498ff36566ddd0fe00e9fa73791a8480d0edd2ed4a271dcdd614f456",
+      "mission_status": "completed",
+      "met_s": 69.99994533,
+      "compute_s": 1.048297667002771,
+      "completed_tasks": [
+        "science",
+        "transmit"
+      ],
+      "reasons": [],
+      "decision_count": 13,
+      "transitions": [
+        {
+          "phase": "launch",
+          "met_s": 0.0,
+          "fuel_kg": 100.0,
+          "energy_wh": 15.0
+        },
+        {
+          "phase": "cruise",
+          "met_s": 14.0,
+          "fuel_kg": 98.0,
+          "energy_wh": 15.007777777777779
+        },
+        {
+          "phase": "descent",
+          "met_s": 29.0,
+          "fuel_kg": 95.37500000000001,
+          "energy_wh": 15.016111111111114
+        },
+        {
+          "phase": "surface",
+          "met_s": 58.99994533,
+          "fuel_kg": 78.1943262730806,
+          "energy_wh": 15.03277774740487
+        }
+      ],
+      "selected_history": [
+        {
+          "met_s": 0.0,
+          "status": "accepted",
+          "choice": "hold"
+        },
+        {
+          "met_s": 2.0,
+          "status": "accepted",
+          "choice": "hold"
+        },
+        {
+          "met_s": 4.0,
+          "status": "accepted",
+          "choice": "hold"
+        },
+        {
+          "met_s": 6.0,
+          "status": "accepted",
+          "choice": "hold"
+        },
+        {
+          "met_s": 8.0,
+          "status": "accepted",
+          "choice": "hold"
+        },
+        {
+          "met_s": 10.0,
+          "status": "accepted",
+          "choice": "hold"
+        },
+        {
+          "met_s": 12.0,
+          "status": "accepted",
+          "choice": "launch"
+        },
+        {
+          "met_s": 15.0,
+          "status": "accepted",
+          "choice": "direct"
+        },
+        {
+          "met_s": 17.0,
+          "status": "accepted",
+          "choice": "autonomous"
+        },
+        {
+          "met_s": 23.0,
+          "status": "accepted",
+          "choice": "direct"
+        },
+        {
+          "met_s": 30.0,
+          "status": "accepted",
+          "choice": "primary"
+        },
+        {
+          "met_s": 59.99994533,
+          "status": "accepted",
+          "choice": "science"
+        },
+        {
+          "met_s": 66.99994533,
+          "status": "accepted",
+          "choice": "transmit"
+        }
+      ],
+      "idempotency_verified": true
+    },
+    {
+      "name": "Cruise thrust loss and fuel leak",
+      "job_id": "a56bcff5-1f6c-4e87-b369-a76d2272cf9f",
+      "input_sha256": "e94e53446facccf192aaa650b120b763f2e1b5f188430ffa6728dfe4783500dd",
+      "mission_status": "no_feasible_continuation",
+      "met_s": 16.0,
+      "compute_s": 0.3653124580014264,
+      "completed_tasks": [],
+      "reasons": [
+        "horizontal_speed",
+        "position",
+        "uncertainty",
+        "vertical_speed"
+      ],
+      "decision_count": 5,
+      "transitions": [
+        {
+          "phase": "cruise",
+          "met_s": 0.0,
+          "fuel_kg": 100.0,
+          "energy_wh": 15.0
+        },
+        {
+          "phase": "descent",
+          "met_s": 16.0,
+          "fuel_kg": 92.80000000000001,
+          "energy_wh": 15.00888888888889
+        }
+      ],
+      "selected_history": [
+        {
+          "met_s": 0.0,
+          "status": "accepted",
+          "choice": "direct"
+        },
+        {
+          "met_s": 3.0,
+          "status": "accepted",
+          "choice": "autonomous"
+        },
+        {
+          "met_s": 5.0,
+          "status": "accepted",
+          "choice": "autonomous"
+        },
+        {
+          "met_s": 12.0,
+          "status": "accepted",
+          "choice": "autonomous"
+        },
+        {
+          "met_s": 16.0,
+          "status": "no_feasible_continuation",
+          "choice": null
+        }
+      ],
+      "idempotency_verified": true
+    },
+    {
+      "name": "Landing fallback then fallback failure",
+      "job_id": "53dfedcf-1fc0-42c0-ab48-7d28314051e3",
+      "input_sha256": "60c580424f1d3af04a03fe09d6d3c7cba6ca50e204d4db5a6f2710c130cb509b",
+      "mission_status": "no_feasible_continuation",
+      "met_s": 9.0,
+      "compute_s": 1.598883708997164,
+      "completed_tasks": [],
+      "reasons": [
+        "landing_hazard"
+      ],
+      "decision_count": 4,
+      "transitions": [
+        {
+          "phase": "descent",
+          "met_s": 0.0,
+          "fuel_kg": 100.0,
+          "energy_wh": 15.0
+        }
+      ],
+      "selected_history": [
+        {
+          "met_s": 0.0,
+          "status": "accepted",
+          "choice": "primary"
+        },
+        {
+          "met_s": 2.0,
+          "status": "accepted",
+          "choice": "backup"
+        },
+        {
+          "met_s": 6.0,
+          "status": "accepted",
+          "choice": "spare"
+        },
+        {
+          "met_s": 9.0,
+          "status": "no_feasible_continuation",
+          "choice": null
+        }
+      ],
+      "idempotency_verified": true
+    },
+    {
+      "name": "Conflicting landing sensors",
+      "job_id": "2a186b4c-a02c-489e-a7f1-2ecdc20dbabf",
+      "input_sha256": "0f96f2bcd9b138a1405c5b4048544de18db021a04000dfa9092f0b41dec6fc85",
+      "mission_status": "no_feasible_continuation",
+      "met_s": 1.0,
+      "compute_s": 0.5801468750069034,
+      "completed_tasks": [],
+      "reasons": [
+        "navigation_sensor_conflict"
+      ],
+      "decision_count": 2,
+      "transitions": [
+        {
+          "phase": "descent",
+          "met_s": 0.0,
+          "fuel_kg": 100.0,
+          "energy_wh": 15.0
+        }
+      ],
+      "selected_history": [
+        {
+          "met_s": 0.0,
+          "status": "accepted",
+          "choice": "primary"
+        },
+        {
+          "met_s": 1.0,
+          "status": "no_feasible_continuation",
+          "choice": null
+        }
+      ],
+      "idempotency_verified": true
+    },
+    {
+      "name": "Surface power and communications recovery",
+      "job_id": "04c19091-2cae-4421-b33e-b99c4cf416ea",
+      "input_sha256": "48c238f9e2d382e156a61ec10f73f794ed22e0a07ef89e29ccd72afc33b00306",
+      "mission_status": "completed",
+      "met_s": 14.0,
+      "compute_s": 0.0028795830003218725,
+      "completed_tasks": [
+        "science",
+        "transmit"
+      ],
+      "reasons": [],
+      "decision_count": 5,
+      "transitions": [
+        {
+          "phase": "surface",
+          "met_s": 0.0,
+          "fuel_kg": 100.0,
+          "energy_wh": 15.0
+        }
+      ],
+      "selected_history": [
+        {
+          "met_s": 0.0,
+          "status": "accepted",
+          "choice": "science"
+        },
+        {
+          "met_s": 3.0,
+          "status": "accepted",
+          "choice": "science"
+        },
+        {
+          "met_s": 7.0,
+          "status": "accepted",
+          "choice": "standby"
+        },
+        {
+          "met_s": 9.0,
+          "status": "accepted",
+          "choice": "standby"
+        },
+        {
+          "met_s": 11.0,
+          "status": "accepted",
+          "choice": "transmit"
+        }
+      ],
+      "idempotency_verified": true
+    },
+    {
+      "name": "Surface equipment and energy exhaustion",
+      "job_id": "f942a0ae-0ae5-4c07-99a6-a63579b21b1c",
+      "input_sha256": "01731eab7599258aaf96cba83cef9f17724d9a6599898c3ecbfe3a336adcc755",
+      "mission_status": "no_feasible_continuation",
+      "met_s": 5.0,
+      "compute_s": 0.0013770419973297976,
+      "completed_tasks": [
+        "transmit"
+      ],
+      "reasons": [
+        "resource_depleted"
+      ],
+      "decision_count": 2,
+      "transitions": [
+        {
+          "phase": "surface",
+          "met_s": 0.0,
+          "fuel_kg": 100.0,
+          "energy_wh": 15.0
+        }
+      ],
+      "selected_history": [
+        {
+          "met_s": 0.0,
+          "status": "accepted",
+          "choice": "science"
+        },
+        {
+          "met_s": 2.0,
+          "status": "accepted",
+          "choice": "transmit"
+        }
+      ],
+      "idempotency_verified": true
+    }
+  ],
+  "browser": {
+    "nominal": true,
+    "playback": true,
+    "truth_toggle": true,
+    "sequential_failure_history": true,
+    "cancel": true,
+    "invalid_json": true,
+    "surface_recovery": true,
+    "english_turkish": true,
+    "desktop_width_px": 1280,
+    "mobile_width_px": 390,
+    "horizontal_overflow": false,
+    "export_includes_original_inputs": true,
+    "console_errors_final_workflow": 0,
+    "existing_three_clock_deprecation": true
+  },
+  "tests": {
+    "new_backend": 57,
+    "backend_total": 2031,
+    "ingestion_total": 218,
+    "optional_quantum_total": 94,
+    "total": 2343,
+    "full_regression": "passed",
+    "backend_ingestion_ruff": "passed",
+    "frontend_clean_install": "passed; npm reported 0 vulnerabilities",
+    "frontend_typecheck": "passed",
+    "frontend_production_build": "passed",
+    "compose_configuration": "passed",
+    "frozen_tests_unchanged": true,
+    "user_H6_notebook_unchanged": true,
+    "C1_C2_evidence_unchanged": true
+  },
+  "frozen_test_commits": [
+    "83468d9",
+    "90d3e06",
+    "eda5afe",
+    "b2a005a",
+    "c040cf8"
+  ],
+  "warnings": [
+    "Existing Starlette/AnyIO deprecation",
+    "Existing optional Qiskit deprecations",
+    "Existing Vite large-chunk warning",
+    "Existing Three.Clock browser deprecation"
+  ]
+}

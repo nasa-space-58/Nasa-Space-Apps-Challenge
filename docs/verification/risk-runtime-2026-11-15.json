@@ -1,0 +1,682 @@
+{
+  "http_verification": {
+    "complete": true,
+    "endpoint": "POST /descents/risk",
+    "mode": "real_local_HTTP_synthetic_verified_DEM",
+    "rows": [
+      {
+        "seed": 831,
+        "runs": 24,
+        "cache_enabled": false,
+        "cold": {
+          "elapsed_s": 2.179821625999466,
+          "result_id": "d1c68e80f297d2ad352c05f50498f97db352f5390bf55625648b77e127b41025",
+          "diagnostics": {
+            "pending": 0,
+            "closed": false,
+            "owner_pid": 743,
+            "cache": {
+              "nominal": {
+                "hits": 0,
+                "misses": 1,
+                "compute_s": 0.9334192500027712,
+                "overhead_s": 3.108300006715581e-05
+              },
+              "dynamics": {
+                "hits": 0,
+                "misses": 24,
+                "compute_s": 1.2165105400272296,
+                "overhead_s": 0.0005531289934879169
+              },
+              "entries": 0,
+              "retained_bytes": 0,
+              "max_bytes": 33554432,
+              "max_entries": 128,
+              "revision": "r6-runtime-v1",
+              "bypassed_oversize": 0,
+              "bypassed_capacity": 0,
+              "enabled": false
+            }
+          }
+        },
+        "warm": {
+          "elapsed_s": 2.1725450419980916,
+          "result_id": "d1c68e80f297d2ad352c05f50498f97db352f5390bf55625648b77e127b41025",
+          "diagnostics": {
+            "pending": 0,
+            "closed": false,
+            "owner_pid": 743,
+            "cache": {
+              "nominal": {
+                "hits": 0,
+                "misses": 2,
+                "compute_s": 1.8330739580051159,
+                "overhead_s": 5.112499638926238e-05
+              },
+              "dynamics": {
+                "hits": 0,
+                "misses": 48,
+                "compute_s": 2.469920705014374,
+                "overhead_s": 0.001195754019136075
+              },
+              "entries": 0,
+              "retained_bytes": 0,
+              "max_bytes": 33554432,
+              "max_entries": 128,
+              "revision": "r6-runtime-v1",
+              "bypassed_oversize": 0,
+              "bypassed_capacity": 0,
+              "enabled": false
+            }
+          }
+        },
+        "outcomes_identical": true,
+        "server_exit_code": -15,
+        "after_shutdown": {
+          "pending": 0,
+          "closed": true,
+          "owner_pid": 743,
+          "cache": {
+            "nominal": {
+              "hits": 0,
+              "misses": 2,
+              "compute_s": 1.8330739580051159,
+              "overhead_s": 5.112499638926238e-05
+            },
+            "dynamics": {
+              "hits": 0,
+              "misses": 48,
+              "compute_s": 2.469920705014374,
+              "overhead_s": 0.001195754019136075
+            },
+            "entries": 0,
+            "retained_bytes": 0,
+            "max_bytes": 33554432,
+            "max_entries": 128,
+            "revision": "r6-runtime-v1",
+            "bypassed_oversize": 0,
+            "bypassed_capacity": 0,
+            "enabled": false
+          }
+        }
+      },
+      {
+        "seed": 831,
+        "runs": 24,
+        "cache_enabled": true,
+        "cold": {
+          "elapsed_s": 2.1433146679992205,
+          "result_id": "d1c68e80f297d2ad352c05f50498f97db352f5390bf55625648b77e127b41025",
+          "diagnostics": {
+            "pending": 0,
+            "closed": false,
+            "owner_pid": 765,
+            "cache": {
+              "nominal": {
+                "hits": 0,
+                "misses": 1,
+                "compute_s": 0.866669124996406,
+                "overhead_s": 0.0012766670042765327
+              },
+              "dynamics": {
+                "hits": 0,
+                "misses": 24,
+                "compute_s": 1.138651124034368,
+                "overhead_s": 0.09841687493462814
+              },
+              "entries": 25,
+              "retained_bytes": 10674745,
+              "max_bytes": 33554432,
+              "max_entries": 128,
+              "revision": "r6-runtime-v1",
+              "bypassed_oversize": 0,
+              "bypassed_capacity": 0,
+              "enabled": true
+            }
+          }
+        },
+        "warm": {
+          "elapsed_s": 0.0718628339964198,
+          "result_id": "d1c68e80f297d2ad352c05f50498f97db352f5390bf55625648b77e127b41025",
+          "diagnostics": {
+            "pending": 0,
+            "closed": false,
+            "owner_pid": 765,
+            "cache": {
+              "nominal": {
+                "hits": 1,
+                "misses": 1,
+                "compute_s": 0.866669124996406,
+                "overhead_s": 0.0020409170028869994
+              },
+              "dynamics": {
+                "hits": 24,
+                "misses": 24,
+                "compute_s": 1.138651124034368,
+                "overhead_s": 0.15407920692086918
+              },
+              "entries": 25,
+              "retained_bytes": 10674745,
+              "max_bytes": 33554432,
+              "max_entries": 128,
+              "revision": "r6-runtime-v1",
+              "bypassed_oversize": 0,
+              "bypassed_capacity": 0,
+              "enabled": true
+            }
+          }
+        },
+        "outcomes_identical": true,
+        "disconnect_release_s": 0.1688429579953663,
+        "server_exit_code": -15,
+        "after_shutdown": {
+          "pending": 0,
+          "closed": true,
+          "owner_pid": 765,
+          "cache": {
+            "nominal": {
+              "hits": 2,
+              "misses": 1,
+              "compute_s": 0.866669124996406,
+              "overhead_s": 0.0027548329962883145
+            },
+            "dynamics": {
+              "hits": 24,
+              "misses": 26,
+              "compute_s": 1.236239165038569,
+              "overhead_s": 0.16239637391845463
+            },
+            "entries": 0,
+            "retained_bytes": 0,
+            "max_bytes": 33554432,
+            "max_entries": 128,
+            "revision": "r6-runtime-v1",
+            "bypassed_oversize": 0,
+            "bypassed_capacity": 0,
+            "enabled": true
+          }
+        }
+      },
+      {
+        "seed": 832,
+        "runs": 24,
+        "cache_enabled": false,
+        "cold": {
+          "elapsed_s": 1.913623667001957,
+          "result_id": "abf4f9bcb5bd894c7603cd55a99d30bda6490de282f13adb210ca9d153ec288c",
+          "diagnostics": {
+            "pending": 0,
+            "closed": false,
+            "owner_pid": 787,
+            "cache": {
+              "nominal": {
+                "hits": 0,
+                "misses": 1,
+                "compute_s": 0.7869185009985813,
+                "overhead_s": 2.6041001547127962e-05
+              },
+              "dynamics": {
+                "hits": 0,
+                "misses": 24,
+                "compute_s": 1.0982027520076372,
+                "overhead_s": 0.0004890799827990122
+              },
+              "entries": 0,
+              "retained_bytes": 0,
+              "max_bytes": 33554432,
+              "max_entries": 128,
+              "revision": "r6-runtime-v1",
+              "bypassed_oversize": 0,
+              "bypassed_capacity": 0,
+              "enabled": false
+            }
+          }
+        },
+        "warm": {
+          "elapsed_s": 1.927537333998771,
+          "result_id": "abf4f9bcb5bd894c7603cd55a99d30bda6490de282f13adb210ca9d153ec288c",
+          "diagnostics": {
+            "pending": 0,
+            "closed": false,
+            "owner_pid": 787,
+            "cache": {
+              "nominal": {
+                "hits": 0,
+                "misses": 2,
+                "compute_s": 1.6057796259992756,
+                "overhead_s": 4.441600322024897e-05
+              },
+              "dynamics": {
+                "hits": 0,
+                "misses": 48,
+                "compute_s": 2.1902642939894577,
+                "overhead_s": 0.0009824950029724278
+              },
+              "entries": 0,
+              "retained_bytes": 0,
+              "max_bytes": 33554432,
+              "max_entries": 128,
+              "revision": "r6-runtime-v1",
+              "bypassed_oversize": 0,
+              "bypassed_capacity": 0,
+              "enabled": false
+            }
+          }
+        },
+        "outcomes_identical": true,
+        "server_exit_code": -15,
+        "after_shutdown": {
+          "pending": 0,
+          "closed": true,
+          "owner_pid": 787,
+          "cache": {
+            "nominal": {
+              "hits": 0,
+              "misses": 2,
+              "compute_s": 1.6057796259992756,
+              "overhead_s": 4.441600322024897e-05
+            },
+            "dynamics": {
+              "hits": 0,
+              "misses": 48,
+              "compute_s": 2.1902642939894577,
+              "overhead_s": 0.0009824950029724278
+            },
+            "entries": 0,
+            "retained_bytes": 0,
+            "max_bytes": 33554432,
+            "max_entries": 128,
+            "revision": "r6-runtime-v1",
+            "bypassed_oversize": 0,
+            "bypassed_capacity": 0,
+            "enabled": false
+          }
+        }
+      },
+      {
+        "seed": 832,
+        "runs": 24,
+        "cache_enabled": true,
+        "cold": {
+          "elapsed_s": 2.1458072509994963,
+          "result_id": "abf4f9bcb5bd894c7603cd55a99d30bda6490de282f13adb210ca9d153ec288c",
+          "diagnostics": {
+            "pending": 0,
+            "closed": false,
+            "owner_pid": 809,
+            "cache": {
+              "nominal": {
+                "hits": 0,
+                "misses": 1,
+                "compute_s": 0.83580074999918,
+                "overhead_s": 0.0014110830015852116
+              },
+              "dynamics": {
+                "hits": 0,
+                "misses": 24,
+                "compute_s": 1.1830854570289375,
+                "overhead_s": 0.09890925097715808
+              },
+              "entries": 25,
+              "retained_bytes": 10675679,
+              "max_bytes": 33554432,
+              "max_entries": 128,
+              "revision": "r6-runtime-v1",
+              "bypassed_oversize": 0,
+              "bypassed_capacity": 0,
+              "enabled": true
+            }
+          }
+        },
+        "warm": {
+          "elapsed_s": 0.07670995800435776,
+          "result_id": "abf4f9bcb5bd894c7603cd55a99d30bda6490de282f13adb210ca9d153ec288c",
+          "diagnostics": {
+            "pending": 0,
+            "closed": false,
+            "owner_pid": 809,
+            "cache": {
+              "nominal": {
+                "hits": 1,
+                "misses": 1,
+                "compute_s": 0.83580074999918,
+                "overhead_s": 0.002249582998047117
+              },
+              "dynamics": {
+                "hits": 24,
+                "misses": 24,
+                "compute_s": 1.1830854570289375,
+                "overhead_s": 0.15928983495541615
+              },
+              "entries": 25,
+              "retained_bytes": 10675679,
+              "max_bytes": 33554432,
+              "max_entries": 128,
+              "revision": "r6-runtime-v1",
+              "bypassed_oversize": 0,
+              "bypassed_capacity": 0,
+              "enabled": true
+            }
+          }
+        },
+        "outcomes_identical": true,
+        "disconnect_release_s": 0.11293083299824502,
+        "server_exit_code": -15,
+        "after_shutdown": {
+          "pending": 0,
+          "closed": true,
+          "owner_pid": 809,
+          "cache": {
+            "nominal": {
+              "hits": 2,
+              "misses": 1,
+              "compute_s": 0.83580074999918,
+              "overhead_s": 0.003011458000401035
+            },
+            "dynamics": {
+              "hits": 24,
+              "misses": 26,
+              "compute_s": 1.2758169160370016,
+              "overhead_s": 0.16741758394346107
+            },
+            "entries": 0,
+            "retained_bytes": 0,
+            "max_bytes": 33554432,
+            "max_entries": 128,
+            "revision": "r6-runtime-v1",
+            "bypassed_oversize": 0,
+            "bypassed_capacity": 0,
+            "enabled": true
+          }
+        }
+      },
+      {
+        "seed": 833,
+        "runs": 200,
+        "cache_enabled": false,
+        "cold": {
+          "elapsed_s": 10.50719188000221,
+          "result_id": "0a505f5606b81c3a34e70b6d8b4db080d0283dd7e0f5e535ee46e2e78803650d",
+          "diagnostics": {
+            "pending": 0,
+            "closed": false,
+            "owner_pid": 831,
+            "cache": {
+              "nominal": {
+                "hits": 0,
+                "misses": 1,
+                "compute_s": 0.8022734999976819,
+                "overhead_s": 3.370900230947882e-05
+              },
+              "dynamics": {
+                "hits": 0,
+                "misses": 200,
+                "compute_s": 9.629141077974054,
+                "overhead_s": 0.005171962970052846
+              },
+              "entries": 0,
+              "retained_bytes": 0,
+              "max_bytes": 33554432,
+              "max_entries": 128,
+              "revision": "r6-runtime-v1",
+              "bypassed_oversize": 0,
+              "bypassed_capacity": 0,
+              "enabled": false
+            }
+          }
+        },
+        "warm": {
+          "elapsed_s": 10.564523380002356,
+          "result_id": "0a505f5606b81c3a34e70b6d8b4db080d0283dd7e0f5e535ee46e2e78803650d",
+          "diagnostics": {
+            "pending": 0,
+            "closed": false,
+            "owner_pid": 831,
+            "cache": {
+              "nominal": {
+                "hits": 0,
+                "misses": 2,
+                "compute_s": 1.6297883759980323,
+                "overhead_s": 6.520799797726795e-05
+              },
+              "dynamics": {
+                "hits": 0,
+                "misses": 400,
+                "compute_s": 19.29969288303255,
+                "overhead_s": 0.009521188905637246
+              },
+              "entries": 0,
+              "retained_bytes": 0,
+              "max_bytes": 33554432,
+              "max_entries": 128,
+              "revision": "r6-runtime-v1",
+              "bypassed_oversize": 0,
+              "bypassed_capacity": 0,
+              "enabled": false
+            }
+          }
+        },
+        "outcomes_identical": true,
+        "server_exit_code": -15,
+        "after_shutdown": {
+          "pending": 0,
+          "closed": true,
+          "owner_pid": 831,
+          "cache": {
+            "nominal": {
+              "hits": 0,
+              "misses": 2,
+              "compute_s": 1.6297883759980323,
+              "overhead_s": 6.520799797726795e-05
+            },
+            "dynamics": {
+              "hits": 0,
+              "misses": 400,
+              "compute_s": 19.29969288303255,
+              "overhead_s": 0.009521188905637246
+            },
+            "entries": 0,
+            "retained_bytes": 0,
+            "max_bytes": 33554432,
+            "max_entries": 128,
+            "revision": "r6-runtime-v1",
+            "bypassed_oversize": 0,
+            "bypassed_capacity": 0,
+            "enabled": false
+          }
+        }
+      },
+      {
+        "seed": 833,
+        "runs": 200,
+        "cache_enabled": true,
+        "cold": {
+          "elapsed_s": 14.999541340002907,
+          "result_id": "0a505f5606b81c3a34e70b6d8b4db080d0283dd7e0f5e535ee46e2e78803650d",
+          "diagnostics": {
+            "pending": 0,
+            "closed": false,
+            "owner_pid": 853,
+            "cache": {
+              "nominal": {
+                "hits": 0,
+                "misses": 1,
+                "compute_s": 0.8397643339994829,
+                "overhead_s": 0.0012504580008680932
+              },
+              "dynamics": {
+                "hits": 0,
+                "misses": 200,
+                "compute_s": 13.099514922025264,
+                "overhead_s": 0.974054510013957
+              },
+              "entries": 77,
+              "retained_bytes": 33519763,
+              "max_bytes": 33554432,
+              "max_entries": 128,
+              "revision": "r6-runtime-v1",
+              "bypassed_oversize": 0,
+              "bypassed_capacity": 124,
+              "enabled": true
+            }
+          }
+        },
+        "warm": {
+          "elapsed_s": 7.066171086000395,
+          "result_id": "0a505f5606b81c3a34e70b6d8b4db080d0283dd7e0f5e535ee46e2e78803650d",
+          "diagnostics": {
+            "pending": 0,
+            "closed": false,
+            "owner_pid": 853,
+            "cache": {
+              "nominal": {
+                "hits": 1,
+                "misses": 1,
+                "compute_s": 0.8397643339994829,
+                "overhead_s": 0.0022982080045039766
+              },
+              "dynamics": {
+                "hits": 76,
+                "misses": 324,
+                "compute_s": 19.376142725057434,
+                "overhead_s": 1.7064400469389511
+              },
+              "entries": 77,
+              "retained_bytes": 33519763,
+              "max_bytes": 33554432,
+              "max_entries": 128,
+              "revision": "r6-runtime-v1",
+              "bypassed_oversize": 0,
+              "bypassed_capacity": 248,
+              "enabled": true
+            }
+          }
+        },
+        "outcomes_identical": true,
+        "disconnect_release_s": 0.1943265829977463,
+        "server_exit_code": -15,
+        "after_shutdown": {
+          "pending": 0,
+          "closed": true,
+          "owner_pid": 853,
+          "cache": {
+            "nominal": {
+              "hits": 2,
+              "misses": 1,
+              "compute_s": 0.8397643339994829,
+              "overhead_s": 0.0030929580025258474
+            },
+            "dynamics": {
+              "hits": 76,
+              "misses": 326,
+              "compute_s": 19.49571522505721,
+              "overhead_s": 1.714795213942125
+            },
+            "entries": 0,
+            "retained_bytes": 0,
+            "max_bytes": 33554432,
+            "max_entries": 128,
+            "revision": "r6-runtime-v1",
+            "bypassed_oversize": 0,
+            "bypassed_capacity": 248,
+            "enabled": true
+          }
+        }
+      }
+    ],
+    "source_sha256": {
+      "backend/app/risk.py": "8155b8afc54a430b8baa22c3af79d4fc79deab283655bc3bbc200c7e3e8f6545",
+      "backend/app/risk_runtime.py": "9e307dc8edd53317b220f8ef0242f4be59d919308d1adbdc1529d6c29d7bf6d0",
+      "backend/app/analysis_api.py": "1f015280e480ff4da42f63db9b21baf54f79e422e56db612266f307daa650867",
+      "backend/app/verify_risk_runtime.py": "f955c6bf098398ce933daef6ec1a071c01ebc17be6c342f585adb8342cf38178"
+    },
+    "hardware_jobs": 0,
+    "spark_spent": 0,
+    "quantum_advantage": false
+  },
+  "surrogate_readiness": {
+    "independent_scenario_groups": 4,
+    "scenario_groups": [
+      811,
+      812,
+      813,
+      814
+    ],
+    "unique_candidate_records": 32,
+    "repeated_record_occurrences": 288,
+    "finite_pair_spaces": {
+      "811": {
+        "candidate_counts": [
+          4,
+          4
+        ],
+        "full_pair_count": 16
+      },
+      "812": {
+        "candidate_counts": [
+          4,
+          4
+        ],
+        "full_pair_count": 16
+      },
+      "813": {
+        "candidate_counts": [
+          4,
+          4
+        ],
+        "full_pair_count": 16
+      },
+      "814": {
+        "candidate_counts": [
+          4,
+          4
+        ],
+        "full_pair_count": 16
+      }
+    },
+    "blind_holdout_groups": 0,
+    "fit_performed": false,
+    "physics_calls": 0,
+    "circuit_evaluations": 0,
+    "quantum_experiment_justified": false,
+    "decision": "stop_before_surrogate_training_or_quantum_submission",
+    "missing": [
+      "untouched group holdout",
+      "validated input-only surrogate",
+      "evidence of selection benefit over full cheap classical enumeration"
+    ],
+    "scope": "Readiness audit of exposed synthetic C2 data, not a new performance benchmark"
+  },
+  "new_hardware_jobs": 0,
+  "spark_spent": 0,
+  "quantum_advantage": false,
+  "hardware_observation": {
+    "job_id": "dd340d59-3d25-43e0-8268-df5607b84e3a",
+    "status": "Canceled",
+    "backend_code": "rigetti:cepheus-1-108q",
+    "problem_fingerprint": "9ea6a5890b3050cbffff358cdd080fb06f3132a6cd0a0a5c4bd64471d696f77d",
+    "circuit_sha256": "e65e8e13dbc4c2ea3d90e4cf90ebac48ec4b6f282606b463a39c805a2fd8e7e0",
+    "shots": 256,
+    "quoted_credits": 1.0,
+    "submitted_utc": "2026-11-15T01:33:44.079602+00:00",
+    "observed_utc": "2026-11-15T03:18:26.485162+00:00",
+    "spark_credits": 22.0,
+    "full_credits": 0.0,
+    "new_jobs": 0,
+    "new_credits_spent": 0
+  },
+  "verification": {
+    "backend_tests": 1974,
+    "ingestion_tests": 218,
+    "optional_quantum_tests": 94,
+    "total_tests": 2286,
+    "new_frozen_tests": 34,
+    "backend_and_ingestion_ruff": "passed",
+    "frontend_clean_install_and_build": "passed",
+    "compose_config": "passed",
+    "unchanged_science_evidence": "C1 and C2",
+    "shared_services_restarted": false,
+    "merge": false,
+    "production_deployment": false
+  }
+}
