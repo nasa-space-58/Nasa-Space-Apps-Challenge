@@ -1832,5 +1832,43 @@
     "sourcesToggle": "Sources ({count})",
     "kindDoc": "Doc",
     "kindApi": "Result"
+  },
+  "siteNames": {
+    "mons-mouton-feature-center": {
+      "name": "Mons Mouton — feature center",
+      "short": "MOUTON"
+    },
+    "peak-near-cabeus-b": {
+      "name": "Peak near Cabeus B — LROC mosaic center",
+      "short": "CABEUS B"
+    },
+    "haworth": {
+      "name": "Haworth — NASA region center",
+      "short": "HAWORTH"
+    },
+    "mons-mouton-plateau": {
+      "name": "Mons Mouton Plateau — LROC mosaic center",
+      "short": "PLATEAU"
+    },
+    "nobile-rim-1-r06": {
+      "name": "Nobile Rim 1 — R06",
+      "short": "NOBILE 1"
+    },
+    "nobile-rim-2-dm2": {
+      "name": "Nobile Rim 2 — DM2",
+      "short": "NOBILE 2"
+    },
+    "de-gerlache-rim-2-sl2": {
+      "name": "de Gerlache Rim 2 — SL2",
+      "short": "DE GERLACHE 2"
+    },
+    "slater-plain-crater-anchor": {
+      "name": "Slater Plain — Slater crater anchor (not region center)",
+      "short": "SLATER"
+    },
+    "malapert-massif-r23": {
+      "name": "Malapert Massif — R23",
+      "short": "R23"
+    }
   }
 }

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { MissionCandidate } from "../missionCandidates";
 import type { Preset } from "../types";
-import { errorText, useTranslate, type Translate } from "../i18n";
+import { errorText, siteLabel, useTranslate, type Translate } from "../i18n";
 
 // R3 (S8/S9): renders backend rankings; scores and rescoring come from the API.
 // "fuel" is the opt-in R5 descent criterion; it appears only when the API returns it.
@@ -325,8 +325,8 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
 
   const names: Record<string, string> = {};
   for (const c of rec?.candidates ?? []) {
-    names[c.candidate_id] =
-      sites.find((s) => s.site_id === c.site.site_id)?.display_name ?? c.site.site_id;
+    const preset = sites.find((s) => s.site_id === c.site.site_id);
+    names[c.candidate_id] = preset ? siteLabel(t, preset) : c.site.site_id;
   }
   const running = rec ? ACTIVE.includes(rec.status) : false;
   const finished = rec && ["ready", "partial"].includes(rec.status) && rec.ranking;
@@ -371,7 +371,7 @@ export default function Recommendations({ sites, onCandidates }: { sites: Preset
                     )
                   }
                 />
-                {s.display_name}
+                {siteLabel(t, s)}
               </label>
             ))}
             {custom.map((c, i) => (

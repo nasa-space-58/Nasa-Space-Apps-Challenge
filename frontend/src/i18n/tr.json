@@ -1832,5 +1832,43 @@
     "sourcesToggle": "Kaynaklar ({count})",
     "kindDoc": "Doküman",
     "kindApi": "Sonuç"
+  },
+  "siteNames": {
+    "mons-mouton-feature-center": {
+      "name": "Mons Mouton — oluşum merkezi",
+      "short": "MOUTON"
+    },
+    "peak-near-cabeus-b": {
+      "name": "Cabeus B yakınındaki tepe — LROC mozaik merkezi",
+      "short": "CABEUS B"
+    },
+    "haworth": {
+      "name": "Haworth — NASA bölge merkezi",
+      "short": "HAWORTH"
+    },
+    "mons-mouton-plateau": {
+      "name": "Mons Mouton Platosu — LROC mozaik merkezi",
+      "short": "PLATO"
+    },
+    "nobile-rim-1-r06": {
+      "name": "Nobile Kenarı 1 — R06",
+      "short": "NOBILE 1"
+    },
+    "nobile-rim-2-dm2": {
+      "name": "Nobile Kenarı 2 — DM2",
+      "short": "NOBILE 2"
+    },
+    "de-gerlache-rim-2-sl2": {
+      "name": "de Gerlache Kenarı 2 — SL2",
+      "short": "DE GERLACHE 2"
+    },
+    "slater-plain-crater-anchor": {
+      "name": "Slater Düzlüğü — Slater krateri referansı (bölge merkezi değil)",
+      "short": "SLATER"
+    },
+    "malapert-massif-r23": {
+      "name": "Malapert Masifi — R23",
+      "short": "R23"
+    }
   }
 }

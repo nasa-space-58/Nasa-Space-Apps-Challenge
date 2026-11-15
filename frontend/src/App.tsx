@@ -29,7 +29,7 @@ import MissionPlanner from "./components/MissionPlanner";
 import SelfHealing from "./components/SelfHealing";
 import AssistantPanel from "./components/AssistantPanel";
 import type { Job, Preset, Result, Setting, Interval } from "./types";
-import { LanguageToggle, useTranslate, type Translate } from "./i18n";
+import { LanguageToggle, siteLabel, useTranslate, type Translate } from "./i18n";
 
 const MoonScene = lazy(() => import("./components/MoonScene"));
 const activeStates = ["pending", "preparing", "analyzing", "refining"];
@@ -1293,7 +1293,7 @@ export default function App() {
                   {sites.length ? (
                     sites.map((site) => (
                       <option key={site.site_id} value={site.site_id}>
-                        {site.display_name}
+                        {siteLabel(t, site)}
                       </option>
                     ))
                   ) : (
@@ -1523,7 +1523,7 @@ export default function App() {
                     target="_blank"
                     rel="noreferrer"
                   >
-                    {t("app.sources.coordinate", { name: site.display_name })}
+                    {t("app.sources.coordinate", { name: siteLabel(t, site) })}
                   </a>
                 </li>
               ))}

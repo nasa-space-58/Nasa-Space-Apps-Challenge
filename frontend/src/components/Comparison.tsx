@@ -2,7 +2,7 @@ import ExportPanel from "./ExportPanel";
 import { useEffect, useState } from "react";
 import HorizonPlot from "./HorizonPlot";
 import type { Result, Preset, Frame } from "../types";
-import { errorText, useTranslate, type Translate } from "../i18n";
+import { errorText, siteLabel, useTranslate, type Translate } from "../i18n";
 
 type Submission = {
   site_id: string;
@@ -522,7 +522,7 @@ export default function Comparison({
                           )}
                         {sites.map((site) => (
                           <option key={site.site_id} value={site.site_id}>
-                            {site.display_name}
+                            {siteLabel(t, site)}
                           </option>
                         ))}
                       </select>
