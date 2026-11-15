@@ -67,14 +67,15 @@ Restart the backend container after changing these values.
 
 ## Interface
 
-A "Mission Control · Ask the Navigator" launcher sits in the lower right corner of every page (`frontend/src/components/AssistantPanel.tsx`). It opens a console drawer that:
+An "Ask the Navigator" button sits in the lower right corner of every page (`frontend/src/components/AssistantPanel.tsx`). It opens a plain, rounded chat drawer that:
 
-- shows the link status (model and indexed documentation sections, or why the assistant is offline),
+- shows a one-line status (online with documentation only or with N linked results, or offline),
 - links the open analysis (and the comparison base, when one is open) and the last recommendation, so questions about "this site" use those results,
 - offers context-aware starter questions, keeps the conversation and sends completed turns as `history`,
-- lists each answer's sources as `DOC`/`API` chips and the tokens it used.
+- renders a safe Markdown subset (bold, code, headings, lists) without injecting HTML,
+- keeps sources behind a "Sources (N)" toggle under each answer. The toggle lists document and result sources and the tokens used.
 
-Strings are in English and Turkish (`assistant.*` in `frontend/src/i18n`). Esc or the scrim closes the drawer. The panel holds no analysis logic. Per the team rule, it was verified with `npm run build` only.
+Strings are in English and Turkish (`assistant.*` in `frontend/src/i18n`). Esc closes the drawer. The panel holds no analysis logic. Per the team rule, it was verified with `npm run build` only.
 
 ## Next steps
 

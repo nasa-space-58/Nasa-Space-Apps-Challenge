@@ -1855,31 +1855,22 @@
     "quantumCompleted": "Kuantum önerisi + klasik tamamlama"
   },
   "assistant": {
-    "launcherEyebrow": "GÖREV KONTROL",
     "launcher": "Navigatöre Sor",
-    "eyebrow": "GÖREV KONTROL · SORU-CEVAP",
-    "title": "Navigatöre Sor",
+    "title": "Navigatör asistanı",
     "close": "Asistanı kapat",
     "connecting": "Bağlantı kuruluyor…",
-    "online": "BAĞLANTI AKTİF · {model} · {sections} doküman bölümü",
-    "offline": "BAĞLANTI KAPALI",
+    "offline": "Çevrimdışı",
     "statusFailed": "Asistan servisine ulaşılamadı.",
-    "contextLabel": "Bağlı",
-    "noContext": "Henüz kayıtlı analiz yok: sorular yalnızca dokümantasyonla yanıtlanır.",
-    "offlineTitle": "ASİSTAN KAPALI",
+    "offlineTitle": "Asistan kapalı",
     "offlineBody": "Soru-cevap asistanı isteğe bağlıdır ve bu sunucuda şu an kapalı. Tüm analizler onsuz da çalışır.",
-    "intro": "İniş bölgen, tarih karşılaştırman ya da navigatörün nasıl çalıştığı hakkında soru sor. Cevaplar yalnızca hesaplanmış sonuçlara ve proje dokümantasyonuna dayanır, kaynaklarıyla birlikte gelir.",
-    "you": "SEN",
-    "navigator": "NAVİGATÖR",
-    "signalLost": "SİNYAL KAYBI",
-    "sources": "Kaynaklar",
+    "intro": "İniş bölgen, tarih karşılaştırman ya da navigatörün nasıl çalıştığı hakkında soru sor. Cevaplar hesaplanmış sonuçlara ve proje dokümantasyonuna dayanır.",
     "tokens": "{count} token",
-    "thinking": "Görev verileri sorgulanıyor…",
-    "placeholder": "Güneş ışığı, Dünya görünürlüğü, bölgeler hakkında sor…",
+    "thinking": "Görev verilerine bakılıyor…",
+    "placeholder": "Navigatöre sor",
     "placeholderOff": "Asistan kullanılamıyor",
-    "send": "GÖNDER",
+    "send": "Gönder",
     "askFailed": "Asistan cevap veremedi. Lütfen tekrar dene.",
-    "disclaimer": "Yapay zekâ cevapları hatalı olabilir. Sayılar backend'in hesapladığı sonuçlardan gelir. Bu bir karar desteğidir, uçuş sertifikası değildir.",
+    "disclaimer": "Asistan hata yapabilir. Sayılar hesaplanmış sonuçlardan gelir; bu bir uçuş sertifikası değildir.",
     "suggest": {
       "explainSite": "Bu bölgenin güneş ışığı ve Dünya görünürlüğünü sade bir dille anlat.",
       "compare": "İki senaryom nasıl farklı, enerji için hangisi daha iyi?",
@@ -1888,6 +1879,50 @@
       "horizon": "Arazi ufku nasıl hesaplanıyor?",
       "sites": "Hangi iniş bölgelerini analiz edebilirim?",
       "data": "Navigatör hangi NASA veri kaynaklarını kullanıyor?"
+    },
+    "greeting": "Merhaba, ne öğrenmek istersin?",
+    "onlineDocs": "Çevrimiçi · dokümantasyon",
+    "onlineLinked": "Çevrimiçi · {count} bağlı sonuç",
+    "sourcesToggle": "Kaynaklar ({count})",
+    "kindDoc": "Doküman",
+    "kindApi": "Sonuç"
+  },
+  "siteNames": {
+    "mons-mouton-feature-center": {
+      "name": "Mons Mouton — oluşum merkezi",
+      "short": "MOUTON"
+    },
+    "peak-near-cabeus-b": {
+      "name": "Cabeus B yakınındaki tepe — LROC mozaik merkezi",
+      "short": "CABEUS B"
+    },
+    "haworth": {
+      "name": "Haworth — NASA bölge merkezi",
+      "short": "HAWORTH"
+    },
+    "mons-mouton-plateau": {
+      "name": "Mons Mouton Platosu — LROC mozaik merkezi",
+      "short": "PLATO"
+    },
+    "nobile-rim-1-r06": {
+      "name": "Nobile Kenarı 1 — R06",
+      "short": "NOBILE 1"
+    },
+    "nobile-rim-2-dm2": {
+      "name": "Nobile Kenarı 2 — DM2",
+      "short": "NOBILE 2"
+    },
+    "de-gerlache-rim-2-sl2": {
+      "name": "de Gerlache Kenarı 2 — SL2",
+      "short": "DE GERLACHE 2"
+    },
+    "slater-plain-crater-anchor": {
+      "name": "Slater Düzlüğü — Slater krateri referansı (bölge merkezi değil)",
+      "short": "SLATER"
+    },
+    "malapert-massif-r23": {
+      "name": "Malapert Masifi — R23",
+      "short": "R23"
     }
   },
   "workspace": {

@@ -144,3 +144,15 @@ export function LanguageToggle() {
 export function errorText(error: unknown, t: Translate, fallbackKey: string) {
   return error instanceof Error && error.message ? error.message : t(fallbackKey);
 }
+
+/** Localized preset label; falls back to the backend display name for unknown sites. */
+export function siteLabel(
+  t: Translate,
+  site: { site_id: string; display_name: string },
+  part: "name" | "short" = "name",
+) {
+  const key = `siteNames.${site.site_id}.${part}`;
+  const text = t(key);
+  if (text !== key) return text;
+  return part === "short" ? site.site_id.toUpperCase() : site.display_name;
+}

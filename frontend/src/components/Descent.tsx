@@ -8,7 +8,7 @@ import BackupPlans from "./BackupPlans";
 import SurfaceRoutes from "./SurfaceRoutes";
 import TerrainRecoveryPanel from "./TerrainRecoveryPanel";
 import TwinPanel from "./TwinPanel";
-import { errorText, useTranslate } from "../i18n";
+import { errorText, siteLabel, useTranslate } from "../i18n";
 
 // R4 (S6): renders backend descent plans; all physics runs in the API.
 type Sample = {
@@ -413,7 +413,7 @@ export default function Descent({ sites, onCandidates, onLocation }: { sites: Pr
                 <option value="custom">{t("app.form.custom")}</option>
                 {sites.map((s) => (
                   <option key={s.site_id} value={s.site_id}>
-                    {s.display_name}
+                    {siteLabel(t, s)}
                   </option>
                 ))}
               </select>

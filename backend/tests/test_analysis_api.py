@@ -48,7 +48,12 @@ def test_presets_have_sources_and_same_coordinate_convention(client):
     response = client.get("/presets")
     assert response.status_code == 200
     sites = response.json()["sites"]
-    assert len(sites) == 2
+    # The catalog grew from the two Step 0 observers to all NASA Artemis III
+    # candidate regions; the original two must remain available.
+    assert len(sites) >= 2
+    assert {"mons-mouton-feature-center", "malapert-massif-r23"} <= {
+        s["site_id"] for s in sites
+    }
     assert all(
         s["runtime_preset_enabled"]
         and s["coordinate_source_url"].startswith("https://")
