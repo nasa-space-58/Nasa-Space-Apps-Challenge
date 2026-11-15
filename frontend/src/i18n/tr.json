@@ -481,7 +481,16 @@
       "craftMoon": "Araç–Ay (temsili rota)",
       "loading": "Gerçek Ay/Güneş konumları JPL Horizons'tan alınıyor…",
       "failed": "Gerçek konumlar alınamadı; sabit temsili düzen gösteriliyor."
-    }
+    },
+    "steps": {
+      "plan": "Yer ve zaman",
+      "results": "Sonuçlar",
+      "compare": "Karşılaştır ve öner",
+      "descent": "İniş ve yüzey"
+    },
+    "learn": "Öğren",
+    "advanced": "Gelişmiş",
+    "advancedHint": "Uzmanlar için planlama ve araştırma araçları"
   },
   "missionPhases": {
     "launch": {

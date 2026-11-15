@@ -8,7 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import HorizonPlot from "./components/HorizonPlot";
-import MissionStage from "./components/MissionStage";
+import MissionStage, { type StageModule } from "./components/MissionStage";
 import Comparison from "./components/Comparison";
 import WindowSearch from "./components/WindowSearch";
 import DateScrubber from "./components/DateScrubber";
@@ -852,46 +852,57 @@ export default function App() {
       <ScenarioTransfer onOpen={openSearchResult} />
     </section>
   );
-  const stageModules = [
-    { id: "scaling", label: t("research.scaling"), content: <ResearchLab kind="scaling" active={view === "mission" && panel === "scaling" && pageVisible} /> },
-    { id: "relays", label: t("research.relays"), content: <ResearchLab kind="relays" active={view === "mission" && panel === "relays" && pageVisible} /> },
-    { id: "shared-antenna", label: t("sharedAntenna.tab"), content: <SharedAntenna active={view === "mission" && panel === "shared-antenna" && pageVisible} /> },
-    { id: "arena", label: t("arena.tab"), content: <SolverArena active={view === "mission" && panel === "arena" && pageVisible} /> },
-    { id: "results", label: t("app.modules.results"), content: resultsModule },
-    ...(comparisonBase
-      ? [{ id: "comparison", label: t("app.modules.compare"), content: comparisonBase ? (
-      <Comparison
-        key={comparisonBase.id}
-        aId={comparisonBase.id}
-        initialBId={sharedB}
-        initialCursor={Number(shared.current.get("cursor") || 0)}
-        a={comparisonBase.result}
-        sites={sites}
-        onClose={() => {
-          setComparisonBase(null);
-          setPanel("results");
-        }}
-      />
-    ) : null }]
-      : []),
-    {
-      id: "window-search",
-      label: t("app.modules.timeSearch"),
-      content: <WindowSearch sites={sites} onChoose={openSearchResult} />,
-    },
+  // Grouped into four numbered steps; research tools live in the Advanced menu.
+  const stageModules: StageModule[] = [
+    { id: "results", group: "results", label: t("app.modules.results"), content: resultsModule },
     {
       id: "recommendations",
+      group: "compare",
       label: t("app.modules.recommend"),
       content: <Recommendations sites={sites} />,
     },
-    { id: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} /> },
-    { id: "campaign", label: t("app.modules.campaign"), content: <MissionPlanner /> },
-    { id: "recovery", label: t("app.modules.recovery"), content: <SelfHealing /> },
+    {
+      id: "window-search",
+      group: "compare",
+      label: t("app.modules.timeSearch"),
+      content: <WindowSearch sites={sites} onChoose={openSearchResult} />,
+    },
+    ...(comparisonBase
+      ? [
+          {
+            id: "comparison",
+            group: "compare" as const,
+            label: t("app.modules.compare"),
+            content: (
+              <Comparison
+                key={comparisonBase.id}
+                aId={comparisonBase.id}
+                initialBId={sharedB}
+                initialCursor={Number(shared.current.get("cursor") || 0)}
+                a={comparisonBase.result}
+                sites={sites}
+                onClose={() => {
+                  setComparisonBase(null);
+                  setPanel("results");
+                }}
+              />
+            ),
+          },
+        ]
+      : []),
+    { id: "descent", group: "descent", label: t("app.modules.descent"), content: <Descent sites={sites} /> },
     {
       id: "classroom",
+      group: "learn",
       label: t("app.modules.classroom"),
       content: <Classroom onOpen={openSearchResult} />,
     },
+    { id: "campaign", group: "advanced", label: t("app.modules.campaign"), content: <MissionPlanner /> },
+    { id: "recovery", group: "advanced", label: t("app.modules.recovery"), content: <SelfHealing /> },
+    { id: "scaling", group: "advanced", label: t("research.scaling"), content: <ResearchLab kind="scaling" active={view === "mission" && panel === "scaling" && pageVisible} /> },
+    { id: "relays", group: "advanced", label: t("research.relays"), content: <ResearchLab kind="relays" active={view === "mission" && panel === "relays" && pageVisible} /> },
+    { id: "shared-antenna", group: "advanced", label: t("sharedAntenna.tab"), content: <SharedAntenna active={view === "mission" && panel === "shared-antenna" && pageVisible} /> },
+    { id: "arena", group: "advanced", label: t("arena.tab"), content: <SolverArena active={view === "mission" && panel === "arena" && pageVisible} /> },
   ];
 
   return (

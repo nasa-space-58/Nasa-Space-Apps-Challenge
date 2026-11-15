@@ -481,7 +481,16 @@
       "craftMoon": "Craft–Moon (illustrative path)",
       "loading": "Fetching real Moon/Sun positions from JPL Horizons…",
       "failed": "Real positions unavailable; showing the fixed illustrative layout."
-    }
+    },
+    "steps": {
+      "plan": "Place & time",
+      "results": "Results",
+      "compare": "Compare & recommend",
+      "descent": "Landing & surface"
+    },
+    "learn": "Learn",
+    "advanced": "Advanced",
+    "advancedHint": "Planning and research tools for experts"
   },
   "missionPhases": {
     "launch": {
